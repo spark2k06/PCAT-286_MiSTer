@@ -29,8 +29,11 @@ That compatibility result is a later task and is not a diagnostic-ROM gate.
   slow for that combination, so its full program run uses a documented narrow
   PIC boundary and separately tests the real KF8259 in a short dual-simulator
   case.
-- FPGA synthesis, fit, constrained timing, resources and RBF belong to I5 and
-  are reported separately from simulation.
+- I5 produces a successful Quartus compile, fit and RBF. SPK286, the bridge
+  and the complete shared 50 MHz domain close setup and hold timing. The
+  inherited video/HPS/SDIO constraints still report global setup violations,
+  so whole-project timing sign-off is explicitly not claimed; see
+  `I5_FPGA_BUILD.md`.
 - No physical MiSTer board is authorized or available in this task. I6 is
   prepared through ROM loading, port signatures and LED observation, but stays
   pending until an actual board/configuration is supplied and execution is

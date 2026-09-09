@@ -1,5 +1,12 @@
 # XTEGACTL
 
+> **PCAT-286 integration note:** the legacy speed field now selects **XT Bus
+> Pace**, not an SPK286 CPU frequency. The legacy Fake 286 FLAGS field is
+> forced off in the PCAT-286 resolver because the real SPK286 FLAGS behavior
+> replaces it; writes remain accepted only for register-map compatibility.
+> The existing **Sync Joy to CPU Speed** name and behavior are intentionally
+> retained for a later input-specific task.
+
 Per-program hardware control for the PCXT-EGA core. A DOS program writes a
 small block of I/O ports to set the machine up the way it wants before it runs,
 so a batch file can do what the user would otherwise do by hand in the OSD.

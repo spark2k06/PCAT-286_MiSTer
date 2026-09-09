@@ -65,3 +65,27 @@ python3 scripts/verify_imports.py verify
 Intentional edits to imported PCXT paths are recorded in
 `docs/imports/pcxt-modified-files.txt`. New integration paths are not PCXT
 imports and therefore do not appear in the PCXT source manifest.
+
+The PCXT README and XTEGACTL reference are adapted only to remove inherited
+MCL86/8088 claims and describe the PCAT-286 menu contract. Their originals are
+identified by the PCXT manifest and selected commit. Production RTL changes
+are kept in new `PCAT-286*`, `files_pcat286.qip`, `Chipset_SPK286.sv`,
+`Bus_Arbiter_SPK286.sv` and `rtl/spk286_integration/` paths; the corresponding
+PCXT originals remain present.
+
+## Consumer-side SPK286 timing variant
+
+The complete `vendor/spk286/` snapshot remains byte-for-byte unchanged. The
+PCAT-286 QIP substitutes
+`rtl/spk286_integration/spk286_operand_timing.sv` for the vendored
+`spk286_operand.sv`. It factors the `done` expression around the registered
+pending state, removing a false combinational dependency from an accepted
+memory response without adding a register or changing cycle behavior.
+
+`scripts/test_i5_timing_equivalence.sh` compares every output and internal
+state element of the two implementations for directed cases and 50,000
+randomized cycles in both Icarus and Verilator. This generic refactor is a
+candidate for a later SPK286 upstream change. The Quartus 17 compilation-unit
+wrapper is also potentially reusable as optional tool compatibility. The XT
+bridge, local reset release, bus pacing and machine timing constraints are
+consumer-specific and do not belong in the CPU repository.

@@ -1,6 +1,7 @@
-# [IBM PC/XT](https://en.wikipedia.org/wiki/IBM_Personal_Computer_XT) for [MiSTer FPGA](https://mister-devel.github.io/MkDocs_MiSTer/)
+# PCAT-286 for [MiSTer FPGA](https://mister-devel.github.io/MkDocs_MiSTer/)
 
-PCXT port for MiSTer by [@spark2k06](https://github.com/spark2k06/).
+An SPK286 CPU integrated with the PCXT-EGA MiSTer machine by
+[@spark2k06](https://github.com/spark2k06/).
 
 Discussion and development of the core take place in the
 [MiSTerFPGA PCXT forum section](https://misterfpga.org/viewforum.php?f=40).
@@ -9,11 +10,13 @@ Discussion and development of the core take place in the
 
 ## Description
 
-The goal of this core is to provide a reliable IBM PC/XT-compatible machine for
-MiSTer. It builds on the [MCL86 core](https://github.com/MicroCoreLabs/Projects/tree/master/MCL86)
-from [@MicroCoreLabs](https://github.com/MicroCoreLabs/) and
-[KFPC-XT](https://github.com/kitune-san/KFPC-XT) from
-[@kitune-san](https://github.com/kitune-san).
+This initial core is an XT-derived machine profile using the complete
+[SPK286](vendor/spk286/README.md) CPU, BIU and generated microcode in Real Mode.
+It retains the [KFPC-XT](https://github.com/kitune-san/KFPC-XT) chipset and the
+PCXT-EGA machine peripherals. It is deliberately not advertised as a complete
+IBM PC/AT: the AT chipset, Protected Mode and production-BIOS adaptation are
+separate future work. See [known limitations](docs/KNOWN_LIMITATIONS.md) and
+the [source provenance](docs/SOURCE_PROVENANCE.md).
 
 The video path is a full EGA implementation. Earlier releases used the
 [Graphics Gremlin](https://github.com/schlae/graphics-gremlin) CGA and Hercules
@@ -33,11 +36,13 @@ For an architectural overview and possible future improvements, see the
 
 ## Key features
 
-* Selectable 8088 or 8086 bus mode, applied safely with Reset & apply settings
-* CPU speed settings: 4.77 MHz, 7.16 MHz, 9.54 MHz and **Max**. Max is the
-  unthrottled performance profile shared by 8088 and 8086; it is neither a
-  historical CPU grade nor cycle-accurate.
-* IBM PC/XT 5160 and compatible systems
+* Complete pinned SPK286 CPU, BIU and generated microcode
+* Six-byte prefetch queue and native 24-bit CPU address generation
+* Serialized SPK286-to-XT bridge with READY, LOCK, HOLD/HLDA and dual INTA
+  handling
+* XT bus pace settings: 4.77 MHz, 7.16 MHz, 9.54 MHz and **Max**. These pace
+  the retained byte bus; they are not certified 80286 speed grades.
+* XT-derived chipset and peripheral profile
 * **EGA video**: sequencer, graphics controller, attribute controller and a four-plane VRAM, around the UM6845R CRTC
 * Dual EGA dot clock, 14.318181 MHz and 16.257 MHz, selected per mode as on real hardware
 * CGA-compatible text and graphics behaviour, provided by the EGA rather than a separate adapter
@@ -57,9 +62,9 @@ For an architectural overview and possible future improvements, see the
 
 ## Memory map
 
-The 8088 exposes a 1 MiB physical address space. The core divides it as shown
-below; the ROM rows describe the normal configuration after their images have
-been loaded.
+SPK286 generates a 24-bit physical address. The initial `XT_COMPAT` adapter
+projects memory transactions into the retained 1 MiB machine map shown below;
+the ROM rows describe the normal configuration after their images have loaded.
 
 | Address range | Size | Core assignment | DOS availability |
 | --- | ---: | --- | --- |
@@ -344,7 +349,7 @@ example, or running EGA-only software with nothing else in the picture.
 
 ## Current configuration
 
-* System/ROM set to PC/XT
+* XT-derived machine profile with SPK286 in Real Mode
 * EGA video active at boot
 * CGA-compatible text and graphics behaviour through EGA
 * Optional VGA 13h+, enabled by `VGATSR.COM`; Native/TV timing selected in the OSD
@@ -357,58 +362,35 @@ example, or running EGA-only software with nothing else in the picture.
 * Build the EGA BIOS with `SW/ROMs/EGA/make_ega_bios_rom.py` and copy the
   resulting `ega_bios.rom` to the SD card. **The core cannot show a usable
   picture without it** — see [EGA BIOS — required](#ega-bios--required).
-* Copy the contents of `games/PCXT` to your MiSTer SD card and extract `hd_image.zip`. It contains a [FreeDOS](https://www.freedos.org/) image.
-* Select the core from Computers/PCXT.
+* Copy `releases/PCAT-286_20260909.rbf` to the MiSTer SD card and select the
+  PCAT-286 core.
 * Press Win + F12 on your keyboard.
-  * Model: IBM PCXT.
-  * CPU Speed: pick a speed.
-  * System & BIOS → CPU Type: choose 8088 (compatible default) or 8086.
+  * XT Bus Pace: select the retained bus pace.
   * FDD & HDD → HDD Image: FreeDOS_HD.img
-  * System & BIOS → PCXT BIOS: choose a compatible system BIOS, such as `bios-micro8088-xtide.rom` from `SW/8088_bios/binaries/`.
+  * System & BIOS → PCAT Main/Diagnostic ROM: select
+    `tests/firmware/pcat286_event_diag.rom` for the verified diagnostic path.
   * System & BIOS → EGA BIOS: `ega_bios.rom`. **Required.**
 * Choose Reset & apply settings.
 
-The 8086 mode uses a six-byte prefetch queue and transfers aligned SDRAM words
-over its private 16-bit path. Odd words and the XT-class video and peripheral
-buses remain split into byte cycles. The fixed 4.77/7.16/9.54 MHz settings keep
-their cycle-accurate timing floor while the shared EU and selected BIU account
-for each transfer; Max bypasses the nominal timing counter and exposes the
-full bus benefit. The default 8088 keeps its four-byte queue and byte-wide
-memory transfers in every profile.
+The SPK286 side retains 16-bit requests and a six-byte prefetch queue. The
+initial bridge serializes aligned words into two independently acknowledged XT
+byte beats; odd bytes use D15:8. SPK286 currently executes on every 50 MHz
+chipset clock. Historical Accurate/Fast/Max CPU timing profiles remain deferred
+and must not be inferred from the bus-pace menu.
 
 ### The F12 keys
 
-* **Win + F12** opens the OSD. F12 on its own is the machine's, not the
-  framework's, exactly as the splash says: it pauses and shows the credits.
-  Once the OSD is open, F12 or Esc closes it again.
-* **F12 during the boot splash** does the same thing: the credits come up and
-  the machine is held, except that here it was already held and what stops is
-  the splash's own countdown. Press it again to return to the splash and let
-  it run out. That is the moment to reach the OSD with Win + F12 and pick a
-  disk image or a video mode before DOS starts. Setting **Boot Splash Screen**
-  to *No* still dismisses it, so a held splash is never a dead end.
+* **Win + F12** opens the OSD. Once the OSD is open, F12 or Esc closes it.
+* CPU pause is not exposed in this initial profile. SPK286 `execute_enable`
+  remains asserted so an outstanding bus response cannot be lost.
 
 ## Known limitations
 
-None specific to CPU speed remain. Two issues that used to affect the
-**Max** setting are fixed in the current RTL:
-
-* The former intermittent memory fault: an accepted RAM write is now retained
-  until it reaches SDRAM even when its short CPU-side `MEMW` pulse overlaps a
-  refresh. The refresh-collision regression passes at addresses across
-  conventional memory, and Supersoft `SLOW REFRESH` has been confirmed
-  error-free on MiSTer hardware.
-* The intermittent IBM 5160 BIOS `101` at that speed: the 8088 core now
-  samples `INTR` at instruction boundaries instead of asynchronously
-  mid-instruction, closing a hot-interrupt race in the POST's PIC/PIT check.
-  Hardware testing confirms the POST now completes without `101` at Max.
-
-Video is not affected by either fix. I/O writes to the video ports cross into
-the video clock domain as posted writes with a guaranteed pulse width, so they
-are independent of how short the CPU's bus cycle gets, and display behaviour
-is the same at all four speeds.
-
-An older prebuilt RBF will not contain these source changes.
+The exact functional, timing, BIOS and physical-validation boundaries are in
+[`docs/KNOWN_LIMITATIONS.md`](docs/KNOWN_LIMITATIONS.md). In particular, there
+is no historical 80286 MHz/cycle-accuracy claim, no production-BIOS result and
+no physical-board result yet. The per-milestone outcome is recorded in
+[`docs/MILESTONE_STATUS.md`](docs/MILESTONE_STATUS.md).
 
 ## XTEGACTL — per-program hardware control
 
@@ -421,7 +403,7 @@ GAME.EXE
 XTEGACTL reset
 ```
 
-It can set the CPU speed, Fake 286 FLAGS, the OPL2 address (or turn it off),
+It can set the XT bus pace, the OPL2 address (or turn it off),
 C/MS, Sound Blaster and its IRQ (5 or 7), EMS, UMB, Tandy sound, CRT position
 and sync widths, the MPU-401, both joysticks (analog,
 digital or disabled), the joystick swap and CPU-speed sync, and the MT32-pi
@@ -440,8 +422,8 @@ launcher can inspect the machine without opening the OSD. VGA 13h+ remains an
 actual `on`/`off` report because its enable state belongs to `VGATSR.COM`.
 
 Everything it can change applies immediately; nothing in it needs a machine
-reset. Options the core only samples during reset — CPU Type, Monitor and
-2nd SD card — are deliberately not included, because a program would have to
+reset. Options the core only samples during reset — Monitor and 2nd SD card —
+are deliberately not included, because a program would have to
 reboot the machine to make them take. Those stay in the OSD, which now tells
 you when one of them is waiting on a reset.
 
@@ -504,7 +486,7 @@ new port.
 ## ROM Instructions
 
 ROMs are loaded from the **System & BIOS** section of the OSD. It provides slots
-for the main system BIOS, an optional XTIDE ROM at `EC00h`, and the EGA BIOS,
+for the PCAT main/diagnostic ROM, an optional XTIDE ROM at `EC00h`, and the EGA BIOS,
 which is required — see [EGA BIOS — required](#ega-bios--required) below.
 Once loaded, a ROM remains available on subsequent boots until it is replaced.
 Original and copyrighted system ROMs can be prepared with the Python scripts in
@@ -533,7 +515,7 @@ the sequencer and the attribute controller during POST. Nothing else does it.
 With no EGA BIOS loaded those registers are never initialised, and the picture
 has nowhere to go.
 
-The core no longer lets that happen. If either the PCXT BIOS or the EGA BIOS is
+The core no longer lets that happen. If either the PCAT main/diagnostic ROM or the EGA BIOS is
 missing, it stops at the boot splash instead of starting the machine, and says
 which one it wants — see [If the core stops at the splash](#if-the-core-stops-at-the-splash).
 
@@ -554,12 +536,12 @@ before writing the file.
 The splash staying on screen with a notice over it means a required ROM has not
 been selected. The notice names which one, and repeats until it is:
 
-* `No PCXT BIOS selected` — **System & BIOS → PCXT BIOS**
+* `No PCAT ROM selected` — **System & BIOS → PCAT Main/Diagnostic ROM**
 * `No EGA BIOS selected` — **System & BIOS → EGA BIOS**
 
 The machine is held in reset for as long as that is true, and the splash is put
 back up for it even if **Boot Splash Screen** is set to *No*. Both are
-deliberate. An 8088 released with nothing at `F000h` executes whatever the
+deliberate. A CPU released with nothing at `F000h` executes whatever the
 memory happens to hold and eventually reprograms the CRTC, at which point a
 15 kHz television loses lock and takes the OSD with it — the "splash, then black
 screen" that made the core impossible to configure without an HDMI display.
@@ -572,6 +554,10 @@ same hold applies if a BIOS is replaced while the machine is running, which
 restarts it rather than pulling `F000h` out from under DOS.
 
 ## Other BIOSes
+
+The following inherited PCXT firmware references are preserved for provenance,
+but none is validated with PCAT-286 in I0-I5. See
+[`docs/BIOS_BACKLOG.md`](docs/BIOS_BACKLOG.md).
 
 * https://github.com/640-KB/GLaBIOS
 
@@ -590,11 +576,15 @@ only pre-formatted images, as it will not be possible to format them from MS-DOS
 
 * `rtl/video/` — the EGA core, the VGA 13h+ blocks and their testbenches
 * `rtl/KFPC-XT/` — chipset, peripherals, RAM and the SDRAM controller
+* `rtl/spk286_integration/` — CPU wrapper, XT bridge, ownership and timing integration
+* `vendor/spk286/` — complete pinned SPK286 source, generated microcode and evidence
+* `tests/firmware/` — deterministic project-owned diagnostic ROM sources and images
+* `releases/` — verified FPGA candidate and hash
 * `SW/vga/` — `vgatsr.asm`, source for the VGA 13h+ TSR packaged as `hdd/VGATSR.COM`
 * `SW/XTEGACTL/` — the per-program hardware control tool
 * `SW/ROMs/` — scripts for preparing system ROMs
 * `SW/8088_bios/` — Micro8088 BIOS sources and binaries
-* `docs/` — DOS configuration, implementation notes and the XTEGACTL reference
+* `docs/` — provenance, verification, FPGA/I6 handoff and machine references
 * `docs/report/` — source for the [technical report](https://aitorgomez.net/pcxt-ega/core-report)
 
 ## Developers

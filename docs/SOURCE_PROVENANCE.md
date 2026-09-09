@@ -43,8 +43,7 @@ The selected tree contains the complete RTL, SPK286 BIU and prefetch path,
 authoritative `.mc` inputs, compiler/audit tools, generated package/ROM/listing,
 tests, documentation and evidence records. The user's integration acceptance
 explicitly treats the five D-026/D-037 notes as nonblocking and does not require
-Phase 8 completion. They remain recorded in `docs/KNOWN_LIMITATIONS.md` once the
-integration documentation is installed.
+Phase 8 completion. They remain recorded in `docs/KNOWN_LIMITATIONS.md`.
 
 ## Reproduction and integrity
 

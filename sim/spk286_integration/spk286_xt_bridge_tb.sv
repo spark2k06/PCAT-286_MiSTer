@@ -240,6 +240,46 @@ module spk286_xt_bridge_tb #(
         backend_ready = 1'b1;
         finish_request(response);
 
+        // SPK286 emits an odd word as two retained normalized transfers. Check
+        // the exact memory wrap and I/O carry at the XT 20/16-bit boundaries.
+        backend_data = 8'hd1;
+        begin_request(24'h0fffff, 4'h5, 1'b0, 1'b0, 16'd0);
+        wait_active();
+        check(xt_address == 20'hfffff && xt_byte_high &&
+              !xt_memory_projection,
+              "odd memory word first half did not reach FFFFFh");
+        backend_ready = 1'b1;
+        finish_request(response);
+        check(response == 16'hd100,
+              "odd memory word first half used the wrong lane");
+        backend_data = 8'hd2;
+        begin_request(24'h100000, 4'h5, 1'b0, 1'b1, 16'd0);
+        wait_active();
+        check(xt_address == 20'h00000 && !xt_byte_high &&
+              xt_memory_projection,
+              "odd memory word second half did not wrap to 00000h");
+        backend_ready = 1'b1;
+        finish_request(response);
+        check(response == 16'h00d2,
+              "odd memory word second half used the wrong lane");
+
+        backend_data = 8'he1;
+        begin_request(24'h00ffff, 4'h9, 1'b0, 1'b0, 16'd0);
+        wait_active();
+        check(xt_address == 20'h0ffff && xt_byte_high &&
+              !xt_memory_projection,
+              "odd I/O word first half did not reach port FFFFh");
+        backend_ready = 1'b1;
+        finish_request(response);
+        backend_data = 8'he2;
+        begin_request(24'h010000, 4'h9, 1'b0, 1'b1, 16'd0);
+        wait_active();
+        check(xt_address == 20'h10000 && !xt_byte_high &&
+              !xt_memory_projection,
+              "odd I/O word second half lost the port carry");
+        backend_ready = 1'b1;
+        finish_request(response);
+
         // One accepted port request produces one physical side effect even if
         // READY remains high.
         before_count = port_write_effects;
@@ -314,6 +354,31 @@ module spk286_xt_bridge_tb #(
               "reset-held loader incorrectly waited for CPU HLDA");
         external_request = 1'b0;
         loader_reset_owner = 1'b0;
+
+        // Reset during an extended READY stall cancels the retained transfer.
+        // A stale completion after release must not replay the old request, and
+        // the next independent request must still complete normally.
+        before_count = accepted_beats;
+        backend_ready = 1'b0;
+        begin_request(24'h012340, 4'h5, 1'b0, 1'b1, 16'd0);
+        wait_active();
+        repeat (8) @(negedge clk);
+        check(accepted_beats == before_count,
+              "extended READY stall accepted a transfer early");
+        reset = 1'b1;
+        cpu_bus_valid = 1'b0;
+        @(negedge clk);
+        check(bridge_idle && !xt_valid && !cpu_ready,
+              "reset did not cancel an active retained transfer");
+        reset = 1'b0;
+        backend_ready = 1'b1;
+        repeat (4) @(negedge clk);
+        check(accepted_beats == before_count && bridge_idle,
+              "stale READY replayed the reset transfer");
+        backend_data = 8'h6c;
+        simple_request(24'h012341, 4'h5, 1'b0, 1'b0, 16'd0, response);
+        check(response == 16'h6c00,
+              "bridge did not recover after reset during transfer");
 
         // No-lane requests are reported and completed without an XT side effect.
         before_count = accepted_beats;

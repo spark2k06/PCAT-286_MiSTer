@@ -1,0 +1,645 @@
+{
+  "accounting_summary_scope": "Combination of older prototype cohorts only; not proof of the integrated string CPU.",
+  "boundaries": {
+    "cases": 148,
+    "checks": 17823,
+    "simulators": [
+      "verilator",
+      "iverilog"
+    ]
+  },
+  "compiler_tests": 84,
+  "completed_user_milestone": false,
+  "corpus_revision": "37c73caf53dcd22d3dd369ff09305d13d117a4fe",
+  "cpu_directed": {
+    "cases": 10272,
+    "checks": 1187981,
+    "ready_stalls": 35498,
+    "simulators": [
+      "verilator",
+      "iverilog"
+    ]
+  },
+  "expected_values_changed": false,
+  "full_fault_research": {
+    "includes_unimplemented_string_io_observations": true,
+    "path": "build/phase7-preparation/string-full-fault-order.json",
+    "sha256": "b632747101dd7ddb8ac3a8a95290f95727c25d9deffaf1bf3cf88bdac0ef6da9"
+  },
+  "lifetime": {
+    "cases": 500,
+    "checks": 38095,
+    "simulators": [
+      "verilator",
+      "iverilog"
+    ]
+  },
+  "microcode": {
+    "address_bits": 10,
+    "control_bits": 7,
+    "entries": 88,
+    "format": 15,
+    "words": 535
+  },
+  "new_revocations": 0,
+  "new_rtl_mutants": 18,
+  "ordinary_tests": 231,
+  "pending": [
+    "complete integrated gate",
+    "286-specific REP TF granularity evidence",
+    "CX=0 competing event ordering adjudication",
+    "independent architectural review"
+  ],
+  "physical_cases": 50000,
+  "physical_faults": 1865,
+  "preserved_failed_runs": {
+    "prototype-string-audits-1": {
+      "log_sha256": "cd2c7676e4e729307533b294bcc03408e586cdb18c1dc9d1a22b4aec98fcc81b",
+      "results": [
+        {
+          "command": [
+            "python3",
+            "-m",
+            "unittest",
+            "discover",
+            "-s",
+            "tests"
+          ],
+          "end": 1788930693.6343713,
+          "exit_code": 0,
+          "start": 1788930681.9689171
+        },
+        {
+          "command": [
+            "make",
+            "microcode-test",
+            "microcode-check",
+            "microcode-audit",
+            "lint"
+          ],
+          "end": 1788930700.159005,
+          "exit_code": 0,
+          "start": 1788930693.6343746
+        },
+        {
+          "command": [
+            "python3",
+            "-m",
+            "tools.audit_strings"
+          ],
+          "end": 1788930730.1731622,
+          "exit_code": 1,
+          "start": 1788930700.1590087
+        }
+      ]
+    },
+    "prototype-string-audits-2": {
+      "log_sha256": "0125a1f2461bb324d1cd6e820302083ba0e55b9227f0eeee6d6345ab4e6056db",
+      "results": [
+        {
+          "command": [
+            "python3",
+            "-m",
+            "tools.audit_strings"
+          ],
+          "end": 1788930825.1481473,
+          "exit_code": 1,
+          "start": 1788930768.0703204
+        }
+      ]
+    },
+    "prototype-string-boundaries-1": {
+      "log_sha256": "271872fc50a0d26b1e95e732649f603405f3e08d829b058048c1578a90b578b6",
+      "results": [
+        {
+          "command": [
+            "make",
+            "lint"
+          ],
+          "end": 1788930158.3509028,
+          "exit_code": 0,
+          "start": 1788930154.4391768
+        },
+        {
+          "command": [
+            "bash",
+            "scripts/test_units.sh",
+            "both",
+            "spk286_string_boundaries"
+          ],
+          "end": 1788930197.5887382,
+          "exit_code": 134,
+          "start": 1788930158.3509057
+        }
+      ]
+    },
+    "prototype-string-cpu-1": {
+      "log_sha256": "0aab6b878c38d44e55d49ca42991d37351d487716784e716e802ee84028cb120",
+      "results": [
+        {
+          "command": [
+            "make",
+            "lint"
+          ],
+          "end": 1788928969.419439,
+          "exit_code": 0,
+          "start": 1788928965.493098
+        },
+        {
+          "command": [
+            "bash",
+            "scripts/test_units.sh",
+            "both",
+            "spk286_string_instructions"
+          ],
+          "end": 1788928985.5687191,
+          "exit_code": 134,
+          "start": 1788928969.419442
+        }
+      ]
+    },
+    "prototype-string-cpu-2": {
+      "log_sha256": "734bb0de603a393eee955a4fa9814078f6a09106cd595773cfb9acf2a20d2580",
+      "results": [
+        {
+          "command": [
+            "python3",
+            "-m",
+            "unittest",
+            "discover",
+            "-s",
+            "tests"
+          ],
+          "end": 1788929157.4204593,
+          "exit_code": 1,
+          "start": 1788929144.471841
+        }
+      ]
+    },
+    "prototype-string-lifecycle-1": {
+      "log_sha256": "4b2e6b79bec9a5836804b097a414dff6366c561d4198de6159f9eff37fc1d64e",
+      "results": [
+        {
+          "command": [
+            "make",
+            "lint"
+          ],
+          "end": 1788929793.2436883,
+          "exit_code": 0,
+          "start": 1788929789.4894235
+        },
+        {
+          "command": [
+            "bash",
+            "scripts/test_units.sh",
+            "both",
+            "spk286_string_lifecycle"
+          ],
+          "end": 1788929830.6701798,
+          "exit_code": 134,
+          "start": 1788929793.2436917
+        }
+      ]
+    },
+    "prototype-string-physical-1": {
+      "log_sha256": "793fcaa46a15a8b5e06f64819ccab24d8474ac61671322f1f691b698c2b9f9c6",
+      "results": [
+        {
+          "command": [
+            "bash",
+            "scripts/test_verilator.sh"
+          ],
+          "end": 1788929440.5514417,
+          "exit_code": 0,
+          "start": 1788929430.2371936
+        },
+        {
+          "command": [
+            "bash",
+            "scripts/test_iverilog.sh"
+          ],
+          "end": 1788929440.967939,
+          "exit_code": 0,
+          "start": 1788929440.5514467
+        },
+        {
+          "command": [
+            "python3",
+            "-m",
+            "tools.run_singlestep",
+            "--repo",
+            "/mnt/d/GitHub/SPK286/.cache/phase7-clean-corpus-285",
+            "--build-dir",
+            "/mnt/d/GitHub/SPK286/build/phase7-string-prototype/build/physical-1",
+            "--executable",
+            "/mnt/d/GitHub/SPK286/build/phase7-string-prototype/build/physical-1/verilator/obj_dir/spk286_smoke",
+            "--full",
+            "--include-prefixes",
+            "--include-exceptions",
+            "--opcode",
+            "A4",
+            "--opcode",
+            "A5",
+            "--opcode",
+            "A6",
+            "--opcode",
+            "A7",
+            "--opcode",
+            "AA",
+            "--opcode",
+            "AB",
+            "--opcode",
+            "AC",
+            "--opcode",
+            "AD",
+            "--opcode",
+            "AE",
+            "--opcode",
+            "AF"
+          ],
+          "end": 1788929458.577746,
+          "exit_code": 1,
+          "start": 1788929440.9679413
+        }
+      ]
+    }
+  },
+  "primary_source_files": {
+    ".cache/intel286/oswriters.pdf": "3d1cd77bd629988440c7829f4000c270a29d8916722fb5a7cd46262964114440",
+    ".cache/intel286/programmer.pdf": "ad487ba99b48cd9f61b14c0fe912a04c7cdb4c7c14a18419aa9faf62d8962460"
+  },
+  "runs": {
+    "prototype-string-audits-3": {
+      "log_sha256": "365b05c9deabc83e189b3c0a10309e0dd9228c70b67c39b4975d5a5f551710f1",
+      "results": [
+        {
+          "command": [
+            "python3",
+            "-m",
+            "unittest",
+            "discover",
+            "-s",
+            "tests"
+          ],
+          "end": 1788930897.5007284,
+          "exit_code": 0,
+          "start": 1788930885.0903542
+        },
+        {
+          "command": [
+            "make",
+            "microcode-test",
+            "microcode-check",
+            "microcode-audit",
+            "lint"
+          ],
+          "end": 1788930904.2587051,
+          "exit_code": 0,
+          "start": 1788930897.5007331
+        },
+        {
+          "command": [
+            "python3",
+            "-m",
+            "tools.audit_strings"
+          ],
+          "end": 1788930959.8957942,
+          "exit_code": 0,
+          "start": 1788930904.2587075
+        },
+        {
+          "command": [
+            "make",
+            "synth-check"
+          ],
+          "end": 1788930984.9219236,
+          "exit_code": 0,
+          "start": 1788930959.8957963
+        }
+      ]
+    },
+    "prototype-string-boundaries-2": {
+      "log_sha256": "80677b5f3a5bbc04a297b7dcaad557fd58ac3f107a276e813e140bf2647ead6e",
+      "results": [
+        {
+          "command": [
+            "make",
+            "lint"
+          ],
+          "end": 1788930267.0195208,
+          "exit_code": 0,
+          "start": 1788930262.581941
+        },
+        {
+          "command": [
+            "bash",
+            "scripts/test_units.sh",
+            "both",
+            "spk286_string_boundaries"
+          ],
+          "end": 1788930306.0983937,
+          "exit_code": 0,
+          "start": 1788930267.019524
+        }
+      ]
+    },
+    "prototype-string-compiler-2": {
+      "log_sha256": "086c4d5ab8523a70697c26c415b0699c5472ec1c0a5eb9ec2e71105fcb7a13cf",
+      "results": [
+        {
+          "command": [
+            "make",
+            "microcode-test",
+            "microcode-check",
+            "microcode-audit"
+          ],
+          "end": 1788928661.483025,
+          "exit_code": 0,
+          "start": 1788928658.7107913
+        }
+      ]
+    },
+    "prototype-string-cpu-3": {
+      "log_sha256": "b8df7c627ec0f978c1b9700757165e6d3c5961f2f2455d4e4a043e30d38f222f",
+      "results": [
+        {
+          "command": [
+            "python3",
+            "-m",
+            "unittest",
+            "discover",
+            "-s",
+            "tests"
+          ],
+          "end": 1788929271.0506377,
+          "exit_code": 0,
+          "start": 1788929258.1410363
+        },
+        {
+          "command": [
+            "make",
+            "lint"
+          ],
+          "end": 1788929275.4258044,
+          "exit_code": 0,
+          "start": 1788929271.050656
+        },
+        {
+          "command": [
+            "bash",
+            "scripts/test_units.sh",
+            "both",
+            "spk286_decoder"
+          ],
+          "end": 1788929281.1012313,
+          "exit_code": 0,
+          "start": 1788929275.425807
+        },
+        {
+          "command": [
+            "bash",
+            "scripts/test_units.sh",
+            "both",
+            "spk286_string_instructions"
+          ],
+          "end": 1788929324.5672467,
+          "exit_code": 0,
+          "start": 1788929281.101234
+        }
+      ]
+    },
+    "prototype-string-lifecycle-2": {
+      "log_sha256": "fe189947b5e22fc868e89bb4f925a9ea33bcb6808ea5e5d45d8f228d39231a21",
+      "results": [
+        {
+          "command": [
+            "make",
+            "lint"
+          ],
+          "end": 1788929935.775077,
+          "exit_code": 0,
+          "start": 1788929931.506499
+        },
+        {
+          "command": [
+            "bash",
+            "scripts/test_units.sh",
+            "both",
+            "spk286_string_lifecycle"
+          ],
+          "end": 1788929982.663224,
+          "exit_code": 0,
+          "start": 1788929935.77508
+        }
+      ]
+    },
+    "prototype-string-parser-audit": {
+      "log_sha256": "290ae790585eb1c5d57b0c0663fa1faf91ce4e598d8e4661c8fddc92ab41b539",
+      "results": [
+        {
+          "command": [
+            "python3",
+            "-m",
+            "tools.audit_singlestep",
+            "--repo",
+            "/mnt/d/GitHub/SPK286/.cache/phase7-clean-corpus-285",
+            "--build-dir",
+            "/mnt/d/GitHub/SPK286/build/phase7-string-prototype/build/physical-2",
+            "--include-prefixes"
+          ],
+          "end": 1788930272.9945858,
+          "exit_code": 0,
+          "start": 1788929864.178611
+        }
+      ]
+    },
+    "prototype-string-physical-2": {
+      "log_sha256": "c236ca9aa530031b6df431c6d88143e6980bc7ef4315050823428d0ad7db7f19",
+      "results": [
+        {
+          "command": [
+            "bash",
+            "scripts/test_verilator.sh"
+          ],
+          "end": 1788929678.667994,
+          "exit_code": 0,
+          "start": 1788929669.1704388
+        },
+        {
+          "command": [
+            "bash",
+            "scripts/test_iverilog.sh"
+          ],
+          "end": 1788929679.0865486,
+          "exit_code": 0,
+          "start": 1788929678.6679974
+        },
+        {
+          "command": [
+            "python3",
+            "-m",
+            "tools.run_singlestep",
+            "--repo",
+            "/mnt/d/GitHub/SPK286/.cache/phase7-clean-corpus-285",
+            "--build-dir",
+            "/mnt/d/GitHub/SPK286/build/phase7-string-prototype/build/physical-2",
+            "--executable",
+            "/mnt/d/GitHub/SPK286/build/phase7-string-prototype/build/physical-2/verilator/obj_dir/spk286_smoke",
+            "--include-prefixes",
+            "--include-exceptions",
+            "--opcode",
+            "A4",
+            "--index",
+            "10"
+          ],
+          "end": 1788929679.995233,
+          "exit_code": 0,
+          "start": 1788929679.0865512
+        },
+        {
+          "command": [
+            "python3",
+            "-m",
+            "tools.run_singlestep",
+            "--repo",
+            "/mnt/d/GitHub/SPK286/.cache/phase7-clean-corpus-285",
+            "--build-dir",
+            "/mnt/d/GitHub/SPK286/build/phase7-string-prototype/build/physical-2",
+            "--executable",
+            "/mnt/d/GitHub/SPK286/build/phase7-string-prototype/build/physical-2/verilator/obj_dir/spk286_smoke",
+            "--full",
+            "--include-prefixes",
+            "--include-exceptions",
+            "--opcode",
+            "A4",
+            "--opcode",
+            "A5",
+            "--opcode",
+            "A6",
+            "--opcode",
+            "A7",
+            "--opcode",
+            "AA",
+            "--opcode",
+            "AB",
+            "--opcode",
+            "AC",
+            "--opcode",
+            "AD",
+            "--opcode",
+            "AE",
+            "--opcode",
+            "AF"
+          ],
+          "end": 1788929697.6537218,
+          "exit_code": 0,
+          "start": 1788929679.995236
+        }
+      ]
+    },
+    "prototype-string-retained-audits": {
+      "log_sha256": "e62cdc1223904907064995e38f626a40eb13338821dc504909f3ea067d812049",
+      "results": [
+        {
+          "command": [
+            "python3",
+            "-m",
+            "tools.audit_events"
+          ],
+          "end": 1788929902.8496144,
+          "exit_code": 0,
+          "start": 1788929886.0159943
+        },
+        {
+          "command": [
+            "python3",
+            "-m",
+            "tools.audit_byte_prefix"
+          ],
+          "end": 1788929904.9832597,
+          "exit_code": 0,
+          "start": 1788929902.8496172
+        },
+        {
+          "command": [
+            "python3",
+            "-m",
+            "tools.audit_data"
+          ],
+          "end": 1788929954.549957,
+          "exit_code": 0,
+          "start": 1788929904.9832623
+        },
+        {
+          "command": [
+            "python3",
+            "-m",
+            "tools.audit_segment"
+          ],
+          "end": 1788929973.4784236,
+          "exit_code": 0,
+          "start": 1788929954.5499594
+        }
+      ]
+    },
+    "prototype-string-summary": {
+      "log_sha256": "577aadde126d6afda9e3147891f7c776049b660bdd815fed85932ff502a72651",
+      "results": [
+        {
+          "command": [
+            "python3",
+            "-m",
+            "unittest",
+            "discover",
+            "-s",
+            "tests"
+          ],
+          "end": 1788931064.492046,
+          "exit_code": 0,
+          "start": 1788931043.293889
+        },
+        {
+          "command": [
+            "python3",
+            "-m",
+            "tools.phase7_string_reports",
+            "--segment-directory",
+            "/mnt/d/GitHub/SPK286/build/phase7-segment-prototype/build/segment-physical/singlestep",
+            "--adjust-directory",
+            "/mnt/d/GitHub/SPK286/build/phase7-adjust-prototype/build/adjust-final-focused/physical/singlestep",
+            "--stack-frame-directory",
+            "/mnt/d/GitHub/SPK286/build/phase7-stack-frame-prototype/build/cursor-fixed/singlestep",
+            "--unary-directory",
+            "/mnt/d/GitHub/SPK286/build/phase7-unary-prototype/build/physical-unary/singlestep",
+            "--data-directory",
+            "/mnt/d/GitHub/SPK286/build/phase7-data-prototype/build/data-physical/singlestep",
+            "--shift-directory",
+            "/mnt/d/GitHub/SPK286/build/phase7-shift-final/singlestep",
+            "--scalar-directory",
+            "/mnt/d/GitHub/SPK286/build/phase7-shift-final/scalar/singlestep",
+            "--byte-directory",
+            "/mnt/d/GitHub/SPK286/build/phase7-shift-final/scalar/byte/singlestep",
+            "--output",
+            "/mnt/d/GitHub/SPK286/build/phase7-preparation/prototype-string-summary.json",
+            "--far-directory",
+            "/mnt/d/GitHub/SPK286/build/phase7-far-prototype/build/physical-1/singlestep",
+            "--directory",
+            "/mnt/d/GitHub/SPK286/build/phase7-string-prototype/build/physical-2/singlestep"
+          ],
+          "end": 1788931111.53135,
+          "exit_code": 0,
+          "start": 1788931064.49205
+        }
+      ]
+    }
+  },
+  "schema_version": 1,
+  "skips": 0,
+  "status": "FOCUSED_EXECUTABLE_PASS_INTEGRATED_GATE_AND_EVENT_EVIDENCE_PENDING",
+  "synthesis": {
+    "baseline_mapped": 14069,
+    "baseline_sequential": 1195,
+    "mapped_cells": 14692,
+    "sequential_cells": 1200
+  }
+}

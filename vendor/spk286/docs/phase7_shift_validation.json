@@ -1,0 +1,538 @@
+{
+  "architectural_evidence_pending": [
+    "failed-iret-nmi",
+    "sti-old-if",
+    "fault-tf"
+  ],
+  "base_commit": "ba61ffd85a067ce03d046ef88d00b46ce82ffcf9",
+  "compiler_tests": 67,
+  "directed_benches_per_simulator": 34,
+  "full_phase7": "INCOMPLETE",
+  "historical_cycle_accuracy_claim": false,
+  "implemented_opcode_files": 223,
+  "independent_architectural_review": "pending",
+  "input_manifest_sha256": "174ce49a4ac050a3d4cf478db36d141c9151a8110e955962154f4844c9d75c1c",
+  "inputs": {
+    ".gitattributes": "15301cffc419de6faca9501b9453284b59c963607be537988ee112cf492eb23d",
+    ".github/workflows/ci.yml": "6eb216544c26044903fb2f05a53e9970cefbf7a725c81be9311ab0eddfddd383",
+    "AGENTS.md": "f2a37667a85d3297bdb61f2c2dc00cc10393c0980e0f3b25cd9c0efc51b102e7",
+    "Makefile": "a290cdcfc3224ab3ffe11435823e21ec0c2977bc19066f8bc46f091651485562",
+    "docs/phase6_evidence.json": "ea1d9aa6b866498449698bcc3db00a9ce7e3e30059d492a69fa2e9922dc4ce6e",
+    "microcode/README.md": "aa13e9f10782c7febd55248ddbdcfa309b94a19a36a8e2729bb6162e52ebb8b9",
+    "microcode/generated/spk286_microcode.lst": "65cbdf58e06f58f0391aaa0b1c003e06fe68f98251045c4b3856a08fe8b48f38",
+    "microcode/generated/spk286_microcode_pkg.sv": "24ff6517eb630c1d26a3f741c26786644b0382ead8672ab26179417f0e064bd8",
+    "microcode/generated/spk286_microcode_rom.sv": "0476b2d69cb7747970c34ab7b716524073e9fb94a05ec5ff61b094683a7a3961",
+    "microcode/generated/spk286_microcode_symbols.json": "5be0d7a4c6fc84264af8f9b2f6e1ac96da2e272dbc420721c37c0d85f35fae0e",
+    "microcode/generated/spk286_microcode_validation.json": "a94b4c06cae35d0fa800ecf79440db8755d7da42338d13b15ded37acebd0e20a",
+    "microcode/source/data_move.mc": "0aa4ae7fa92080e5d14b2118327c4f528e31f1e015c3fe0b1f8c5cb31f718823",
+    "microcode/source/word_alu.mc": "87c682e9ee39d53434830267be179899a12c68bf39f400bd82e77db266e6b8e4",
+    "microcode/source/word_stack_control.mc": "adbc7d859f27d0add9d2e86ece19d8a92a25612f4dda4ec655e64e2363c0c415",
+    "microcode/source/z_interrupts.mc": "768647de72c75af863047065cafa29efd6cc519f32ee77dc92a62221ca5bee37",
+    "microcode/source/zz_byte_scalar.mc": "0635b236683bba54a31901f4e527f1786a6cf36cab3c2c8115a80ec1415fc755",
+    "microcode/source/zzz_scalar.mc": "a3a2f32697d081b9c958a1b5e9a769d62289eab1566ef5df2fe7043634f0086b",
+    "microcode/source/zzzz_shift.mc": "d56f94b679e8b5ac7da010c6a269ed81fe431312568ddc9056b350f862527f90",
+    "research/__init__.py": "a55007011d38d2ec34106cfc32729205c69d6b9831c6517bdb1280d9ac130c0f",
+    "research/mcl86/README.md": "736d47c29bdb246f0cd8340bb4cfd4ee9953998a8c5496dd8c69c245f55a7eea",
+    "research/mcl86/__init__.py": "111d2e633ef9e1555d248d9a6cab046ce1c34970a90f5c84623afb7db730ee82",
+    "research/mcl86/fetch_references.py": "a9be4f3d679bd4a6facebc34fbb9daa9dabba47ca2404df78a68dcdde89c43c9",
+    "research/mcl86/mcl86_ucasm.py": "dfbe10fe5a26e89b16685eee3c724ceefcc8e5c6810b3f0b6425dc1190f987e4",
+    "research/mcl86/mcl86_uccheck.py": "e3ec1a1390083addd3180e13f935a832a43028706fb3a0bc3b03f43ceb698806",
+    "research/mcl86/mcl86_ucdis.py": "dcfd9c53dcd5f808391d72f4b8002f6c4791a0201f7936fd543806ac28a72de5",
+    "research/mcl86/sources.json": "bf3e0792842966bf943b16b2f0828bc300e69a4e919e41ce6a5309460127d01a",
+    "research/mcl86/tests/__init__.py": "723fdaaa35da1e345fe2fb6a10ae3220c821e5dcbe2a80ad0de512c746c4d320",
+    "research/mcl86/tests/test_toolchain.py": "14194264f701d0083c508680ed292d9d3830605dedc301e8a4a574d3a11094cc",
+    "research/phase6_probes/README.md": "743049a44655fdf5d270ad78a290e9b932f45421cc8393bb65d62ee2635d66a2",
+    "research/phase6_probes/RESULT_SCHEMA.md": "380ef458d5f96578065e62afaf4e89a73b8cbb1e397a273e71fb95153eacbdfe",
+    "research/phase6_probes/__init__.py": "9c1b9a77b52d0fea1e5562c13fb5185c4751be28316c9a5456b7f3763369ae2c",
+    "research/phase6_probes/build.py": "7ccbed5b79f7ad8c24428210b655f5e504120243e4fd4157798507d222960ac1",
+    "research/phase6_probes/mechanics.py": "253b64fe770ed8a7896da7022894471f91f5c9d3d54104868e843dce11f9d801",
+    "research/phase6_probes/probes.asm": "4ffa4a5063ac8f03e54f21d6f29fc46e7cac0a94b8e925b356bed6aeafaec0be",
+    "research/phase6_probes/results.py": "391afd2276001e998304f670cab9ef679863770e15beea7d808f124f14133e46",
+    "rtl/spk286.sv": "10ebbc2f34f1fd68eff2c53fed0dcbd160b11de046dce12c2a2a04e9f57c9695",
+    "rtl/spk286_alu.sv": "103cd07b5a3ae79e96b2bb42aa0eb411ba1b4ee6261f7e5f9cfbc5a41f21d232",
+    "rtl/spk286_alu_decode.sv": "2b865bed09f1cc02a3bf54ef978284433fd1afcfaace27dfc7e8806b1ae32d46",
+    "rtl/spk286_biu.sv": "1ed9a4ad862132775cfc3d86d1335da418a01b11ba9d7810dc59c1b058f09987",
+    "rtl/spk286_condition.sv": "2885a31a13ad49c64460a329b640d4329725c7c8ce82cc0b983148563e9431a9",
+    "rtl/spk286_control_decode.sv": "eb5240d942b7bdaea8f1c7099b7a6f4a04232f81d1f62df759b32e619de8dc1c",
+    "rtl/spk286_decoder.sv": "7d29dbfec6fdbf4ae58a38139499204cca5398acd62c5c5a3149240e86731f0a",
+    "rtl/spk286_effective_address.sv": "cb2ec2959b616f92594353a36ecea7e0af18774b32d4cd9a7e547fd28516d988",
+    "rtl/spk286_events.sv": "a82150bc1f7b7d2e57c41d7217539c30fa395fe00f025d37dbef645dcd27c955",
+    "rtl/spk286_fetch.sv": "8b4fd6a45842df9cacb26440b97689d643093af2094f0320a9e088d9c5b48420",
+    "rtl/spk286_flags_decode.sv": "81527f7053df20cdb32a4a56c499bfaa3abea65e1e956530c1f15ea3b2d032ed",
+    "rtl/spk286_instruction_context.sv": "c54c2fe9eacfbd1bc053204a52382c973a441e72ed35cabf93311c06fcaa6114",
+    "rtl/spk286_micro_executor.sv": "5c50587c84236aecd0da62f4fcd042d383586606f2baefcbbfb6c1f85929575d",
+    "rtl/spk286_microsequencer.sv": "f03adccb5e12bff25d9b710d7c4e89c9e572ee461f350a8abfc6cbdddc8a2f0a",
+    "rtl/spk286_modrm.sv": "621ab5d58c2f8877559d151d0e270f0062ac069cd781e3c7ac9a8565c3d7193c",
+    "rtl/spk286_operand.sv": "e85ba3ccce273d5ba6fbff910a64ce89396320835baabd91db7c3e0ab9c69ac3",
+    "rtl/spk286_operand_decode.sv": "9c584782602073696ca205567e7f45db24f7f0b4ffc323fd5c11cd2090f898c9",
+    "rtl/spk286_prefetch_queue.sv": "629649f09e4a1641c0ae7cd5aa619a8744fe6ab9548bfdc677284d78c535ed34",
+    "rtl/spk286_registers.sv": "d569141574dcfcd8adc976a4f7476fbd423535fa4f1ee96ebca7138e807bdd0b",
+    "rtl/spk286_segments.sv": "6c51661534c57c2b0b3b54d92d7bbe299af93b07222f8bc871e588e8ad8fdf0d",
+    "rtl/spk286_shift.sv": "722482adde5777f89947ec03572f183436db4dfa8f6e599ab972f5eb55f108fc",
+    "rtl/spk286_stack.sv": "30c94c57730dd333ba4533193b805891a9eb5ce772bf9e263e608224662be577",
+    "scripts/bootstrap.sh": "43e675e4a53252e846eb7e2f6d7e480e82f283a4fe92873e70735e419989159d",
+    "scripts/build_verilator.sh": "0e3088ba4f24af30e852116b5c2fd7997b587856829bcf888f1ecc79eeef3b3a",
+    "scripts/env_check.sh": "c4b3721a9fbf4a12c781f9b99225e933d81dd524de2970ba76c43d135bb3c8c0",
+    "scripts/lint.sh": "0fc2b3d394a4dffd184828394aa72c3e45ec3a7cdae2c15e3446dfed01c7da22",
+    "scripts/quartus_info.sh": "4c47a098cd934ae32a1faca9b5e88191d9c83605e6b2c0b75588d935e2d95ecf",
+    "scripts/rtl_sources.sh": "5aeca59324f2510fbaf8ae8066bc64854e69a648af3fa965cbcd032e500dbc84",
+    "scripts/synth_check.sh": "4536a3bbe94c7d845e08805115595c4c40ef66f011c1d8df3a1fe0f247fcc730",
+    "scripts/test.sh": "038d23521f85f9050b79eac50558a64dfbacbbc8c538c315c7004d84d0e5645c",
+    "scripts/test_iverilog.sh": "67872105e079d2ef8d9a1799c64f79fcb6c679e8b34b6c1aabc8ebde521b1fee",
+    "scripts/test_units.sh": "ae40ce0363d34928ba526d9ec5fa5089edb50cab6b376a7aa7c0c6deea73927b",
+    "scripts/test_verilator.sh": "9a9cd0fce4b6c4a9091ea92650cbfeeab30b9b34790fcfcf3f3e28671002ffff",
+    "scripts/validate_phase2_80.sh": "ae4f8e3c4eb2b8f0733baa7398e1eb34d1ea5abc8be3e0443b46822d670d81a8",
+    "scripts/validate_phase3.sh": "020ddbcd52ed5fa093434052b5f4b0299b3da36266e54a6ad11bc80868cbf42c",
+    "scripts/validate_phase4.sh": "d7a142001a4c99c05d223b5b974be494a0a540ab4c23ca7d52c08291b265922a",
+    "scripts/validate_phase5.sh": "ba1caf3040b82d387ad8f67b21e7f0048e91b6858d19f25a44afb82fe6af8178",
+    "scripts/validate_phase6.sh": "e7ad24224fe7166b5f47c562b95cc316fcb652d4bd7878c655a900a2b9b195ed",
+    "scripts/validate_phase7_byte_prefix.sh": "1bd8c02fb311a4d2243e19866983d25fd29edfc854d43a88c247f028bb44402b",
+    "scripts/validate_phase7_scalar.sh": "71f499b8dd5d2d848e766512e943a1ef98be5affb3a2c3a37e488f6f839754ce",
+    "scripts/validate_phase7_shift.sh": "8925a02dc252dcefce4711b604a7e669a7c943a1980c6df94168c0094401478a",
+    "scripts/verify_failure_path.sh": "d3007e487c60c6844bfe1cf5e566eac0f1c5fd6dfc4276305137d6088758270b",
+    "sim/iverilog/spk286_reset_tb.sv": "a5b1afc6cc1419cf22c8389851094f16c58850603a11b2811e480d1da0105fb8",
+    "sim/unit/spk286_alu_byte_tb.sv": "e0404e577ce5af2cb98eb81d9dd4909aeeeaeda398750d0ca2e3b95f6c9be687",
+    "sim/unit/spk286_alu_instructions_tb.sv": "758f4c649b63d8639e64042c2f62466d5d32990f1915249344325e34d0645797",
+    "sim/unit/spk286_alu_lifecycle_tb.sv": "56ffb69f615a83c368bf68f1a70e8a536f548791c78eff2b5e6f33faf871baed",
+    "sim/unit/spk286_alu_tb.sv": "afc68bb60b5a13a7ce118e21dec66b35aa89f118e6a47042282d242a89808348",
+    "sim/unit/spk286_biu_tb.sv": "a2b8eb8aa497358df76bb5f3e8422d458ebc02187c6b8a3fc229969fa6ecb9cc",
+    "sim/unit/spk286_biu_width_io_tb.sv": "dfcd87f32c1ffd7148da148cec8365c3237bda8f95fbcd832d85bf21408b1a72",
+    "sim/unit/spk286_byte_scalar_tb.sv": "cfcc628a55967e69a0ce5326a8ebeded2999f0e35b1182870382857103525bf8",
+    "sim/unit/spk286_core_tb.sv": "d461b64e374f5e0d1a049f5468aaf2bf268645e85bbb960856b11ca8f9feb89f",
+    "sim/unit/spk286_decoder_tb.sv": "2479da1d5e166d41866477f478888f5b7f506f007d12a7b9479e3581539005bc",
+    "sim/unit/spk286_effective_address_tb.sv": "8d50595f25bfc018dc3acdbd315f6d9e9e1767d11560e214debb494cb7682ebf",
+    "sim/unit/spk286_event_instructions_tb.sv": "02ebd3db1fea8b66abe3662908ea4a6a4f5f679cfc868b66699ea6017a698c8e",
+    "sim/unit/spk286_event_lifecycle_tb.sv": "6261e3203683277a0e85771cd5b6df0d8bbee67ff72f25fb9c0e9f1bca9eb96c",
+    "sim/unit/spk286_event_streams_tb.sv": "4956d9d1746c2a974d10a13adae207df3379c3b1301302c2908e73d200d65598",
+    "sim/unit/spk286_execution_tb.sv": "8776f9f2b5afac831fff76f3aad05ebd57444f69e04bea39a3182d7eec0ea0fc",
+    "sim/unit/spk286_fetch_tb.sv": "1bd2ab9415470dae1a1b0ace27c560af6b22806e4810eb2bed2dbf65376dc4d8",
+    "sim/unit/spk286_microcode_execution_tb.sv": "791d97fb4458da14eaea5a74fac2b742c81926fa2321af51deac6894de634af2",
+    "sim/unit/spk286_microcode_rom_tb.sv": "05af287279e370788708e09f64fc401591bc0675a759309deea342b21d1d19ea",
+    "sim/unit/spk286_microsequencer_tb.sv": "9837960c1f8511a4a07f47d388203afc1925b34a9b09b5692df685f25ce75ba6",
+    "sim/unit/spk286_modrm_tb.sv": "42bfd18225372f9237ea2d53e061528cd22221ae80556aad19f1f848cbc787bc",
+    "sim/unit/spk286_mov_operands_tb.sv": "0003d660c6f06f943b655202c1607ba316cf8045bbf805886d449e7b28935053",
+    "sim/unit/spk286_operand_byte_tb.sv": "360c22bdb7f632e278da2100ce60c5c344517d48a25b728409b1811d03512d6a",
+    "sim/unit/spk286_operand_decode_tb.sv": "b421d25ee5966d12f27bc2caa34da757cb47838204fa307bb154d0c032b90c51",
+    "sim/unit/spk286_operand_lifecycle_tb.sv": "ffa986b7c4fccea111e2f8c7777289f8f43f1a04dcaee19d2f05e5c77690bb43",
+    "sim/unit/spk286_operand_service_tb.sv": "ca99522dbda3fefea71c13c2c78cfa33f280aa0209981290079ac6b98b381794",
+    "sim/unit/spk286_prefetch_queue_tb.sv": "18c7432285805909e55be07b7cf12ad65bcb2f6502053c7f057baa170ecc88c4",
+    "sim/unit/spk286_prefix_tb.sv": "074fb55d8df60f7607ec4a49f76b05c4130b9f17035a439cbfa47c04d18d5fbe",
+    "sim/unit/spk286_registers_tb.sv": "6b74a92f676bd8b724a73174008bf041b98d6671f3a2b45c36a46fbde91e1c25",
+    "sim/unit/spk286_scalar_direct_tb.sv": "fcd0e70f7687b171461e54f7b8ec3db0a798a5eea7d900825aa7e1468b515e7e",
+    "sim/unit/spk286_segments_tb.sv": "6455d974f4214997e8598a1b58ccac1a2b5767840c1f6f017e0a14f3e3c9f6cd",
+    "sim/unit/spk286_shift_instructions_tb.sv": "14bfe13b90d5da4e35836efac8aa0afcdb9d188bc38cdf22b339efcbd187c8e5",
+    "sim/unit/spk286_shift_tb.sv": "4adc8909ec38e6111fa54db726f91967b54b6e39afbab173c8c57f00753cf313",
+    "sim/unit/spk286_signals.svh": "cf72b27f671056a13a7e374f699b89f1ee09e5205a09bd78007443070028f1c7",
+    "sim/unit/spk286_stack_control_tb.sv": "8617b320aa260724e5c233abe7c0979a6ed7611d0acf1438d8022615ec9eefc2",
+    "sim/unit/spk286_stack_lifecycle_tb.sv": "a3bdff00a7d40ceca00b33b1e9ab388ba8201ec67ede7e7c92b547df9eb5fc07",
+    "sim/unit/spk286_test_instructions_tb.sv": "cbeb631fb8795b65ead2d1db5a2d3958e701bbf9f6c818e54691a6bd2959dab7",
+    "sim/verilator/reset_smoke.cpp": "1702a78a44c36fbb7a7d10e47dfce669d9f64e71b757b026ea2d4460ebdea2e5",
+    "sim/verilator/singlestep.cpp": "092de75552825caf2718478fc4827f96bc60e68b68e5c4c178dbd21c91e526b9",
+    "sim/verilator/singlestep.h": "a8ee1484d03f8c57449efa5af008d4ff28ea02ad9aa5ecb22031c75775ac7110",
+    "sim/verilator/state_inputs.h": "acc74d9ea914e2329046a6265d284eb20e9316db3181f3a845041bb16358ac37",
+    "sim/verilator/state_vector.cpp": "1912a997c755652131865201e9ad16c5e4140e744ad6570c0a0592208874147e",
+    "sim/verilator/state_vector.h": "9518cd0b1b98d3161e5bfed60302dfbd717891e9c7a64292d576b7beff6b1a11",
+    "tests/fixtures/microcode_phase2_75.json": "50a62b2f105540022b4f027d1b694b3b417c890d8fb786715a76a2abc42cbe75",
+    "tests/fixtures/microcode_phase3.json": "89dfce507ffebd8924298e3afb1d8f758f45623ff0b881a4f5bfdc13f755ea1f",
+    "tests/fixtures/microcode_phase3.mc": "0aa4ae7fa92080e5d14b2118327c4f528e31f1e015c3fe0b1f8c5cb31f718823",
+    "tests/fixtures/microcode_phase4.json": "adfe661c76c1fdca5636e7723533e53484f4edb662582c345eb697fa177cdecc",
+    "tests/fixtures/microcode_phase5.json": "9ffd4cf9ee98a90c8391f2e80da14afacb147a069f912c25c9346b10987b500e",
+    "tests/fixtures/microcode_phase5_sources.json": "144e95c9fb18c369aec48768b6208ba9ab0a1750b11dda5f45e98f950560ec4e",
+    "tests/fixtures/microcode_phase6.json": "f21cb68df8dbd924e3858a3c194d9dc85daf830dda6347dd9159612ae633c3cc",
+    "tests/fixtures/microcode_phase6_sources.json": "29601b14ef85224231bb4daa38d08895edf0c011bff9c24dade6f65bfb1b523a",
+    "tests/fixtures/microcode_phase7_byte.json": "a1115ed170a308abbf656bf8f4f556f86ba3227ba42409bdc4dbf6229227a574",
+    "tests/fixtures/microcode_phase7_byte_sources.json": "3196bd2de94b0e00712a2e5a9e023c4b521c0fd01915be08a593468aa75888dc",
+    "tests/fixtures/microcode_phase7_scalar.json": "b1ebc9db54a9a76c637e2aa4779fa6f9079ce2b3534ddb7b44b9871cc3a8c841",
+    "tests/fixtures/microcode_phase7_scalar_sources.json": "bfe2894340171dccf7bd8fda5e96b3399f98a82b4c7bed0a3d6143bbdf2ee578",
+    "tests/fixtures/microcode_phase7_shift.json": "607f6ba5fa7c236a4d0b190763ac63c6abb12858a05179fe3342d25c65ab7c32",
+    "tests/fixtures/singlestep_sample.json": "3f913bb07fbdf9e78088cab44fa5575fd4bedb48af52bbdd9ed3cef3a560a933",
+    "tests/fixtures/state_vectors.json": "7eabd0131f110503bb6631ca205826904f8bc53f93956fe618f064bc20b9ffdd",
+    "tests/test_alu_reference.py": "e87d5a5d6141c37aa9dbf509f38b83fb5e90df1a493ac048a0f0daf6c24db994",
+    "tests/test_event_reference.py": "62d035128f427ec3bfa5f11758425e848324bffc348dc38654595b5ed661cc58",
+    "tests/test_mcl86.py": "5aaa431fa14fab5fb31fb594e928ccb61f50f80d2aaad614bfacfc652a075fcd",
+    "tests/test_microcode.py": "3d9186f61803e555d0001972088324778a1bcbf3ef91400e85b92efe263247b3",
+    "tests/test_microcode_alu.py": "2d5d7a9c7bfd2e5550bed0c91f7e7848d1897f7c80e7a8e23be325ebba93f3d1",
+    "tests/test_microcode_audit.py": "5e376ed9583cfca7850e6c360feb579d6ee1dda8ff4254634467fb0007950ffd",
+    "tests/test_microcode_byte.py": "2ac655090533603c258dd6a12d5be5f352f23bd31193b5441d897e10ff5419a6",
+    "tests/test_microcode_events.py": "d1203e0b4a30bccad9fdc1dd27a12a90b298876b21e1988693efd9f1d4e541c6",
+    "tests/test_microcode_operands.py": "249c0663915770604ffa4e1d3b06a209c188f057c41f1c3e750338aeaa638514",
+    "tests/test_microcode_scalar.py": "b755b08703e65190f74c4d1ed3d10f3965d01fdf119aa6ad1f45f473b1585226",
+    "tests/test_microcode_shift.py": "0ed7842e939c2cafcbbacad7c8c5ec470a1a8dff1c93bd4e3b8c4ebe6b75d722",
+    "tests/test_microcode_stack_control.py": "fcf3e84a6cee70951b66f7503766c7572b65e4f82e172ac90751b0c319b95c51",
+    "tests/test_mutation_anchors.py": "714fc8bd2187633bdca67cb22f30bd5b8058cc0ced32a771d135293dd39cf68b",
+    "tests/test_phase6_development.py": "acbd523b347bbb7927ce20722056c189fbf9e016ae65e49343ab11214a4c77eb",
+    "tests/test_phase6_probes.py": "e3d5706a479e92c9cdfe03a51133a0b81695e89e60410497d3fe59f0228db65c",
+    "tests/test_phase6_release.py": "585467b16dcd8192be72fd437ed5571e68c0f9011101684c1aed224423874e47",
+    "tests/test_phase7_increment.py": "a66375b2d122eb281142f71ecd7546d320ea4927b8113e1b9f811c1a200416b3",
+    "tests/test_phase7_scalar.py": "0c61e3cc994f3b5e82f6849ceab496b88461af3330bf3050f68d9b34044fe7b6",
+    "tests/test_phase7_shift.py": "1359a3a6b6b7ff23773f69cf9704adb73eef543580dc1b33d9dd4db9da22c017",
+    "tests/test_shift_reference.py": "282e12a771c318b168fe6eead93d47452b4f8c4423057460bee0b7bdc98a2029",
+    "tests/test_singlestep.py": "cd63622b43ac589ba3ba1ab6350e7159053f9100092175b16721b88a0e3e8d91",
+    "tests/test_singlestep_alu.py": "d5df0df1e89d4ea949d683c3dc88c8b09bb8ffa13477b4cce6c8b5da3f87139f",
+    "tests/test_singlestep_audit.py": "f273511a64ab3a6d29cd763da058b6851c4493057d703114d013010d71e8e34e",
+    "tests/test_singlestep_byte_prefix.py": "603d55ac32e9cefa309340ca7ce00ed0eb1741d27bccda5e970ec94e8656c61b",
+    "tests/test_singlestep_events.py": "ba1003b92925856b2a0e4789fa31f4c0df6efcf5385453e54e534a763ef22cbb",
+    "tests/test_singlestep_operands.py": "4e627d3b34dd760283cfc4dc16701fed1a2b0b34e15a541324fb656ce951aaed",
+    "tests/test_singlestep_runner.py": "7ec1cae8b4b436ade23a935eb3344a0487ca1675239a6a5c1fba3f8eeb676248",
+    "tests/test_singlestep_scalar.py": "63e3f7af005d641cd020f63ebc732a63fd879ded2f87cb38485aafad84fa9215",
+    "tests/test_singlestep_shift.py": "1e4ee036dec38e0f3e8f1f02e859d97c289bbf1034fff7c4a512bff00587c596",
+    "tests/test_singlestep_stack_control.py": "62c8d42c5820cfd5760c5ba29d00f296e6fc9a8ef88f7e422863bf64a465f3cf",
+    "tests/test_stack_control_reference.py": "752b684fc03a6cf5b36b94ad75fd41c99a5bec63d7b84cff78551cb5718fca39",
+    "tests/test_state_vectors.py": "548c9d985c9fed0fb3d500cad93dcc9ba6a338a07c5b63bfbbe46e65f5e822e1",
+    "tools/__init__.py": "3fa363533c4127f29ebf1870860416895e402b3c8ff6444565aa142c3be01517",
+    "tools/alu_instruction_vectors.py": "5f42071e6ec91b6fc094a4ea39b955a6a1f059ddf3ad40a673e2c3fc174ef81e",
+    "tools/alu_reference.py": "76c9cd2dc8e1b7440ac5fc70fe65c18c5dfe380e74d3a0bd3f05d813f32ceb6b",
+    "tools/audit_alu.py": "2f8d9456238948ea4b26cf177b4bb79d64678ee58f618475e47218aa2f9251e5",
+    "tools/audit_byte_prefix.py": "de0df0155c49ef5e4288bd5e2ec800e886c37a7bb6b6a747eb89fda728c4831c",
+    "tools/audit_events.py": "271822710fe8b360e5b816edf7ac561ef2db5d74b4084e503d6b5cb79b8a8bf9",
+    "tools/audit_phase3_boundaries.py": "b5adfb32945a8ccf85f3b99dfbc4a8f3034c0d6f608a8cb8561f0563e369e5b4",
+    "tools/audit_scalar.py": "b7068b44ee83d150481561ae9013ad684624667974b83272e7845c5990b86443",
+    "tools/audit_shift.py": "d68af9220342aabe9fb8469889315a0f94b7f7e4618abe2751b22245429a2176",
+    "tools/audit_singlestep.py": "a7881d71273b840d0e3819acaf85dd9863b9ebfe887da35c2931f3a5adb65cc3",
+    "tools/audit_stack_control.py": "ab283425f7f7b9f79b0d5ed026cec1816b82665349e5bf7fff771107efbf4ff0",
+    "tools/byte_alu_vectors.py": "b230401d3c3223341073ed44ca928750fd945a30631497565e51260d4638d9bf",
+    "tools/byte_scalar_vectors.py": "d857269096cc189fe390420777e7f80a384d7932f26f38e3a77e84af49d75a81",
+    "tools/event_reference.py": "84e3ccdeeea07e6bbab5a41d5d3d1f33a81bdb1e72f1819ffd82ab7fb911c34f",
+    "tools/event_streams.py": "52b5dc057763c8a56f128631f95e6e8ac06252e0648b13a63a3f062b4d4684f9",
+    "tools/event_vectors.py": "54ebf2f06915f7233e2f72bc8766eec2bd358e2de257637942371c1e6e10f700",
+    "tools/fetch_singlestep.py": "914bcf76eba8f0acbf21a7bf42f2b7df8bc53397537a4d1b3feea62df5313740",
+    "tools/inspect_event_traces.py": "0a971ad3ea24808f4cd22e8b1b64083cfbe3466607554f39d0c3515ad25dae8e",
+    "tools/microcode/__init__.py": "67c5ef4690e5d1dbe0c37eb0dc99685fa077a90634da6ccb1633d4b425ad7b4b",
+    "tools/microcode/audit_microcode.py": "1c0f8b6c7fd9d521dff594155c99a60603c83f900d2c9fa6ab393a53ff8b2fd7",
+    "tools/microcode/compile_microcode.py": "88b431146d9133d0d5da883ba6cb0b15a5c5a3c17cedcbe3d1ea2139f5a5c850",
+    "tools/phase6_cohort.py": "6205383ce3f9a42c014d081d6d44fa0b565310bb2e9601c7be3d7b23edba934d",
+    "tools/phase6_development.py": "96fb69ed3626ca5bbd27f931d02c1bb37356cdde5c103c9baabea822fc1aef92",
+    "tools/phase6_evidence.py": "9be7b2ab5167b748bb24d952e9f46fdf57cfec65dceffd5b3895fbf11a3aba9b",
+    "tools/phase6_inputs.py": "6c0a1f23441129a053ccbaec8887b005792a7fc810980da1e7473599f42ca3b0",
+    "tools/phase6_reports.py": "420eeda3f44bfb7c69f688264e32cf5f34993751d0d564ec4090f00c89f23069",
+    "tools/phase7_reports.py": "6dd6912a8acb5dddc3ed505e0d7b9975f5c1d89ba726df31c58ab8df158852ec",
+    "tools/phase7_scalar_reports.py": "c08cce96e0748feae722befd5b02efaf6329f2d12f4e94ee07fa4b929b09473e",
+    "tools/phase7_scope.py": "221d2fa30058bf6143c270f158aca862c499b0cd72207d3776b246e10961b05b",
+    "tools/phase7_shift_reports.py": "cf7a0e23e022af3c17350cc03ee1f65801dd68dfeac9717daf8fadba866ffd17",
+    "tools/run_singlestep.py": "3a3c3bfa7a91b4b2538baf24e8a029c9d3a68bdf96b9d01f1d61f8186164ff18",
+    "tools/run_tests.py": "c959365b7d9d947277b468e34d7509d2c770dd476a3bd1da685f0473d80a2db3",
+    "tools/scalar_direct_vectors.py": "09b2ded3cb38d6cbeadd60460488c5cc77ba62de157f130f76a45e16b00029a1",
+    "tools/shift_instruction_vectors.py": "062a18de92239c51a13acd0393fbb937e4205e2b6e8bcd0b075c2f134427f05d",
+    "tools/shift_reference.py": "63b4d0c8362fbe5aa22d994af8321a28fb041554cba163ddb8ee4ba580b8ae4c",
+    "tools/singlestep.py": "245d3d7a49ae37b7713f9524483eb6a45f7c0951b091844c19c4aa7ad9ca221a",
+    "tools/stack_control_reference.py": "f7d216ebd6ddbb4001ed661799a50c76dde12f0f0e2cd0d75a17743db8d09541",
+    "tools/stack_control_vectors.py": "abc02b9caf33aeed8f4da606991761e2cf0253d94e8d21f918f2d8be6c8e0e69",
+    "tools/state_vectors.py": "6527549fc5ed9fac74c41739c9a5595603abbd312b09aad69e732c1a482f0dc2",
+    "tools/test_instruction_vectors.py": "43ecb45eca82f4e9e42da70a2923e4f85bfd17ce6a764946018cdeb5b9c57f49"
+  },
+  "kind": "bounded-shift-development-increment",
+  "microcode": {
+    "address_bits": 8,
+    "control_bits": 6,
+    "entries": 48,
+    "format": 8,
+    "words": 235
+  },
+  "missing_required_opcode_files": 84,
+  "new_rtl_mutants": 9,
+  "physical": {
+    "combined_passed": 1010998,
+    "full_phase7": "incomplete",
+    "opcodes": [
+      {
+        "executed": 5000,
+        "identity_sha256": "60260916b2458cf9a91c2523f8db5fa19d0bae10b4ba396b5a4dd40cb1399397",
+        "opcode": "C0.0",
+        "source_git_blob": "f317766c420721d0086da933f177fd62d5036360"
+      },
+      {
+        "executed": 5000,
+        "identity_sha256": "a918ca9b8608081ed752bf0ba021282a880b10ee7c96e6b48c1d5f2d475afac2",
+        "opcode": "C0.1",
+        "source_git_blob": "3d1c1f838f5822b1912ac8d9808a6becb2d3fd67"
+      },
+      {
+        "executed": 5000,
+        "identity_sha256": "3152997a77a79a01de6c5e81481b5131f8d8c65a8a9c81fd30e2319ee8c6780b",
+        "opcode": "C0.2",
+        "source_git_blob": "303b4508ca4a6b214749b771135ba742c0954683"
+      },
+      {
+        "executed": 5000,
+        "identity_sha256": "4c1d65b34890a51f6f604927fbfc7e0fc56e772cb980b35fdddcca2654604207",
+        "opcode": "C0.3",
+        "source_git_blob": "26f42eb942ad5a18f80d917b34e4e368728d3060"
+      },
+      {
+        "executed": 5000,
+        "identity_sha256": "14c32ebf8fc0751b93904610b7112d910e45427fda0cfb2b6d0f9c538ea87b8a",
+        "opcode": "C0.4",
+        "source_git_blob": "5a1091b9448b5c6d35ca285a579c062fec6fb4d7"
+      },
+      {
+        "executed": 5000,
+        "identity_sha256": "dc65c3e07ea9bf88feef1a06cc9846343575ac06e509fc819d30a53dbca77620",
+        "opcode": "C0.5",
+        "source_git_blob": "f8a8eb6bdbc7eba1f0b0f938f69a362470632e24"
+      },
+      {
+        "executed": 5000,
+        "identity_sha256": "0e3e15a18196bc05b7b16b431b6f7fd8b99155f30f9e239c35f7fa4f1b865a38",
+        "opcode": "C0.7",
+        "source_git_blob": "1a2c425d48ba235b2fa17e4229343aeaf749cbde"
+      },
+      {
+        "executed": 5000,
+        "identity_sha256": "702d1c8574e7c3fc281bfc49f49a0f98ba3a6143f85dba600a7a7a8aff7548ce",
+        "opcode": "C1.0",
+        "source_git_blob": "ffec3d3bbc5aede0c34b0f059cdd504e98712f2c"
+      },
+      {
+        "executed": 5000,
+        "identity_sha256": "8fff55402f4d28144ee166c53c88b985fd8b0542cbebcf58ef33ab569d92a995",
+        "opcode": "C1.1",
+        "source_git_blob": "1403b33f9f0db4b36282e6955fdeb807c232a72e"
+      },
+      {
+        "executed": 5000,
+        "identity_sha256": "57737f18fecf76ff207d69ea35fb711a3451ee11aaabccbb227b225a585fd8e3",
+        "opcode": "C1.2",
+        "source_git_blob": "15176d2643600584ed0a5fc5d5b0b367a115ebe4"
+      },
+      {
+        "executed": 5000,
+        "identity_sha256": "1a760a4c780f1a4b2a38af2fdff93174a6663672afb950ca7f166c2ef23d6ec0",
+        "opcode": "C1.3",
+        "source_git_blob": "a0f3b9e28a4f981d91099e348a6187858348d4e0"
+      },
+      {
+        "executed": 5000,
+        "identity_sha256": "3b5bc04ab59d2385592941f6fd97cfbc957cb11083bda335dff9dfedfc0f1ba0",
+        "opcode": "C1.4",
+        "source_git_blob": "fcc22ab039d4a31bf4b3cf220c5b722fcddbe483"
+      },
+      {
+        "executed": 5000,
+        "identity_sha256": "fbe4d3c423a73b05b5859c4d13870c527fef991deaadd37582c9be256107b850",
+        "opcode": "C1.5",
+        "source_git_blob": "dd39064e1f4cc2954f382f51b824f9e8da1656f6"
+      },
+      {
+        "executed": 5000,
+        "identity_sha256": "965e9fb5e7da3d25b28a57201743ca7596fdfed54b08f6826d365463a046347a",
+        "opcode": "C1.7",
+        "source_git_blob": "71bb0307a075ddf048bccd427c9625aec1474c2c"
+      },
+      {
+        "executed": 5000,
+        "identity_sha256": "5828110391475762873aad0b0edcf70d8e044f48be21ad7e9a173ed204ed4f89",
+        "opcode": "D0.0",
+        "source_git_blob": "5ff63f6d49204576df389cf3248a52acb34ef73b"
+      },
+      {
+        "executed": 5000,
+        "identity_sha256": "d20438fb84504a43470c531e0199f989e8e36682151adb82cc1a18fa756ad079",
+        "opcode": "D0.1",
+        "source_git_blob": "b506b55017a79ad1e6f87793d5863b1b25546dfb"
+      },
+      {
+        "executed": 5000,
+        "identity_sha256": "2183c27022ef6d8841d0a5cab8ece78763dd352117956305032eda5207bd0695",
+        "opcode": "D0.2",
+        "source_git_blob": "ef1f7eb79200803322a6fc3e735656e547877f50"
+      },
+      {
+        "executed": 5000,
+        "identity_sha256": "3f69b3da4415fccd530e1edabfe7142cd885da5450d11907f379ec2971b0423f",
+        "opcode": "D0.3",
+        "source_git_blob": "b479c993ab0d8f4198d449300f9b7de453840049"
+      },
+      {
+        "executed": 5000,
+        "identity_sha256": "6660e14ba2a9d1562405f4568cfb220b45215cd4ca52674f8eceb838545fd558",
+        "opcode": "D0.4",
+        "source_git_blob": "ad68be8ee4b517c2f09e5d701dab779077df1954"
+      },
+      {
+        "executed": 5000,
+        "identity_sha256": "b34a87a9f1b7e277201f0b98d073db81002c88793bb3547d9c3de411bf3f1d5e",
+        "opcode": "D0.5",
+        "source_git_blob": "2d9ea5809b471529cc3db99e5c0680633edbab5d"
+      },
+      {
+        "executed": 5000,
+        "identity_sha256": "4dc8f887dbcc501f30f2d6b290b58a7155d83fbfd4c9414522b86524b875963b",
+        "opcode": "D0.7",
+        "source_git_blob": "8b3e38e79c839546506b62db8ce902b5faaa4e9a"
+      },
+      {
+        "executed": 5000,
+        "identity_sha256": "72f616562f2aa2afb8f300046e0c490bca9fa2c27543d4798d3859dfee6d9be6",
+        "opcode": "D1.0",
+        "source_git_blob": "a055f4296d9487392b172cb0658d60624c2d9050"
+      },
+      {
+        "executed": 5000,
+        "identity_sha256": "9254ed6e15959e11923b2ad8afb6340a891c2f069ceb02ccad0bd3bb61256e68",
+        "opcode": "D1.1",
+        "source_git_blob": "0bd99571c28790fc4aa842c4d42c6957d1b71f35"
+      },
+      {
+        "executed": 5000,
+        "identity_sha256": "c30d347db9b233b3fe0e1ed6a8a44b3b7beca848c141fac49f87b8dd4e9af97e",
+        "opcode": "D1.2",
+        "source_git_blob": "c8141097a2f6c7287829c45c2df1c5ea965eb8ad"
+      },
+      {
+        "executed": 5000,
+        "identity_sha256": "b3f9ac7542e603cb924f8d67039728afafd1f9ee80ce60e21618ec51b01fba0f",
+        "opcode": "D1.3",
+        "source_git_blob": "8edd0ff45b556636d7cb2d317432aed083b65881"
+      },
+      {
+        "executed": 5000,
+        "identity_sha256": "b2039e75faaf9bb478e59ccf5262ec028ddbb586f7b2f873572e5ae2e908cc62",
+        "opcode": "D1.4",
+        "source_git_blob": "a6ca2b6d488e2d67e848cd60c92b77caf6639f1b"
+      },
+      {
+        "executed": 5000,
+        "identity_sha256": "5212316e5c3d9d7131087fc1e711a72c561853dbe6d8cfebb1715cd6231e3604",
+        "opcode": "D1.5",
+        "source_git_blob": "e986f56c33897d5692750a09281fc96fbfbec8b2"
+      },
+      {
+        "executed": 5000,
+        "identity_sha256": "d48503a474d7fbce08a5313ba12bdd4de56e3a6fc3a597d330f3d5c127099e3c",
+        "opcode": "D1.7",
+        "source_git_blob": "fd89ffe3f7387f657ea650a80c00c0afd791b502"
+      },
+      {
+        "executed": 5000,
+        "identity_sha256": "4c3b80b8d2a7b484b915c501b6d9ac6cc7e246a600d3d0c7b88fc7d0a41c032a",
+        "opcode": "D2.0",
+        "source_git_blob": "e3d9f3de1341809c59ed0e080a98fb66357b2614"
+      },
+      {
+        "executed": 5000,
+        "identity_sha256": "c5735891762bfbe5c121764747a166fdaaa59213845553043fdb46a09fdbeb1b",
+        "opcode": "D2.1",
+        "source_git_blob": "4a7c0f7e28c6a9dd3c0653b2a1b74aac5624cbd7"
+      },
+      {
+        "executed": 5000,
+        "identity_sha256": "eb106b701b84ab63af5c9c7ccd7f7064479c86842318eeb70e86e0801a024b00",
+        "opcode": "D2.2",
+        "source_git_blob": "11e108173ae8c89860c43e67f4b41618a2716505"
+      },
+      {
+        "executed": 5000,
+        "identity_sha256": "4e2756232af42fd26156a1f288d9b989b3e6a784de80ca55f7a737971939183f",
+        "opcode": "D2.3",
+        "source_git_blob": "39d7e069a99967677bcc02ca878e4d36c16e979c"
+      },
+      {
+        "executed": 5000,
+        "identity_sha256": "c1d7d0376a1805f1bb59c9049649671bf5beca3b78098b81c88953e974d77e17",
+        "opcode": "D2.4",
+        "source_git_blob": "1e395b3123580a56c8d1d131c23c16f0c095a18f"
+      },
+      {
+        "executed": 5000,
+        "identity_sha256": "4142b8d954d55a0e340caa50bc9dff52614c108843c50b5bd1b370f7474aa4fb",
+        "opcode": "D2.5",
+        "source_git_blob": "ef4caf532218dedd34195a66ebb4641b1af2e814"
+      },
+      {
+        "executed": 5000,
+        "identity_sha256": "f962faa6e2c52a346ea1fadb2e12c71144dac8bf46cf547d91015fa72fe0e3e9",
+        "opcode": "D2.7",
+        "source_git_blob": "bff3fa472b38ac9b865a24bb4a24c7f3cb750250"
+      },
+      {
+        "executed": 5000,
+        "identity_sha256": "8f02fd18ce82f181f28b87fe326903bd30273a82a0a2f937b7d182abc0a7b798",
+        "opcode": "D3.0",
+        "source_git_blob": "274292e8c0e7f0633521bdf0c727fabcb9dda097"
+      },
+      {
+        "executed": 5000,
+        "identity_sha256": "3583655ec8a1b597bffa50445a4e96c14da012d30ec50b3c1fb4240f32c188bd",
+        "opcode": "D3.1",
+        "source_git_blob": "c43eb983b68b48d75f8f54c9e1ff8fba8b13fb08"
+      },
+      {
+        "executed": 5000,
+        "identity_sha256": "e1a8ed5421232f0b683345a77fa616e26c527aa1b327af17e4167f5c4d44d677",
+        "opcode": "D3.2",
+        "source_git_blob": "8c785c38e70537586ff4a556545a62b3229f193e"
+      },
+      {
+        "executed": 5000,
+        "identity_sha256": "be5bd86b4e6fb6c120f62e31ee9e775b222bb6bbc6533cf1192c771b6b5a6f73",
+        "opcode": "D3.3",
+        "source_git_blob": "e75e33f5b9425074194bf6a10543ed069d694475"
+      },
+      {
+        "executed": 5000,
+        "identity_sha256": "5853a765fdadeb1cb9d6858a89c5b7872f55fefe617beacd62c6591cd4a1e103",
+        "opcode": "D3.4",
+        "source_git_blob": "7922c100fdc9f10095a9bdc7a44df511eda9b679"
+      },
+      {
+        "executed": 5000,
+        "identity_sha256": "f13e20dc3731272c9ef05bb81433c2b668e8e369835df379b554516dd163359f",
+        "opcode": "D3.5",
+        "source_git_blob": "62108972a589d17004029329b990077daaa5f9ed"
+      },
+      {
+        "executed": 5000,
+        "identity_sha256": "5a9dcaf602b79b75d5da957a2ef1b45ddaca5bf333a08b410ac6806315b08804",
+        "opcode": "D3.7",
+        "source_git_blob": "7f7ace2819ffc874c4d0d13511277fd7dc0f921b"
+      }
+    ],
+    "prior_combined_passed": 800998,
+    "schema_version": 1,
+    "scope": "shift-increment-only",
+    "shift_totals": {
+      "discovered": 210000,
+      "executed": 210000,
+      "failed": 0,
+      "passed": 210000,
+      "revoked": 0
+    },
+    "validation": "PASS"
+  },
+  "python_tests": 189,
+  "required_opcode_files": 307,
+  "retained_rtl_mutants": 60,
+  "run": {
+    "build_dir": "/mnt/d/GitHub/SPK286/build/phase7-shift-final",
+    "build_jobs": 4,
+    "command": "make phase7-shift-check",
+    "corpus_path": "/mnt/d/GitHub/SPK286/.cache/phase7-clean-corpus-223",
+    "end": 1788886995.595894,
+    "linux_make_exit": 0,
+    "log_sha256": "3c94d13dfa349fd6bc3750206f3174bbaf444041696881e23f8a7f3d828b0900",
+    "start": 1788884578.7959764
+  },
+  "schema_version": 1,
+  "scope_manifest_sha256": "c14b1996fb5f2f20f25244b9b03e765a7bf467b8e2085d93c30b629844171f46",
+  "synthesis": {
+    "baseline": {
+      "mapped_cells": 10213,
+      "sequential_cells": 963
+    },
+    "current": {
+      "mapped_cells": 10681,
+      "sequential_cells": 1018
+    },
+    "delta": {
+      "mapped_cells": 468,
+      "sequential_cells": 55
+    }
+  },
+  "validation": "PASS",
+  "validation_archive": {
+    "path": ".cache/phase7-shift-validation-20260908.zip",
+    "sha256": "e5833e4d9029b741faf1811cdce4655961001bdb4e6180246ff0e4c3f8131296",
+    "verified_entries": 569
+  },
+  "work_branch": "codex/phase7-realmode-completion"
+}

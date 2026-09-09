@@ -1,0 +1,354 @@
+{
+  "schema_version": 1,
+  "status": "all-focused-checks-pass-fresh-integrated-gate-pending",
+  "delivered": false,
+  "base_commit": "99cf002238b19532150056f3ed83e3e99ed80917",
+  "records": {
+    "prototype-arithmetic-compiler-1": {
+      "results": [
+        {
+          "command": [
+            "make",
+            "microcode"
+          ],
+          "start": 1788935051.0081673,
+          "end": 1788935051.332947,
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "python3",
+            "-m",
+            "unittest",
+            "discover",
+            "-s",
+            "tests"
+          ],
+          "start": 1788935051.3329504,
+          "end": 1788935066.3519595,
+          "exit_code": 1
+        }
+      ],
+      "log_sha256": "60d51d753f392691be4a7b32c91ce6e6cce394663c94f4aaa2ab30ba8b637f82"
+    },
+    "prototype-arithmetic-compiler-2": {
+      "results": [
+        {
+          "command": [
+            "make",
+            "microcode"
+          ],
+          "start": 1788935098.253189,
+          "end": 1788935098.4709008,
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "python3",
+            "-m",
+            "unittest",
+            "discover",
+            "-s",
+            "tests"
+          ],
+          "start": 1788935098.4709032,
+          "end": 1788935112.085084,
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "make",
+            "microcode-test",
+            "microcode-audit",
+            "lint"
+          ],
+          "start": 1788935112.085087,
+          "end": 1788935119.6765435,
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "bash",
+            "scripts/test_units.sh",
+            "both",
+            "spk286_decoder"
+          ],
+          "start": 1788935119.6765459,
+          "end": 1788935125.127084,
+          "exit_code": 0
+        }
+      ],
+      "log_sha256": "7fbcaa932e9903711a15f13a7dfcdf3af649e6cba9bb87fb09ac64fadb820e22"
+    },
+    "prototype-arithmetic-focused-1": {
+      "results": [
+        {
+          "command": [
+            "python3",
+            "-m",
+            "unittest",
+            "discover",
+            "-s",
+            "tests"
+          ],
+          "start": 1788935197.3951442,
+          "end": 1788935209.754596,
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "make",
+            "lint"
+          ],
+          "start": 1788935209.7546015,
+          "end": 1788935213.792472,
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "bash",
+            "scripts/test_units.sh",
+            "both",
+            "spk286_muldiv"
+          ],
+          "start": 1788935213.7924743,
+          "end": 1788935271.2953336,
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "bash",
+            "scripts/test_units.sh",
+            "both",
+            "spk286_muldiv_instructions"
+          ],
+          "start": 1788935271.2953362,
+          "end": 1788935338.493185,
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "bash",
+            "scripts/test_units.sh",
+            "both",
+            "spk286_muldiv_lifecycle"
+          ],
+          "start": 1788935338.4931872,
+          "end": 1788935374.3973904,
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "bash",
+            "scripts/test_units.sh",
+            "both",
+            "spk286_far_instructions"
+          ],
+          "start": 1788935374.397393,
+          "end": 1788935403.9652326,
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "bash",
+            "scripts/test_units.sh",
+            "both",
+            "spk286_far_lifecycle"
+          ],
+          "start": 1788935403.965235,
+          "end": 1788935432.610034,
+          "exit_code": 0
+        }
+      ],
+      "log_sha256": "48ab0fe8ff27250cdad6cf30f3347465383de1a0b275d59e4f2888db184cd030"
+    },
+    "prototype-arithmetic-physical-1": {
+      "results": [
+        {
+          "command": [
+            "python3",
+            "-m",
+            "unittest",
+            "discover",
+            "-s",
+            "tests"
+          ],
+          "start": 1788935484.177632,
+          "end": 1788935497.1970465,
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "make",
+            "microcode-test",
+            "microcode-audit",
+            "verilator",
+            "iverilog"
+          ],
+          "start": 1788935497.1970499,
+          "end": 1788935512.2060158,
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "python3",
+            "-m",
+            "tools.run_singlestep",
+            "--repo",
+            "/mnt/d/GitHub/SPK286/.cache/phase7-clean-corpus-arithmetic-285",
+            "--build-dir",
+            "/mnt/d/GitHub/SPK286/build/phase7-arithmetic-prototype/build/physical-1",
+            "--executable",
+            "/mnt/d/GitHub/SPK286/build/phase7-arithmetic-prototype/build/physical-1/verilator/obj_dir/spk286_smoke",
+            "--full",
+            "--include-exceptions",
+            "--include-prefixes",
+            "--opcode",
+            "69",
+            "--opcode",
+            "6B",
+            "--opcode",
+            "F6.4",
+            "--opcode",
+            "F6.5",
+            "--opcode",
+            "F6.6",
+            "--opcode",
+            "F6.7",
+            "--opcode",
+            "F7.4",
+            "--opcode",
+            "F7.5",
+            "--opcode",
+            "F7.6",
+            "--opcode",
+            "F7.7",
+            "--opcode",
+            "C4",
+            "--opcode",
+            "C5",
+            "--opcode",
+            "9A",
+            "--opcode",
+            "EA",
+            "--opcode",
+            "CA",
+            "--opcode",
+            "CB",
+            "--opcode",
+            "FF.3",
+            "--opcode",
+            "FF.5"
+          ],
+          "start": 1788935512.2060184,
+          "end": 1788935540.186907,
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "python3",
+            "-m",
+            "tools.audit_muldiv_adapter",
+            "--repo",
+            "/mnt/d/GitHub/SPK286/.cache/phase7-clean-corpus-arithmetic-285",
+            "--executable",
+            "/mnt/d/GitHub/SPK286/build/phase7-arithmetic-prototype/build/physical-1/verilator/obj_dir/spk286_smoke",
+            "--build-dir",
+            "/mnt/d/GitHub/SPK286/build/phase7-arithmetic-prototype/build/physical-1/adapter"
+          ],
+          "start": 1788935540.1869094,
+          "end": 1788935543.380072,
+          "exit_code": 0
+        }
+      ],
+      "log_sha256": "c50d7248e1be88ffaf3afb777f05b1ffb2713ca33e63a1039756282e4823e86b"
+    },
+    "prototype-arithmetic-parser-audit": {
+      "results": [
+        {
+          "command": [
+            "python3",
+            "-m",
+            "tools.audit_singlestep",
+            "--repo",
+            "/mnt/d/GitHub/SPK286/.cache/phase7-clean-corpus-arithmetic-285",
+            "--build-dir",
+            "/mnt/d/GitHub/SPK286/build/phase7-arithmetic-prototype/build/physical-1",
+            "--include-prefixes"
+          ],
+          "start": 1788935623.7946107,
+          "end": 1788936063.7698567,
+          "exit_code": 0
+        }
+      ],
+      "log_sha256": "2c384401e1036263f348d5d8b9c651e0e196112d4eeabeadf1e01ec27499ca94"
+    },
+    "prototype-arithmetic-audits-1": {
+      "results": [
+        {
+          "command": [
+            "python3",
+            "-m",
+            "tools.audit_muldiv"
+          ],
+          "start": 1788935622.4924948,
+          "end": 1788936034.9948137,
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "python3",
+            "-m",
+            "tools.audit_far"
+          ],
+          "start": 1788936034.9948173,
+          "end": 1788936154.204213,
+          "exit_code": 0
+        },
+        {
+          "command": [
+            "make",
+            "synth-check"
+          ],
+          "start": 1788936154.2042158,
+          "end": 1788936195.055624,
+          "exit_code": 0
+        }
+      ],
+      "log_sha256": "5616afb0b2dbe14a27fe4f1183476ff06797a1c44f1a67635b3b4939ba828e7b"
+    }
+  },
+  "physical": {
+    "executed": 90000,
+    "passed": 90000,
+    "failed": 0,
+    "arithmetic": 50000,
+    "retained_far": 40000,
+    "skipped": 0,
+    "new_revocations": 0
+  },
+  "python_tests": 235,
+  "compiler_tests": 84,
+  "microcode": {
+    "format": 15,
+    "entries": 87,
+    "words": 521,
+    "address_bits": 10,
+    "control_bits": 7
+  },
+  "full_phase7": "incomplete",
+  "synthesis": {
+    "mapped_cells": 16484,
+    "sequential_cells": 1395,
+    "baseline_mapped_cells": 14069,
+    "baseline_sequential_cells": 1195,
+    "delta_mapped_cells": 2415,
+    "delta_sequential_cells": 200
+  },
+  "mutations": {
+    "new_arithmetic": 17,
+    "retained_far": 12,
+    "all_pristine_pass": true
+  },
+  "parser_audit_files": 285
+}

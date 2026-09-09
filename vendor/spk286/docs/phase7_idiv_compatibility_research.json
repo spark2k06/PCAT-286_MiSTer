@@ -1,0 +1,57 @@
+{
+  "status": "hypothesis-matches-full-physical-file",
+  "counts": {
+    "cases": 5000,
+    "faults": 3057
+  },
+  "errors": [],
+  "overflow_acceptances": [
+    {
+      "index": 952,
+      "hash": "0038b4bacfb75535b5da175f619b0812b16d0601",
+      "dividend": 33217,
+      "divisor": 124,
+      "mathematical_quotient": -260,
+      "finite_result": 49536
+    },
+    {
+      "index": 1085,
+      "hash": "de153d1e3812cdb2c9d25272844b4b28a5adc35f",
+      "dividend": 35936,
+      "divisor": 103,
+      "mathematical_quotient": -287,
+      "finite_result": 57472
+    },
+    {
+      "index": 2653,
+      "hash": "dce03c62813266bf0ba50e3325fa3898132cad1f",
+      "dividend": 45283,
+      "divisor": 30,
+      "mathematical_quotient": -675,
+      "finite_result": 58240
+    },
+    {
+      "index": 4297,
+      "hash": "38a27640b8a9475f75998d2cab801d51eb8bb0b2",
+      "dividend": 25529,
+      "divisor": 185,
+      "mathematical_quotient": -359,
+      "finite_result": 14720
+    }
+  ],
+  "source_sha256": "2f2afe7524d3bd1814a9f840bd4543eedc6914c40efc632763157f34b9394d49",
+  "reference": "https://github.com/SingleStepTests/80286/issues/1#issuecomment-4121587450",
+  "limits": "Reference algorithm is evidence, not physical adjudication; only 5000 unchanged captured cases support this hypothesis. Production RTL unchanged.",
+  "exhaustive_research": {
+    "pairs": 16777216,
+    "legal_matches": 4210433,
+    "invalid_rejected": 12550526,
+    "overflow_acceptances": 16257,
+    "additional_positive_overflow_predictions": 128,
+    "errors": 0,
+    "interpretation": "All 4210433 legal mathematical divisions match. The recurrence predicts extra illegal successes: 16129 negative overflow and 128 positive overflow. The physical file only supports four negative-overflow examples. Do not import unobserved positive-overflow predictions merely because the reference does."
+  },
+  "implementation_plan": "Keep mathematical results and zero-divisor checks. For negative byte-IDIV overflow only, obtain the finite eight-step candidate and accept its minimum signed quotient. Keep Intel-defined faults for positive overflow and all word/unsigned division.",
+  "reference_source_sha256": "85695704f4ca0de1a38b2e1959159919178aaf2da58abee13e6b5401aa03c02a",
+  "reuse": "No external source code copied into project-owned RTL or microcode; inspected as a hypothesis about a finite division algorithm. Physical data remains authoritative evidence."
+}

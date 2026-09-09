@@ -1,0 +1,326 @@
+{
+  "baseline": "integrated arithmetic format 15; final arithmetic gate running separately",
+  "compiler_tests": 86,
+  "completed_user_milestone": false,
+  "expected_values_changed": false,
+  "implemented_opcode_files": 295,
+  "microcode": {
+    "address_bits": 10,
+    "control_bits": 8,
+    "entries": 92,
+    "format": 16,
+    "preserved_arithmetic_words": 521,
+    "words": 564
+  },
+  "new_revocations": 0,
+  "new_string_rtl_mutants": 18,
+  "ordinary_tests": 240,
+  "pending": [
+    "fresh full integrated 1338997-case gate",
+    "CX=0 competing event ordering adjudication",
+    "independent architectural review",
+    "integration and verified delivery"
+  ],
+  "physical_cases": 140000,
+  "physical_cohorts": {
+    "arithmetic": 50000,
+    "far": 40000,
+    "memory_strings": 50000
+  },
+  "required_opcode_files": 307,
+  "retained_arithmetic_rtl_mutants": 17,
+  "runs": {
+    "prototype-string-arithmetic-audits-1": {
+      "log_sha256": "0fd3ca4695ec9d549887a929b14517f4f0eb1dc47672f0f12e1785403164d61a",
+      "results": [
+        {
+          "command": [
+            "python3",
+            "-m",
+            "tools.audit_strings"
+          ],
+          "end": 1788938607.4938679,
+          "exit_code": 0,
+          "start": 1788938547.9266102
+        },
+        {
+          "command": [
+            "python3",
+            "-m",
+            "tools.audit_muldiv"
+          ],
+          "end": 1788938972.5702763,
+          "exit_code": 0,
+          "start": 1788938607.4938717
+        },
+        {
+          "command": [
+            "make",
+            "synth-check"
+          ],
+          "end": 1788939002.5747492,
+          "exit_code": 0,
+          "start": 1788938972.5702798
+        }
+      ]
+    },
+    "prototype-string-arithmetic-compiler-4": {
+      "log_sha256": "75f4f94a4c3ab1737928d80645f663d6220aa8221e58627739b2e21d7ef12147",
+      "results": [
+        {
+          "command": [
+            "make",
+            "microcode"
+          ],
+          "end": 1788938070.4002106,
+          "exit_code": 0,
+          "start": 1788938070.1845837
+        },
+        {
+          "command": [
+            "python3",
+            "-m",
+            "unittest",
+            "discover",
+            "-s",
+            "tests"
+          ],
+          "end": 1788938085.9375813,
+          "exit_code": 0,
+          "start": 1788938070.4002142
+        },
+        {
+          "command": [
+            "make",
+            "microcode-test",
+            "microcode-check",
+            "microcode-audit",
+            "lint"
+          ],
+          "end": 1788938095.0012996,
+          "exit_code": 0,
+          "start": 1788938085.9375837
+        },
+        {
+          "command": [
+            "bash",
+            "scripts/test_units.sh",
+            "both",
+            "spk286_decoder"
+          ],
+          "end": 1788938100.5196495,
+          "exit_code": 0,
+          "start": 1788938095.0013034
+        }
+      ]
+    },
+    "prototype-string-arithmetic-focused-1": {
+      "log_sha256": "4e693ae5420c18220b90abb578c365fbc73b8464fbebea1c098f0d8c42c81022",
+      "results": [
+        {
+          "command": [
+            "bash",
+            "scripts/test_units.sh",
+            "both",
+            "spk286_string_instructions"
+          ],
+          "end": 1788938225.7121847,
+          "exit_code": 0,
+          "start": 1788938180.7998967
+        },
+        {
+          "command": [
+            "bash",
+            "scripts/test_units.sh",
+            "both",
+            "spk286_string_lifecycle"
+          ],
+          "end": 1788938268.6302476,
+          "exit_code": 0,
+          "start": 1788938225.7121882
+        },
+        {
+          "command": [
+            "bash",
+            "scripts/test_units.sh",
+            "both",
+            "spk286_string_boundaries"
+          ],
+          "end": 1788938308.7785559,
+          "exit_code": 0,
+          "start": 1788938268.6302497
+        },
+        {
+          "command": [
+            "bash",
+            "scripts/test_units.sh",
+            "both",
+            "spk286_muldiv_instructions"
+          ],
+          "end": 1788938376.0836442,
+          "exit_code": 0,
+          "start": 1788938308.7785585
+        },
+        {
+          "command": [
+            "bash",
+            "scripts/test_units.sh",
+            "both",
+            "spk286_muldiv_lifecycle"
+          ],
+          "end": 1788938409.4557924,
+          "exit_code": 0,
+          "start": 1788938376.0836465
+        },
+        {
+          "command": [
+            "bash",
+            "scripts/test_units.sh",
+            "both",
+            "spk286_far_instructions"
+          ],
+          "end": 1788938435.7495325,
+          "exit_code": 0,
+          "start": 1788938409.4557953
+        },
+        {
+          "command": [
+            "bash",
+            "scripts/test_units.sh",
+            "both",
+            "spk286_far_lifecycle"
+          ],
+          "end": 1788938461.7946484,
+          "exit_code": 0,
+          "start": 1788938435.749536
+        }
+      ]
+    },
+    "prototype-string-arithmetic-parser-audit": {
+      "log_sha256": "8437cbffa69d33f7ccbac59fdfd06e7fe1a74f647f506d317ba928d8f230321e",
+      "results": [
+        {
+          "command": [
+            "python3",
+            "-m",
+            "tools.audit_singlestep",
+            "--repo",
+            "/mnt/d/GitHub/SPK286/.cache/phase7-clean-corpus-string-arithmetic-295",
+            "--build-dir",
+            "/mnt/d/GitHub/SPK286/build/phase7-string-arithmetic-prototype/build/physical-2",
+            "--include-prefixes"
+          ],
+          "end": 1788939133.6050618,
+          "exit_code": 0,
+          "start": 1788938706.5370398
+        }
+      ]
+    },
+    "prototype-string-arithmetic-physical-2": {
+      "log_sha256": "6491958b20a2b801b469583e5cb0bafa87d866fad62cb18df897286b28e0cbd3",
+      "results": [
+        {
+          "command": [
+            "make",
+            "verilator",
+            "iverilog"
+          ],
+          "end": 1788938597.9975774,
+          "exit_code": 0,
+          "start": 1788938587.2985063
+        },
+        {
+          "command": [
+            "python3",
+            "-m",
+            "tools.run_singlestep",
+            "--full",
+            "--include-exceptions",
+            "--include-prefixes",
+            "--opcode",
+            "A4",
+            "--opcode",
+            "A5",
+            "--opcode",
+            "A6",
+            "--opcode",
+            "A7",
+            "--opcode",
+            "AA",
+            "--opcode",
+            "AB",
+            "--opcode",
+            "AC",
+            "--opcode",
+            "AD",
+            "--opcode",
+            "AE",
+            "--opcode",
+            "AF",
+            "--opcode",
+            "69",
+            "--opcode",
+            "6B",
+            "--opcode",
+            "F6.4",
+            "--opcode",
+            "F6.5",
+            "--opcode",
+            "F6.6",
+            "--opcode",
+            "F6.7",
+            "--opcode",
+            "F7.4",
+            "--opcode",
+            "F7.5",
+            "--opcode",
+            "F7.6",
+            "--opcode",
+            "F7.7",
+            "--opcode",
+            "C4",
+            "--opcode",
+            "C5",
+            "--opcode",
+            "9A",
+            "--opcode",
+            "EA",
+            "--opcode",
+            "CA",
+            "--opcode",
+            "CB",
+            "--opcode",
+            "FF.3",
+            "--opcode",
+            "FF.5"
+          ],
+          "end": 1788938643.1749856,
+          "exit_code": 0,
+          "start": 1788938597.9975812
+        },
+        {
+          "command": [
+            "python3",
+            "-m",
+            "tools.audit_muldiv_adapter",
+            "--repo",
+            "/mnt/d/GitHub/SPK286/.cache/phase7-clean-corpus-string-arithmetic-295",
+            "--executable",
+            "/mnt/d/GitHub/SPK286/build/phase7-string-arithmetic-prototype/build/physical-2/verilator/obj_dir/spk286_smoke",
+            "--build-dir",
+            "/mnt/d/GitHub/SPK286/build/phase7-string-arithmetic-prototype/build/physical-2/comparator"
+          ],
+          "end": 1788938646.0439398,
+          "exit_code": 0,
+          "start": 1788938643.1749887
+        }
+      ]
+    }
+  },
+  "schema_version": 1,
+  "status": "focused-validation-PASS; full integrated gate and review pending",
+  "synthesis": {
+    "mapped_cells": 17058,
+    "sequential_cells": 1398
+  }
+}

@@ -3,7 +3,6 @@ derive_clock_uncertainty
 
 # core specific constraints
 # Clocks - PLL principal (Chipset/SDRAM domain)
-set CLOCK_CORE      {emu|pll|pll_inst|altera_pll_i|cyclonev_pll|counter[0].output_counter|divclk}
 set CLOCK_CHIP      {emu|pll|pll_inst|altera_pll_i|cyclonev_pll|counter[1].output_counter|divclk}
 # Clocks - PLL video domain (precise frequencies)
 set CLOCK_VIDEO_BASE   {emu|pll_system_inst|pll_system_inst|altera_pll_i|general[0].gpll~PLL_OUTPUT_COUNTER|divclk}
@@ -35,16 +34,17 @@ set_false_path -from [get_clocks $CLOCK_VIDEO_VGA] -to [get_clocks $CLOCK_CHIP]
 set_false_path -from [get_clocks $CLOCK_CHIP] -to [get_clocks clk_14_318]
 set_false_path -from [get_clocks clk_14_318] -to [get_clocks $CLOCK_CHIP]
 
-set_false_path -from [get_clocks $CLOCK_CORE] -to [get_clocks $CLOCK_VIDEO_BASE]
-set_false_path -from [get_clocks $CLOCK_VIDEO_BASE] -to [get_clocks $CLOCK_CORE]
-set_false_path -from [get_clocks $CLOCK_CORE] -to [get_clocks $CLOCK_VIDEO_X2]
-set_false_path -from [get_clocks $CLOCK_VIDEO_X2] -to [get_clocks $CLOCK_CORE]
-set_false_path -from [get_clocks $CLOCK_CORE] -to [get_clocks $CLOCK_VIDEO_OUT_PS]
-set_false_path -from [get_clocks $CLOCK_VIDEO_OUT_PS] -to [get_clocks $CLOCK_CORE]
-set_false_path -from [get_clocks $CLOCK_CORE] -to [get_clocks $CLOCK_VIDEO_VGA]
-set_false_path -from [get_clocks $CLOCK_VIDEO_VGA] -to [get_clocks $CLOCK_CORE]
-set_false_path -from [get_clocks $CLOCK_CORE] -to [get_clocks clk_14_318]
-set_false_path -from [get_clocks clk_14_318] -to [get_clocks $CLOCK_CORE]
+# The inherited MCL86-only 100 MHz EU clock is no longer instantiated. SPK286
+# and its bridge both use CLOCK_CHIP, so no CLOCK_CORE CDC exceptions remain.
+
+# The native VGA clock is an alternative source selected at run time instead
+# of the legacy EGA clock. It is asynchronous to the legacy base/X2 pipeline;
+# crossings are handled by the video front ends and must not be timed as a
+# fixed-phase PLL relationship.
+set_false_path -from [get_clocks $CLOCK_VIDEO_VGA] -to [get_clocks $CLOCK_VIDEO_BASE]
+set_false_path -from [get_clocks $CLOCK_VIDEO_BASE] -to [get_clocks $CLOCK_VIDEO_VGA]
+set_false_path -from [get_clocks $CLOCK_VIDEO_VGA] -to [get_clocks $CLOCK_VIDEO_X2]
+set_false_path -from [get_clocks $CLOCK_VIDEO_X2] -to [get_clocks $CLOCK_VIDEO_VGA]
 
 # HDMI_TX can switch at run time between the scaler's HDMI clock and the
 # direct-video clock.  They are independent PLL domains.

@@ -622,6 +622,7 @@ module emu
 
     logic reset_cpu_ff = 1'b1;
     logic reset_cpu = 1'b1;
+    logic spk_reset = 1'b1;
     logic [15:0] reset_cpu_count = 16'h0000;
 
     always @(negedge clk_chipset, posedge reset)
@@ -631,6 +632,12 @@ module emu
         else
             reset_cpu_ff <= reset;
     end
+
+    // SPK286 uses a synchronous reset throughout its datapath. Register the
+    // machine reset on the CPU clock so its high-fanout release has a complete
+    // clock period, while retaining the inherited reset stretcher and order.
+    always_ff @(posedge clk_chipset)
+        spk_reset <= reset_cpu;
 
     always @(negedge clk_chipset, posedge reset)
     begin
@@ -1199,7 +1206,7 @@ module emu
     // or unsafe pause. The selected OSD pace controls only XT bus phases.
     spk286_machine_cpu u_SPK286 (
         .clk                    (clk_chipset),
-        .reset                  (reset_cpu),
+        .reset                  (spk_reset),
         .execute_enable         (1'b1),
         .ready                  (spk_ready),
         .data_in                (spk_data_in),
@@ -1236,7 +1243,7 @@ module emu
 
     spk286_xt_bridge u_SPK286_XT_BRIDGE (
         .clk                    (clk_chipset),
-        .reset                  (reset_cpu),
+        .reset                  (spk_reset),
         .cpu_bus_valid          (spk_bus_valid),
         .cpu_address            (spk_address),
         .cpu_data_out           (spk_data_out),
@@ -1268,7 +1275,7 @@ module emu
 
     spk286_xt_ownership u_SPK286_XT_OWNERSHIP (
         .external_request       (processor_hold_request),
-        .loader_reset_owner     (reset_cpu),
+        .loader_reset_owner     (spk_reset),
         .cpu_hlda               (spk_hlda),
         .cpu_lock               (spk_bus_lock),
         .bridge_idle            (bridge_idle),
@@ -1281,7 +1288,7 @@ module emu
     // lights the user LED. This observation path does not affect execution.
     spk286_diag_monitor u_SPK286_DIAG_MONITOR (
         .clk                    (clk_chipset),
-        .reset                  (reset_cpu),
+        .reset                  (spk_reset),
         .accepted_io_write      (xt_valid && processor_cycle_active &&
                                  processor_ready && xt_io && xt_write),
         .port_address           (xt_address[15:0]),

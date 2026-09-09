@@ -12,7 +12,12 @@ python3 scripts/check_pcat_project.py
 cpu_sources=(
   vendor/spk286/microcode/generated/spk286_microcode_pkg.sv
   vendor/spk286/microcode/generated/spk286_microcode_rom.sv
-  vendor/spk286/rtl/*.sv
+)
+for source in vendor/spk286/rtl/*.sv; do
+  [[ "$source" == "vendor/spk286/rtl/spk286_operand.sv" ]] || cpu_sources+=("$source")
+done
+cpu_sources+=(
+  rtl/spk286_integration/spk286_operand_timing.sv
   rtl/spk286_integration/spk286_xt_address_map.sv
   rtl/spk286_integration/spk286_xt_bridge.sv
   rtl/spk286_integration/spk286_machine_cpu.sv

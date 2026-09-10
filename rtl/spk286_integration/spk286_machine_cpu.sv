@@ -37,6 +37,7 @@ module spk286_machine_cpu (
     output logic [15:0]  debug_ip,
     output logic [15:0]  debug_flags,
     output logic [127:0] debug_gpr,
+    output logic [63:0]  debug_segment_selectors,
     output logic [11:0]  debug_micro_pc,
     output logic [3:0]   debug_bus_state
 );
@@ -62,7 +63,6 @@ module spk286_machine_cpu (
     logic [15:0] unused_fetch_ip;
     logic [1:0]  unused_fetch_count;
     logic        unused_fetch_blocked;
-    logic [63:0] unused_debug_segment_selectors;
     logic [95:0] unused_debug_segment_bases;
     logic [63:0] unused_debug_segment_limits;
     logic [31:0] unused_debug_segment_access;
@@ -153,7 +153,7 @@ module spk286_machine_cpu (
         .debug_ip(debug_ip),
         .debug_flags(debug_flags),
         .debug_gpr(debug_gpr),
-        .debug_segment_selectors(unused_debug_segment_selectors),
+        .debug_segment_selectors(debug_segment_selectors),
         .debug_segment_bases(unused_debug_segment_bases),
         .debug_segment_limits(unused_debug_segment_limits),
         .debug_segment_access(unused_debug_segment_access),

@@ -25,6 +25,7 @@ timing_reports=(
     output_files_pcat286/PCAT-286.spk286_internal_hold.rpt
     output_files_pcat286/PCAT-286.spk286_to_bridge_setup.rpt
     output_files_pcat286/PCAT-286.bridge_to_spk286_setup.rpt
+    output_files_pcat286/PCAT-286.spk286_debug_capture_setup.rpt
     output_files_pcat286/PCAT-286.chipset_clock_setup.rpt
     output_files_pcat286/PCAT-286.chipset_clock_hold.rpt
 )

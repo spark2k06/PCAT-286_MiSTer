@@ -13,14 +13,17 @@ file mkdir $output_dir
 
 set spk_registers [get_registers -nowarn {*spk286_machine_cpu:u_SPK286|*}]
 set bridge_registers [get_registers -nowarn {*spk286_xt_bridge:u_SPK286_XT_BRIDGE|*}]
+set debug_snapshot_registers [get_registers -nowarn {*spk286_debug_overlay:u_SPK286_DEBUG_OVERLAY|source_snapshot[*]}]
 set spk_count [get_collection_size $spk_registers]
 set bridge_count [get_collection_size $bridge_registers]
+set debug_snapshot_count [get_collection_size $debug_snapshot_registers]
 
 set summary_path "$output_dir/PCAT-286.spk286_timing_summary.txt"
 set summary_file [open $summary_path w]
 puts $summary_file "SPK286 timing collections"
 puts $summary_file "spk_registers=$spk_count"
 puts $summary_file "bridge_registers=$bridge_count"
+puts $summary_file "debug_snapshot_registers=$debug_snapshot_count"
 close $summary_file
 
 if {$spk_count == 0} {
@@ -46,6 +49,20 @@ if {$bridge_count != 0} {
         -file "$output_dir/PCAT-286.bridge_to_spk286_setup.rpt"
 } else {
     post_message -type error "No SPK286 XT bridge registers matched the timing hierarchy"
+    delete_timing_netlist
+    project_close
+    qexit -error
+}
+
+if {$debug_snapshot_count != 0} {
+    # This is the synchronous source side of the observation handshake. The
+    # wide source_snapshot-to-video_snapshot crossing is intentionally covered
+    # by the CHIP<->VIDEO false paths in PCAT-286.sdc.
+    report_timing -setup -to $debug_snapshot_registers \
+        -npaths 20 -detail full_path \
+        -file "$output_dir/PCAT-286.spk286_debug_capture_setup.rpt"
+} else {
+    post_message -type error "No SPK286 debug source snapshot registers matched"
     delete_timing_netlist
     project_close
     qexit -error

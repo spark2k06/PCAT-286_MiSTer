@@ -47,3 +47,42 @@ The final review reported **no blocking findings**. The reviewer reproduced:
 
 These observations are nonblocking for I4 and remain explicit qualification
 boundaries rather than being promoted to physical-validation claims.
+
+## I5 bring-up instrumentation review
+
+Date: 2026-09-10. Reviewer: independent Codex agent `Turing`.
+
+This second review was explicitly read-only and ran independently while the
+main task owned the build. The reviewer confirmed that it neither modified
+files nor started repository-writing processes. It examined the production
+SPK286 wrapper and XT adapter again, plus the new external-ROM boundary smoke
+and four-page hardware overlay.
+
+No new functional defect was found in the SPK286-to-XT adapter. Status mapping,
+byte selection and aligned-word serialization, request retention, READY and
+COMPLETE handling, LOCK, HOLD/HLDA ownership, signal widths, GPR order and
+segment order were all found consistent.
+
+The review did find instrumentation and test weaknesses. Their disposition is:
+
+1. External-ROM `HLT` and timeout could be accepted after minimal activity.
+   They are now fatal; success is the explicit `EXTERNAL_ROM_BOUNDARY_PASS`
+   condition after reset-vector execution and 128 accepted transfers.
+2. Wide debug vectors crossed clock domains as independently sampled bits.
+   They now use a coherent source snapshot with a toggle/acknowledge handshake.
+3. The observer was reset with SPK286 and could preserve ambiguous splash-time
+   data. It now has a separate hard reset and publishes a visible wrapping
+   `SNAP` sequence while SPK286 reset itself remains observable.
+4. Page selection could change during a frame. It is now synchronized and
+   latched only on vertical blank.
+5. Font/RGB latency and blank-input behavior lacked a functional test.
+   `scripts/test_debug_overlay.sh` now exercises all pages, architectural and
+   trace ordering, coherent refresh, glyph alignment, RGB/HB/VB latency and a
+   splash-off fully blank raster under both Icarus and Verilator.
+6. Trace legend, SPDX identifier and two synthesis-width warnings were fixed.
+
+The external-ROM test remains intentionally a boundary smoke: it does not
+model the complete SDRAM, peripheral and video system and cannot prove a BIOS
+boot. Preliminary synthesis attributed roughly 1,046 ALMs, 1,241 registers,
+8,192 memory bits and one RAM block to the observer. Final resource and focused
+timing evidence must therefore come from the final post-review Quartus build.

@@ -42,6 +42,9 @@ For an architectural overview and possible future improvements, see the
   handling
 * XT bus pace settings: 4.77 MHz, 7.16 MHz, 9.54 MHz and **Max**. These pace
   the retained byte bus; they are not certified 80286 speed grades.
+* Passive four-page SPK286 debug overlay for CPU state, architectural
+  registers, live bus signals and the four latest accepted XT transactions;
+  it includes a live snapshot counter and a splash-off blank-raster fallback
 * XT-derived chipset and peripheral profile
 * **EGA video**: sequencer, graphics controller, attribute controller and a four-plane VRAM, around the UM6845R CRTC
 * Dual EGA dot clock, 14.318181 MHz and 16.257 MHz, selected per mode as on real hardware
@@ -365,9 +368,10 @@ example, or running EGA-only software with nothing else in the picture.
 * Copy `releases/PCAT-286_20260909.rbf` to the MiSTer SD card and select the
   PCAT-286 core.
 * Press Win + F12 on your keyboard.
+  * Boot Splash Screen: select **No** for reproducible SPK286 bring-up.
   * XT Bus Pace: select the retained bus pace.
   * FDD & HDD → HDD Image: FreeDOS_HD.img
-  * System & BIOS → PCAT Main/Diagnostic ROM: select
+  * System & BIOS → PCAT BIOS: select
     `tests/firmware/pcat286_event_diag.rom` for the verified diagnostic path.
   * System & BIOS → EGA BIOS: `ega_bios.rom`. **Required.**
 * Choose Reset & apply settings.
@@ -536,7 +540,7 @@ before writing the file.
 The splash staying on screen with a notice over it means a required ROM has not
 been selected. The notice names which one, and repeats until it is:
 
-* `No PCAT ROM selected` — **System & BIOS → PCAT Main/Diagnostic ROM**
+* `No PCAT ROM selected` — **System & BIOS → PCAT BIOS**
 * `No EGA BIOS selected` — **System & BIOS → EGA BIOS**
 
 The machine is held in reset for as long as that is true, and the splash is put

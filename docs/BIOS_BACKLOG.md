@@ -6,10 +6,36 @@ or binary was changed, and B0-B2 were not started.
 ## Current result
 
 The project-owned diagnostic ROM passes deterministic machine simulations.
-Production PCXT/Micro8088 BIOS execution was not evaluated on physical hardware
-in this task, so there is no honest POST, DOS or CheckIt result to report. The
-unchanged firmware contains 8088/V20/FPU assumptions and may fail even though
-normal 286 identification techniques see SPK286's Real-Mode FLAGS behavior.
+On 2026-09-10 the user reported a first physical-board attempt with the I5 RBF:
+after the splash, neither the supplied XT Sergey-derived BIOS nor the Supersoft
+diagnostic produced visible boot output. A preliminary overlay rendered reset-
+vector-looking values but did not prove that its snapshot was advancing. With
+the splash disabled from core start the same build produced a black machine
+raster and no overlay. These observations motivated a live `SNAP` heartbeat
+and a blank-raster fallback; they are not evidence that SPK286 itself remained
+in reset. The exact board/configuration and loaded RBF hash were not captured,
+so this remains a reported observation rather than a completed I6 result.
+
+The supplied 64 KiB images are retained outside Git under `SW/ROMs/test/`:
+
+| Image | SHA-256 |
+| --- | --- |
+| `xtsergey_mod.rom` | `df25bbc8aba4e35eb56ca585b2c7054da1d7435278b2bfe0f0c7ffae2f85f443` |
+| `supersoft_diag.rom` | `9de4e13b37e05a924db1842510b411e1042268da18b982ce2226c2c66f1ba806` |
+
+A reduced simulation using each exact image, the production SPK286 wrapper,
+XT bridge, KF8288 and READY logic completes the native reset-vector fetch and
+far transfer without a CPU or bridge fault. XT Sergey reaches POST writes
+`01h, 02h, 03h, 04h`; Supersoft enters its low-memory clear loop. This narrows
+but does not reproduce the physical failure because SDRAM, the complete
+peripheral set and video are modeled only at their boundary.
+
+The unchanged firmware contains 8088/V20/FPU assumptions and may still fail
+later even though normal 286 identification techniques see SPK286's Real-Mode
+FLAGS behavior. The next board discriminator is the project-owned
+`pcat286_event_diag.rom`, followed by the passive SPK286 CPU/register/bus/trace
+overlay defined in the I6 checklist. It is not replaced by the Supersoft BIOS
+diagnostic.
 
 ## Later work
 

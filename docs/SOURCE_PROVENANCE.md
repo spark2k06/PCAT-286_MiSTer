@@ -73,6 +73,14 @@ are kept in new `PCAT-286*`, `files_pcat286.qip`, `Chipset_SPK286.sv`,
 `Bus_Arbiter_SPK286.sv` and `rtl/spk286_integration/` paths; the corresponding
 PCXT originals remain present.
 
+The passive SPK286 display methodology in
+`rtl/common/spk286_debug_overlay.sv` is adapted from the user's
+`D:/GitHub/PCXT_MiSTer_devel` branch `test/crtc-debug`, commit
+`f553fb076f102e81c5e58dee4a9c2ea2a2ce9af5` (`Add CRTC Debug Overlay with OSD
+toggle`). The new file records that source and license in its header. The
+imported `rtl/common/common.qip` is changed only to register the new source and
+is therefore listed explicitly in `docs/imports/pcxt-modified-files.txt`.
+
 ## Consumer-side SPK286 timing variant
 
 The complete `vendor/spk286/` snapshot remains byte-for-byte unchanged. The

@@ -81,9 +81,9 @@ module emu
     //
     // The first 64 status bits are fully allocated. The extended status
     // vector continues at bit 64; its first six bits carry the VSync and
-    // HSync width options and bit 70 carries the Sound Blaster IRQ choice,
-    // so those settings remain available to the OSD and are also persisted
-    // by the normal core CFG file.
+    // HSync width options, bit 70 carries the Sound Blaster IRQ choice, and
+    // bits 71:73 control the passive SPK286 debug overlay. These settings
+    // remain available to the OSD and are persisted by the normal core CFG.
     //
     // Spend the extended status bits carefully. Anything already reachable through XTEGACTL
     // is a candidate to give its bit back the same way - Sync Joy to CPU
@@ -92,7 +92,7 @@ module emu
 
 	`include "build_id.v"
 
-    localparam CONF_STR_ROM = "P1FC0,ROM,PCAT Main/Diagnostic ROM:;";
+    localparam CONF_STR_ROM = "P1FC0,ROM,PCAT BIOS:;";
     // The Sound Blaster and the C/MS both live at 220h and collide on
     // 226h/227h, where one puts its DSP reset and the other its detection
     // register, so at most one of them can answer. When both are built that
@@ -165,6 +165,8 @@ module emu
 		"P1FC3,ROM,EGA BIOS:;",
 		"P1-;",
 		"P1OUV,BIOS Writable,None,EC00,Main,All;",
+		"P1O[71],SPK286 Debug,Off,On;",
+		"P1O[73:72],Debug Page,CPU,Registers,Bus,Trace;",
 		"P1-;",	
 		"P2,Audio & Video;",
 		"P2-;",
@@ -961,6 +963,24 @@ module emu
     wire        spk_microcode_fault;
     wire        spk_operand_blocked;
     wire        spk_event_completed;
+    wire [7:0]  spk_debug_event_vector;
+    wire [2:0]  spk_debug_event_kind;
+    wire [7:0]  spk_debug_opcode;
+    wire [15:0] spk_debug_cs;
+    wire [23:0] spk_debug_cs_base;
+    wire [15:0] spk_debug_ip;
+    wire [15:0] spk_debug_flags;
+    wire [127:0] spk_debug_gpr;
+    wire [63:0] spk_debug_segment_selectors;
+    wire [11:0] spk_debug_micro_pc;
+    wire [3:0]  spk_debug_bus_state;
+    logic [7:0]  spk_debug_last_post = 8'h00;
+    logic [15:0] spk_debug_cpu_cycles = 16'h0000;
+    logic [15:0] spk_debug_xt_cycles = 16'h0000;
+    logic [31:0] spk_debug_trace0 = 32'h00000000;
+    logic [31:0] spk_debug_trace1 = 32'h00000000;
+    logic [31:0] spk_debug_trace2 = 32'h00000000;
+    logic [31:0] spk_debug_trace3 = 32'h00000000;
     wire        xt_valid;
     wire [19:0] xt_address;
     wire [7:0]  xt_data_out;
@@ -1229,16 +1249,17 @@ module emu
         .microcode_fault        (spk_microcode_fault),
         .operand_blocked        (spk_operand_blocked),
         .event_completed        (spk_event_completed),
-        .debug_event_vector     (),
-        .debug_event_kind       (),
-        .debug_opcode           (),
-        .debug_cs               (),
-        .debug_cs_base          (),
-        .debug_ip               (),
-        .debug_flags            (),
-        .debug_gpr              (),
-        .debug_micro_pc         (),
-        .debug_bus_state        ()
+        .debug_event_vector     (spk_debug_event_vector),
+        .debug_event_kind       (spk_debug_event_kind),
+        .debug_opcode           (spk_debug_opcode),
+        .debug_cs               (spk_debug_cs),
+        .debug_cs_base          (spk_debug_cs_base),
+        .debug_ip               (spk_debug_ip),
+        .debug_flags            (spk_debug_flags),
+        .debug_gpr              (spk_debug_gpr),
+        .debug_segment_selectors(spk_debug_segment_selectors),
+        .debug_micro_pc         (spk_debug_micro_pc),
+        .debug_bus_state        (spk_debug_bus_state)
     );
 
     spk286_xt_bridge u_SPK286_XT_BRIDGE (
@@ -1297,6 +1318,39 @@ module emu
         .diagnostic_failure     (diagnostic_failure),
         .progress               ()
     );
+
+    // Passive bring-up capture. A trace entry is committed only when the XT
+    // chipset accepts a transfer; no signal from this block feeds execution.
+    // Entry format: address[31:12], data[11:4], status[3:1], write[0].
+    always_ff @(posedge clk_chipset) begin
+        if (spk_reset) begin
+            spk_debug_last_post  <= 8'h00;
+            spk_debug_cpu_cycles <= 16'h0000;
+            spk_debug_xt_cycles  <= 16'h0000;
+            spk_debug_trace0     <= 32'h00000000;
+            spk_debug_trace1     <= 32'h00000000;
+            spk_debug_trace2     <= 32'h00000000;
+            spk_debug_trace3     <= 32'h00000000;
+        end else begin
+            if (spk_ready && spk_bus_valid)
+                spk_debug_cpu_cycles <= spk_debug_cpu_cycles + 16'd1;
+
+            if (xt_valid && processor_cycle_active && processor_ready) begin
+                spk_debug_xt_cycles <= spk_debug_xt_cycles + 16'd1;
+                spk_debug_trace3 <= spk_debug_trace2;
+                spk_debug_trace2 <= spk_debug_trace1;
+                spk_debug_trace1 <= spk_debug_trace0;
+                spk_debug_trace0 <= {
+                    xt_address,
+                    xt_write ? xt_data_out : data_bus,
+                    xt_status,
+                    xt_write
+                };
+                if (xt_io && xt_write && (xt_address[15:0] == 16'h0080))
+                    spk_debug_last_post <= xt_data_out;
+            end
+        end
+    end
 
     //
     ////////////////////////////  AUDIO  ///////////////////////////////////
@@ -2133,6 +2187,98 @@ module emu
         .rgb_out    ( credits_rgb_out )
     );
 
+    // Post-credits diagnostic overlay. The method follows the PCXT
+    // test/crtc-debug implementation. A passive request/acknowledge snapshot
+    // crosses the clock boundary, and output selection changes only during
+    // vertical blank. The source-side observer deliberately remains alive
+    // during machine reset so a held reset cannot masquerade as stale data.
+    wire        spk_debug_hb_out;
+    wire        spk_debug_vb_out;
+    wire [23:0] spk_debug_rgb_out;
+    wire        spk_debug_source_reset = RESET | !pll_locked |
+                                            !pll_system_locked;
+
+    spk286_debug_overlay #(
+        .COLW(8)
+    ) u_SPK286_DEBUG_OVERLAY (
+        .rst                     (video_retime_reset_local),
+        .src_rst                 (spk_debug_source_reset),
+        .src_clk                 (clk_chipset),
+        .clk                     (clk_video_out_ps),
+        .pxl_cen                 (CE_PIXEL_CREDITS),
+        .HS                      (VGA_HS_video_hdmi),
+        .VS                      (VGA_VS_video_hdmi),
+        .HB                      (pre2x_LHBL),
+        .VB                      (pre2x_LVBL),
+        .rgb_in                  (credits_rgb_out),
+        .page                    (status[73:72]),
+        .cpu_reset               (spk_reset),
+        .cpu_halted              (spk_halted),
+        .cpu_shutdown            (spk_shutdown),
+        .cpu_control_error       (spk_control_error),
+        .cpu_unsupported_opcode  (spk_unsupported_opcode),
+        .cpu_microcode_fault     (spk_microcode_fault),
+        .cpu_operand_blocked     (spk_operand_blocked),
+        .cpu_event_completed     (spk_event_completed),
+        .cpu_event_vector        (spk_debug_event_vector),
+        .cpu_event_kind          (spk_debug_event_kind),
+        .cpu_opcode              (spk_debug_opcode),
+        .cpu_cs                  (spk_debug_cs),
+        .cpu_cs_base             (spk_debug_cs_base),
+        .cpu_ip                  (spk_debug_ip),
+        .cpu_flags               (spk_debug_flags),
+        .cpu_gpr                 (spk_debug_gpr),
+        .cpu_segments            (spk_debug_segment_selectors),
+        .cpu_micro_pc            (spk_debug_micro_pc),
+        .cpu_biu_state           (spk_debug_bus_state),
+        .cpu_address             (spk_address),
+        .cpu_data_out            (spk_data_out),
+        .cpu_data_in             (spk_data_in),
+        .cpu_bus_status          (spk_bus_status),
+        .cpu_bus_valid           (spk_bus_valid),
+        .cpu_bus_write           (spk_bus_write),
+        .cpu_bhe_n               (spk_bus_bhe_n),
+        .cpu_bus_lock            (spk_bus_lock),
+        .cpu_hlda                (spk_hlda),
+        .cpu_ready               (spk_ready),
+        .xt_address              (xt_address),
+        .xt_data_out             (xt_data_out),
+        .xt_data_in              (data_bus),
+        .xt_status               (xt_status),
+        .xt_valid                (xt_valid),
+        .xt_write                (xt_write),
+        .xt_io                   (xt_io),
+        .xt_inta                 (xt_inta),
+        .xt_code                 (xt_code),
+        .xt_byte_high            (xt_byte_high),
+        .xt_memory_projection    (xt_memory_projection),
+        .xt_cycle_active         (processor_cycle_active),
+        .xt_ready                (processor_ready),
+        .bridge_idle             (bridge_idle),
+        .bridge_error            (bridge_protocol_error),
+        .hold_request            (spk_hold_request),
+        .last_post               (spk_debug_last_post),
+        .cpu_cycle_count         (spk_debug_cpu_cycles),
+        .xt_cycle_count          (spk_debug_xt_cycles),
+        .trace0                  (spk_debug_trace0),
+        .trace1                  (spk_debug_trace1),
+        .trace2                  (spk_debug_trace2),
+        .trace3                  (spk_debug_trace3),
+        .HB_out                  (spk_debug_hb_out),
+        .VB_out                  (spk_debug_vb_out),
+        .rgb_out                 (spk_debug_rgb_out)
+    );
+
+    logic use_spk_debug = 1'b0;
+    wire use_spk_debug_next = status[71] & ~video_credits_show;
+
+    always_ff @(posedge clk_video_out_ps or posedge video_retime_reset_local) begin
+        if (video_retime_reset_local)
+            use_spk_debug <= 1'b0;
+        else if (pre2x_LVBL)
+            use_spk_debug <= use_spk_debug_next;
+    end
+
     // The credits block registers RGB once on CE_PIXEL, even while its overlay
     // is disabled.  Register the already-processed DE on that same event; using
     // VGA_DE_video_hdmi directly opens the active window one pixel before the
@@ -2145,8 +2291,12 @@ module emu
             VGA_DE_credits <= VGA_DE_video_hdmi;
     end
 
-    assign VGA_DE = VGA_DE_credits;
-    assign {VGA_R, VGA_G, VGA_B} = credits_rgb_out;
+    assign VGA_DE = use_spk_debug
+        ? (~spk_debug_hb_out & ~spk_debug_vb_out)
+        : VGA_DE_credits;
+    assign {VGA_R, VGA_G, VGA_B} = use_spk_debug
+        ? spk_debug_rgb_out
+        : credits_rgb_out;
 
 
 endmodule

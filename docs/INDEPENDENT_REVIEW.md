@@ -83,6 +83,10 @@ The review did find instrumentation and test weaknesses. Their disposition is:
 
 The external-ROM test remains intentionally a boundary smoke: it does not
 model the complete SDRAM, peripheral and video system and cannot prove a BIOS
-boot. Preliminary synthesis attributed roughly 1,046 ALMs, 1,241 registers,
-8,192 memory bits and one RAM block to the observer. Final resource and focused
-timing evidence must therefore come from the final post-review Quartus build.
+boot. The final post-review Quartus fit retained the observer at an estimated
+895 ALMs, 1,315 registers, 8,192 memory bits and one RAM block. Its 563-register
+source-snapshot timing collection closed at `+5.664 ns`; SPK286 internal setup
+also closed at `+0.171 ns`, with zero violations in the CPU/bridge/debug focused
+groups. The inherited whole-project video/HPS/SDIO setup exceptions remain
+listed separately in `docs/I5_FPGA_BUILD.md` and do not turn this source review
+into physical-board validation.

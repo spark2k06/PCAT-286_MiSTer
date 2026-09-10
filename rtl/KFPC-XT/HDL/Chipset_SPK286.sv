@@ -218,7 +218,9 @@ module CHIPSET #(
         output  logic   [7:0]   keyboard_debug_keycode,
         output  logic           keyboard_debug_irq,
         output  logic   [7:0]   keyboard_debug_port_b,
-        output  logic           keyboard_debug_pic_int
+        output  logic           keyboard_debug_pic_int,
+        output  logic [3:0]     dma_request_debug,
+        output  logic [3:0]     dma_acknowledge_debug
 
     );
 
@@ -339,6 +341,9 @@ module CHIPSET #(
         .clk_select                         (clk_select)
     );
 
+    assign dma_request_debug = {dma_request[3], fdd_dma_req, sb_dma_req, DRQ0};
+    assign dma_acknowledge_debug = dma_acknowledge_n;
+
     BUS_ARBITER u_BUS_ARBITER
     (
         .clock                              (clock),
@@ -378,7 +383,7 @@ module CHIPSET #(
         .memory_write_n_direction           (memory_write_n_direction),
         .no_command_state                   (no_command_state),
         .ext_access_request                 (ext_access_request),
-        .dma_request                        ({dma_request[3], fdd_dma_req, sb_dma_req, DRQ0}),
+        .dma_request                        (dma_request_debug),
         .dma_acknowledge_n                  (dma_acknowledge_n),
         .address_enable_n                   (address_enable_n),
         .terminal_count_n                   (terminal_count_n)

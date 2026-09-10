@@ -984,6 +984,7 @@ module emu
     wire        spk_debug_micro_active;
     wire [3:0]  spk_debug_prefetch_count;
     wire [3:0]  spk_debug_bus_state;
+    wire [7:0]  spk_debug_biu_detail;
     logic [7:0]  spk_debug_last_post = 8'h00;
     logic [15:0] spk_debug_cpu_cycles = 16'h0000;
     logic [15:0] spk_debug_xt_cycles = 16'h0000;
@@ -1023,6 +1024,8 @@ module emu
                        spk_operand_blocked | bridge_protocol_error;
 
     wire [3:0]   dma_acknowledge_n;
+    wire [3:0]   dma_request_debug;
+    wire [3:0]   dma_acknowledge_debug;
 
     logic   [7:0]   port_b_out;
     logic   [7:0]   port_c_in;
@@ -1126,6 +1129,8 @@ module emu
 	//  .memory_write_n_direction           (memory_write_n_direction),
 		.dma_request                        (0),    // use?	-> I don't know if it will ever be necessary, at least not during testing.
 		.dma_acknowledge_n                  (dma_acknowledge_n),
+		.dma_request_debug                  (dma_request_debug),
+		.dma_acknowledge_debug              (dma_acknowledge_debug),
 	//  .address_enable_n                   (address_enable_n),
 	//  .terminal_count_n                   (terminal_count_n)
 		.port_b_out                         (port_b_out),
@@ -1262,6 +1267,7 @@ module emu
         .bus_status             (spk_bus_status),
         .bus_lock               (spk_bus_lock),
         .hlda                   (spk_hlda),
+        .debug_biu_detail      (spk_debug_biu_detail),
         .halted                 (spk_halted),
         .shutdown               (spk_shutdown),
         .control_error          (spk_control_error),
@@ -2290,6 +2296,7 @@ module emu
         .bridge_idle             (bridge_idle),
         .bridge_error            (bridge_protocol_error),
         .hold_request            (spk_hold_request),
+        .biu_detail              (spk_debug_biu_detail),
         .last_post               (spk_debug_last_post),
         .cpu_cycle_count         (spk_debug_cpu_cycles),
         .xt_cycle_count          (spk_debug_xt_cycles),
@@ -2301,6 +2308,8 @@ module emu
         .keyboard_irq            (keyboard_debug_irq),
         .keyboard_port_b         (keyboard_debug_port_b),
         .keyboard_pic_int        (keyboard_debug_pic_int),
+        .dma_request             (dma_request_debug),
+        .dma_acknowledge_n       (dma_acknowledge_debug),
         .HB_out                  (spk_debug_hb_out),
         .VB_out                  (spk_debug_vb_out),
         .rgb_out                 (spk_debug_rgb_out)

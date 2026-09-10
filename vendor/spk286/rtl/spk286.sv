@@ -70,6 +70,7 @@ module spk286 (
     output logic [3:0]   bus_status,
     output logic         bus_lock,
     output logic         hlda,
+    output logic [7:0]   debug_biu_detail,
 
     output logic [15:0]  debug_cs,
     output logic [23:0]  debug_cs_base,
@@ -275,7 +276,8 @@ module spk286 (
         .data_write(memory_write), .data_byte(memory_byte), .data_io(io_transfer), .data_address(memory_address), .data_write_data(memory_write_data),
         .data_response_valid(memory_response_valid), .data_response_ready(memory_response_ready),
         .data_read_data(memory_read_data), .address(biu_address), .data_out(data_out), .data_oe(data_oe),
-        .bus_valid(bus_valid), .bus_write(bus_write), .bus_bhe_n(bus_bhe_n), .bus_status(biu_status)
+        .bus_valid(bus_valid), .bus_write(bus_write), .bus_bhe_n(bus_bhe_n), .bus_status(biu_status),
+        .debug_detail(debug_biu_detail)
     );
 
     spk286_decoder decoder (

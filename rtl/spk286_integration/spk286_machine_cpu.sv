@@ -45,7 +45,8 @@ module spk286_machine_cpu (
     output logic [7:0]   debug_micro_instruction,
     output logic         debug_micro_active,
     output logic [3:0]   debug_prefetch_count,
-    output logic [3:0]   debug_bus_state
+    output logic [3:0]   debug_bus_state,
+    output logic [7:0]   debug_biu_detail
 );
     logic [15:0] unused_gpr_read_a_data;
     logic [15:0] unused_gpr_read_b_data;
@@ -146,6 +147,7 @@ module spk286_machine_cpu (
         .bus_status(bus_status),
         .bus_lock(bus_lock),
         .hlda(hlda),
+        .debug_biu_detail(debug_biu_detail),
 
         .debug_cs(debug_cs),
         .debug_cs_base(debug_cs_base),

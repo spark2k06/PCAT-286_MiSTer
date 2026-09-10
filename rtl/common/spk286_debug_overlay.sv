@@ -77,6 +77,7 @@ module spk286_debug_overlay #(
     input  logic                  bridge_idle,
     input  logic                  bridge_error,
     input  logic                  hold_request,
+    input  logic [7:0]            biu_detail,
 
     input  logic [7:0]            last_post,
     input  logic [15:0]           cpu_cycle_count,
@@ -89,6 +90,8 @@ module spk286_debug_overlay #(
     input  logic                  keyboard_irq,
     input  logic [7:0]            keyboard_port_b,
     input  logic                  keyboard_pic_int,
+    input  logic [3:0]            dma_request,
+    input  logic [3:0]            dma_acknowledge_n,
 
     output logic                  HB_out,
     output logic                  VB_out,
@@ -112,20 +115,21 @@ module spk286_debug_overlay #(
         cpu_biu_state
     };
 
-    wire [174:0] bus_state_async = {
+    wire [190:0] bus_state_async = {
         cpu_address, cpu_data_out, cpu_data_in, cpu_bus_status,
         cpu_bus_valid, cpu_bus_write, cpu_bhe_n, cpu_bus_lock, cpu_hlda,
         cpu_ready, xt_address, xt_data_out, xt_data_in, xt_status, xt_valid,
         xt_write, xt_io, xt_inta, xt_code, xt_byte_high,
         xt_memory_projection, xt_cycle_active, xt_ready, bridge_idle,
         bridge_error, hold_request, last_post, cpu_cycle_count, xt_cycle_count,
-        keyboard_keycode, keyboard_irq, keyboard_port_b, keyboard_pic_int
+        keyboard_keycode, keyboard_irq, keyboard_port_b, keyboard_pic_int,
+        dma_request, dma_acknowledge_n, biu_detail
     };
-    wire [652:0] complete_state_async = {
+    wire [668:0] complete_state_async = {
         cpu_state_async, bus_state_async, trace0, trace1, trace2, trace3
     };
-    logic [660:0] source_snapshot = '0;
-    logic [660:0] video_snapshot = '0;
+    logic [676:0] source_snapshot = '0;
+    logic [676:0] video_snapshot = '0;
     logic [7:0] snapshot_sequence = 8'd0;
     logic snapshot_request = 1'b0;
     logic snapshot_acknowledge = 1'b0;
@@ -191,7 +195,7 @@ module spk286_debug_overlay #(
     end
 
     wire [349:0] cpu_state_snapshot;
-    wire [174:0] bus_state_snapshot;
+    wire [190:0] bus_state_snapshot;
     wire [127:0] trace_state_snapshot;
     wire [7:0] d_snapshot_sequence;
     assign {
@@ -263,6 +267,7 @@ module spk286_debug_overlay #(
     wire        d_bridge_idle;
     wire        d_bridge_error;
     wire        d_hold_request;
+    wire [7:0]  d_biu_detail;
     wire [7:0]  d_last_post;
     wire [15:0] d_cpu_cycle_count;
     wire [15:0] d_xt_cycle_count;
@@ -270,6 +275,8 @@ module spk286_debug_overlay #(
     wire        d_keyboard_irq;
     wire [7:0]  d_keyboard_port_b;
     wire        d_keyboard_pic_int;
+    wire [3:0]  d_dma_request;
+    wire [3:0]  d_dma_acknowledge_n;
 
     assign {
         d_cpu_address, d_cpu_data_out, d_cpu_data_in, d_cpu_bus_status,
@@ -279,7 +286,8 @@ module spk286_debug_overlay #(
         d_xt_byte_high, d_xt_memory_projection, d_xt_cycle_active,
         d_xt_ready, d_bridge_idle, d_bridge_error, d_hold_request,
         d_last_post, d_cpu_cycle_count, d_xt_cycle_count,
-        d_keyboard_keycode, d_keyboard_irq, d_keyboard_port_b, d_keyboard_pic_int
+        d_keyboard_keycode, d_keyboard_irq, d_keyboard_port_b, d_keyboard_pic_int,
+        d_dma_request, d_dma_acknowledge_n, d_biu_detail
     } = bus_state_snapshot;
 
     wire [31:0] d_trace0 = trace_state_snapshot[127:96];
@@ -687,12 +695,22 @@ module spk286_debug_overlay #(
                         end else if (col == 19) character = bit_digit(d_keyboard_pic_int);
                     end
                     4'd10: begin
-                        character = text_at("IDLE:0 ERR:0 POST:00", 20, col);
-                        if (col == 5) character = bit_digit(d_bridge_idle);
-                        else if (col == 11) character = bit_digit(d_bridge_error);
-                        else if ((col >= 18) && (col <= 19)) begin
-                            nibble_shift = (19 - col) * 4;
-                            character = hex_digit(d_last_post[nibble_shift +: 4]);
+                        // DMA request/ack and BIU ownership detail replace the
+                        // less useful POST-only row while diagnosing a stuck
+                        // HOLD. Ack is shown in its active-low pin polarity.
+                        character = text_at("I:0 R:0000 A:FFFF B:00", 22, col);
+                        if (col == 2) character = bit_digit(d_bridge_idle);
+                        else if ((col >= 6) && (col <= 8)) begin
+                            character = 7'd48;
+                        end else if (col == 9) begin
+                            character = hex_digit(d_dma_request);
+                        end else if ((col >= 13) && (col <= 15)) begin
+                            character = 7'd48;
+                        end else if (col == 16) begin
+                            character = hex_digit(d_dma_acknowledge_n);
+                        end else if ((col >= 20) && (col <= 21)) begin
+                            nibble_shift = (21 - col) * 4;
+                            character = hex_digit(d_biu_detail[nibble_shift +: 4]);
                         end
                     end
                     4'd11: begin

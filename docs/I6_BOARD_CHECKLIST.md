@@ -1,12 +1,14 @@
 # I6 physical-board checklist
 
-I6 is prepared but pending. No physical MiSTer board was available or
-authorized during I0-I5, so this document is a repeatable procedure rather than
-a hardware result.
+I6 is prepared but pending. Exploratory board runs with an earlier instrumented
+candidate showed that a production BIOS did not start and also demonstrated
+that splash-time debug values can be misleading. The exact release below has
+not yet completed the diagnostic acceptance run, so this document remains a
+repeatable procedure rather than a successful hardware result.
 
 ## Required files
 
-- `releases/PCAT-286_20260909.rbf`
+- `releases/PCAT-286_20260910.rbf`
 - `tests/firmware/pcat286_event_diag.rom`
 - a legally obtained EGA option ROM accepted by the inherited core
 
@@ -18,8 +20,9 @@ Verify the RBF and diagnostic ROM against the hashes in
 1. Copy the RBF into the MiSTer `Computer` core directory.
 2. Before the first recorded run, set **Boot Splash Screen** to **No**, leave
    it persisted, restart the core, and keep that setting for all captures.
-   This is the reference configuration for the current bring-up so no field
-   can be confused with a splash-time snapshot.
+   Start directly in this state: do not begin with the splash enabled and then
+   turn it off. This is the reference configuration for the current bring-up
+   so no field can be confused with a splash-time snapshot.
 3. Open **System & BIOS**.
 4. Load `pcat286_event_diag.rom` into **PCAT BIOS** (slot 0).
 5. Load the EGA ROM into **EGA BIOS** (slot 3). The machine deliberately

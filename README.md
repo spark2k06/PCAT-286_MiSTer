@@ -365,10 +365,11 @@ example, or running EGA-only software with nothing else in the picture.
 * Build the EGA BIOS with `SW/ROMs/EGA/make_ega_bios_rom.py` and copy the
   resulting `ega_bios.rom` to the SD card. **The core cannot show a usable
   picture without it** — see [EGA BIOS — required](#ega-bios--required).
-* Copy `releases/PCAT-286_20260909.rbf` to the MiSTer SD card and select the
+* Copy `releases/PCAT-286_20260910.rbf` to the MiSTer SD card and select the
   PCAT-286 core.
 * Press Win + F12 on your keyboard.
-  * Boot Splash Screen: select **No** for reproducible SPK286 bring-up.
+  * Boot Splash Screen: select **No**, leave it persisted, and start the core
+    directly in that state for reproducible SPK286 bring-up.
   * XT Bus Pace: select the retained bus pace.
   * FDD & HDD → HDD Image: FreeDOS_HD.img
   * System & BIOS → PCAT BIOS: select

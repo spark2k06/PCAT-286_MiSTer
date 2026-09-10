@@ -28,6 +28,12 @@ video emulation in [86Box](https://github.com/86box/86box).
 [JTOPL](https://github.com/jotego/jtopl) by Jose Tejada
 ([@jotego](https://github.com/jotego)) provides AdLib sound.
 
+The planned AT migration is specified in
+[AT_BUS_CPU_CHIPSET_SPEC.md](docs/AT_BUS_CPU_CHIPSET_SPEC.md). It defines the
+CPU–chipset transaction contract, bus ownership, cascaded PIC, DMA/refresh and
+the staged verification path; it does not claim that the current XT-derived
+machine already implements those features.
+
 Splash artwork by [@mills32](https://github.com/mills32).
 
 For an architectural overview and possible future improvements, see the

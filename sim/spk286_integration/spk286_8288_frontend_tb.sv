@@ -39,7 +39,11 @@ module spk286_8288_frontend_tb;
     wire [7:0] xt_data_out;
     wire [2:0] xt_status;
     wire xt_write, xt_io, xt_inta, xt_code, xt_byte_high;
-    wire xt_memory_projection, xt_lock_n, bridge_idle, protocol_error;
+    wire xt_memory_projection, xt_lock_n, xt_accepted;
+    wire bridge_idle, protocol_error;
+    logic late_read_sample = 1'b0;
+    wire xt_sample = (late_read_sample && !xt_write) ?
+                     cpu_ce_negedge : cpu_ce_posedge;
     logic [7:0] xt_data_in;
 
     logic pic_chip_select_n = 1'b1;
@@ -108,7 +112,9 @@ module spk286_8288_frontend_tb;
             latched_address <= xt_address;
             address_latches <= address_latches + 1;
         end
-        if (!reset && xt_valid && cycle_active && xt_ready) begin
+        if (!reset && xt_accepted) begin
+            if (late_read_sample && !xt_write && !cpu_ce_negedge)
+                $fatal(1, "late read was not accepted on cpu_ce_negedge");
             accepted_address[accepted_beats] <= xt_address;
             accepted_data[accepted_beats] <= xt_data_out;
             accepted_beats <= accepted_beats + 1;
@@ -168,13 +174,15 @@ module spk286_8288_frontend_tb;
         .cpu_bus_write(cpu_bus_write), .cpu_bus_bhe_n(cpu_bus_bhe_n),
         .cpu_bus_status(cpu_bus_status), .cpu_bus_lock(cpu_bus_lock),
         .cpu_ready(cpu_ready), .cpu_data_in(cpu_data_in),
-        .xt_start(cpu_ce_posedge), .xt_cycle_active(cycle_active),
+        .xt_start(cpu_ce_posedge), .xt_sample(xt_sample),
+        .xt_cycle_active(cycle_active),
         .xt_ready(xt_ready), .xt_data_in(xt_data_in),
         .xt_valid(xt_valid), .xt_address(xt_address),
         .xt_data_out(xt_data_out), .xt_status(xt_status),
         .xt_write(xt_write), .xt_io(xt_io), .xt_inta(xt_inta),
         .xt_code(xt_code), .xt_byte_high(xt_byte_high),
         .xt_memory_projection(xt_memory_projection), .xt_lock_n(xt_lock_n),
+        .xt_accepted(xt_accepted),
         .bridge_idle(bridge_idle), .protocol_error(protocol_error)
     );
 
@@ -242,6 +250,17 @@ module spk286_8288_frontend_tb;
             accepted_data[before_beats] !== 8'h5a ||
             accepted_data[before_beats + 1] !== 8'ha5)
             $fatal(1, "word write was not two distinct 8288 commands");
+
+        // The 9.54 MHz profile samples reads on the falling edge. It must use
+        // the same guarded completion handshake without changing launch phase.
+        before_beats = accepted_beats;
+        before_commands = command_starts;
+        late_read_sample = 1'b1;
+        request(24'h0f0102, 4'hd, 1'b0, 1'b1, 16'd0, response);
+        late_read_sample = 1'b0;
+        if (response !== 16'h003c || accepted_beats != before_beats + 1 ||
+            command_starts != before_commands + 1)
+            $fatal(1, "late-edge CODE read did not complete once");
 
         before_beats = accepted_beats;
         before_commands = command_starts;

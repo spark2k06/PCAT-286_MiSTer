@@ -29,7 +29,8 @@ module spk286_diagnostic_tb;
     logic [7:0] xt_data_out;
     logic [2:0] xt_status;
     logic xt_write, xt_io, xt_inta, xt_code, xt_byte_high;
-    logic xt_memory_projection, xt_lock_n, bridge_idle, protocol_error;
+    logic xt_memory_projection, xt_lock_n, xt_accepted;
+    logic bridge_idle, protocol_error;
 
     // A tag/value store models the small set of RAM bytes touched by the ROM.
     // This keeps the whole-CPU bench portable without expanding a 1 MiB array
@@ -122,7 +123,7 @@ module spk286_diagnostic_tb;
             xt_ready <= 1'b1;
         end
 
-        if (!reset && xt_valid && xt_cycle_active && xt_ready) begin
+        if (!reset && xt_accepted) begin
             accepted_beats <= accepted_beats + 1;
             if (xt_inta) begin
                 // No INTA is expected until the event-focused I4 diagnostic.
@@ -212,13 +213,15 @@ module spk286_diagnostic_tb;
         .cpu_bus_write(cpu_bus_write), .cpu_bus_bhe_n(cpu_bus_bhe_n),
         .cpu_bus_status(cpu_bus_status), .cpu_bus_lock(cpu_bus_lock),
         .cpu_ready(cpu_ready), .cpu_data_in(cpu_data_in),
-        .xt_start(1'b1), .xt_cycle_active(xt_cycle_active),
+        .xt_start(1'b1), .xt_sample(1'b1),
+        .xt_cycle_active(xt_cycle_active),
         .xt_ready(xt_ready), .xt_data_in(xt_data_in),
         .xt_valid(xt_valid), .xt_address(xt_address),
         .xt_data_out(xt_data_out), .xt_status(xt_status),
         .xt_write(xt_write), .xt_io(xt_io), .xt_inta(xt_inta),
         .xt_code(xt_code), .xt_byte_high(xt_byte_high),
         .xt_memory_projection(xt_memory_projection), .xt_lock_n(xt_lock_n),
+        .xt_accepted(xt_accepted),
         .bridge_idle(bridge_idle), .protocol_error(protocol_error)
     );
 

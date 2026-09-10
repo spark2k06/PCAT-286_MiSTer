@@ -20,6 +20,8 @@ module spk286_xt_bridge (
 
     // Assert at a safe legacy CPU phase to launch a new 8288 transaction.
     input  logic         xt_start,
+    // Assert at the legacy phase where read data or write completion is safe.
+    input  logic         xt_sample,
     // True only after the downstream command strobe is active.
     input  logic         xt_cycle_active,
     input  logic         xt_ready,
@@ -35,6 +37,7 @@ module spk286_xt_bridge (
     output logic         xt_byte_high,
     output logic         xt_memory_projection,
     output logic         xt_lock_n,
+    output logic         xt_accepted,
 
     output logic         bridge_idle,
     output logic         protocol_error
@@ -55,7 +58,7 @@ module spk286_xt_bridge (
     logic        request_lock_q;
     logic        request_two_beats_q;
     logic        beat_high_q;
-    logic        cycle_seen_q;
+    logic        sample_edge_seen_q;
     logic [15:0] read_data_q;
 
     logic [23:0] beat_address;
@@ -128,6 +131,9 @@ module spk286_xt_bridge (
                          ((state_q != STATE_IDLE) && request_lock_q));
     assign cpu_ready = (state_q == STATE_COMPLETE);
     assign bridge_idle = (state_q == STATE_IDLE);
+    assign xt_accepted = (state_q == STATE_ACTIVE) &&
+                         sample_edge_seen_q && xt_sample &&
+                         xt_cycle_active && xt_ready;
 
     always_ff @(posedge clk) begin
         if (reset) begin
@@ -141,14 +147,14 @@ module spk286_xt_bridge (
             request_lock_q <= 1'b0;
             request_two_beats_q <= 1'b0;
             beat_high_q <= 1'b0;
-            cycle_seen_q <= 1'b0;
+            sample_edge_seen_q <= 1'b0;
             read_data_q <= 16'd0;
             cpu_data_in <= 16'd0;
             protocol_error <= 1'b0;
         end else begin
             case (state_q)
                 STATE_IDLE: begin
-                    cycle_seen_q <= 1'b0;
+                    sample_edge_seen_q <= 1'b0;
                     if (cpu_bus_valid) begin
                         request_address_q <= cpu_address;
                         request_data_q <= cpu_data_out;
@@ -173,16 +179,24 @@ module spk286_xt_bridge (
                 end
 
                 STATE_ARMED: begin
-                    cycle_seen_q <= 1'b0;
+                    sample_edge_seen_q <= 1'b0;
                     if (xt_start && !xt_cycle_active)
                         state_q <= STATE_ACTIVE;
                 end
 
                 STATE_ACTIVE: begin
-                    if (xt_cycle_active)
-                        cycle_seen_q <= 1'b1;
-                    if ((cycle_seen_q || xt_cycle_active) &&
-                        xt_cycle_active && xt_ready) begin
+                    // READY is generated for the legacy CPU timing model and
+                    // can still contain the idle value when an 8288 command
+                    // first becomes active. Sample it, and the shared data
+                    // bus, only on the configured legacy sample edge. This is
+                    // the point where the original CPU consumes both.
+                    // The first sample edge after the 8288 command appears
+                    // can still carry READY from the preceding idle phase.
+                    // Use it only to arm the completion window; later sample
+                    // edges see READY after the inherited two-edge pipeline.
+                    if (xt_sample && xt_cycle_active)
+                        sample_edge_seen_q <= 1'b1;
+                    if (xt_accepted) begin
                         if (request_is_read) begin
                             if (request_is_inta) begin
                                 read_data_q <= {8'd0, xt_data_in};
@@ -202,19 +216,19 @@ module spk286_xt_bridge (
                         end else begin
                             state_q <= STATE_COMPLETE;
                         end
-                        cycle_seen_q <= 1'b0;
+                        sample_edge_seen_q <= 1'b0;
                     end
                 end
 
                 STATE_GAP: begin
-                    cycle_seen_q <= 1'b0;
+                    sample_edge_seen_q <= 1'b0;
                     if (!xt_cycle_active)
                         state_q <= STATE_ARMED;
                 end
 
                 STATE_COMPLETE: begin
                     state_q <= STATE_IDLE;
-                    cycle_seen_q <= 1'b0;
+                    sample_edge_seen_q <= 1'b0;
                 end
 
                 default: begin

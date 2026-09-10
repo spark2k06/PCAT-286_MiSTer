@@ -32,7 +32,8 @@ module spk286_external_rom_smoke_tb;
     logic [7:0] xt_data_out;
     logic [2:0] xt_status;
     logic xt_write, xt_io, xt_inta, xt_code, xt_byte_high;
-    logic xt_memory_projection, xt_lock_n, bridge_idle, protocol_error;
+    logic xt_memory_projection, xt_lock_n, xt_accepted;
+    logic bridge_idle, protocol_error;
     logic [7:0] port_3da = 8'd0;
     logic [2:0] phase = 3'd0;
     logic cpu_ce_posedge = 1'b0;
@@ -122,7 +123,7 @@ module spk286_external_rom_smoke_tb;
             (cpu_bus_status == 4'hd) && (cpu_address[23:20] == 4'h0))
             saw_low_code_fetch <= 1'b1;
 
-        if (!reset && xt_valid && xt_cycle_active && xt_ready) begin
+        if (!reset && xt_accepted) begin
             accepted_beats <= accepted_beats + 1;
             if (xt_code)
                 code_fetches <= code_fetches + 1;
@@ -173,13 +174,15 @@ module spk286_external_rom_smoke_tb;
         .cpu_bus_write(cpu_bus_write), .cpu_bus_bhe_n(cpu_bus_bhe_n),
         .cpu_bus_status(cpu_bus_status), .cpu_bus_lock(cpu_bus_lock),
         .cpu_ready(cpu_ready), .cpu_data_in(cpu_data_in),
-        .xt_start(cpu_ce_posedge), .xt_cycle_active(xt_cycle_active),
+        .xt_start(cpu_ce_posedge), .xt_sample(cpu_ce_posedge),
+        .xt_cycle_active(xt_cycle_active),
         .xt_ready(xt_ready), .xt_data_in(xt_data_in),
         .xt_valid(xt_valid), .xt_address(xt_address),
         .xt_data_out(xt_data_out), .xt_status(xt_status),
         .xt_write(xt_write), .xt_io(xt_io), .xt_inta(xt_inta),
         .xt_code(xt_code), .xt_byte_high(xt_byte_high),
         .xt_memory_projection(xt_memory_projection), .xt_lock_n(xt_lock_n),
+        .xt_accepted(xt_accepted),
         .bridge_idle(bridge_idle), .protocol_error(protocol_error)
     );
 

@@ -998,8 +998,14 @@ module emu
     wire        xt_byte_high;
     wire        xt_memory_projection;
     wire        xt_lock_n;
+    wire        xt_accepted;
     wire        bridge_idle;
     wire        bridge_protocol_error;
+
+    // Match the legacy BIU data phase. The inherited 9.54 MHz and maximum
+    // profiles deliberately move reads to the later falling edge.
+    wire xt_sample = (shift_read_timing && !xt_write) ?
+                     cpu_ce_negedge : cpu_ce_posedge;
 
     assign cpu_ad_out = xt_address;
     assign cpu_data_bus = xt_data_out;
@@ -1288,6 +1294,7 @@ module emu
         .cpu_ready              (spk_ready),
         .cpu_data_in            (spk_data_in),
         .xt_start               (cpu_ce_posedge),
+        .xt_sample              (xt_sample),
         .xt_cycle_active        (processor_cycle_active),
         .xt_ready               (processor_ready),
         .xt_data_in             (data_bus),
@@ -1302,6 +1309,7 @@ module emu
         .xt_byte_high           (xt_byte_high),
         .xt_memory_projection   (xt_memory_projection),
         .xt_lock_n              (xt_lock_n),
+        .xt_accepted            (xt_accepted),
         .bridge_idle            (bridge_idle),
         .protocol_error         (bridge_protocol_error)
     );
@@ -1322,8 +1330,7 @@ module emu
     spk286_diag_monitor u_SPK286_DIAG_MONITOR (
         .clk                    (clk_chipset),
         .reset                  (spk_reset),
-        .accepted_io_write      (xt_valid && processor_cycle_active &&
-                                 processor_ready && xt_io && xt_write),
+        .accepted_io_write      (xt_accepted && xt_io && xt_write),
         .port_address           (xt_address[15:0]),
         .write_data             (xt_data_out),
         .diagnostic_pass        (diagnostic_pass),
@@ -1347,7 +1354,7 @@ module emu
             if (spk_ready && spk_bus_valid)
                 spk_debug_cpu_cycles <= spk_debug_cpu_cycles + 16'd1;
 
-            if (xt_valid && processor_cycle_active && processor_ready) begin
+            if (xt_accepted) begin
                 spk_debug_xt_cycles <= spk_debug_xt_cycles + 16'd1;
                 spk_debug_trace3 <= spk_debug_trace2;
                 spk_debug_trace2 <= spk_debug_trace1;

@@ -17,7 +17,8 @@ module spk286_xt_bridge_tb #(
     logic cpu_ready;
     logic [15:0] cpu_data_in;
 
-    logic xt_start = 1'b1;
+    logic xt_start = 1'b0;
+    logic xt_sample = 1'b0;
     logic backend_cycle_enable = 1'b1;
     logic backend_ready = 1'b0;
     logic [7:0] backend_data = 8'd0;
@@ -31,7 +32,8 @@ module spk286_xt_bridge_tb #(
     logic [7:0] xt_data_out;
     logic [2:0] xt_status;
     logic xt_write, xt_io, xt_inta, xt_code, xt_byte_high;
-    logic xt_memory_projection, xt_lock_n, bridge_idle, protocol_error;
+    logic xt_memory_projection, xt_lock_n, xt_accepted;
+    logic bridge_idle, protocol_error;
 
     logic external_request = 1'b0;
     logic loader_reset_owner = 1'b0;
@@ -69,7 +71,7 @@ module spk286_xt_bridge_tb #(
     end
 
     always @(posedge clk) begin
-        if (!reset && xt_valid && xt_cycle_active && xt_ready) begin
+        if (!reset && xt_accepted) begin
             accepted_beats <= accepted_beats + 1;
             if (xt_io && xt_write)
                 port_write_effects <= port_write_effects +
@@ -89,13 +91,15 @@ module spk286_xt_bridge_tb #(
         .cpu_bus_write(cpu_bus_write), .cpu_bus_bhe_n(cpu_bus_bhe_n),
         .cpu_bus_status(cpu_bus_status), .cpu_bus_lock(cpu_bus_lock),
         .cpu_ready(cpu_ready), .cpu_data_in(cpu_data_in),
-        .xt_start(xt_start), .xt_cycle_active(xt_cycle_active),
+        .xt_start(xt_start), .xt_sample(xt_sample),
+        .xt_cycle_active(xt_cycle_active),
         .xt_ready(xt_ready), .xt_data_in(xt_data_in),
         .xt_valid(xt_valid), .xt_address(xt_address),
         .xt_data_out(xt_data_out), .xt_status(xt_status),
         .xt_write(xt_write), .xt_io(xt_io), .xt_inta(xt_inta),
         .xt_code(xt_code), .xt_byte_high(xt_byte_high),
         .xt_memory_projection(xt_memory_projection), .xt_lock_n(xt_lock_n),
+        .xt_accepted(xt_accepted),
         .bridge_idle(bridge_idle), .protocol_error(protocol_error)
     );
 
@@ -178,6 +182,42 @@ module spk286_xt_bridge_tb #(
         repeat (4) @(posedge clk);
         reset = 1'b0;
 
+        // An asserted idle READY must not let the adapter consume stale data
+        // as soon as the downstream command appears. Completion belongs to a
+        // later legacy CPU sample edge.
+        backend_data = 8'hde;
+        backend_ready = 1'b1;
+        begin_request(24'h000010, 4'h5, 1'b0, 1'b1, 16'd0);
+        repeat (2) @(negedge clk);
+        check(!xt_valid, "beat launched without a legacy CPU edge");
+        xt_start = 1'b1;
+        @(negedge clk);
+        xt_start = 1'b0;
+        wait_active();
+        repeat (4) @(negedge clk);
+        check(!cpu_ready, "stale READY completed before the sample edge");
+        xt_sample = 1'b1;
+        @(negedge clk);
+        xt_sample = 1'b0;
+        check(!cpu_ready, "stale idle READY survived the guard edge");
+        backend_ready = 1'b0;
+        backend_data = 8'had;
+        xt_sample = 1'b1;
+        @(negedge clk);
+        xt_sample = 1'b0;
+        check(!cpu_ready, "low READY completed the guarded cycle");
+        backend_ready = 1'b1;
+        xt_sample = 1'b1;
+        @(negedge clk);
+        xt_sample = 1'b0;
+        finish_request(response);
+        check(response == 16'h00ad, "read data was not sampled on the CPU edge");
+
+        // The remaining unit checks use an always-available abstract sample
+        // edge; the 8288 frontend test covers the real phase pulses.
+        xt_start = 1'b1;
+        xt_sample = 1'b1;
+
         // CODE must be explicitly translated to 100, never truncated to 101.
         backend_data = 8'hea;
         begin_request(24'hfffff0, 4'hd, 1'b0, 1'b1, 16'd0);
@@ -213,12 +253,13 @@ module spk286_xt_bridge_tb #(
               "aligned word low beat was incorrect");
         check(!checked_cpu_ready, "word was acknowledged before its first beat");
         backend_ready = 1'b1;
-        @(negedge clk);
+        while (xt_valid) @(negedge clk);
         backend_ready = 1'b0;
         check(!cpu_ready, "word was acknowledged after only one beat");
         wait_active();
         check(xt_address == 20'h00201 && checked_data_out == 8'ha5,
-              "aligned word high beat was incorrect");
+              $sformatf("aligned word high beat was incorrect address=%h data=%h high=%b",
+                        xt_address, checked_data_out, xt_byte_high));
         backend_ready = 1'b1;
         finish_request(response);
 

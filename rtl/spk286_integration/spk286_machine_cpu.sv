@@ -38,7 +38,13 @@ module spk286_machine_cpu (
     output logic [15:0]  debug_flags,
     output logic [127:0] debug_gpr,
     output logic [63:0]  debug_segment_selectors,
+    output logic         fetch_blocked,
+    output logic [16:0]  debug_fetch_cursor,
     output logic [11:0]  debug_micro_pc,
+    output logic [11:0]  debug_micro_entry,
+    output logic [7:0]   debug_micro_instruction,
+    output logic         debug_micro_active,
+    output logic [3:0]   debug_prefetch_count,
     output logic [3:0]   debug_bus_state
 );
     logic [15:0] unused_gpr_read_a_data;
@@ -62,16 +68,9 @@ module spk286_machine_cpu (
     logic [15:0] unused_fetch_data;
     logic [15:0] unused_fetch_ip;
     logic [1:0]  unused_fetch_count;
-    logic        unused_fetch_blocked;
     logic [95:0] unused_debug_segment_bases;
     logic [63:0] unused_debug_segment_limits;
     logic [31:0] unused_debug_segment_access;
-    logic [16:0] unused_debug_fetch_cursor;
-    logic [11:0] unused_debug_micro_entry;
-    logic [spk286_microcode_pkg::MC_WORD_WIDTH-1:0]
-                 unused_debug_micro_instruction;
-    logic        unused_debug_micro_active;
-    logic [3:0]  unused_debug_prefetch_count;
 
     spk286 cpu (
         .clk(clk),
@@ -136,7 +135,7 @@ module spk286_machine_cpu (
         .fetch_data(unused_fetch_data),
         .fetch_ip(unused_fetch_ip),
         .fetch_count(unused_fetch_count),
-        .fetch_blocked(unused_fetch_blocked),
+        .fetch_blocked(fetch_blocked),
 
         .address(address),
         .data_out(data_out),
@@ -157,12 +156,12 @@ module spk286_machine_cpu (
         .debug_segment_bases(unused_debug_segment_bases),
         .debug_segment_limits(unused_debug_segment_limits),
         .debug_segment_access(unused_debug_segment_access),
-        .debug_fetch_cursor(unused_debug_fetch_cursor),
+        .debug_fetch_cursor(debug_fetch_cursor),
         .debug_micro_pc(debug_micro_pc),
-        .debug_micro_entry(unused_debug_micro_entry),
-        .debug_micro_instruction(unused_debug_micro_instruction),
-        .debug_micro_active(unused_debug_micro_active),
-        .debug_prefetch_count(unused_debug_prefetch_count),
+        .debug_micro_entry(debug_micro_entry),
+        .debug_micro_instruction(debug_micro_instruction),
+        .debug_micro_active(debug_micro_active),
+        .debug_prefetch_count(debug_prefetch_count),
         .debug_bus_state(debug_bus_state)
     );
 endmodule

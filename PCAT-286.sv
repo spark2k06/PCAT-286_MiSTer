@@ -972,7 +972,13 @@ module emu
     wire [15:0] spk_debug_flags;
     wire [127:0] spk_debug_gpr;
     wire [63:0] spk_debug_segment_selectors;
+    wire        spk_fetch_blocked;
+    wire [16:0] spk_debug_fetch_cursor;
     wire [11:0] spk_debug_micro_pc;
+    wire [11:0] spk_debug_micro_entry;
+    wire [7:0]  spk_debug_micro_instruction;
+    wire        spk_debug_micro_active;
+    wire [3:0]  spk_debug_prefetch_count;
     wire [3:0]  spk_debug_bus_state;
     logic [7:0]  spk_debug_last_post = 8'h00;
     logic [15:0] spk_debug_cpu_cycles = 16'h0000;
@@ -1258,7 +1264,13 @@ module emu
         .debug_flags            (spk_debug_flags),
         .debug_gpr              (spk_debug_gpr),
         .debug_segment_selectors(spk_debug_segment_selectors),
+        .fetch_blocked          (spk_fetch_blocked),
+        .debug_fetch_cursor     (spk_debug_fetch_cursor),
         .debug_micro_pc         (spk_debug_micro_pc),
+        .debug_micro_entry      (spk_debug_micro_entry),
+        .debug_micro_instruction(spk_debug_micro_instruction),
+        .debug_micro_active     (spk_debug_micro_active),
+        .debug_prefetch_count   (spk_debug_prefetch_count),
         .debug_bus_state        (spk_debug_bus_state)
     );
 
@@ -2229,7 +2241,13 @@ module emu
         .cpu_flags               (spk_debug_flags),
         .cpu_gpr                 (spk_debug_gpr),
         .cpu_segments            (spk_debug_segment_selectors),
+        .cpu_fetch_blocked       (spk_fetch_blocked),
+        .cpu_fetch_cursor        (spk_debug_fetch_cursor),
         .cpu_micro_pc            (spk_debug_micro_pc),
+        .cpu_micro_entry         (spk_debug_micro_entry),
+        .cpu_micro_instruction   (spk_debug_micro_instruction),
+        .cpu_micro_active        (spk_debug_micro_active),
+        .cpu_prefetch_count      (spk_debug_prefetch_count),
         .cpu_biu_state           (spk_debug_bus_state),
         .cpu_address             (spk_address),
         .cpu_data_out            (spk_data_out),

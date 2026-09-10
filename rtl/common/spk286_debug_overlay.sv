@@ -41,7 +41,13 @@ module spk286_debug_overlay #(
     input  logic [15:0]           cpu_flags,
     input  logic [127:0]          cpu_gpr,
     input  logic [63:0]           cpu_segments,
+    input  logic                  cpu_fetch_blocked,
+    input  logic [16:0]           cpu_fetch_cursor,
     input  logic [11:0]           cpu_micro_pc,
+    input  logic [11:0]           cpu_micro_entry,
+    input  logic [7:0]            cpu_micro_instruction,
+    input  logic                  cpu_micro_active,
+    input  logic [3:0]            cpu_prefetch_count,
     input  logic [3:0]            cpu_biu_state,
 
     input  logic [23:0]           cpu_address,
@@ -92,12 +98,14 @@ module spk286_debug_overlay #(
     // A toggle/ack handshake captures one coherent source-domain snapshot per
     // frame. The wide snapshot remains stable while its acknowledgement crosses
     // the clock boundary; it is never used by functional machine logic.
-    wire [306:0] cpu_state_async = {
+    wire [349:0] cpu_state_async = {
         cpu_reset, cpu_halted, cpu_shutdown, cpu_control_error,
         cpu_unsupported_opcode, cpu_microcode_fault, cpu_operand_blocked,
         cpu_event_completed, cpu_event_vector, cpu_event_kind, cpu_opcode,
         cpu_cs, cpu_cs_base, cpu_ip, cpu_flags, cpu_gpr, cpu_segments,
-        cpu_micro_pc, cpu_biu_state
+        cpu_fetch_blocked, cpu_fetch_cursor, cpu_micro_pc, cpu_micro_entry,
+        cpu_micro_instruction, cpu_micro_active, cpu_prefetch_count,
+        cpu_biu_state
     };
 
     wire [156:0] bus_state_async = {
@@ -108,11 +116,11 @@ module spk286_debug_overlay #(
         xt_memory_projection, xt_cycle_active, xt_ready, bridge_idle,
         bridge_error, hold_request, last_post, cpu_cycle_count, xt_cycle_count
     };
-    wire [591:0] complete_state_async = {
+    wire [634:0] complete_state_async = {
         cpu_state_async, bus_state_async, trace0, trace1, trace2, trace3
     };
-    logic [599:0] source_snapshot = '0;
-    logic [599:0] video_snapshot = '0;
+    logic [642:0] source_snapshot = '0;
+    logic [642:0] video_snapshot = '0;
     logic [7:0] snapshot_sequence = 8'd0;
     logic snapshot_request = 1'b0;
     logic snapshot_acknowledge = 1'b0;
@@ -177,7 +185,7 @@ module spk286_debug_overlay #(
         end
     end
 
-    wire [306:0] cpu_state_snapshot;
+    wire [349:0] cpu_state_snapshot;
     wire [156:0] bus_state_snapshot;
     wire [127:0] trace_state_snapshot;
     wire [7:0] d_snapshot_sequence;
@@ -203,16 +211,25 @@ module spk286_debug_overlay #(
     wire [15:0] d_cpu_flags;
     wire [127:0] d_cpu_gpr;
     wire [63:0] d_cpu_segments;
+    wire        d_cpu_fetch_blocked;
+    wire [16:0] d_cpu_fetch_cursor;
     wire [11:0] d_cpu_micro_pc;
+    wire [11:0] d_cpu_micro_entry;
+    wire [7:0]  d_cpu_micro_instruction;
+    wire        d_cpu_micro_active;
+    wire [3:0]  d_cpu_prefetch_count;
     wire [3:0]  d_cpu_biu_state;
+    wire [19:0] d_cpu_fetch_cursor_padded = {3'd0, d_cpu_fetch_cursor};
 
     assign {
         d_cpu_reset, d_cpu_halted, d_cpu_shutdown, d_cpu_control_error,
         d_cpu_unsupported_opcode, d_cpu_microcode_fault,
         d_cpu_operand_blocked, d_cpu_event_completed, d_cpu_event_vector,
         d_cpu_event_kind, d_cpu_opcode, d_cpu_cs, d_cpu_cs_base, d_cpu_ip,
-        d_cpu_flags, d_cpu_gpr, d_cpu_segments, d_cpu_micro_pc,
-        d_cpu_biu_state
+        d_cpu_flags, d_cpu_gpr, d_cpu_segments, d_cpu_fetch_blocked,
+        d_cpu_fetch_cursor, d_cpu_micro_pc, d_cpu_micro_entry,
+        d_cpu_micro_instruction, d_cpu_micro_active,
+        d_cpu_prefetch_count, d_cpu_biu_state
     } = cpu_state_snapshot;
 
     wire [23:0] d_cpu_address;
@@ -465,6 +482,14 @@ module spk286_debug_overlay #(
                         end else if (col == 18)
                             character = hex_digit({1'b0, d_cpu_event_kind});
                     end
+                    4'd6: begin
+                        character = text_at("ACT:0 PF:0 FB:0", 15, col);
+                        if (col == 4) character = bit_digit(d_cpu_micro_active);
+                        else if (col == 9)
+                            character = hex_digit(d_cpu_prefetch_count);
+                        else if (col == 14)
+                            character = bit_digit(d_cpu_fetch_blocked);
+                    end
                     4'd7: begin
                         character = text_at("RST:0 HLT:0 SHD:0 EVT:0", 23, col);
                         if (col == 4) character = bit_digit(d_cpu_reset);
@@ -479,6 +504,19 @@ module spk286_debug_overlay #(
                         else if (col == 14) character = bit_digit(d_cpu_microcode_fault);
                         else if (col == 18) character = bit_digit(d_cpu_operand_blocked);
                         else if (col == 22) character = bit_digit(d_bridge_error);
+                    end
+                    4'd9: begin
+                        character = text_at("FC:00000 ME:000 MI:00", 21, col);
+                        if ((col >= 3) && (col <= 7)) begin
+                            nibble_shift = (7 - col) * 4;
+                            character = hex_digit(d_cpu_fetch_cursor_padded[nibble_shift +: 4]);
+                        end else if ((col >= 12) && (col <= 14)) begin
+                            nibble_shift = (14 - col) * 4;
+                            character = hex_digit(d_cpu_micro_entry[nibble_shift +: 4]);
+                        end else if ((col >= 19) && (col <= 20)) begin
+                            nibble_shift = (20 - col) * 4;
+                            character = hex_digit(d_cpu_micro_instruction[nibble_shift +: 4]);
+                        end
                     end
                     4'd10: begin
                         character = text_at("CPU#:0000 XT#:0000", 18, col);

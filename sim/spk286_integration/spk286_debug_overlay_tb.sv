@@ -38,7 +38,13 @@ module spk286_debug_overlay_tb;
     logic [63:0] cpu_segments = {
         16'hdddd, 16'hcccc, 16'hbbbb, 16'haaaa
     };
+    logic cpu_fetch_blocked = 1'b1;
+    logic [16:0] cpu_fetch_cursor = 17'h1abcd;
     logic [11:0] cpu_micro_pc = 12'habc;
+    logic [11:0] cpu_micro_entry = 12'h789;
+    logic [7:0] cpu_micro_instruction = 8'h5e;
+    logic cpu_micro_active = 1'b1;
+    logic [3:0] cpu_prefetch_count = 4'h6;
     logic [3:0] cpu_biu_state = 4'hd;
 
     logic [23:0] cpu_address = 24'h123456;
@@ -91,7 +97,9 @@ module spk286_debug_overlay_tb;
         .cpu_unsupported_opcode, .cpu_microcode_fault,
         .cpu_operand_blocked, .cpu_event_completed, .cpu_event_vector,
         .cpu_event_kind, .cpu_opcode, .cpu_cs, .cpu_cs_base, .cpu_ip,
-        .cpu_flags, .cpu_gpr, .cpu_segments, .cpu_micro_pc,
+        .cpu_flags, .cpu_gpr, .cpu_segments, .cpu_fetch_blocked,
+        .cpu_fetch_cursor, .cpu_micro_pc, .cpu_micro_entry,
+        .cpu_micro_instruction, .cpu_micro_active, .cpu_prefetch_count,
         .cpu_biu_state, .cpu_address, .cpu_data_out, .cpu_data_in,
         .cpu_bus_status, .cpu_bus_valid, .cpu_bus_write, .cpu_bhe_n,
         .cpu_bus_lock, .cpu_hlda, .cpu_ready, .xt_address, .xt_data_out,
@@ -209,7 +217,12 @@ module spk286_debug_overlay_tb;
             fail("segment snapshot order");
         if (dut.d_cpu_cs !== 16'hf123 || dut.d_cpu_cs_base !== 24'hf12340 ||
             dut.d_cpu_ip !== 16'h5678 || dut.d_cpu_flags !== 16'ha5a5 ||
-            dut.d_cpu_opcode !== 8'hb8 || dut.d_cpu_micro_pc !== 12'habc)
+            dut.d_cpu_opcode !== 8'hb8 || dut.d_cpu_micro_pc !== 12'habc ||
+            dut.d_cpu_fetch_cursor !== 17'h1abcd ||
+            dut.d_cpu_micro_entry !== 12'h789 ||
+            dut.d_cpu_micro_instruction !== 8'h5e ||
+            !dut.d_cpu_micro_active || dut.d_cpu_prefetch_count !== 4'h6 ||
+            !dut.d_cpu_fetch_blocked)
             fail("CPU state snapshot");
         if (dut.d_cpu_address !== 24'h123456 ||
             dut.d_xt_address !== 20'habcde || dut.d_xt_data_out !== 8'h5a ||
@@ -245,6 +258,15 @@ module spk286_debug_overlay_tb;
         // register nibbles and all fields of the newest trace entry.
         expect_character(2'd0, 0, 0, "S");
         expect_character(2'd0, 2, 3, "F");
+        expect_character(2'd0, 6, 4, "1");
+        expect_character(2'd0, 6, 9, "6");
+        expect_character(2'd0, 6, 14, "1");
+        expect_character(2'd0, 9, 3, "1");
+        expect_character(2'd0, 9, 7, "D");
+        expect_character(2'd0, 9, 12, "7");
+        expect_character(2'd0, 9, 14, "9");
+        expect_character(2'd0, 9, 19, "5");
+        expect_character(2'd0, 9, 20, "E");
         expect_character(2'd1, 2, 3, "9");
         expect_character(2'd1, 2, 11, "2");
         expect_character(2'd2, 2, 6, "1");

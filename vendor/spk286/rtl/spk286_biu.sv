@@ -68,11 +68,10 @@ module spk286_biu (
     always_ff @(posedge clk) begin
         if (reset) hlda <= 1'b0;
         else if (hlda) begin
-            // A HOLD can be accepted at an instruction boundary while the
-            // execution path is still finishing a prefetched locked XCHG.
-            // Drop HLDA as soon as LOCK appears so that the atomic transfer
-            // can complete; otherwise the arbiter withholds its grant while
-            // the DMA controller remains parked in S0 indefinitely.
+            // A HOLD can be accepted at a free boundary immediately before
+            // execution raises an implicit LOCK for a memory XCHG.  LOCK
+            // owns the next transaction, so release a stale grant before it
+            // can hide the locked request behind HLDA.
             if (!hold_request || lock_request) hlda <= 1'b0;
         end else if (hold_request && !bus_lock && !data_active_q && !ack_active_q &&
                      (!bus_valid || ready)) hlda <= 1'b1;

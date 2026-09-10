@@ -860,3 +860,72 @@ results and a separate independent functional reviewer. All evaluable records,
 negative audits and real CPU dependencies remain mandatory. Phase 8 entry is
 permitted after this scoped delivery, with the named notes recorded; no Phase 8
 implementation or E7 issue publication is part of this decision.
+
+## D-038 — Phase 8 BIU race and ESC decoder scope (2026-09-10)
+
+The downstream `PCAT-286_MiSTer` consumer exposed two CPU-level integration
+issues after Phase 7 delivery. First, its diagnostic candidate at commit
+`409292dcb06ea507099e4e68cf6d691d9b7294e8` reports a HOLD/HLDA race when a HOLD
+request collides with the implicit LOCK interval of a memory `XCHG` (`87`).
+Second, an ESC/coprocessor opcode in `D8–DF` (including `DB`) can block the
+decoder/microcode path during bring-up.
+
+Phase 8 therefore includes two independent CPU-only workstreams. Workstream
+8A shall reproduce and, if confirmed, integrate the general BIU correction
+(`if (!hold_request || lock_request) hlda <= 1'b0;`) together with a focused
+BIU and CPU-level XCHG/HOLD/READY regression. The candidate line is evidence,
+not an instruction to copy blindly. Workstream 8B shall establish deterministic
+286 no-coprocessor behavior for the complete D8–DF ESC range without deadlock,
+using Intel primary documentation and project contracts to choose whether the
+profile requires pass-through completion, an exception or an external request.
+It does not implement a complete 80287, NPX state, Protected Mode or historical
+WAIT timing. Generated microcode source remains authoritative.
+
+Both workstreams must pass independently and retain separate manifests and
+review evidence. The unchanged PCXT/PCAT BIOS is retested after 8B; BIOS
+adaptation is not part of Phase 8 and is only opened as a later contingency if
+an independent firmware failure remains. PCAT bus overlays, DMA/DACK wiring,
+XT serialization and MiSTer top-level changes remain in the downstream
+consumer. This decision expands Phase 8 CPU scope without changing SPK286's
+CPU-only repository boundary.
+
+## D-039 — Phase 8 downstream transfer and user hardware checkpoint (2026-09-10)
+
+After the independent validation of the two Phase 8 workstreams in SPK286, the
+general CPU corrections shall be transferred to the downstream
+`PCAT-286_MiSTer` checkout and committed there. The transfer includes the BIU
+HOLD/LOCK correction, the D8–DF decoder/microcode correction and their required
+portable generated/test artifacts; it preserves the PCAT-specific BUS overlay,
+DMA/DACK wiring, top-level integration and diagnostics, and does not modify the
+BIOS. The source and destination commits, file hashes and recovery procedure
+must be recorded.
+
+The user owns the subsequent Quartus synthesis and physical RBF test. The agent
+must not infer fit, timing or board success from an unavailable, stale or
+unobserved build. The user's explicit OK is the acceptance of this hardware
+checkpoint and allows Phase 8 closure. If the user reports a failure, the agent
+must classify and correct the relevant CPU or consumer defect before closure.
+An explicit OK after the D8–DF correction removes the need for a BIOS
+adaptation task; the unchanged BIOS remains the reference image. Waiting for
+the user's RBF result is a pending handoff state, not a Phase 8 implementation
+blocker.
+
+## D-040 — deterministic no-coprocessor ESC profile (2026-09-10)
+
+Intel documentation defines `ESC` as the processor-extension instruction
+handoff and documents processor-extension-not-available handling separately
+from the instruction's byte syntax. SPK286 currently has neither an 80287/NPX
+implementation nor a CPU-to-extension request/event boundary. The Phase 8
+standalone XT profile therefore accepts the complete `D8`–`DF` opcode range as
+a deterministic terminal passthrough: normal prefix, ModR/M and displacement
+acquisition advances the instruction stream, but the CPU performs no operand
+bus access, GPR/FLAGS/segment update or extension execution, and retires once.
+
+This is an explicit compatibility profile for the present CPU-only core, not a
+claim of complete 80287 or general architectural no-coprocessor behavior.
+`WAIT`/`FWAIT`, MSW/TS-driven vector 7 handling and a future extension interface
+remain separately scoped. Invalid forms continue to use the existing decoder
+policy. The source-level terminal microprogram is authoritative and generated
+ROM artifacts are regenerated from it. Primary evidence:
+[Intel iAPX 286 Programmer’s Reference Manual (1985)](https://www.bitsavers.org/components/intel/80286/210498-003_iAPX_286_Programmers_Reference_1985.pdf),
+[Intel iAPX 286 Programmer’s Reference Manual (1983)](https://bitsavers.org/components/intel/80286/210498-001_iAPX_286_Programmers_Reference_1983.pdf).

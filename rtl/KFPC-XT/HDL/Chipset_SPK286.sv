@@ -214,7 +214,11 @@ module CHIPSET #(
         input   logic   [3:0]   crt_h_offset,
         input   logic   [2:0]   crt_v_offset,
         input   logic   [2:0]   vsync_width_osd,
-        input   logic   [2:0]   hsync_width_osd
+        input   logic   [2:0]   hsync_width_osd,
+        output  logic   [7:0]   keyboard_debug_keycode,
+        output  logic           keyboard_debug_irq,
+        output  logic   [7:0]   keyboard_debug_port_b,
+        output  logic           keyboard_debug_pic_int
 
     );
 
@@ -541,7 +545,11 @@ module CHIPSET #(
         .crt_h_offset                       (crt_h_offset),
         .crt_v_offset                       (crt_v_offset),
         .vsync_width_osd                    (vsync_width_osd),
-        .hsync_width_osd                    (hsync_width_osd)
+        .hsync_width_osd                    (hsync_width_osd),
+        .keyboard_debug_keycode              (keyboard_debug_keycode),
+        .keyboard_debug_irq                  (keyboard_debug_irq),
+        .keyboard_debug_port_b               (keyboard_debug_port_b),
+        .keyboard_debug_pic_int              (keyboard_debug_pic_int)
     );
 
     RAM u_RAM

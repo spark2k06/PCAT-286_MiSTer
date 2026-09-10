@@ -85,6 +85,10 @@ module spk286_debug_overlay #(
     input  logic [31:0]           trace1,
     input  logic [31:0]           trace2,
     input  logic [31:0]           trace3,
+    input  logic [7:0]            keyboard_keycode,
+    input  logic                  keyboard_irq,
+    input  logic [7:0]            keyboard_port_b,
+    input  logic                  keyboard_pic_int,
 
     output logic                  HB_out,
     output logic                  VB_out,
@@ -108,19 +112,20 @@ module spk286_debug_overlay #(
         cpu_biu_state
     };
 
-    wire [156:0] bus_state_async = {
+    wire [174:0] bus_state_async = {
         cpu_address, cpu_data_out, cpu_data_in, cpu_bus_status,
         cpu_bus_valid, cpu_bus_write, cpu_bhe_n, cpu_bus_lock, cpu_hlda,
         cpu_ready, xt_address, xt_data_out, xt_data_in, xt_status, xt_valid,
         xt_write, xt_io, xt_inta, xt_code, xt_byte_high,
         xt_memory_projection, xt_cycle_active, xt_ready, bridge_idle,
-        bridge_error, hold_request, last_post, cpu_cycle_count, xt_cycle_count
+        bridge_error, hold_request, last_post, cpu_cycle_count, xt_cycle_count,
+        keyboard_keycode, keyboard_irq, keyboard_port_b, keyboard_pic_int
     };
-    wire [634:0] complete_state_async = {
+    wire [652:0] complete_state_async = {
         cpu_state_async, bus_state_async, trace0, trace1, trace2, trace3
     };
-    logic [642:0] source_snapshot = '0;
-    logic [642:0] video_snapshot = '0;
+    logic [660:0] source_snapshot = '0;
+    logic [660:0] video_snapshot = '0;
     logic [7:0] snapshot_sequence = 8'd0;
     logic snapshot_request = 1'b0;
     logic snapshot_acknowledge = 1'b0;
@@ -186,7 +191,7 @@ module spk286_debug_overlay #(
     end
 
     wire [349:0] cpu_state_snapshot;
-    wire [156:0] bus_state_snapshot;
+    wire [174:0] bus_state_snapshot;
     wire [127:0] trace_state_snapshot;
     wire [7:0] d_snapshot_sequence;
     assign {
@@ -261,6 +266,10 @@ module spk286_debug_overlay #(
     wire [7:0]  d_last_post;
     wire [15:0] d_cpu_cycle_count;
     wire [15:0] d_xt_cycle_count;
+    wire [7:0]  d_keyboard_keycode;
+    wire        d_keyboard_irq;
+    wire [7:0]  d_keyboard_port_b;
+    wire        d_keyboard_pic_int;
 
     assign {
         d_cpu_address, d_cpu_data_out, d_cpu_data_in, d_cpu_bus_status,
@@ -269,7 +278,8 @@ module spk286_debug_overlay #(
         d_xt_status, d_xt_valid, d_xt_write, d_xt_io, d_xt_inta, d_xt_code,
         d_xt_byte_high, d_xt_memory_projection, d_xt_cycle_active,
         d_xt_ready, d_bridge_idle, d_bridge_error, d_hold_request,
-        d_last_post, d_cpu_cycle_count, d_xt_cycle_count
+        d_last_post, d_cpu_cycle_count, d_xt_cycle_count,
+        d_keyboard_keycode, d_keyboard_irq, d_keyboard_port_b, d_keyboard_pic_int
     } = bus_state_snapshot;
 
     wire [31:0] d_trace0 = trace_state_snapshot[127:96];
@@ -664,6 +674,17 @@ module spk286_debug_overlay #(
                         else if (col == 11) character = bit_digit(d_xt_byte_high);
                         else if (col == 17) character = bit_digit(d_xt_memory_projection);
                         else if (col == 23) character = bit_digit(d_xt_cycle_active);
+                    end
+                    4'd9: begin
+                        character = text_at("KBD:00 I:0 PB:00 P:0", 20, col);
+                        if ((col >= 4) && (col <= 5)) begin
+                            nibble_shift = (5 - col) * 4;
+                            character = hex_digit(d_keyboard_keycode[nibble_shift +: 4]);
+                        end else if (col == 9) character = bit_digit(d_keyboard_irq);
+                        else if ((col >= 14) && (col <= 15)) begin
+                            nibble_shift = (15 - col) * 4;
+                            character = hex_digit(d_keyboard_port_b[nibble_shift +: 4]);
+                        end else if (col == 19) character = bit_digit(d_keyboard_pic_int);
                     end
                     4'd10: begin
                         character = text_at("IDLE:0 ERR:0 POST:00", 20, col);

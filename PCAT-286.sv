@@ -384,6 +384,10 @@ module emu
     wire VGA_VBlank_border;
     wire std_hsyncwidth;
     wire pause_core;
+    wire [7:0] keyboard_debug_keycode;
+    wire       keyboard_debug_irq;
+    wire [7:0] keyboard_debug_port_b;
+    wire       keyboard_debug_pic_int;
 
     always @(posedge clk_57_272)
     begin
@@ -1222,7 +1226,11 @@ module emu
 		.crt_h_offset                       (eff_crt_h),
 		.crt_v_offset                       (eff_crt_v),
 		.vsync_width_osd                    (vsync_width_osd),
-		.hsync_width_osd                    (hsync_width_osd)
+		.hsync_width_osd                    (hsync_width_osd),
+		.keyboard_debug_keycode              (keyboard_debug_keycode),
+		.keyboard_debug_irq                  (keyboard_debug_irq),
+		.keyboard_debug_port_b               (keyboard_debug_port_b),
+		.keyboard_debug_pic_int              (keyboard_debug_pic_int)
 	);
 
     wire [15:0] SDRAM_DQ_IN;
@@ -2289,6 +2297,10 @@ module emu
         .trace1                  (spk_debug_trace1),
         .trace2                  (spk_debug_trace2),
         .trace3                  (spk_debug_trace3),
+        .keyboard_keycode        (keyboard_debug_keycode),
+        .keyboard_irq            (keyboard_debug_irq),
+        .keyboard_port_b         (keyboard_debug_port_b),
+        .keyboard_pic_int        (keyboard_debug_pic_int),
         .HB_out                  (spk_debug_hb_out),
         .VB_out                  (spk_debug_vb_out),
         .rgb_out                 (spk_debug_rgb_out)

@@ -184,9 +184,12 @@ singlestep-events-smoke: verilator
 singlestep-phase6: verilator
 	python3 -m tools.run_singlestep --phase6 --full
 
-.PHONY: phase7-check phase7-byte-prefix-check
+.PHONY: phase7-check phase7-byte-prefix-check phase8-audit
 phase7-byte-prefix-check:
 	bash scripts/validate_phase7_byte_prefix.sh
+
+phase8-audit:
+	python3 -m tools.audit_phase8
 
 # Full scope cannot pass by running only the byte/prefix increment.
 phase7-check:

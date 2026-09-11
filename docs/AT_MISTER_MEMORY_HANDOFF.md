@@ -11,14 +11,18 @@ adapter between the normalized AT machine and a MiSTer memory owner. It
 exposes one abstract 16-bit backend transaction port and three initiator sides:
 
 - CPU memory/code fetch, including cycle class and byte enables;
+- reset-time BIOS loader writes;
 - DMA memory beats;
 - refresh ownership.
 
-The adapter selects one owner at a time with the documented priority CPU,
-refresh, DMA. It accepts a command once, keeps address, data and lanes stable
-until completion, requires explicit read-data-valid for reads, and returns
-independent ready/data handshakes to the initiator. An overlap is retained as
-a sticky protocol diagnostic instead of silently allowing two owners.
+The adapter selects one owner at a time with the documented priority loader,
+CPU, refresh, DMA. The loader priority is intended for reset-held HPS BIOS
+downloads; normal machine operation still presents only one candidate from
+the AT arbiter. It accepts a command once, keeps address, data and lanes
+stable until completion, requires explicit read-data-valid for reads, and
+returns independent ready/data handshakes to the initiator. An overlap is
+retained as a sticky protocol diagnostic instead of silently allowing two
+owners.
 
 `rtl/spk286_integration/spk286_at_mister_sdram_owner.sv` now implements the
 physical owner below that port. It drives the existing `KFSDRAM` controller,
@@ -68,7 +72,10 @@ AT_MISTER_SDRAM_OWNER_TEST_PASS
 
 ## Remaining physical connection
 
-This is still not board acceptance. The active `PCAT-286.sv` top level still
+This is still not board acceptance. The loader endpoint is now available to a
+future HPS ROM sequencer, but it is not yet wired to `pcat_rom_loader`; that
+existing sequencer targets the legacy XT bus and uses a different write
+protocol. The active `PCAT-286.sv` top level still
 instantiates `CHIPSET_SPK286`, whose legacy XT path owns the existing SDRAM
 controller and device wiring internally. The next top-level step is an
 explicit AT profile/backend connection that selects this owner instead of the

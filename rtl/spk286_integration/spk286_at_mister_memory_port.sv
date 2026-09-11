@@ -25,6 +25,15 @@ module spk286_at_mister_memory_port (
     output logic [15:0] cpu_read_data,
     output logic        cpu_read_data_valid,
 
+    input  logic        loader_valid,
+    input  logic        loader_write,
+    input  logic [23:0] loader_address,
+    input  logic [1:0]  loader_byte_enable,
+    input  logic [15:0] loader_data_out,
+    output logic        loader_accept,
+    output logic        loader_ready,
+    output logic [15:0] loader_read_data,
+
     input  logic        dma_valid,
     input  logic        dma_write,
     input  logic [23:0] dma_address,
@@ -60,6 +69,7 @@ module spk286_at_mister_memory_port (
     localparam logic [1:0] OWNER_CPU     = 2'd0;
     localparam logic [1:0] OWNER_DMA     = 2'd1;
     localparam logic [1:0] OWNER_REFRESH = 2'd2;
+    localparam logic [1:0] OWNER_LOADER  = 2'd3;
 
     logic       active_q;
     logic       accepted_q;
@@ -102,6 +112,9 @@ module spk286_at_mister_memory_port (
         dma_read_data         = backend_read_data;
         refresh_accept        = 1'b0;
         refresh_ready         = 1'b0;
+        loader_accept         = 1'b0;
+        loader_ready          = 1'b0;
+        loader_read_data      = backend_read_data;
 
         if (active_q) begin
             // CPU has a separate command phase.  DMA and refresh enter the
@@ -117,6 +130,8 @@ module spk286_at_mister_memory_port (
                 dma_accept = selected_accept;
             else if (owner_q == OWNER_REFRESH)
                 refresh_accept = selected_accept;
+            else if (owner_q == OWNER_LOADER)
+                loader_accept = selected_accept;
 
             // A read response is complete only when the backend supplies
             // valid data.  Writes and refreshes need only the ready response.
@@ -127,6 +142,8 @@ module spk286_at_mister_memory_port (
                 dma_ready = response_complete;
             end else if (owner_q == OWNER_REFRESH) begin
                 refresh_ready = response_complete;
+            end else if (owner_q == OWNER_LOADER) begin
+                loader_ready = response_complete;
             end
         end else begin
         end
@@ -146,10 +163,20 @@ module spk286_at_mister_memory_port (
             protocol_error <= 1'b0;
         end else begin
             if (!active_q) begin
-                // CPU wins over refresh, and refresh wins over DMA.  Normal
-                // machine operation presents only one candidate; detecting a
-                // collision here makes an accidental double-owner visible.
-                if (cpu_valid) begin
+                // The loader wins during boot, then CPU wins over refresh,
+                // and refresh wins over DMA.  Normal machine operation
+                // presents only one candidate; detecting a collision here
+                // makes an accidental double-owner visible.
+                if (loader_valid) begin
+                    active_q      <= 1'b1;
+                    owner_q       <= OWNER_LOADER;
+                    write_q       <= loader_write;
+                    code_fetch_q  <= 1'b0;
+                    cycle_class_q <= 4'b0000;
+                    address_q     <= loader_address;
+                    byte_enable_q <= loader_byte_enable;
+                    data_out_q    <= loader_data_out;
+                end else if (cpu_valid) begin
                     active_q      <= 1'b1;
                     owner_q       <= OWNER_CPU;
                     write_q       <= cpu_write;
@@ -178,7 +205,10 @@ module spk286_at_mister_memory_port (
                     data_out_q    <= dma_data_out;
                 end
 
-                if ((cpu_valid && refresh_valid) ||
+                if ((loader_valid && cpu_valid) ||
+                    (loader_valid && refresh_valid) ||
+                    (loader_valid && dma_valid) ||
+                    (cpu_valid && refresh_valid) ||
                     (cpu_valid && dma_valid) ||
                     (refresh_valid && dma_valid))
                     protocol_error <= 1'b1;

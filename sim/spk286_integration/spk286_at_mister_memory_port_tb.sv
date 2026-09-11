@@ -17,6 +17,15 @@ module spk286_at_mister_memory_port_tb;
     logic [15:0] cpu_read_data;
     logic        cpu_read_data_valid;
 
+    logic        loader_valid;
+    logic        loader_write;
+    logic [23:0] loader_address;
+    logic [1:0]  loader_byte_enable;
+    logic [15:0] loader_data_out;
+    logic        loader_accept;
+    logic        loader_ready;
+    logic [15:0] loader_read_data;
+
     logic        dma_valid;
     logic        dma_write;
     logic [23:0] dma_address;
@@ -50,6 +59,7 @@ module spk286_at_mister_memory_port_tb;
     localparam logic [1:0] OWNER_CPU      = 2'd0;
     localparam logic [1:0] OWNER_DMA      = 2'd1;
     localparam logic [1:0] OWNER_REFRESH  = 2'd2;
+    localparam logic [1:0] OWNER_LOADER   = 2'd3;
 
     always #5 clk = ~clk;
 
@@ -68,6 +78,12 @@ module spk286_at_mister_memory_port_tb;
         .cpu_ready(cpu_ready),
         .cpu_read_data(cpu_read_data),
         .cpu_read_data_valid(cpu_read_data_valid),
+        .loader_valid(loader_valid), .loader_write(loader_write),
+        .loader_address(loader_address),
+        .loader_byte_enable(loader_byte_enable),
+        .loader_data_out(loader_data_out),
+        .loader_accept(loader_accept), .loader_ready(loader_ready),
+        .loader_read_data(loader_read_data),
         .dma_valid(dma_valid),
         .dma_write(dma_write),
         .dma_address(dma_address),
@@ -115,6 +131,11 @@ module spk286_at_mister_memory_port_tb;
         cpu_address            = 24'h000000;
         cpu_byte_enable        = 2'b11;
         cpu_data_out           = 16'h0000;
+        loader_valid           = 1'b0;
+        loader_write           = 1'b0;
+        loader_address         = 24'h000000;
+        loader_byte_enable     = 2'b11;
+        loader_data_out        = 16'h0000;
         dma_valid              = 1'b0;
         dma_write              = 1'b0;
         dma_address            = 24'h000000;
@@ -177,6 +198,32 @@ module spk286_at_mister_memory_port_tb;
         cpu_valid = 1'b0;
         cpu_command_valid = 1'b0;
         backend_read_data_valid = 1'b0;
+
+        // The boot loader is a first-class owner and wins over runtime
+        // candidates while it writes the BIOS image.
+        loader_valid = 1'b1;
+        loader_write = 1'b1;
+        loader_address = 24'h0f0000;
+        loader_byte_enable = 2'b11;
+        loader_data_out = 16'h2860;
+        backend_accept = 1'b1;
+        @(posedge clk);
+        @(negedge clk);
+        check(backend_owner == OWNER_LOADER && loader_accept &&
+              !cpu_accept && !refresh_accept && !dma_accept,
+              "loader did not own the backend exclusively");
+        @(posedge clk);
+        #1;
+        loader_valid = 1'b0;
+        backend_accept = 1'b0;
+        backend_ready = 1'b0;
+        @(negedge clk);
+        backend_ready = 1'b1;
+        #1;
+        check(loader_ready && !cpu_ready && !refresh_ready && !dma_ready,
+              "loader completion was not returned exclusively");
+        @(posedge clk);
+        #1;
 
         // Refresh has priority over DMA at this boundary and owns the port.
         refresh_valid = 1'b1;

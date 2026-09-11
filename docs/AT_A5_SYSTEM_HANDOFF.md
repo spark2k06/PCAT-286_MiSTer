@@ -33,7 +33,10 @@ drives the machine through this port and the new
 `rtl/spk286_integration/spk286_at_mister_sdram_owner.sv`, which exercises the
 existing KFSDRAM controller and physical byte masks in simulation. The active
 `CHIPSET_SPK286` still owns the legacy XT memory/peripheral path internally,
-so the final top-level profile selection remains a separate step.
+so the final top-level profile selection remains a separate step. The memory
+port also exposes a reset-time loader owner; the existing
+`pcat_rom_loader.sv` still targets the legacy XT write protocol and has not
+yet been adapted to this endpoint.
 
 ## Composed evidence
 

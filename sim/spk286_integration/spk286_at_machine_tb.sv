@@ -45,10 +45,10 @@ module spk286_at_machine_tb;
     wire [23:0] memory_address;
     wire [1:0] memory_byte_enable;
     wire [15:0] memory_data_out;
-    wire memory_accept = memory_command_valid;
-    wire memory_ready = memory_request_valid;
+    wire memory_accept;
+    wire memory_ready;
     logic [15:0] memory_read_data;
-    wire memory_read_data_valid = memory_request_valid && !memory_write;
+    wire memory_read_data_valid;
 
     wire dma_memory_valid;
     wire dma_memory_write;
@@ -56,14 +56,32 @@ module spk286_at_machine_tb;
     wire [23:0] dma_memory_address;
     wire [1:0] dma_memory_byte_enable;
     wire [15:0] dma_memory_data_out;
-    wire dma_memory_accept = dma_memory_valid;
-    wire dma_memory_ready = dma_memory_valid;
+    wire dma_memory_accept;
+    wire dma_memory_ready;
     logic [15:0] dma_memory_data_in;
 
     wire refresh_memory_valid;
     wire [23:0] refresh_memory_address;
-    wire refresh_memory_accept = refresh_memory_valid;
-    wire refresh_memory_ready = refresh_memory_valid;
+    wire refresh_memory_accept;
+    wire refresh_memory_ready;
+
+    wire        backend_valid;
+    wire        backend_command_valid;
+    wire [1:0]  backend_owner;
+    wire        backend_write;
+    wire        backend_refresh;
+    wire        backend_code_fetch;
+    wire [3:0]  backend_cycle_class;
+    wire [23:0] backend_address;
+    wire [1:0]  backend_byte_enable;
+    wire [15:0] backend_data_out;
+    wire        backend_accept = backend_command_valid;
+    wire        backend_ready = backend_valid;
+    logic [15:0] backend_read_data;
+    wire        backend_read_data_valid = backend_valid &&
+                                          !backend_write &&
+                                          !backend_refresh;
+    wire        memory_port_protocol_error;
 
     wire keyboard_output_valid;
     wire [7:0] keyboard_output_byte;
@@ -158,17 +176,10 @@ module spk286_at_machine_tb;
     endtask
 
     always_comb begin
-        if (memory_byte_enable[1])
-            memory_read_data = {memory_read_byte(memory_address), 8'h00};
+        if (backend_byte_enable[1])
+            backend_read_data = {memory_read_byte(backend_address), 8'h00};
         else
-            memory_read_data = {8'h00, memory_read_byte(memory_address)};
-    end
-
-    always_comb begin
-        if (dma_memory_byte_enable[1])
-            dma_memory_data_in = {memory_read_byte(dma_memory_address), 8'h00};
-        else
-            dma_memory_data_in = {8'h00, memory_read_byte(dma_memory_address)};
+            backend_read_data = {8'h00, memory_read_byte(backend_address)};
     end
 
     always_ff @(posedge clk) begin
@@ -183,32 +194,32 @@ module spk286_at_machine_tb;
             saw_native_reset_fetch <= 1'b0;
             saw_low_rom_fetch <= 1'b0;
         end else begin
-            if (memory_command_valid) begin
+            if (backend_command_valid && (backend_owner == 2'd0)) begin
                 accepted_memory_beats <= accepted_memory_beats + 1;
-                if (memory_address == 24'hFFFFF0)
+                if (backend_address == 24'hFFFFF0)
                     saw_native_reset_fetch <= 1'b1;
-                if ((memory_address >= 24'h0F0000) &&
-                    (memory_address <= 24'h0FFFFF))
+                if ((backend_address >= 24'h0F0000) &&
+                    (backend_address <= 24'h0FFFFF))
                     saw_low_rom_fetch <= 1'b1;
-                if (memory_write) begin
-                    if (memory_byte_enable[0])
-                        write_memory_byte(memory_address, memory_data_out[7:0]);
-                    if (memory_byte_enable[1])
-                        write_memory_byte(memory_address,
-                                          memory_data_out[15:8]);
+                if (backend_write) begin
+                    if (backend_byte_enable[0])
+                        write_memory_byte(backend_address, backend_data_out[7:0]);
+                    if (backend_byte_enable[1])
+                        write_memory_byte(backend_address,
+                                          backend_data_out[15:8]);
                 end
             end
 
-            if (dma_memory_valid && dma_memory_write) begin
-                if (dma_memory_byte_enable[0])
-                    write_memory_byte(dma_memory_address,
-                                      dma_memory_data_out[7:0]);
-                if (dma_memory_byte_enable[1])
-                    write_memory_byte(dma_memory_address + 24'd1,
-                                      dma_memory_data_out[15:8]);
+            if (backend_command_valid && (backend_owner == 2'd1) &&
+                backend_write) begin
+                if (backend_byte_enable[0])
+                    write_memory_byte(backend_address, backend_data_out[7:0]);
+                if (backend_byte_enable[1])
+                    write_memory_byte(backend_address + 24'd1,
+                                      backend_data_out[15:8]);
             end
 
-            if (refresh_memory_valid)
+            if (backend_command_valid && (backend_owner == 2'd2))
                 refresh_beats <= refresh_beats + 1;
             if (irq_request[0] && !intr)
                 irq0_edges <= irq0_edges + 1;
@@ -251,6 +262,46 @@ module spk286_at_machine_tb;
         for (index = 0; index < 4; index = index + 1)
             port80_sequence[index] = 8'h00;
     end
+
+    // Exercise the real machine through the same serialized memory boundary
+    // that the future MiSTer SDRAM/HPS owner will use.
+    spk286_at_mister_memory_port memory_port (
+        .clk(clk), .reset(reset),
+        .cpu_valid(memory_request_valid),
+        .cpu_command_valid(memory_command_valid),
+        .cpu_write(memory_write),
+        .cpu_code_fetch(memory_code_fetch),
+        .cpu_cycle_class(memory_cycle_class),
+        .cpu_address(memory_address),
+        .cpu_byte_enable(memory_byte_enable),
+        .cpu_data_out(memory_data_out),
+        .cpu_accept(memory_accept), .cpu_ready(memory_ready),
+        .cpu_read_data(memory_read_data),
+        .cpu_read_data_valid(memory_read_data_valid),
+        .dma_valid(dma_memory_valid), .dma_write(dma_memory_write),
+        .dma_address(dma_memory_address),
+        .dma_byte_enable(dma_memory_byte_enable),
+        .dma_data_out(dma_memory_data_out),
+        .dma_accept(dma_memory_accept), .dma_ready(dma_memory_ready),
+        .dma_read_data(dma_memory_data_in),
+        .refresh_valid(refresh_memory_valid),
+        .refresh_address(refresh_memory_address),
+        .refresh_accept(refresh_memory_accept),
+        .refresh_ready(refresh_memory_ready),
+        .backend_valid(backend_valid),
+        .backend_command_valid(backend_command_valid),
+        .backend_owner(backend_owner), .backend_write(backend_write),
+        .backend_refresh(backend_refresh),
+        .backend_code_fetch(backend_code_fetch),
+        .backend_cycle_class(backend_cycle_class),
+        .backend_address(backend_address),
+        .backend_byte_enable(backend_byte_enable),
+        .backend_data_out(backend_data_out),
+        .backend_accept(backend_accept), .backend_ready(backend_ready),
+        .backend_read_data(backend_read_data),
+        .backend_read_data_valid(backend_read_data_valid),
+        .protocol_error(memory_port_protocol_error)
+    );
 
     spk286_at_machine dut (
         .clk(clk), .reset(reset), .execute_enable(execute_enable),
@@ -318,6 +369,9 @@ module spk286_at_machine_tb;
                 $fatal(1, "AT_SYSTEM_FAULT cycle=%0d cs_ip=%04h:%04h opcode=%02h owner=%0d bridge_idle=%b fault=%b",
                        cycles, debug_cs, debug_ip, debug_opcode, bus_owner,
                        bridge_idle, cpu_fault);
+            if (memory_port_protocol_error)
+                $fatal(1, "AT_MEMORY_PORT_FAULT cycle=%0d owner=%0d address=%06h",
+                       cycles, backend_owner, backend_address);
             if (port81_writes != 0)
                 $fatal(1, "AT_SYSTEM_DIAGNOSTIC_FAILURE cycle=%0d port81=%0d cs_ip=%04h:%04h",
                        cycles, port81_writes, debug_cs, debug_ip);

@@ -24,6 +24,15 @@ The AT bridge was also corrected so the first INTA beat can complete on READY
 without fabricated read data, while ordinary reads still require an explicit
 data-valid response.
 
+The next attachment boundary is now implemented in
+`rtl/spk286_integration/spk286_at_mister_memory_port.sv`. It serializes the
+CPU, refresh and DMA endpoints into one MiSTer-facing 16-bit backend port,
+latches request metadata across backend stalls, preserves byte lanes, and
+reports accidental multi-owner requests. The composed event-ROM test now
+drives the machine through this port. Its physical SDRAM/HPS implementation
+is intentionally still a separate step because the active `CHIPSET_SPK286`
+owns the legacy XT memory/peripheral path internally.
+
 ## Composed evidence
 
 Run:
@@ -56,7 +65,7 @@ yet the final production-PIC/DOS/hardware path.
 ## Acceptance still pending
 
 This milestone is not a DOS-boot or board acceptance. Remaining work is to
-attach the composed profile to the real MiSTer top-level memory/HPS/media and
+attach the new backend port to the real MiSTer top-level memory/HPS/media and
 video owners, exercise physical keyboard/storage/video paths, run the DOS and
 representative-device trace ladder, and then produce a board-loadable RBF for
 user testing. No AT compatibility claim is made until those steps pass.

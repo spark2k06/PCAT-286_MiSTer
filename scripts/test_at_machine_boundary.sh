@@ -29,6 +29,7 @@ sources+=(
   rtl/spk286_integration/spk286_at_storage_video.sv
   rtl/spk286_integration/spk286_at_device_router.sv
   rtl/spk286_integration/spk286_at_machine.sv
+  rtl/spk286_integration/spk286_at_mister_memory_port.sv
 )
 pic_sources=()
 for source in rtl/KFPC-XT/HDL/KF8259/HDL/*.sv; do

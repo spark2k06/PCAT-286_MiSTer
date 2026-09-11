@@ -140,8 +140,13 @@ module spk286_at_bus_bridge (
             beat_byte_enable = 2'b01;
     end
 
+    // INTA is the one read-like cycle whose first completion deliberately
+    // carries no data.  The PIC owns that two-beat sequence; the CPU must
+    // still observe READY for the first acknowledge so it can issue the
+    // second one.  Ordinary reads continue to require explicit data-valid.
     assign completion_valid = (state_q == STATE_WAIT) && at_ready &&
-                              (!request_is_read || at_read_data_valid);
+                              (!request_is_read || request_is_inta ||
+                               at_read_data_valid);
 
     assign at_valid          = (state_q == STATE_ADDRESS) ||
                                (state_q == STATE_COMMAND) ||

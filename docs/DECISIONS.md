@@ -48,6 +48,33 @@ FIFO; individual address, lane and control bits may not be synchronized
 independently. AT memory decode, cascaded PIC/DMA, refresh and A20 policy remain
 open A2+ decisions and are not implied by this bridge.
 
+## D-AT-004 — First AT memory decode profile
+
+**Date:** 2026-09-11
+**Status:** Accepted for the A2 implementation slice
+
+The first decoder retains the complete 24-bit physical address and classifies
+memory/code requests into conventional RAM (`000000h–09FFFFh`), video aperture
+(`0A0000h–0BFFFFh`), option/reserved region (`0C0000h–0EFFFFh`), system BIOS
+(`0F0000h–0FFFFFh`) and extended RAM (`100000h–FFFFFFh`). I/O and INTA never
+select the memory path. Conventional, video and extended RAM writes are
+allowed; option-region and BIOS writes are reported as ROM-protected. Presence
+of individual option ROMs and reserved-hole side effects remains a later
+chipset decision.
+
+## D-AT-005 — First AT ownership policy
+
+**Date:** 2026-09-11
+**Status:** Accepted for the A2 implementation slice
+
+The first arbiter uses fixed priority loader, refresh, then DMA. Runtime
+external owners assert CPU HOLD and are granted only after CPU HLDA, bridge
+drain, no pending response and no LOCK/INTA/retained odd-word interval. Once
+latched, an external owner remains selected until `external_done`, even if its
+request line withdraws. A loader explicitly marked as reset-held owns the bus
+without waiting for HLDA and does not assert CPU HOLD. This is a functional
+ownership policy, not an historical 82289 timing claim.
+
 ## Source selections
 
 The consumed CPU snapshot is the imported `vendor/spk286` indexed tree at

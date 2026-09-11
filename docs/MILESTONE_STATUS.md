@@ -25,4 +25,5 @@ profile remains an XT-derived machine with SPK286 in Real Mode.
 | --- | --- | --- |
 | A0 — Contract freeze | Complete | `docs/DECISIONS.md` records the CPU snapshot, shared-clock policy, ownership boundary and handshake decisions |
 | A1 — Functional AT bridge | Complete | `rtl/spk286_integration/spk286_at_bus_bridge.sv` and the Icarus/Verilator `A1_AT_BRIDGE_TEST_PASS` suite validate 24-bit metadata, lanes, READY, LOCK, INTA-class requests and reset cancellation |
-| A2+ — AT chipset and arbitration | Not started | The production top level still uses the separate XT bridge and XT-derived chipset; no AT compatibility claim is made |
+| A2 — Memory and arbitration slice | Complete | `spk286_at_memory_decode.sv` and `spk286_at_arbiter.sv` pass Icarus/Verilator tests for the 24-bit profile map, ROM protection, HOLD/HLDA, LOCK, odd-word/response exclusion and reset-held loader ownership |
+| A3+ — AT chipset and peripherals | Not started | The production top level still uses the separate XT bridge and XT-derived chipset; no AT compatibility claim is made |

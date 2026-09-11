@@ -109,3 +109,34 @@ qualified to one synchronous NMI pulse per asserted source. This is a
 functional source policy, not a claim about every board-specific parity or
 channel-check generator. Separate-clock synchronization and additional AT
 event sources remain later integration work.
+
+## D-AT-008 — Functional DMA pair and transfer profile
+
+**Date:** 2026-09-11
+**Status:** Accepted for the A4 implementation slice
+
+The A4 boundary uses a repository-owned functional DMA pair rather than
+mutating the imported XT-oriented `KF8237`. It exposes DMA1 channels 0–3 as
+byte transfers, DMA2 channels 4–7 as word transfers, page registers, channel
+4 cascade state, request/acknowledge, masking, mode, address/count flip-flops,
+auto-init and terminal count. A transfer retains address, direction and lanes
+until the endpoint accepts and completes exactly one beat.
+
+The first DMA2 profile emits an even physical address with both lanes active.
+This is an explicit functional boundary, not a cycle-accurate claim about all
+8237 word-page and device wiring variants. Device-specific request polarity,
+full word-address page semantics and top-level storage wiring remain open for
+A5/A7.
+
+## D-AT-009 — Refresh and PIT boundary
+
+**Date:** 2026-09-11
+**Status:** Accepted for the A4 implementation slice
+
+Refresh is a separate external bus owner and outranks DMA in the first fixed
+arbiter priority. Its cadence is parameterized for deterministic simulation;
+the refresh row and completion are visible at the normalized boundary. The
+PIT boundary owns ports `40h–43h`, supports the functional counter modes
+needed by the first timer path and emits a synchronous one-cycle IRQ0 pulse.
+`counter_clock` is treated as a sampled tick enable; clock-domain crossing and
+historical PIT frequency selection are later top-level decisions.

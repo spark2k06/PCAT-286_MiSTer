@@ -1,6 +1,6 @@
 # Integration milestone status
 
-Recorded on 2026-09-10 for branch `codex/spk286-xt-integration`.
+Recorded on 2026-09-11 for branch `codex/spk286-xt-integration`.
 
 | Milestone | Status | Evidence |
 | --- | --- | --- |
@@ -27,4 +27,5 @@ profile remains an XT-derived machine with SPK286 in Real Mode.
 | A1 — Functional AT bridge | Complete | `rtl/spk286_integration/spk286_at_bus_bridge.sv` and the Icarus/Verilator `A1_AT_BRIDGE_TEST_PASS` suite validate 24-bit metadata, lanes, READY, LOCK, INTA-class requests and reset cancellation |
 | A2 — Memory and arbitration slice | Complete | `spk286_at_memory_decode.sv` and `spk286_at_arbiter.sv` pass Icarus/Verilator tests for the 24-bit profile map, ROM protection, HOLD/HLDA, LOCK, odd-word/response exclusion and reset-held loader ownership |
 | A3 — Interrupt subsystem | Complete | Dual KF8259 boundary, IRQ2 cascade, programmed masks/vectors, two-INTA delivery and NMI mask/source tests pass; active top remains XT-derived |
-| A4+ — AT chipset and peripherals | Not started | DMA, refresh, PIT, keyboard, RTC, storage/video and AT top-level wiring remain pending; no AT compatibility claim is made |
+| A4 — DMA, refresh and timer | Complete | Functional DMA1/DMA2 boundary, page/count/mode/terminal-count state, refresh owner and PIT/IRQ0 pass Icarus and Verilator integration tests; active top remains XT-derived |
+| A5+ — AT devices and top-level integration | Not started | Keyboard, RTC, storage/video wiring, AT BIOS and hardware validation remain pending; no AT compatibility claim is made |

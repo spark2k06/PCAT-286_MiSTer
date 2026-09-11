@@ -2,7 +2,7 @@
 
 **Document:** `docs/AT_BUS_CPU_CHIPSET_SPEC.md`
 **Version:** 1.0 draft engineering specification
-**Status:** A0–A3 implementation slice delivered; A4+ and hardware validation pending
+**Status:** A0–A4 implementation slice delivered; A5+ and hardware validation pending
 **Scope:** CPU wrapper, 80286-compatible motherboard bus, arbitration and minimum PC/AT chipset boundary
 **Consumer:** `PCAT-286_MiSTer`
 **CPU provider:** `SPK286`
@@ -13,12 +13,12 @@ SPK286 architectural specification and from individual peripheral
 implementations. The purpose is to prevent an XT-derived bridge, a CPU bus
 owner and an AT chipset from silently acquiring overlapping responsibilities.
 
-The current implementation delivery covers the A0–A3 normalized CPU-facing
+The current implementation delivery covers the A0–A4 normalized CPU-facing
 contract, the standalone `spk286_at_bus_bridge`, the AT memory-range decoder,
-ownership arbiter and dual-PIC/NMI interrupt boundaries. The active MiSTer
-machine remains the documented `XT_COMPAT` profile; DMA, refresh and AT
-peripheral integration remain later milestones and are not implied by this
-isolated A3 slice.
+ownership arbiter, dual-PIC/NMI interrupt boundaries and the functional
+DMA/refresh/PIT boundaries. The active MiSTer machine remains the documented
+`XT_COMPAT` profile; keyboard, RTC, storage/video, AT BIOS and hardware
+integration remain later milestones and are not implied by this A4 slice.
 
 The words **MUST**, **MUST NOT**, **SHOULD**, **SHOULD NOT** and **MAY** are
 normative. A statement that is not yet validated on hardware is marked as a
@@ -771,6 +771,13 @@ duplicated side effects.
 
 **Acceptance:** floppy-like DMA transfers, refresh contention and timer tests
 pass with no CPU bus corruption.
+
+**Implementation status:** Delivered as a standalone functional boundary in
+`spk286_at_dma.sv`, `spk286_at_refresh.sv` and `spk286_at_pit.sv`. The
+Icarus/Verilator `A4_DMA_REFRESH_PIT_TEST_PASS` suite covers a two-beat DMA1
+transfer with page addressing and terminal count, refresh priority under
+contention and PIT channel 0/IRQ0. DMA2 word-page refinements and top-level
+device wiring remain later work.
 
 ### A5 — Keyboard, RTC and storage/video integration
 

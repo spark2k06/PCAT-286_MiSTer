@@ -72,10 +72,11 @@ AT_MISTER_SDRAM_OWNER_TEST_PASS
 
 ## Remaining physical connection
 
-This is still not board acceptance. The loader endpoint is now available to a
-future HPS ROM sequencer, but it is not yet wired to `pcat_rom_loader`; that
-existing sequencer targets the legacy XT bus and uses a different write
-protocol. The active `PCAT-286.sv` top level still
+This is still not board acceptance. `rtl/spk286_integration/spk286_at_hps_rom_loader.sv`
+now translates HPS WIDE download words into the loader endpoint and latches
+ROM presence only after a completed download. It is not yet wired to the
+active `hps_io` instance; the existing `pcat_rom_loader` targets the legacy XT
+bus and uses a different write protocol. The active `PCAT-286.sv` top level still
 instantiates `CHIPSET_SPK286`, whose legacy XT path owns the existing SDRAM
 controller and device wiring internally. The next top-level step is an
 explicit AT profile/backend connection that selects this owner instead of the

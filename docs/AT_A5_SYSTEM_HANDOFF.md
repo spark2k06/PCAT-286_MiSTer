@@ -36,7 +36,10 @@ existing KFSDRAM controller and physical byte masks in simulation. The active
 so the final top-level profile selection remains a separate step. The memory
 port also exposes a reset-time loader owner; the existing
 `pcat_rom_loader.sv` still targets the legacy XT write protocol and has not
-yet been adapted to this endpoint.
+yet been adapted to this endpoint. The new
+`spk286_at_hps_rom_loader.sv` provides that normalized HPS-to-loader
+translation, but remains unconnected to the active `hps_io` top-level instance
+until the AT profile is selected.
 
 ## Composed evidence
 

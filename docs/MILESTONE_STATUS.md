@@ -18,3 +18,11 @@ these milestones. See `BIOS_BACKLOG.md`.
 The current deliverable is therefore a simulation-validated and FPGA-built
 candidate, not a physically validated PC/AT-compatible machine. The initial
 profile remains an XT-derived machine with SPK286 in Real Mode.
+
+## AT contract implementation progress
+
+| Milestone | Status | Evidence |
+| --- | --- | --- |
+| A0 — Contract freeze | Complete | `docs/DECISIONS.md` records the CPU snapshot, shared-clock policy, ownership boundary and handshake decisions |
+| A1 — Functional AT bridge | Complete | `rtl/spk286_integration/spk286_at_bus_bridge.sv` and the Icarus/Verilator `A1_AT_BRIDGE_TEST_PASS` suite validate 24-bit metadata, lanes, READY, LOCK, INTA-class requests and reset cancellation |
+| A2+ — AT chipset and arbitration | Not started | The production top level still uses the separate XT bridge and XT-derived chipset; no AT compatibility claim is made |

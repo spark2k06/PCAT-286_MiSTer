@@ -2,7 +2,7 @@
 
 **Document:** `docs/AT_BUS_CPU_CHIPSET_SPEC.md`
 **Version:** 1.0 draft engineering specification
-**Status:** Planning baseline; implementation and hardware validation are not implied
+**Status:** A0/A1 implementation slice delivered; A2+ and hardware validation pending
 **Scope:** CPU wrapper, 80286-compatible motherboard bus, arbitration and minimum PC/AT chipset boundary
 **Consumer:** `PCAT-286_MiSTer`
 **CPU provider:** `SPK286`
@@ -12,6 +12,12 @@ progressively developed PC/AT machine. It is deliberately separate from the
 SPK286 architectural specification and from individual peripheral
 implementations. The purpose is to prevent an XT-derived bridge, a CPU bus
 owner and an AT chipset from silently acquiring overlapping responsibilities.
+
+The current implementation delivery covers the A0/A1 normalized CPU-facing
+contract and the standalone `spk286_at_bus_bridge` test boundary. The active
+MiSTer machine remains the documented `XT_COMPAT` profile; AT memory decode,
+AT arbitration, dual PIC/DMA, refresh and AT peripheral integration remain
+later milestones and are not implied by the A1 bridge.
 
 The words **MUST**, **MUST NOT**, **SHOULD**, **SHOULD NOT** and **MAY** are
 normative. A statement that is not yet validated on hardware is marked as a

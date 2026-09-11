@@ -16,10 +16,11 @@ owner and an AT chipset from silently acquiring overlapping responsibilities.
 The current implementation delivery covers the A0–A5 normalized CPU-facing
 contract, the standalone `spk286_at_bus_bridge`, the AT memory-range decoder,
 ownership arbiter, dual-PIC/NMI interrupt boundaries, functional DMA/refresh/
-PIT boundaries and the A5 device router. The active MiSTer machine remains the
-documented `XT_COMPAT` profile; physical media, full video/keyboard wiring, AT
-BIOS and hardware integration remain later acceptance work and are not implied
-by this functional A5 slice.
+PIT boundaries, the A5 device router and an optional `emu_at` MiSTer profile.
+The default MiSTer machine remains the documented `XT_COMPAT` profile;
+`AT_PROFILE` selects the parallel AT shell without changing that default.
+Physical media, full video/keyboard wiring, AT BIOS behaviour and hardware
+acceptance remain later work and are not implied by this structural profile.
 
 The words **MUST**, **MUST NOT**, **SHOULD**, **SHOULD NOT** and **MAY** are
 normative. A statement that is not yet validated on hardware is marked as a
@@ -792,8 +793,11 @@ router are delivered in `spk286_at_8042.sv`, `spk286_at_rtc_cmos.sv`,
 `spk286_at_storage_video.sv` and `spk286_at_device_router.sv`. The
 Icarus/Verilator `A5_AT_DEVICES_TEST_PASS` suite covers IRQ1/IRQ8/IRQ6/IRQ14,
 unmapped-I/O policy, EGA routing and a floppy-like channel-2 DMA transfer.
-The DOS/representative-device acceptance remains pending until these
-boundaries are attached to an AT top-level and real media/video backends.
+The optional `AT_PROFILE` top-level shell now attaches HPS WIDE ROM loading to
+the single physical SDRAM owner and keeps the AT CPU in reset until the main
+BIOS is present. Its selector/elaboration check passes while the video, media
+and full physical keyboard owners remain pending. The DOS/representative-
+device acceptance therefore remains open.
 
 ### A6 — Full protected-mode machine validation
 

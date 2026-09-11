@@ -1,7 +1,7 @@
 # AT A5 handoff — composed system boundary
 
 **Date:** 2026-09-11
-**Status:** Intermediate boundary evidence complete; acceptance pending
+**Status:** AT profile shell attached; acceptance pending
 **Branch:** `codex/spk286-xt-integration`
 
 ## Delivered
@@ -17,8 +17,8 @@ one explicit machine boundary:
 The wrapper exposes separate CPU-memory, DMA-memory and refresh-memory
 handshakes. This is the point at which the future MiSTer SDRAM, media and
 video owners can attach without changing the CPU transaction contract.
-The active MiSTer top level remains `XT_COMPAT`; it was not switched to this
-profile by this milestone.
+The active/default MiSTer top level remains `XT_COMPAT`; it is not switched to
+the AT profile unless the explicit `AT_PROFILE` build macro is enabled.
 
 The AT bridge was also corrected so the first INTA beat can complete on READY
 without fabricated read data, while ordinary reads still require an explicit
@@ -32,14 +32,19 @@ reports accidental multi-owner requests. The composed event-ROM test now
 drives the machine through this port and the new
 `rtl/spk286_integration/spk286_at_mister_sdram_owner.sv`, which exercises the
 existing KFSDRAM controller and physical byte masks in simulation. The active
-`CHIPSET_SPK286` still owns the legacy XT memory/peripheral path internally,
-so the final top-level profile selection remains a separate step. The memory
-port also exposes a reset-time loader owner; the existing
-`pcat_rom_loader.sv` still targets the legacy XT write protocol and has not
-yet been adapted to this endpoint. The new
-`spk286_at_hps_rom_loader.sv` provides that normalized HPS-to-loader
-translation, but remains unconnected to the active `hps_io` top-level instance
-until the AT profile is selected.
+default `CHIPSET_SPK286` still owns the legacy XT memory/peripheral path
+internally, so it remains separate from the optional profile. The memory port
+also exposes a reset-time loader owner; the existing `pcat_rom_loader.sv`
+still targets the legacy XT write protocol. The new
+`spk286_at_hps_rom_loader.sv` provides the normalized HPS-to-loader
+translation and is connected by `emu_at` when `AT_PROFILE` is selected.
+
+The optional `AT_PROFILE` path is now selected in `sys/sys_top.v` without
+changing the default `emu` instantiation. Its `emu_at` module wires
+`hps_io` WIDE downloads through the normalized HPS loader, the serialized
+memory-port owner and the physical `KFSDRAM` owner. CPU reset is retained until
+the main BIOS image is complete. Video, SD, audio and DDRAM are deliberately
+safe tie-offs in this intermediate profile.
 
 ## Composed evidence
 
@@ -63,6 +68,15 @@ The diagnostic observed the native reset fetch at `FFFFF0`, fetches from the
 beats with vector `20h`, the handler EOI and `IRET`, and the POST sequence
 `70h -> 72h -> 71h -> 86h`.
 
+The top-level profile elaboration check also passes:
+
+```text
+AT_PROFILE_SELECTOR_PASS
+AT_PROFILE_ELAB_PASS
+```
+
+from `bash scripts/test_at_profile_elab.sh`.
+
 For deterministic whole-CPU runtime, the testbench uses the small portable
 master-only `spk286_at_machine_pic_model` under `AT_MACHINE_PIC_MODEL`. The production
 `spk286_at_pic` plus imported KF8259 pair are still elaborated and linted here,
@@ -73,7 +87,7 @@ yet the final production-PIC/DOS/hardware path.
 ## Acceptance still pending
 
 This milestone is not a DOS-boot or board acceptance. Remaining work is to
-select the AT SDRAM owner in the real MiSTer top level, attach HPS/media and
-video owners, exercise physical keyboard/storage/video paths, run the DOS and
-representative-device trace ladder, and then produce a board-loadable RBF for
-user testing. No AT compatibility claim is made until those steps pass.
+attach the real media and video owners to `emu_at`, complete physical keyboard
+handling, run the DOS and representative-device trace ladder, and then produce
+a board-loadable RBF for user testing. No AT compatibility claim is made until
+those steps pass.

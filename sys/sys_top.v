@@ -1753,7 +1753,11 @@ wire [13:0] fb_stride;
 	assign fb_stride = 0;
 `endif
 
+`ifdef AT_PROFILE
+emu_at emu
+`else
 emu emu
+`endif
 (
 	.CLK_50M(FPGA_CLK2_50),
 	.RESET(reset),

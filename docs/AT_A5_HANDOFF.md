@@ -1,7 +1,7 @@
 # AT A5 handoff — devices and routing
 
 **Date:** 2026-09-11
-**Status:** Functional boundary complete; system acceptance pending
+**Status:** Functional boundary and optional AT profile complete; system acceptance pending
 **Branch:** `codex/spk286-xt-integration`
 
 ## Delivered
@@ -51,6 +51,7 @@ transfer completed through the A4 arbiter/DMA boundary.
 
 This functional boundary is not yet a DOS-boot or hardware acceptance. The
 remaining A5 work is to attach the physical PS/2 receiver, provide the real
-MiSTer media backend, replace the video shadow with the selected EGA/VGA
-memory path, connect the router and IRQ vector to an AT top level, and run
-the DOS/representative-device trace ladder. Board evidence remains A7 work.
+MiSTer media backend, replace the video shadow and safe `emu_at` output tie-off
+with the selected EGA/VGA memory path, and run the DOS/representative-device
+trace ladder. The optional profile is selected with `AT_PROFILE`; the default
+`XT_COMPAT` build remains unchanged. Board evidence remains A7 work.

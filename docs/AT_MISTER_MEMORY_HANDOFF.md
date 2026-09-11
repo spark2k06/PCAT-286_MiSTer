@@ -1,7 +1,7 @@
 # AT MiSTer memory handoff
 
 **Date:** 2026-09-11
-**Status:** SDRAM owner simulation-ready; MiSTer top-level attachment pending
+**Status:** Optional AT top-level profile attached; board acceptance pending
 **Branch:** `codex/spk286-xt-integration`
 
 ## Boundary delivered
@@ -70,18 +70,46 @@ The focused physical-owner test also passes with Icarus and Verilator:
 AT_MISTER_SDRAM_OWNER_TEST_PASS
 ```
 
+## Optional top-level profile
+
+`rtl/spk286_integration/spk286_at_emu.sv` is the opt-in MiSTer `emu_at`
+profile. `sys/sys_top.v` selects it only when the Quartus Verilog macro
+`AT_PROFILE` is defined; with the macro absent, the existing `emu` module and
+the default `XT_COMPAT` path are unchanged.
+
+The profile connects `hps_io` WIDE download signals to
+`spk286_at_hps_rom_loader`, then to `spk286_at_mister_memory_port` and the one
+`spk286_at_mister_sdram_owner`. The AT machine is held in reset until the main
+BIOS download has ended and its image is present. The board outputs for video,
+audio, SD and DDRAM are deterministic safe tie-offs in this intermediate
+profile; they are not presented as finished device implementations.
+
+Structural evidence:
+
+```text
+bash scripts/test_at_profile_elab.sh
+```
+
+Passing markers:
+
+```text
+AT_PROFILE_SELECTOR_PASS
+AT_PROFILE_ELAB_PASS
+```
+
+To build this profile in a local Quartus project, add
+`set_global_assignment -name VERILOG_MACRO "AT_PROFILE"` to the project
+configuration for that build. Do not add it to the default project until the
+AT profile's media and video owners are ready for board acceptance.
+
 ## Remaining physical connection
 
-This is still not board acceptance. `rtl/spk286_integration/spk286_at_hps_rom_loader.sv`
-now translates HPS WIDE download words into the loader endpoint and latches
-ROM presence only after a completed download. It is not yet wired to the
-active `hps_io` instance; the existing `pcat_rom_loader` targets the legacy XT
-bus and uses a different write protocol. The active `PCAT-286.sv` top level still
-instantiates `CHIPSET_SPK286`, whose legacy XT path owns the existing SDRAM
-controller and device wiring internally. The next top-level step is an
-explicit AT profile/backend connection that selects this owner instead of the
-legacy one, while also resolving the media/video owners; a direct unreviewed
-tie into the legacy bus would create two memory owners.
+This is still not board acceptance. The active default `PCAT-286.sv` top level
+continues to instantiate `CHIPSET_SPK286`, whose legacy XT path owns the
+existing SDRAM controller and device wiring internally. The optional AT
+profile deliberately leaves media/video and full physical keyboard handling
+for the next step, and its safe output tie-offs must not be mistaken for DOS
+or EGA support.
 
 No RBF was generated or flashed by this step. Board acceptance remains
 pending physical keyboard, storage, video, DOS and timing evidence.

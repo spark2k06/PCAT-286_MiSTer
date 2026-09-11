@@ -82,3 +82,30 @@ The consumed CPU snapshot is the imported `vendor/spk286` indexed tree at
 `320d7acfa9ccd7f7f852c87ed823aec82332c0ee`. The source manifest and the
 selected PCXT baseline are recorded in `docs/SOURCE_PROVENANCE.md`; no external
 repository is a runtime build dependency.
+
+## D-AT-006 — Cascaded PIC implementation boundary
+
+**Date:** 2026-09-11
+**Status:** Accepted for the A3 implementation slice
+
+The AT interrupt boundary reuses the imported `KF8259` state machines rather
+than introducing a second production PIC implementation. The wrapper maps the
+master to `20h/21h`, the slave to `A0h/A1h`, wires slave IRQ8-15 through master
+IRQ2 and exposes only the second accepted INTA beat as read data. The master's
+cascade ID is registered between accepted INTA transactions so the normalized
+handshake is deterministic without changing the imported device logic.
+
+The active machine remains the separate XT-derived path. The A3 tests are
+standalone device-boundary evidence and do not claim AT BIOS or board support.
+
+## D-AT-007 — NMI mask and source policy
+
+**Date:** 2026-09-11
+**Status:** Accepted for the A3 implementation slice
+
+Port `70h` bit 7 is the NMI mask. Reset starts masked; parity, channel-check
+and explicitly supplied external events are ORed at the boundary and edge
+qualified to one synchronous NMI pulse per asserted source. This is a
+functional source policy, not a claim about every board-specific parity or
+channel-check generator. Separate-clock synchronization and additional AT
+event sources remain later integration work.

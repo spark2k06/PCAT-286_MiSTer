@@ -28,4 +28,5 @@ profile remains an XT-derived machine with SPK286 in Real Mode.
 | A2 — Memory and arbitration slice | Complete | `spk286_at_memory_decode.sv` and `spk286_at_arbiter.sv` pass Icarus/Verilator tests for the 24-bit profile map, ROM protection, HOLD/HLDA, LOCK, odd-word/response exclusion and reset-held loader ownership |
 | A3 — Interrupt subsystem | Complete | Dual KF8259 boundary, IRQ2 cascade, programmed masks/vectors, two-INTA delivery and NMI mask/source tests pass; active top remains XT-derived |
 | A4 — DMA, refresh and timer | Complete | Functional DMA1/DMA2 boundary, page/count/mode/terminal-count state, refresh owner and PIT/IRQ0 pass Icarus and Verilator integration tests; active top remains XT-derived |
-| A5+ — AT devices and top-level integration | Not started | Keyboard, RTC, storage/video wiring, AT BIOS and hardware validation remain pending; no AT compatibility claim is made |
+| A5 — AT device boundary and routing | Functional slice complete; acceptance pending | 8042/IRQ1, RTC/CMOS/IRQ8, ATA/IRQ14, floppy/IRQ6 + channel-2 DMA and EGA routing pass Icarus/Verilator; physical media, AT top-level and DOS acceptance remain pending |
+| A6+ — Protected mode, AT system and board evidence | Not started | Protected-mode validation, AT BIOS, DOS/representative-device traces and hardware validation remain pending; no AT compatibility claim is made |

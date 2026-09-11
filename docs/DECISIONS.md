@@ -140,3 +140,21 @@ PIT boundary owns ports `40h–43h`, supports the functional counter modes
 needed by the first timer path and emits a synchronous one-cycle IRQ0 pulse.
 `counter_clock` is treated as a sampled tick enable; clock-domain crossing and
 historical PIT frequency selection are later top-level decisions.
+
+## D-AT-010 — A5 device routing and interrupt assignments
+
+**Date:** 2026-09-11
+**Status:** Accepted for the A5 functional boundary
+
+The A5 CPU-facing device map is owned by one router so a request cannot be
+accepted by both a legacy alias and an AT device. The first functional IRQ
+assignments are IRQ1 for the 8042, IRQ6 for floppy, IRQ8 for RTC/CMOS and
+IRQ14 for primary ATA. Floppy-like DMA uses channel 2; video has no new IRQ
+source in this slice. Unmapped I/O returns `FFh` on its addressed byte lane
+and does not create DMA or interrupt activity.
+
+The router exposes normalized device boundaries and can be connected to the
+existing AT bridge/PIC/DMA contracts, but it does not silently replace the
+active XT top. Physical PS/2 decoding, real media backends, complete EGA/VGA
+VRAM semantics and DOS boot evidence remain required before A5 system
+acceptance.

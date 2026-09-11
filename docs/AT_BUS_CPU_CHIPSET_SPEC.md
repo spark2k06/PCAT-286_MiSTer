@@ -2,7 +2,7 @@
 
 **Document:** `docs/AT_BUS_CPU_CHIPSET_SPEC.md`
 **Version:** 1.0 draft engineering specification
-**Status:** A0–A4 implementation slice delivered; A5+ and hardware validation pending
+**Status:** A0–A5 functional implementation slices delivered; A5 system acceptance, A6+ and hardware validation pending
 **Scope:** CPU wrapper, 80286-compatible motherboard bus, arbitration and minimum PC/AT chipset boundary
 **Consumer:** `PCAT-286_MiSTer`
 **CPU provider:** `SPK286`
@@ -13,12 +13,13 @@ SPK286 architectural specification and from individual peripheral
 implementations. The purpose is to prevent an XT-derived bridge, a CPU bus
 owner and an AT chipset from silently acquiring overlapping responsibilities.
 
-The current implementation delivery covers the A0–A4 normalized CPU-facing
+The current implementation delivery covers the A0–A5 normalized CPU-facing
 contract, the standalone `spk286_at_bus_bridge`, the AT memory-range decoder,
-ownership arbiter, dual-PIC/NMI interrupt boundaries and the functional
-DMA/refresh/PIT boundaries. The active MiSTer machine remains the documented
-`XT_COMPAT` profile; keyboard, RTC, storage/video, AT BIOS and hardware
-integration remain later milestones and are not implied by this A4 slice.
+ownership arbiter, dual-PIC/NMI interrupt boundaries, functional DMA/refresh/
+PIT boundaries and the A5 device router. The active MiSTer machine remains the
+documented `XT_COMPAT` profile; physical media, full video/keyboard wiring, AT
+BIOS and hardware integration remain later acceptance work and are not implied
+by this functional A5 slice.
 
 The words **MUST**, **MUST NOT**, **SHOULD**, **SHOULD NOT** and **MAY** are
 normative. A statement that is not yet validated on hardware is marked as a
@@ -785,6 +786,14 @@ device wiring remain later work.
   decode and interrupt ownership rules.
 
 **Acceptance:** DOS boot and representative device software run with traces.
+
+**Implementation status:** The functional device boundary and single-owner
+router are delivered in `spk286_at_8042.sv`, `spk286_at_rtc_cmos.sv`,
+`spk286_at_storage_video.sv` and `spk286_at_device_router.sv`. The
+Icarus/Verilator `A5_AT_DEVICES_TEST_PASS` suite covers IRQ1/IRQ8/IRQ6/IRQ14,
+unmapped-I/O policy, EGA routing and a floppy-like channel-2 DMA transfer.
+The DOS/representative-device acceptance remains pending until these
+boundaries are attached to an AT top-level and real media/video backends.
 
 ### A6 — Full protected-mode machine validation
 

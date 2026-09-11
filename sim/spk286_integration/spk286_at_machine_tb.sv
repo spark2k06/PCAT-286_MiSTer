@@ -75,13 +75,25 @@ module spk286_at_machine_tb;
     wire [23:0] backend_address;
     wire [1:0]  backend_byte_enable;
     wire [15:0] backend_data_out;
-    wire        backend_accept = backend_command_valid;
-    wire        backend_ready = backend_valid;
+    wire        backend_accept;
+    wire        backend_ready;
     logic [15:0] backend_read_data;
-    wire        backend_read_data_valid = backend_valid &&
-                                          !backend_write &&
-                                          !backend_refresh;
+    wire        backend_read_data_valid;
     wire        memory_port_protocol_error;
+    wire        sdram_owner_protocol_error;
+
+    wire [12:0] sdram_address;
+    wire        sdram_cke;
+    wire        sdram_cs;
+    wire        sdram_ras;
+    wire        sdram_cas;
+    wire        sdram_we;
+    wire [1:0]  sdram_ba;
+    logic [15:0] sdram_dq_in;
+    wire [15:0] sdram_dq_out;
+    wire        sdram_dq_io;
+    wire        sdram_ldqm;
+    wire        sdram_udqm;
 
     wire keyboard_output_valid;
     wire [7:0] keyboard_output_byte;
@@ -175,12 +187,54 @@ module spk286_at_machine_tb;
         end
     endtask
 
-    always_comb begin
-        if (backend_byte_enable[1])
-            backend_read_data = {memory_read_byte(backend_address), 8'h00};
-        else
-            backend_read_data = {8'h00, memory_read_byte(backend_address)};
+    // Behavioural SDRAM model for the production KFSDRAM owner.  The model
+    // uses the same byte-addressed sparse store as the earlier abstract model,
+    // but observes ACT/READ/WRITE commands and DQM on the physical pins.
+    logic [12:0] sdram_active_row = 13'h0000;
+    logic [1:0]  sdram_active_bank = 2'b00;
+    logic [15:0] sdram_read_data_d1 = 16'h0000;
+    logic [15:0] sdram_read_data_d2 = 16'h0000;
+    wire sdram_command_active = !sdram_cs && !sdram_ras &&
+                                 sdram_cas && sdram_we;
+    wire sdram_command_read = !sdram_cs && sdram_ras &&
+                              !sdram_cas && sdram_we;
+    wire sdram_command_write = !sdram_cs && sdram_ras &&
+                               !sdram_cas && !sdram_we;
+    wire [23:0] sdram_command_address =
+        {sdram_active_bank, sdram_active_row, sdram_address[8:0]};
+    wire [23:0] sdram_command_byte_address =
+        {sdram_command_address[23:1], 1'b0};
+
+    always_ff @(posedge clk) begin
+        if (reset) begin
+            sdram_active_row <= 13'h0000;
+            sdram_active_bank <= 2'b00;
+            sdram_read_data_d1 <= 16'h0000;
+            sdram_read_data_d2 <= 16'h0000;
+        end else begin
+            if (sdram_command_active) begin
+                sdram_active_row <= sdram_address;
+                sdram_active_bank <= sdram_ba;
+            end
+            if (sdram_command_read) begin
+                sdram_read_data_d1 <= {
+                    memory_read_byte(sdram_command_byte_address + 24'd1),
+                    memory_read_byte(sdram_command_byte_address)
+                };
+            end
+            sdram_read_data_d2 <= sdram_read_data_d1;
+            if (sdram_command_write) begin
+                if (!sdram_ldqm)
+                    write_memory_byte(sdram_command_byte_address,
+                                      sdram_dq_out[7:0]);
+                if (!sdram_udqm)
+                    write_memory_byte(sdram_command_byte_address + 24'd1,
+                                      sdram_dq_out[15:8]);
+            end
+        end
     end
+
+    assign sdram_dq_in = sdram_read_data_d2;
 
     always_ff @(posedge clk) begin
         if (reset) begin
@@ -194,32 +248,16 @@ module spk286_at_machine_tb;
             saw_native_reset_fetch <= 1'b0;
             saw_low_rom_fetch <= 1'b0;
         end else begin
-            if (backend_command_valid && (backend_owner == 2'd0)) begin
+            if (backend_accept && (backend_owner == 2'd0)) begin
                 accepted_memory_beats <= accepted_memory_beats + 1;
                 if (backend_address == 24'hFFFFF0)
                     saw_native_reset_fetch <= 1'b1;
                 if ((backend_address >= 24'h0F0000) &&
                     (backend_address <= 24'h0FFFFF))
                     saw_low_rom_fetch <= 1'b1;
-                if (backend_write) begin
-                    if (backend_byte_enable[0])
-                        write_memory_byte(backend_address, backend_data_out[7:0]);
-                    if (backend_byte_enable[1])
-                        write_memory_byte(backend_address,
-                                          backend_data_out[15:8]);
-                end
             end
 
-            if (backend_command_valid && (backend_owner == 2'd1) &&
-                backend_write) begin
-                if (backend_byte_enable[0])
-                    write_memory_byte(backend_address, backend_data_out[7:0]);
-                if (backend_byte_enable[1])
-                    write_memory_byte(backend_address + 24'd1,
-                                      backend_data_out[15:8]);
-            end
-
-            if (backend_command_valid && (backend_owner == 2'd2))
+            if (backend_accept && (backend_owner == 2'd2))
                 refresh_beats <= refresh_beats + 1;
             if (irq_request[0] && !intr)
                 irq0_edges <= irq0_edges + 1;
@@ -303,6 +341,31 @@ module spk286_at_machine_tb;
         .protocol_error(memory_port_protocol_error)
     );
 
+    spk286_at_mister_sdram_owner #(
+        .SDRAM_INIT_WAIT(16'd32)
+    ) sdram_owner (
+        .clk(clk), .reset(reset),
+        .request_valid(backend_valid),
+        .request_command_valid(backend_command_valid),
+        .request_owner_refresh(backend_refresh),
+        .request_write(backend_write),
+        .request_code_fetch(backend_code_fetch),
+        .request_cycle_class(backend_cycle_class),
+        .request_address(backend_address),
+        .request_byte_enable(backend_byte_enable),
+        .request_data_out(backend_data_out),
+        .request_accept(backend_accept), .request_ready(backend_ready),
+        .request_read_data(backend_read_data),
+        .request_read_data_valid(backend_read_data_valid),
+        .physical_idle(), .protocol_error(sdram_owner_protocol_error),
+        .sdram_address(sdram_address), .sdram_cke(sdram_cke),
+        .sdram_cs(sdram_cs), .sdram_ras(sdram_ras),
+        .sdram_cas(sdram_cas), .sdram_we(sdram_we),
+        .sdram_ba(sdram_ba), .sdram_dq_in(sdram_dq_in),
+        .sdram_dq_out(sdram_dq_out), .sdram_dq_io(sdram_dq_io),
+        .sdram_ldqm(sdram_ldqm), .sdram_udqm(sdram_udqm)
+    );
+
     spk286_at_machine dut (
         .clk(clk), .reset(reset), .execute_enable(execute_enable),
         .counter_clock(counter_clock), .refresh_enable(refresh_enable),
@@ -371,6 +434,9 @@ module spk286_at_machine_tb;
                        bridge_idle, cpu_fault);
             if (memory_port_protocol_error)
                 $fatal(1, "AT_MEMORY_PORT_FAULT cycle=%0d owner=%0d address=%06h",
+                       cycles, backend_owner, backend_address);
+            if (sdram_owner_protocol_error)
+                $fatal(1, "AT_SDRAM_OWNER_FAULT cycle=%0d owner=%0d address=%06h",
                        cycles, backend_owner, backend_address);
             if (port81_writes != 0)
                 $fatal(1, "AT_SYSTEM_DIAGNOSTIC_FAILURE cycle=%0d port81=%0d cs_ip=%04h:%04h",

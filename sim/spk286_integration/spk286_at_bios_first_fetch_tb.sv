@@ -5,7 +5,8 @@
 // isolated DMA routines (1/2), original-entry investigation (3), and original
 // parity/memory/PIT/refresh-status routines (4..9), NMI (10), RAM header (11),
 // distinct DS/ES (12), injected low/high-byte faults (13/14), and original POST
-// through RAM (15). Cases other than 0/3/15 set
+// through RAM (15), PM-skip CPU/RAM continuations (16/17), ROM checksums (18).
+// Cases other than 0/3/15 set
 // a test-only entry/setup in the private ROM buffer, never in the user ROM.
 module spk286_at_bios_first_fetch_tb;
     logic clk = 1'b0;
@@ -19,6 +20,13 @@ module spk286_at_bios_first_fetch_tb;
     // This exercises its exact instruction bytes, not a claimed full POST.
     integer landmark_case = 0;
     integer io_completed = 0;
+    integer checksum_pass_count = 0;
+    integer source_lane_sum [0:1];
+    integer fixture_lane_sum;
+    logic [55:0] skip_mono = 0, skip_color = 0;
+    wire [15:0] skip_screen_offset = landmark_case==17 ? 16'h0448 : 16'h0866;
+    // Status text is checked on completed video writes, independently of ROM IP.
+    localparam [55:0] SKIPPED_TEXT = 56'h44455050494B53;
     logic [15:0] routine_entry;
     logic [7:0] last_port61;
     integer ram_reads=0, ram_writes=0;
@@ -410,11 +418,18 @@ module spk286_at_bios_first_fetch_tb;
             if (rom[16'hfff0] != 8'hea || rom[16'h8d85] != 8'hee ||
                 rom[16'h8c50] != 8'he6 || rom[16'h8c51] != 8'hda)
                 $fatal(1,"Landmark diagnostic image signature mismatch");
+            // Preserve the on-disk checksum residues before selecting an entry.
+            // Case 18 later neutralizes only the fixture's own ROM-byte delta.
+            for(integer lane=0;lane<2;lane=lane+1) begin
+                source_lane_sum[lane]=0;
+                for(integer off=16'h8000+lane;off<65536;off=off+2)
+                    source_lane_sum[lane]=(source_lane_sum[lane]+int'(rom[off])) & 255;
+            end
             case (landmark_case)
                 1: begin rom[16'hfff1]=8'h4b; rom[16'hfff2]=8'h8c; end
                 2: begin rom[16'hfff1]=8'h74; rom[16'hfff2]=8'h8d; end
                 3,15: begin end // Original reset entry; 15 continues through the first RAM test.
-                4,5,6,7,8,9,11,12,13,14: begin
+                4,5,6,7,8,9,11,12,13,14,16,17,18: begin
                     // Test fixture only: set SS like POST, gate timer2 on,
                     // then execute untouched diagnostic instructions in ROM.
                     case(landmark_case)
@@ -425,6 +440,9 @@ module spk286_at_bios_first_fetch_tb;
                         8: routine_entry=16'h8af3; // PIT2
                         9: routine_entry=16'h8e48; // Original refresh status loops
                         11: routine_entry=16'h8ddd; // Clear 64 KiB and print original RAM test header
+                        16: routine_entry=16'h8e62; // Real-mode entry to PROTECTED MODE CPU
+                        17: routine_entry=16'h94cd; // Later protected-mode RAM entry
+                        18: routine_entry=16'h89cb; // Both original ROM checksum routines
                         12,13,14: routine_entry=16'h8df6; // Same isolated test with DS != ES
                     endcase
                     rom[16'hfff1]=0; rom[16'hfff2]=8'hff;
@@ -440,7 +458,16 @@ module spk286_at_bios_first_fetch_tb;
                     rom[16'hff0d]=routine_entry[7:0];
                     rom[16'hff0e]=routine_entry[15:8];
                     rom[16'hff0f]=0; rom[16'hff10]=8'hf0;
-                    if(landmark_case>=12) begin
+                    if(landmark_case==17) begin
+                        // This later POST entry uses CALL, with writable SS:SP
+                        // 0000:0800 established by the PM CPU continuation.
+                        // CLI; MOV AX,0; MOV SS,AX; MOV SP,0800; JMP FAR F000:94CD.
+                        rom[16'hff03]=0;
+                        rom[16'hff06]=8'hbc; rom[16'hff07]=0; rom[16'hff08]=8'h08;
+                        rom[16'hff09]=8'hea; rom[16'hff0a]=8'hcd; rom[16'hff0b]=8'h94;
+                        rom[16'hff0c]=0; rom[16'hff0d]=8'hf0;
+                    end
+                    if(landmark_case>=12 && landmark_case<=14) begin
                         // MOV AX,B800; MOV DS,AX; JMP FAR F000:8DF6.
                         rom[16'hff0c]=8'hb8; rom[16'hff0d]=0; rom[16'hff0e]=8'hb8;
                         rom[16'hff0f]=8'h8e; rom[16'hff10]=8'hd8;
@@ -523,6 +550,18 @@ module spk286_at_bios_first_fetch_tb;
                 end
                 default: $fatal(1,"unsupported LANDMARK_CASE");
             endcase
+            if(landmark_case==18) begin
+                // Changing the fixture reset vector must not invalidate a good
+                // ROM, nor repair a bad one. Keep the original lane residues.
+                for(integer lane=0;lane<2;lane=lane+1) begin
+                    if(rom[16'hb1f0+lane]!=0) $fatal(1,"CHECKSUM_FIXTURE_SPACE_NOT_EMPTY");
+                    fixture_lane_sum=0;
+                    for(integer off=16'h8000+lane;off<65536;off=off+2)
+                        fixture_lane_sum=(fixture_lane_sum+int'(rom[off])) & 255;
+                    rom[16'hb1f0+lane]=8'(source_lane_sum[lane]-fixture_lane_sum);
+                end
+                $display("CHECKSUM_SOURCE_RESIDUES even=%02h odd=%02h",8'(source_lane_sum[0]),8'(source_lane_sum[1]));
+            end
             max_cpu_cycles = landmark_case==15 ? 200000000 : 50000000;
             $display("LANDMARK_CASE=%0d entry=f000:%02h%02h",landmark_case,rom[16'hfff2],rom[16'hfff1]);
         end
@@ -673,6 +712,47 @@ module spk286_at_bios_first_fetch_tb;
         cpu_boot_reset=0;
         for(cycles=0;cycles<max_cpu_cycles;cycles=cycles+1) begin
             @(negedge clk);
+            if (landmark_case>=16 && landmark_case<=18) begin
+                if (dut.u_cpu.cpu.msw_q[0] || cpu_reset_request)
+                    $fatal(1,"PM_SKIP_ACTIVATED_PE_OR_RESET case=%0d",landmark_case);
+                if (dut.at_ready && dut.at_write && !dut.at_io && dut.at_byte_enable[0]) begin
+                    for (integer ch=0; ch<7; ch=ch+1) begin
+                        if(dut.at_address == 24'h0B0000 + 24'(skip_screen_offset) + 24'(2*ch))
+                            skip_mono[ch*8 +: 8] = dut.at_data_out[7:0];
+                        if(dut.at_address == 24'h0B8000 + 24'(skip_screen_offset) + 24'(2*ch))
+                            skip_color[ch*8 +: 8] = dut.at_data_out[7:0];
+                    end
+                end
+                if (dut.u_cpu.cpu.opcode_start && debug_cs==16'hf000) begin
+                    if ((debug_ip>=16'ha3b3 && debug_ip<=16'ha657) ||
+                        (debug_ip>=16'h94db && debug_ip<=16'h972c))
+                        $fatal(1,"PM_SKIP_ENTERED_UNSUPPORTED_PATH case=%0d ip=%h",landmark_case,debug_ip);
+                    if(debug_ip==16'h9b68)
+                        $fatal(1,"PM_SKIP_REACHED_FAIL_HANDLER case=%0d",landmark_case);
+                    if (landmark_case==18 && debug_ip==16'h9cb5) begin
+                        if (dut.debug_gpr[32 +: 16] !== (checksum_pass_count==0 ? 16'hab45 : 16'hab67))
+                            $fatal(1,"CHECKSUM_WRONG_PASS_CONTEXT");
+                        checksum_pass_count=checksum_pass_count+1;
+                    end
+                    if ((landmark_case==16 && debug_ip==16'h8ea8) ||
+                        (landmark_case==17 && debug_ip==16'h973e)) begin
+                        if(skip_mono !== SKIPPED_TEXT || skip_color !== SKIPPED_TEXT)
+                            $fatal(1,"PM_SKIP_VIDEO_TEXT mono=%h color=%h",skip_mono,skip_color);
+                        if (cpu_fault || protocol_error)
+                            $fatal(1,"PM_SKIP_FAULT");
+                        if(landmark_case==16 && dut.debug_segment_selectors[32 +: 16]!==16'h0000)
+                            $fatal(1,"PM_SKIP_STACK_SEGMENT");
+                        $display("AT_LANDMARK_PM_SKIP_PASS case=%0d next_ip=%h mono_color_SKIPPED=1 PE=0 reset=0 cycles=%0d",landmark_case,debug_ip,cycles);
+                        $finish;
+                    end
+                    if(landmark_case==18 && debug_ip==16'h8a22) begin
+                        if(checksum_pass_count!=2 || cpu_fault || protocol_error)
+                            $fatal(1,"CHECKSUM_MISSING_PASSES count=%0d",checksum_pass_count);
+                        $display("AT_LANDMARK_ROM_CHECKSUMS_PASS U27=PASS U47=PASS cycles=%0d",cycles);
+                        $finish;
+                    end
+                end
+            end
             if (landmark_case==10) begin
                 if(parity_pulse_cycles>0) begin
                     parity_pulse_cycles=parity_pulse_cycles-1;
@@ -768,7 +848,7 @@ module spk286_at_bios_first_fetch_tb;
                 end
                 // Observe instruction admission, not speculative prefetch past RET.
                 // The header ends at 9B67, immediately before the fail handler.
-                if(landmark_case>=4 && (landmark_case!=15 || ram_test_active) && dut.u_cpu.cpu.opcode_start && debug_cs==16'hf000) begin
+                if(landmark_case>=4 && landmark_case<=15 && (landmark_case!=15 || ram_test_active) && dut.u_cpu.cpu.opcode_start && debug_cs==16'hf000) begin
                     if((landmark_case==13 || landmark_case==14) && debug_ip==16'h9e49) begin
                         if(!injected || !ram_trace_captured || !ram_trace_armed)
                             $fatal(1,"RAM_TRACE_MISSING_CAPTURE");

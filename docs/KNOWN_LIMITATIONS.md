@@ -7,11 +7,10 @@ and subsequent DMA2/page-register PASS in hardware (`785231e` preserves that
 checkpoint). The startup B:1 fault is traced to the RTC protocol flag lacking
 reset; cold/warm simulation and Yosys constant propagation reproduce it.
 Hardware now confirms the port 61h/PIT corrections: all three timers, both DMA
-controllers/page registers, parity and SYSTEM BIOS pass. AT still fails the 16K
-critical RAM test with all-zero First Fault records and repeats POST. The user
-confirms XT passes that test; its separate later MEMORY REFRESH test fails.
-AT has not reached that later test yet. Unpatched original ROM also fails 16K
-on AT, with both ROM checksums passing. The RAM observer is AT-only.
+controllers/page registers, parity and SYSTEM BIOS pass. Before the DQM fix,
+AT failed 16K with both original and patched ROM and repeated POST. XT passed
+16K but failed its separate later MEMORY REFRESH; it remains reference-only.
+The AT-only RAM observer supplied the data needed to diagnose that difference.
 The new RAM Trace identifies the first read at 006E40 returning FF00 instead of
 FFFF. The old AT owner reproduces this with actual MiSTer XS/XSDS DQM wiring:
 A12/A11 stayed zero on WRITE, so byte writes overwrote the neighboring lane.
@@ -19,13 +18,19 @@ The AT-only fix drives the masks on these pins for column commands, preserving
 all row bits on ACTIVE. The corrected pin model now includes this wiring;
 both it and dedicated DQM are tested. Original-ROM five-pattern RAM cases pass,
 including original header and distinct DS/ES, plus injected error controls.
-Hardware confirmation of the DQM fix and the later MEMORY REFRESH remains pending.
-The user's latest pre-fix STA summary has FPGA_CLK2_50 setup -7.563 ns; timing
+The user now confirms both 16K CRITICAL and MEMORY REFRESH PASS in AT hardware.
+The next stop is PROTECTED MODE CPU: SKIP_PM V1 missed the early A3B3 path.
+V2 skips both unsupported PM paths with an explicit SKIPPED status and repairs
+both interleaved ROM checksums. CPU simulation verifies both continuations and
+both original checksum routines; physical V2 confirmation remains pending.
+The STA summary archived before the DQM fix had FPGA_CLK2_50 setup -7.563 ns; timing
 closure is still pending. The previous -4.338 ns CPU-to-CX path was another fit.
-Protected mode remains excluded by the user's existing ROM patch; ROM checksums
-are ignored as requested. The timer backend is not yet a complete 8254: read-back
+Protected-mode tests are excluded only by the new V2 ROM patch; the old V1
+patch did not exclude the early CPU test. V2 checksums are checked independently.
+The timer backend is not yet a complete 8254: read-back
 status is unsupported. RTC calendar/periodic rates and speaker audio are incomplete.
-See `AT_SDRAM_DQM_HANDOFF.md` for the wiring evidence, reproduction and hardware test.
+See `AT_LANDMARK_SKIP_PM_V2.md` for the current ROM and next hardware test.
+See `AT_SDRAM_DQM_HANDOFF.md` for the now hardware-confirmed wiring fix.
 `AT_CRITICAL_RAM_HANDOFF.md` preserves the earlier instrumentation audit.
 See `AT_LANDMARK_PIT_PARITY_HANDOFF.md` for the previous functional fixes.
 Older I0–I6 statements below describe their original acceptance scope.

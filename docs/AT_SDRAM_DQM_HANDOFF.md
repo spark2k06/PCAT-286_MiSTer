@@ -1,5 +1,10 @@
 # AT: corrección de máscaras SDRAM para el test de 16K
 
+> Confirmación posterior del usuario: **16K CRITICAL y MEMORY REFRESH PASSED**
+> en hardware. El siguiente bloqueo es PROTECTED MODE CPU. Ver
+> [AT_LANDMARK_SKIP_PM_V2.md](AT_LANDMARK_SKIP_PM_V2.md) para la nueva ROM,
+> sus checksums y la prueba siguiente con el mismo RBF.
+
 Fecha: 12 de septiembre de 2026. Base anterior: `c581864`.
 
 ## Diagnóstico y alcance

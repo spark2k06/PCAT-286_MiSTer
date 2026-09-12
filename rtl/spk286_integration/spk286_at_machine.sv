@@ -114,6 +114,7 @@ module spk286_at_machine (
     output logic         cpu_halted,
     output logic         cpu_shutdown,
     output logic         cpu_fault,
+    output wire [15:0]   debug_fault_sources,
     output logic         debug_control_error,
     output logic         debug_unsupported_opcode,
     output logic         debug_microcode_fault,
@@ -310,6 +311,7 @@ module spk286_at_machine (
     logic        nmi_source_active_q;
 
     logic [15:0] debug_cpu_cycle_count_q;
+    wire [3:0] device_fault_sources;
     logic [15:0] debug_at_cycle_count_q;
     logic [31:0] debug_trace0_q;
     logic [31:0] debug_trace1_q;
@@ -559,6 +561,7 @@ module spk286_at_machine (
         .video_active_lines     (video_active_lines),
         .side_effect_count      (device_side_effect_count),
         .irq_request             (devices_irq_request),
+        .debug_fault_sources     (device_fault_sources),
         .protocol_error          (devices_protocol_error)
     );
 
@@ -873,6 +876,14 @@ module spk286_at_machine (
             at_read_data_valid = 1'b1;
         end
     end
+
+    // Bits 0..4 CPU, 5 bridge, 6 arbiter, 7 PIC, 8 PIT, 9 DMA,
+    // 10 refresh, 11 router, 12 keyboard, 13 RTC, 14 storage, 15 aggregate devices.
+    assign debug_fault_sources = {devices_protocol_error, device_fault_sources,
+        refresh_protocol_error, dma_protocol_error, pit_protocol_error,
+        pic_protocol_error, arbiter_protocol_error, bridge_protocol_error,
+        spk_operand_blocked, spk_microcode_fault, spk_unsupported_opcode,
+        spk_control_error, spk_shutdown};
 
     assign cpu_fault = spk_shutdown | spk_control_error |
                        spk_unsupported_opcode | spk_microcode_fault |

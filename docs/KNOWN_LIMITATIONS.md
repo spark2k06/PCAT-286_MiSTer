@@ -1,5 +1,17 @@
 # Known limitations and pending evidence
 
+## Latest AT hardware evidence (2026-09-12)
+
+The user has confirmed BIOS execution and visible Supersoft POST on MiSTer;
+commit `6f07770` preserves that hardware checkpoint. The subsequent DMA register
+corrections pass the original Landmark DMA2/page routines in simulation and
+await the next user-built RBF. Persistent startup B:1 is not yet explained;
+a passive First Fault Trace is provided. PIT channels 1/2, full protected-mode
+BIOS use, and complete POST remain open. The selected SKIP_PM ROM has separate
+EPROM-lane checksum failures introduced by its existing patch.
+See `AT_LANDMARK_DMA_HANDOFF.md` for current evidence and hardware steps.
+Older I0–I6 statements below describe their original acceptance scope.
+
 ## Initial machine profile
 
 - The default `XT_COMPAT` machine remains XT-derived. The optional
@@ -35,15 +47,14 @@ the CPU correction. It is not an I0-I6 diagnostic-ROM gate.
   slow for that combination, so its full program run uses a documented narrow
   PIC boundary and separately tests the real KF8259 in a short dual-simulator
   case.
-- I5 produces a successful Quartus compile, fit and RBF. In the current
-  `AT_PROFILE` build, reset recovery is positive in all analyzed corners
-  (worst case +3.750 ns), while inherited video/HPS/SDIO paths still report
-  global setup violations (worst case -21.009 ns). Whole-project timing
-  sign-off is therefore explicitly not claimed; see `I5_FPGA_BUILD.md`.
-- No physical MiSTer board is authorized or available in this task. I6 is
-  prepared through ROM loading, port signatures and LED observation, but stays
-  pending until an actual board/configuration is supplied and execution is
-  explicitly authorized.
+- The user's latest booting AT_FAST fit has worst setup -21.537 ns and hold
+  +0.054 ns. SDRAM_CLK has positive setup/hold; FPGA_CLK2_50 has same-clock
+  Fmax 39.36 MHz at the slow 100C corner, below the configured 50 MHz.
+  Whole-project timing sign-off is not claimed. See the latest handoff above;
+  `I5_FPGA_BUILD.md` retains historical build evidence.
+- Hardware testing is performed by the user between turns. The agent has no
+  direct board capture; the reported boot and diagnostic screenshots are
+  physical observations, while full I6 acceptance remains incomplete.
 
 ## SPK286 nonblocking evidence notes
 

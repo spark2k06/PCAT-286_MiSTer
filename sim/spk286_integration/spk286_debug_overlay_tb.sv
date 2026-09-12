@@ -16,6 +16,7 @@ module spk286_debug_overlay_tb;
     logic [23:0] rgb_in = 24'h2569ad;
     logic [1:0] page = 2'd0;
     logic boot_trace_view = 1'b0;
+    logic fault_trace_view = 1'b0;
 `ifdef TEST_AT_BOOT_TRACE
     localparam bit TEST_AT_MODE = 1'b1;
 `else
@@ -99,7 +100,7 @@ module spk286_debug_overlay_tb;
         .AT_MODE(TEST_AT_MODE)
     ) dut (
         .rst, .src_rst, .src_clk, .clk, .pxl_cen, .HS, .VS, .HB, .VB,
-        .rgb_in, .page, .boot_trace_view,
+        .rgb_in, .page, .boot_trace_view, .fault_trace_view,
         .cpu_reset, .cpu_halted, .cpu_shutdown, .cpu_control_error,
         .cpu_unsupported_opcode, .cpu_microcode_fault,
         .cpu_operand_blocked, .cpu_event_completed, .cpu_event_vector,
@@ -320,6 +321,23 @@ module spk286_debug_overlay_tb;
             $display("AT_BOOT_TRACE_OVERLAY_PASS raw_hex_and_pending_header");
         end else if (dut.d_boot_trace_view !== 1'b0)
             fail("XT must ignore the AT raw trace input");
+        fault_trace_view = 1'b1;
+        repeat (3) begin
+            VB = 1'b0; repeat (8) @(posedge clk);
+            VB = 1'b1; repeat (24) @(posedge clk);
+        end
+        if (TEST_AT_MODE && !dut.d_fault_trace_view) fail("AT fault view CDC bit");
+        if (TEST_AT_MODE) begin
+            expect_character(2'd3,0,3,"F");
+            expect_character(2'd3,2,3,"8");
+            expect_character(2'd3,2,10,"F");
+            expect_character(2'd3,7,0,"T");
+            expect_character(2'd3,8,0,"T");
+            expect_character(2'd3,10,0,"H");
+            $display("AT_FAULT_TRACE_OVERLAY_PASS");
+        end
+        if (!TEST_AT_MODE && dut.d_fault_trace_view !== 1'b0) fail("XT fault view isolation");
+        fault_trace_view = 1'b0;
         boot_trace_view = 1'b0;
         request_snapshot(2'd0);
 

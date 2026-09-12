@@ -1,8 +1,9 @@
 `timescale 1ns/1ps
 
-// Composed CPU-to-AT boundary test.  The memory model is intentionally small:
-// it provides the externally loaded 64 KiB system ROM, sparse conventional
-// memory and the same handshake used by a future MiSTer SDRAM owner.
+// Production CPU, HPS loader, AT bridge, KFSDRAM and physical SDRAM pin model.
+// By default verify first BIOS fetches. Optional LANDMARK_CASE values select
+// isolated DMA routines (1/2) or a bounded original-entry investigation (3).
+// Only cases 1/2 alter the reset entry in the test's private ROM buffer.
 module spk286_at_bios_first_fetch_tb;
     logic clk = 1'b0;
     logic reset = 1'b1;
@@ -10,8 +11,18 @@ module spk286_at_bios_first_fetch_tb;
     logic clk_video = 1'b0;
     always #17.45 clk_video = ~clk_video;
 
+    // Optional isolated Landmark routines. The on-disk user ROM is never
+    // changed; only the test fixture reset jump selects a diagnostic entry.
+    // This exercises its exact instruction bytes, not a claimed full POST.
+    integer landmark_case = 0;
+    integer io_completed = 0;
+    integer io_wait_cycles = 0;
+    integer max_cpu_cycles = 200000;
+    logic protocol_reported = 0;
+
     logic execute_enable = 1'b1;
     logic cpu_boot_reset = 1;
+    logic machine_boot_reset = 1;
     logic counter_clock = 1'b0;
     logic refresh_enable = 1'b1;
     logic pit_clock_active = 1'b0;
@@ -359,6 +370,19 @@ module spk286_at_bios_first_fetch_tb;
         if (loaded_bytes != 65536)
             $fatal(1, "AT system ROM must be exactly 65536 bytes, got %0d",
                    loaded_bytes);
+        if ($value$plusargs("LANDMARK_CASE=%d", landmark_case)) begin
+            if (rom[16'hfff0] != 8'hea || rom[16'h8d85] != 8'hee ||
+                rom[16'h8c50] != 8'he6 || rom[16'h8c51] != 8'hda)
+                $fatal(1,"Landmark diagnostic image signature mismatch");
+            case (landmark_case)
+                1: begin rom[16'hfff1]=8'h4b; rom[16'hfff2]=8'h8c; end
+                2: begin rom[16'hfff1]=8'h74; rom[16'hfff2]=8'h8d; end
+                3: begin end // Original reset entry through pre-PIT POST.
+                default: $fatal(1,"unsupported LANDMARK_CASE");
+            endcase
+            max_cpu_cycles = 20000000;
+            $display("LANDMARK_CASE=%0d entry=f000:%02h%02h",landmark_case,rom[16'hfff2],rom[16'hfff1]);
+        end
         for (index = 0; index < 4; index = index + 1)
             port80_sequence[index] = 8'h00;
     end
@@ -434,7 +458,7 @@ module spk286_at_bios_first_fetch_tb;
     );
 
     spk286_at_machine dut (
-        .clk(clk), .reset(reset | cpu_boot_reset), .cpu_reset(reset | cpu_boot_reset), .clk_video(clk_video), .splashscreen(1'b0),
+        .clk(clk), .reset(reset | machine_boot_reset), .cpu_reset(reset | cpu_boot_reset), .clk_video(clk_video), .splashscreen(1'b0),
         .execute_enable(execute_enable),
         .counter_clock(counter_clock), .refresh_enable(refresh_enable),
         .keyboard_byte_valid(keyboard_byte_valid), .keyboard_byte(keyboard_byte),
@@ -496,12 +520,51 @@ module spk286_at_bios_first_fetch_tb;
         if($value$plusargs("WAVE=%s",wave_path)) begin
             $dumpfile(wave_path); $dumpvars(0,spk286_at_bios_first_fetch_tb);
         end
-        cpu_boot_reset=0;
-        for(cycles=0;cycles<200000;cycles=cycles+1) begin
+        machine_boot_reset=0;
+        // Match the top: devices run while the splash still holds the CPU.
+        repeat (1024) begin
             @(negedge clk);
-            if(cpu_fault || protocol_error || memory_port_protocol_error || sdram_owner_protocol_error || loader_error || cpu_shutdown)
+            if (cpu_fault || protocol_error)
+                $fatal(1,"fault during CPU splash hold bridge=%b pic=%b pit=%b dma=%b devices=%b",dut.bridge_protocol_error,dut.pic_protocol_error,dut.pit_protocol_error,dut.dma_protocol_error,dut.devices_protocol_error);
+        end
+        cpu_boot_reset=0;
+        for(cycles=0;cycles<max_cpu_cycles;cycles=cycles+1) begin
+            @(negedge clk);
+            if (landmark_case != 0) begin
+                if (cpu_bus_valid && cpu_ready && (cpu_bus_status==4'ha || cpu_bus_status==4'h9)) begin
+                    io_completed=io_completed+1;
+                    if (io_completed<10 || cpu_address[15:0]==16'hd0)
+                        $display("LANDMARK_IO count=%0d ip=%04h port=%04h wr=%b data_out=%04h data_in=%04h",io_completed,debug_ip,cpu_address[15:0],cpu_bus_write,cpu_data_out,cpu_data_in);
+                end
+                if (cpu_bus_valid && !cpu_ready && (cpu_bus_status==4'ha || cpu_bus_status==4'h9))
+                    io_wait_cycles=io_wait_cycles+1;
+                else io_wait_cycles=0;
+                if (protocol_error && !protocol_reported) begin
+                    protocol_reported=1;
+                    $display("LANDMARK_PROTOCOL ip=%h bridge=%b arb=%b pic=%b pit=%b dma=%b refresh=%b dev=%b",debug_ip,dut.bridge_protocol_error,dut.arbiter_protocol_error,dut.pic_protocol_error,dut.pit_protocol_error,dut.dma_protocol_error,dut.refresh_protocol_error,dut.devices_protocol_error);
+                end
+                if (landmark_case==3 && protocol_error)
+                    $fatal(1,"LANDMARK_EARLY_BOOT_FAULT csip=%h:%h io=%h",debug_cs,debug_ip,cpu_address);
+                if (landmark_case==3 && debug_ip==16'h8a45) begin
+                    $display("LANDMARK_EARLY_BOOT_PASS cycles=%0d io=%0d",cycles,io_completed);
+                    $finish;
+                end
+                if (io_wait_cycles>1000)
+                    $fatal(1,"LANDMARK_IO_STALL case=%0d csip=%h:%h port=%h at=%h be=%b accept=%b ready=%b bridge=%0d io_completed=%0d",landmark_case,debug_cs,debug_ip,cpu_address,dut.at_address,dut.at_byte_enable,dut.at_accept,dut.at_ready,dut.u_bridge.state_q,io_completed);
+                if (debug_opcode==8'hba && ((landmark_case==1 && debug_ip==16'h8d1a) ||
+                    (landmark_case==2 && debug_ip==16'h8dad)))
+                    $fatal(1,"LANDMARK_ROUTINE_FAIL case=%0d ip=%h io_completed=%0d dma0_address=%h",landmark_case,debug_ip,io_completed,dut.u_dma.current_address_q[4]);
+                if (debug_opcode==8'hba && ((landmark_case==1 && debug_ip==16'h8d20) ||
+                    (landmark_case==2 && debug_ip==16'h8da7))) begin
+                    if (protocol_error || cpu_fault)
+                        $fatal(1,"Landmark routine passed with sticky fault");
+                    $display("LANDMARK_ROUTINE_PASS case=%0d io_completed=%0d cycles=%0d",landmark_case,io_completed,cycles);
+                    $finish;
+                end
+            end
+            if((landmark_case==0 && (cpu_fault || protocol_error)) || memory_port_protocol_error || sdram_owner_protocol_error || loader_error || cpu_shutdown)
                 $fatal(1,"first fetch fault cycle=%0d csip=%h:%h op=%h",cycles,debug_cs,debug_ip,debug_opcode);
-            if(fetch_returns>=32 && cpu_fetch_returns>=16 && saw_opcode && saw_low_rom_fetch) begin
+            if(landmark_case==0 && fetch_returns>=32 && cpu_fetch_returns>=16 && saw_opcode && saw_low_rom_fetch) begin
                 if(!boot_valid || boot_count<16 || boot_words[23:0]!==24'hfffff0 ||
                    boot_words[55:32]!==24'h07fff8 || boot_words[95:64]!==32'hf000fff0 ||
                    boot_words[127:112]!=={rom[16'hfff1],rom[16'hfff0]})
@@ -514,6 +577,6 @@ module spk286_at_bios_first_fetch_tb;
         $fatal(1,"watchdog reads=%0d cpu=%0d csip=%h:%h hlt=%b",fetch_returns,cpu_fetch_returns,debug_cs,debug_ip,cpu_halted);
     end
     initial begin
-        #100000000; $fatal(1,"HPS/SDRAM startup watchdog");
+        #1000000000; $fatal(1,"HPS/SDRAM startup watchdog");
     end
 endmodule

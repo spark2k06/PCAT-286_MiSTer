@@ -1,5 +1,10 @@
 # AT: captura del primer fallo de RAM — 12 de septiembre de 2026
 
+> Entrega histórica de instrumentación (`c581864`). Las capturas ya recibidas
+> permitieron reproducir el fallo FF00 y corregir las máscaras de placa A12/A11.
+> Ver [AT_SDRAM_DQM_HANDOFF.md](AT_SDRAM_DQM_HANDOFF.md) para el estado actual y
+> la prueba siguiente. El modelo descrito aquí aún omitía ese cableado de DQM.
+
 ## Estado comprobado
 
 El AT ya arranca y el usuario confirma PASS en Timer0/1/2, DMA1/2, registros
@@ -150,8 +155,9 @@ Flags P1T2: KF read_request visto, KF read_flag visto, READ visto,
 owner_state[3:0], reservado=0. owner_state={activo,respuesta_pendiente,refresh,idle}.
 
 P2T0: bits31:16=muestra KF; 15:14=DQM durante READ; 13:12=DQM al muestrear;
-11:10=BE; 9:6=owner_state al muestrear; 5:0=0. DQM observado en pines, con su
-latencia de lectura; no se deduce de BE. La lectura completa usa ambas lanes.
+11:10=BE; 9:6=owner_state al muestrear; 5:0=0. DQM observado en las salidas
+dedicadas del FPGA; no se deduce de BE ni observa la conexión A12/A11 de la
+placa. La lectura completa usa ambas lanes.
 
 ## Prueba física siguiente
 

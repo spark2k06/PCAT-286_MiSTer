@@ -12,14 +12,21 @@ critical RAM test with all-zero First Fault records and repeats POST. The user
 confirms XT passes that test; its separate later MEMORY REFRESH test fails.
 AT has not reached that later test yet. Unpatched original ROM also fails 16K
 on AT, with both ROM checksums passing. The RAM observer is AT-only.
-Original Landmark five-pattern RAM routines pass pin-level simulation, including
-original header context and distinct DS/ES. Injected storage errors validate the
-new passive Landmark RAM Trace. Physical RAM root cause remains open. The latest
-AT fit has a CPU-to-CX setup path of -4.338 ns; causality is not established.
+The new RAM Trace identifies the first read at 006E40 returning FF00 instead of
+FFFF. The old AT owner reproduces this with actual MiSTer XS/XSDS DQM wiring:
+A12/A11 stayed zero on WRITE, so byte writes overwrote the neighboring lane.
+The AT-only fix drives the masks on these pins for column commands, preserving
+all row bits on ACTIVE. The corrected pin model now includes this wiring;
+both it and dedicated DQM are tested. Original-ROM five-pattern RAM cases pass,
+including original header and distinct DS/ES, plus injected error controls.
+Hardware confirmation of the DQM fix and the later MEMORY REFRESH remains pending.
+The user's latest pre-fix STA summary has FPGA_CLK2_50 setup -7.563 ns; timing
+closure is still pending. The previous -4.338 ns CPU-to-CX path was another fit.
 Protected mode remains excluded by the user's existing ROM patch; ROM checksums
 are ignored as requested. The timer backend is not yet a complete 8254: read-back
 status is unsupported. RTC calendar/periodic rates and speaker audio are incomplete.
-See `AT_CRITICAL_RAM_HANDOFF.md` for current evidence and the next hardware capture.
+See `AT_SDRAM_DQM_HANDOFF.md` for the wiring evidence, reproduction and hardware test.
+`AT_CRITICAL_RAM_HANDOFF.md` preserves the earlier instrumentation audit.
 See `AT_LANDMARK_PIT_PARITY_HANDOFF.md` for the previous functional fixes.
 Older I0–I6 statements below describe their original acceptance scope.
 

@@ -41,6 +41,8 @@ module spk286_at_dma_refresh_pit_tb;
     wire         dma_transfer_accept = dma_transfer_valid && !dma_endpoint_seen;
     wire         dma_transfer_ready = dma_transfer_valid && dma_endpoint_seen;
     logic [23:0] dma_addresses [0:7];
+    logic [1:0] dma_lanes [0:7];
+    logic [15:0] dma_payloads [0:7];
     integer dma_beat_count = 0;
     integer dma_terminal_count_seen = 0;
 
@@ -261,6 +263,10 @@ module spk286_at_dma_refresh_pit_tb;
             if (dma_transfer_valid && dma_transfer_accept) begin
                 if (dma_beat_count < 8)
                     dma_addresses[dma_beat_count] = dma_transfer_address;
+                if (dma_beat_count < 8) begin
+                    dma_lanes[dma_beat_count] = dma_transfer_byte_enable;
+                    dma_payloads[dma_beat_count] = dma_transfer_data_out;
+                end
                 dma_beat_count = dma_beat_count + 1;
             end
             if (dma_terminal_count)
@@ -344,8 +350,10 @@ module spk286_at_dma_refresh_pit_tb;
               "DMA page/address increment was incorrect");
         check(dma_terminal_count_seen == 1,
               "DMA did not report one terminal count");
-        check(dma_transfer_byte_enable == 2'b01,
-              "DMA1 did not expose a byte transfer lane");
+        check(dma_lanes[0] == 2'b01 && dma_lanes[1] == 2'b10 &&
+              dma_payloads[0][7:0] == 8'h5A &&
+              dma_payloads[1][15:8] == 8'h5A,
+              "DMA1 did not align consecutive bytes to even/odd lanes");
         check(dma_transfer_io_to_memory && !dma_transfer_memory_to_io,
               "DMA transfer direction was not I/O-to-memory");
         check(dma_request_state == 8'h00 && !dma_bus_request,

@@ -20,6 +20,9 @@ for source in vendor/spk286/rtl/*.sv; do
   [[ "$source" == "vendor/spk286/rtl/spk286_operand.sv" ]] || sources+=("$source")
 done
 sources+=(
+  rtl/common/simple_ram.v
+  rtl/common/simple_fifo.v
+  rtl/common/floppy.v
   rtl/spk286_integration/spk286_operand_timing.sv
   rtl/spk286_integration/spk286_machine_cpu.sv
   rtl/spk286_integration/spk286_at_bus_bridge.sv
@@ -36,6 +39,7 @@ sources+=(
   rtl/KFPC-XT/HDL/KF8253/HDL/KF8253_Control_Logic.sv
   rtl/spk286_integration/spk286_at_8042.sv
   rtl/spk286_integration/spk286_at_rtc_cmos.sv
+  rtl/spk286_integration/spk286_at_fdc.sv
   rtl/spk286_integration/spk286_at_storage_video.sv
   rtl/spk286_integration/spk286_at_video_adapter.sv
   rtl/KFPC-XT/HDL/ega_vram_bram_frontend.sv

@@ -179,7 +179,12 @@ module spk286_at_dma (
         if (active_channel_q < 3'd4) begin
             dma_transfer_address = {page_q[channel_page_index(active_channel_q)],
                                      current_address_q[active_channel_q]};
-            dma_transfer_byte_enable = 2'b01;
+            // DMA1 is byte-wide, while the normalized SDRAM boundary is a
+            // 16-bit word with independent lanes. Physical A0 selects the
+            // lane; presenting every byte on lane 0 aliases each odd byte
+            // onto the preceding even address.
+            dma_transfer_byte_enable =
+                current_address_q[active_channel_q][0] ? 2'b10 : 2'b01;
         end else begin
             // DMA2 A0..A15 drive physical A1..A16; page bit 0 is ignored.
             dma_transfer_address = {page_q[channel_page_index(active_channel_q)][7:1],
@@ -193,7 +198,13 @@ module spk286_at_dma (
             mode_q[active_channel_q][3:2] == 2'b10;
         dma_transfer_io_to_memory = dma_transfer_write_to_memory;
         dma_transfer_memory_to_io = dma_transfer_read_from_memory;
-        dma_transfer_data_out = transfer_data_in;
+        // Byte devices exchange their byte in transfer_data_in[7:0]. Align
+        // device-to-memory data to the SDRAM lane selected above.
+        if ((active_channel_q < 3'd4) &&
+            current_address_q[active_channel_q][0])
+            dma_transfer_data_out = {transfer_data_in[7:0], 8'h00};
+        else
+            dma_transfer_data_out = transfer_data_in;
     end
 
     always_ff @(posedge clk) begin

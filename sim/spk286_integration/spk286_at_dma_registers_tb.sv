@@ -138,7 +138,7 @@ module spk286_at_dma_registers_tb;
             dma_request=8'(1<<channel); dma_grant=1;
             if(channel<4) begin
                 receive_beat(3'(channel),24'h2f7ffe,2'b01);
-                receive_beat(3'(channel),24'h2f7fff,2'b01);
+                receive_beat(3'(channel),24'h2f7fff,2'b10);
             end else begin
                 receive_beat(3'(channel),24'h2efffe,2'b11);
                 receive_beat(3'(channel),24'h2f0000,2'b11);

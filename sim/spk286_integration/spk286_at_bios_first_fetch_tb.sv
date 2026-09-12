@@ -6,7 +6,8 @@
 // parity/memory/PIT/refresh-status routines (4..9), NMI (10), RAM header (11),
 // distinct DS/ES (12), injected low/high-byte faults (13/14), and original POST
 // through RAM (15), PM-skip CPU/RAM continuations (16/17), ROM checksums (18),
-// and the original 8042 controller/scan-lines routines (19/20).
+// the original 8042 controller/scan-lines routines (19/20), and the original
+// floppy-adapter/read routines (21/22).
 // Cases other than 0/3/15 set
 // a test-only entry/setup in the private ROM buffer, never in the user ROM.
 module spk286_at_bios_first_fetch_tb;
@@ -22,6 +23,10 @@ module spk286_at_bios_first_fetch_tb;
     integer landmark_case = 0;
     integer io_completed = 0;
     integer checksum_pass_count = 0;
+    integer floppy_pass_count = 0;
+    integer floppy_dma_beats = 0;
+    integer floppy_irq_edges = 0;
+    logic floppy_irq_previous = 1'b0;
     integer source_lane_sum [0:1];
     integer fixture_lane_sum;
     logic [55:0] skip_mono = 0, skip_color = 0;
@@ -69,6 +74,13 @@ module spk286_at_bios_first_fetch_tb;
     logic parity_event = 1'b0;
     logic channel_check_event = 1'b0;
     logic external_nmi_event = 1'b0;
+    logic [15:0] mgmt_address = 16'h0000;
+    logic [15:0] mgmt_writedata = 16'h0000;
+    logic mgmt_write = 1'b0;
+    logic mgmt_read = 1'b0;
+    wire [15:0] mgmt_readdata;
+    wire [1:0] floppy_present;
+    wire [1:0] floppy_request;
 
     wire memory_request_valid;
     wire memory_command_valid;
@@ -247,6 +259,19 @@ module spk286_at_bios_first_fetch_tb;
             @(negedge clk);
             if(pin_writes!=32768) $fatal(1,"HPS writes %0d !=32768",pin_writes);
             $display("AT_HPS_PHYSICAL_LOAD_PASS words=%0d vector=%02h%02h",pin_writes,rom[16'hfff1],rom[16'hfff0]);
+        end
+    endtask
+
+    task automatic floppy_mgmt_write(input logic [15:0] address,
+                                     input logic [15:0] value);
+        begin
+            @(negedge clk);
+            mgmt_address = address;
+            mgmt_writedata = value;
+            mgmt_write = 1'b1;
+            @(posedge clk);
+            @(negedge clk);
+            mgmt_write = 1'b0;
         end
     endtask
     integer fetch_returns=0, cpu_fetch_returns=0;
@@ -430,7 +455,7 @@ module spk286_at_bios_first_fetch_tb;
                 1: begin rom[16'hfff1]=8'h4b; rom[16'hfff2]=8'h8c; end
                 2: begin rom[16'hfff1]=8'h74; rom[16'hfff2]=8'h8d; end
                 3,15: begin end // Original reset entry; 15 continues through the first RAM test.
-                4,5,6,7,8,9,11,12,13,14,16,17,18,19,20: begin
+                4,5,6,7,8,9,11,12,13,14,16,17,18,19,20,21,22: begin
                     // Test fixture only: set SS like POST, gate timer2 on,
                     // then execute untouched diagnostic instructions in ROM.
                     case(landmark_case)
@@ -446,6 +471,7 @@ module spk286_at_bios_first_fetch_tb;
                         18: routine_entry=16'h89cb; // Both original ROM checksum routines
                         19: routine_entry=16'h9191; // 8042 AA/55 self-test and AB/00 interface test
                         20: routine_entry=16'h91c0; // 8042 command-byte write and quiet scan lines
+                        21,22: routine_entry=16'h923f; // Floppy adapter, then read
                         12,13,14: routine_entry=16'h8df6; // Same isolated test with DS != ES
                     endcase
                     rom[16'hfff1]=0; rom[16'hfff2]=8'hff;
@@ -470,7 +496,8 @@ module spk286_at_bios_first_fetch_tb;
                         rom[16'hff09]=8'hea; rom[16'hff0a]=8'hcd; rom[16'hff0b]=8'h94;
                         rom[16'hff0c]=0; rom[16'hff0d]=8'hf0;
                     end
-                    if(landmark_case==19 || landmark_case==20) begin
+                    if(landmark_case==19 || landmark_case==20 ||
+                       landmark_case==21 || landmark_case==22) begin
                         // These routines call the shared 8042 helpers. Give
                         // their isolated fixture a writable real-mode stack;
                         // an SS in the F000 ROM window cannot retain CALL's
@@ -515,6 +542,46 @@ module spk286_at_bios_first_fetch_tb;
                         // status read per outer iteration.
                         rom[16'h91da]=8'h90; rom[16'h91db]=8'h90;
                         rom[16'h91e8]=8'h90; rom[16'h91e9]=8'h90;
+                    end
+                    if(landmark_case==21 || landmark_case==22) begin
+                        // Keep every FDC operation and comparison intact while
+                        // shortening four pure 65536-iteration settle loops.
+                        rom[16'ha29c]=8'h90; rom[16'ha29d]=8'h90;
+                        rom[16'ha2a1]=8'h90; rom[16'ha2a2]=8'h90;
+                        rom[16'h9291]=8'h90; rom[16'h9292]=8'h90;
+                        rom[16'h92ea]=8'h90; rom[16'h92eb]=8'h90;
+
+                        // Install IRQ6 at vector 0Eh, initialize a single
+                        // master 8259 at base 08h, unmask IRQ6 and enter the
+                        // original adapter routine with a writable stack.
+                        rom[16'hff00]=8'hfa;
+                        rom[16'hff01]=8'h31; rom[16'hff02]=8'hc0;
+                        rom[16'hff03]=8'h8e; rom[16'hff04]=8'hd8;
+                        rom[16'hff05]=8'h8e; rom[16'hff06]=8'hd0;
+                        rom[16'hff07]=8'hbc; rom[16'hff08]=8'h00; rom[16'hff09]=8'h08;
+                        rom[16'hff0a]=8'hc7; rom[16'hff0b]=8'h06;
+                        rom[16'hff0c]=8'h38; rom[16'hff0d]=8'h00;
+                        rom[16'hff0e]=8'h60; rom[16'hff0f]=8'hff;
+                        rom[16'hff10]=8'hc7; rom[16'hff11]=8'h06;
+                        rom[16'hff12]=8'h3a; rom[16'hff13]=8'h00;
+                        rom[16'hff14]=8'h00; rom[16'hff15]=8'hf0;
+                        rom[16'hff16]=8'hba; rom[16'hff17]=8'h20; rom[16'hff18]=8'h00;
+                        rom[16'hff19]=8'hb0; rom[16'hff1a]=8'h13; rom[16'hff1b]=8'hee;
+                        rom[16'hff1c]=8'h42;
+                        rom[16'hff1d]=8'hb0; rom[16'hff1e]=8'h08; rom[16'hff1f]=8'hee;
+                        rom[16'hff20]=8'hb0; rom[16'hff21]=8'h01; rom[16'hff22]=8'hee;
+                        rom[16'hff23]=8'hb0; rom[16'hff24]=8'hbf; rom[16'hff25]=8'hee;
+                        rom[16'hff26]=8'hea; rom[16'hff27]=8'h3f;
+                        rom[16'hff28]=8'h92; rom[16'hff29]=8'h00; rom[16'hff2a]=8'hf0;
+
+                        // IRQ6: set Landmark's flag, send non-specific EOI,
+                        // preserve AX and return through the real INTA frame.
+                        rom[16'hff60]=8'h50;
+                        rom[16'hff61]=8'hc6; rom[16'hff62]=8'h06;
+                        rom[16'hff63]=8'h00; rom[16'hff64]=8'h04; rom[16'hff65]=8'h01;
+                        rom[16'hff66]=8'hb0; rom[16'hff67]=8'h20;
+                        rom[16'hff68]=8'he6; rom[16'hff69]=8'h20;
+                        rom[16'hff6a]=8'h58; rom[16'hff6b]=8'hcf;
                     end
                 end
                 10: begin // Integration fixture: pending parity -> RTC unmask -> one NMI -> IRET.
@@ -674,6 +741,11 @@ module spk286_at_bios_first_fetch_tb;
         .clk(clk), .reset(reset | machine_boot_reset), .cpu_reset(reset | cpu_boot_reset), .clk_video(clk_video), .splashscreen(1'b0),
         .execute_enable(execute_enable),
         .counter_clock(counter_clock), .refresh_enable(refresh_enable),
+        .mgmt_address(mgmt_address), .mgmt_writedata(mgmt_writedata),
+        .mgmt_write(mgmt_write), .mgmt_read(mgmt_read),
+        .mgmt_readdata(mgmt_readdata),
+        .floppy_write_protect(2'b00), .floppy_present(floppy_present),
+        .floppy_request(floppy_request),
         .keyboard_byte_valid(keyboard_byte_valid), .keyboard_byte(keyboard_byte),
         .periodic_tick(periodic_tick), .second_tick(second_tick),
         .parity_event(parity_event), .channel_check_event(channel_check_event),
@@ -734,6 +806,24 @@ module spk286_at_bios_first_fetch_tb;
             $dumpfile(wave_path); $dumpvars(0,spk286_at_bios_first_fetch_tb);
         end
         machine_boot_reset=0;
+        if(landmark_case==21 || landmark_case==22) begin
+            // 1.2 MB AT drive: 80 cylinders, 15 sectors, two heads.
+            floppy_mgmt_write(16'hF200,16'h0001);
+            floppy_mgmt_write(16'hF201,16'h0000);
+            floppy_mgmt_write(16'hF202,16'd80);
+            floppy_mgmt_write(16'hF203,16'd15);
+            floppy_mgmt_write(16'hF204,16'd2400);
+            floppy_mgmt_write(16'hF205,16'd2);
+            if(!floppy_present[0]) $fatal(1,"LANDMARK_FLOPPY_MEDIA_NOT_PRESENT");
+            if(landmark_case==22) fork
+                begin : serve_landmark_floppy_sector
+                    integer byte_index;
+                    wait(floppy_request[0]);
+                    for(byte_index=0;byte_index<512;byte_index=byte_index+1)
+                        floppy_mgmt_write(16'hF20F,{8'h00,byte_index[7:0]});
+                end
+            join_none
+        end
         // Match the top: devices run while the splash still holds the CPU.
         repeat (1024) begin
             @(negedge clk);
@@ -834,6 +924,24 @@ module spk286_at_bios_first_fetch_tb;
                 $display("RAM_CONTEXT ip=%h gpr=%h seg=%h bases=%h flags=%h",debug_ip,
                     dut.debug_gpr,dut.debug_segment_selectors,dut.debug_segment_bases,dut.debug_flags);
             if (landmark_case != 0) begin
+                if(landmark_case==21 || landmark_case==22) begin
+                    if(irq_request[6] && !floppy_irq_previous)
+                        floppy_irq_edges=floppy_irq_edges+1;
+                    floppy_irq_previous=irq_request[6];
+                    if(dma_memory_valid && dma_memory_accept) begin
+                        if(landmark_case==22 &&
+                           (dma_memory_address !== 24'h000A00 + 24'(floppy_dma_beats) ||
+                            dma_memory_byte_enable !==
+                              (dma_memory_address[0] ? 2'b10 : 2'b01) ||
+                            (dma_memory_address[0] ? dma_memory_data_out[15:8] :
+                                                   dma_memory_data_out[7:0]) !==
+                              8'(floppy_dma_beats)))
+                            $fatal(1,"LANDMARK_FLOPPY_DMA_BYTE beat=%0d addr=%h be=%b data=%h",
+                                   floppy_dma_beats,dma_memory_address,
+                                   dma_memory_byte_enable,dma_memory_data_out);
+                        floppy_dma_beats=floppy_dma_beats+1;
+                    end
+                end
                 if (cpu_bus_valid && cpu_ready && (cpu_bus_status==4'ha || cpu_bus_status==4'h9)) begin
                     io_completed=io_completed+1;
                     if (io_completed<10 || cpu_address[15:0]==16'hd0)
@@ -941,6 +1049,38 @@ module spk286_at_bios_first_fetch_tb;
                             $fatal(1,"Landmark keyboard routine passed with sticky fault");
                         $display("LANDMARK_KEYBOARD_PASS case=%0d io_completed=%0d cycles=%0d",landmark_case,io_completed,cycles);
                         $finish;
+                    end
+                end
+                if ((landmark_case==21 || landmark_case==22) &&
+                    dut.u_cpu.cpu.opcode_start && debug_cs==16'hf000) begin
+                    if (debug_ip==16'h9b68)
+                        $fatal(1,"LANDMARK_FLOPPY_FAIL case=%0d passes=%0d irq6=%0d dma=%0d io=%0d",
+                               landmark_case,floppy_pass_count,floppy_irq_edges,
+                               floppy_dma_beats,io_completed);
+                    if (debug_ip==16'h9cb5) begin
+                        floppy_pass_count=floppy_pass_count+1;
+                        if(landmark_case==21) begin
+                            if(floppy_irq_edges<1 || protocol_error || cpu_fault)
+                                $fatal(1,"LANDMARK_FLOPPY_ADAPTER_EVIDENCE");
+                            $display("AT_LANDMARK_FLOPPY_ADAPTER_PASS irq6=%0d io=%0d cycles=%0d",
+                                     floppy_irq_edges,io_completed,cycles);
+                            $finish;
+                        end
+                        if(landmark_case==22 && floppy_pass_count==2) begin
+                            if(floppy_dma_beats!=512 || floppy_irq_edges<4 ||
+                               protocol_error || cpu_fault)
+                                $fatal(1,"LANDMARK_FLOPPY_READ_EVIDENCE dma=%0d irq6=%0d",
+                                       floppy_dma_beats,floppy_irq_edges);
+                            for(integer sector_word=0;sector_word<256;
+                                sector_word=sector_word+1)
+                                if(pins.mem[16'h0500+sector_word] !==
+                                   {8'(sector_word*2+1),8'(sector_word*2)})
+                                    $fatal(1,"LANDMARK_FLOPPY_SDRAM_WORD word=%0d data=%h",
+                                           sector_word,pins.mem[16'h0500+sector_word]);
+                            $display("AT_LANDMARK_FLOPPY_READ_PASS dma_bytes=%0d irq6=%0d io=%0d cycles=%0d",
+                                     floppy_dma_beats,floppy_irq_edges,io_completed,cycles);
+                            $finish;
+                        end
                     end
                 end
             end

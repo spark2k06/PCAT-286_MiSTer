@@ -23,6 +23,9 @@ module emu_at
     localparam CONF_STR_AT = {
         "PCAT-286;",
         CONF_STR_HALT_AT,
+        "S0,IMGIMAVFD,Floppy A:;",
+        "S1,IMGIMAVFD,Floppy B:;",
+        "OJK,Write Protect,None,A:,B:,A: & B:;",
         "-;",
         "P1,System & BIOS;",
         "P1-;",
@@ -48,11 +51,32 @@ module emu_at
 
     wire [35:0] EXT_BUS;
     wire [21:0] gamma_bus;
-    // There is no management-extension owner in this first AT profile.
-    // Explicitly drive the extension-select bits low so hps_io returns its
-    // normal framework response on HPS_BUS instead of observing Z/X.
-    assign EXT_BUS[32] = 1'b0;
     assign gamma_bus[21] = 1'b0;
+
+    wire [15:0] at_mgmt_din;
+    wire [15:0] at_mgmt_dout;
+    wire [15:0] at_mgmt_address;
+    wire        at_mgmt_read;
+    wire        at_mgmt_write;
+    wire [1:0]  at_floppy_present;
+    wire [1:0]  at_floppy_request;
+    wire [7:0]  at_mgmt_request = {at_floppy_request, 6'b000000};
+
+    // Use the same MiSTer media-management transport as the XT profile and
+    // ao486/z486. Requests 7:6 are floppy A/B; the remaining owners are not
+    // yet attached in the AT profile.
+    hps_ext hps_ext_at (
+        .clk_sys     (CLK_50M),
+        .EXT_BUS     (EXT_BUS),
+        .ext_din     (at_mgmt_din),
+        .ext_dout    (at_mgmt_dout),
+        .ext_addr    (at_mgmt_address),
+        .ext_rd      (at_mgmt_read),
+        .ext_wr      (at_mgmt_write),
+        .ext_midi    (),
+        .ext_req     (at_mgmt_request),
+        .ext_hotswap (2'b00)
+    );
 
     wire [31:0] joystick_0;
     wire [31:0] joystick_1;
@@ -580,6 +604,14 @@ module emu_at
         .parity_event           (1'b0),
         .channel_check_event    (1'b0),
         .external_nmi_event     (1'b0),
+        .mgmt_address           (at_mgmt_address),
+        .mgmt_writedata         (at_mgmt_dout),
+        .mgmt_write             (at_mgmt_write),
+        .mgmt_read              (at_mgmt_read),
+        .mgmt_readdata          (at_mgmt_din),
+        .floppy_write_protect   (hps_status[20:19]),
+        .floppy_present         (at_floppy_present),
+        .floppy_request         (at_floppy_request),
         .cpu_address            (at_cpu_address),
         .cpu_data_out           (at_cpu_data_out),
         .cpu_data_in            (at_cpu_data_in),

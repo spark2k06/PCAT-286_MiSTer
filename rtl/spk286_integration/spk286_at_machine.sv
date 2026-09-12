@@ -27,6 +27,16 @@ module spk286_at_machine (
     input  logic         channel_check_event,
     input  logic         external_nmi_event,
 
+    // MiSTer hps_ext media management for the shared floppy controller.
+    input  logic [15:0]  mgmt_address,
+    input  logic [15:0]  mgmt_writedata,
+    input  logic         mgmt_write,
+    input  logic         mgmt_read,
+    output logic [15:0]  mgmt_readdata,
+    input  logic [1:0]   floppy_write_protect,
+    output logic [1:0]   floppy_present,
+    output logic [1:0]   floppy_request,
+
     // CPU memory/code-fetch target.  The request metadata is retained by the
     // bridge and remains stable from command through READY.
     output logic         memory_request_valid,
@@ -543,10 +553,24 @@ module spk286_at_machine (
         .dma_transfer_complete  (dma_transfer_complete),
         .dma_terminal_count     (dma_terminal_count),
         .dma_active_channel     (dma_active_channel),
+        // DMA1 byte devices consume a normalized low-byte value. Select the
+        // addressed SDRAM lane for memory-to-I/O transfers.
+        .dma_transfer_data_in   ((dma_active_channel < 3'd4) &&
+                                 dma_transfer_byte_enable[1] ?
+                                 {8'h00, dma_memory_data_in[15:8]} :
+                                 dma_memory_data_in),
         .dma_transfer_accept    (devices_dma_transfer_accept),
         .dma_transfer_ready     (devices_dma_transfer_ready),
         .dma_transfer_data_out  (devices_dma_transfer_data_out),
         .dma_request            (devices_dma_request),
+        .mgmt_address           (mgmt_address),
+        .mgmt_writedata         (mgmt_writedata),
+        .mgmt_write             (mgmt_write),
+        .mgmt_read              (mgmt_read),
+        .mgmt_readdata          (mgmt_readdata),
+        .floppy_write_protect   (floppy_write_protect),
+        .floppy_present         (floppy_present),
+        .floppy_request         (floppy_request),
         .irq6                   (irq6),
         .irq14                  (irq14),
         .ata_selected           (ata_selected),

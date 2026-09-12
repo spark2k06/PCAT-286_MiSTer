@@ -1,7 +1,7 @@
 # AT A5 handoff — composed system boundary
 
 **Date:** 2026-09-11
-**Status:** AT profile shell attached; acceptance pending
+**Status:** AT profile with memory and EGA owners attached; acceptance pending
 **Branch:** `codex/spk286-xt-integration`
 
 ## Delivered
@@ -15,8 +15,8 @@ one explicit machine boundary:
 - 8042, RTC/CMOS, storage/video router and IRQ/NMI wiring.
 
 The wrapper exposes separate CPU-memory, DMA-memory and refresh-memory
-handshakes. This is the point at which the future MiSTer SDRAM, media and
-video owners can attach without changing the CPU transaction contract.
+handshakes. The MiSTer SDRAM owner and the real EGA video owner attach at
+these boundaries without changing the CPU transaction contract.
 The active/default MiSTer top level remains `XT_COMPAT`; it is not switched to
 the AT profile unless the explicit `AT_PROFILE` build macro is enabled.
 
@@ -43,8 +43,9 @@ The optional `AT_PROFILE` path is now selected in `sys/sys_top.v` without
 changing the default `emu` instantiation. Its `emu_at` module wires
 `hps_io` WIDE downloads through the normalized HPS loader, the serialized
 memory-port owner and the physical `KFSDRAM` owner. CPU reset is retained until
-the main BIOS image is complete. Video, SD, audio and DDRAM are deliberately
-safe tie-offs in this intermediate profile.
+the main BIOS image is complete. The AT video output now uses the real EGA
+raster/planar-VRAM path and is retimed into the MiSTer HDMI pipeline. SD and
+audio remain outside this milestone's acceptance scope.
 
 ## Composed evidence
 
@@ -87,7 +88,6 @@ yet the final production-PIC/DOS/hardware path.
 ## Acceptance still pending
 
 This milestone is not a DOS-boot or board acceptance. Remaining work is to
-attach the real media and video owners to `emu_at`, complete physical keyboard
-handling, run the DOS and representative-device trace ladder, and then produce
-a board-loadable RBF for user testing. No AT compatibility claim is made until
-those steps pass.
+attach the real media backend, complete physical keyboard handling, run the
+DOS and representative-device trace ladder, and test the board-loadable RBF.
+No AT compatibility claim is made until those steps pass.

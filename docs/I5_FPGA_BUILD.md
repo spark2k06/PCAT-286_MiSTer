@@ -25,6 +25,31 @@ flow, fitter and assembler all completed with zero errors. The standard flow
 took 33 minutes 32 seconds and the focused sign-off took a further 31 seconds
 in the recorded container run.
 
+## Fast AT development build
+
+For AT bring-up and debug iterations, `PCAT-286_AT_FAST.qsf` uses the same
+RTL, device, pins, PLLs and `AT_PROFILE` macro as the timing-oriented
+`PCAT-286_AT.qsf`, but selects Fast Fit and disables the additional physical
+and final-placement optimization passes. It writes to the separate
+`output_files_pcat286_at_fast/` directory:
+
+```sh
+wsl bash -lc 'cd /mnt/d/GitHub/PCAT-286_MiSTer && \
+  docker run --rm -v /mnt/d/GitHub/PCAT-286_MiSTer:/build -w /build \
+  raetro/quartus:mister quartus_sh --flow compile PCAT-286_AT_FAST.qsf'
+```
+
+Measured with Quartus Prime 17.0.2 on 2026-09-11, the fast flow completed in
+18 min 45 s end-to-end (17 min 41 s reported by the Quartus flow), versus
+1 h 9 min 50 s for the timing-oriented AT build. The generated development
+RBF is `output_files_pcat286_at_fast/PCAT-286_AT_FAST.rbf` with SHA-256
+`27A149C054EADA0D1CE5706E0903670E198A34EE7C962B3EA89F8AD9B071206C`.
+
+This profile is for iteration only. Its worst global setup slack is
+`-22.826 ns` at slow 1100 mV/100 C, compared with `-21.230 ns` for the
+timing-oriented candidate; it must not replace the latter for a final board
+candidate.
+
 ## Fit and artifacts
 
 | Resource | Actual use | Device total | Utilization |

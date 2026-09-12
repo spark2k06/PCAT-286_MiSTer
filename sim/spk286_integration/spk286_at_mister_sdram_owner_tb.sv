@@ -259,6 +259,24 @@ module spk286_at_mister_sdram_owner_tb;
         check(sdram_writes >= 3, "physical write command was not issued");
         check(sdram_reads >= 3, "physical read command was not issued");
         check(!protocol_error, "unexpected SDRAM owner protocol error");
+
+        // The reset-vector alias must hit the same physical BIOS window as
+        // F0000h.  Inspect the translated address at the command boundary;
+        // the SDRAM model uses the same byte-to-word translation as hardware.
+        @(negedge clk);
+        request_valid = 1'b1;
+        request_command_valid = 1'b1;
+        request_owner_refresh = 1'b0;
+        request_write = 1'b0;
+        request_address = 24'hFFFFF0;
+        request_byte_enable = 2'b11;
+        request_data_out = 16'h0000;
+        while (!request_accept)
+            @(negedge clk);
+        check(dut.kf_address == 24'h07FFF8,
+              "reset-vector alias was not translated to the physical BIOS word");
+        request_valid = 1'b0;
+        request_command_valid = 1'b0;
         $display("AT_MISTER_SDRAM_OWNER_PASS writes=%0d reads=%0d", sdram_writes, sdram_reads);
         $finish;
     end

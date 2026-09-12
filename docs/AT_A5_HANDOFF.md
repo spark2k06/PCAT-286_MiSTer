@@ -1,7 +1,7 @@
 # AT A5 handoff — devices and routing
 
 **Date:** 2026-09-11
-**Status:** Functional boundary and optional AT profile complete; system acceptance pending
+**Status:** Functional boundary and real EGA path complete; board acceptance pending
 **Branch:** `codex/spk286-xt-integration`
 
 ## Delivered
@@ -17,7 +17,8 @@
 - `rtl/spk286_integration/spk286_at_storage_video.sv`
   - primary ATA register boundary and deterministic IDENTIFY/status response;
   - floppy register boundary, channel-2 DMA request and terminal IRQ6;
-  - EGA I/O range and a small A0000h aperture shadow for contract tests.
+  - EGA I/O range and A0000h-BFFFFh planar VRAM aperture through the real EGA
+    adapter and raster path.
 - `rtl/spk286_integration/spk286_at_device_router.sv`
   - one-owner decode for 8042, RTC, ATA, floppy and video;
   - response-owner retention through READY;
@@ -28,6 +29,11 @@ All modules are listed in `rtl/spk286_integration/spk286_integration.qip`.
 The active MiSTer machine remains `XT_COMPAT`; the existing XT peripheral
 path and its `KFPS2KB`, `rtc`, FDC, IDE and EGA implementations were not
 mutated.
+
+The optional `AT_PROFILE` now instantiates the real EGA owner, including the
+28.636 MHz EGA raster clock, planar VRAM frontend, CPU I/O/memory bridge and
+the retimed MiSTer video output. Reset release in the video domains is
+synchronous to their respective clocks.
 
 ## Functional evidence
 
@@ -50,8 +56,8 @@ transfer completed through the A4 arbiter/DMA boundary.
 ## Acceptance still pending
 
 This functional boundary is not yet a DOS-boot or hardware acceptance. The
-remaining A5 work is to attach the physical PS/2 receiver, provide the real
-MiSTer media backend, replace the video shadow and safe `emu_at` output tie-off
-with the selected EGA/VGA memory path, and run the DOS/representative-device
-trace ladder. The optional profile is selected with `AT_PROFILE`; the default
-`XT_COMPAT` build remains unchanged. Board evidence remains A7 work.
+remaining work is to attach the physical PS/2 receiver, provide the real
+MiSTer media backend, run the DOS/representative-device trace ladder, and
+test the generated RBF on the board. The optional profile is selected with
+`AT_PROFILE`; the default `XT_COMPAT` build remains unchanged. Board evidence
+remains pending.

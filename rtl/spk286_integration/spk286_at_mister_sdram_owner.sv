@@ -9,10 +9,10 @@
 // when the controller is idle, while enable_refresh remains asserted so the
 // physical controller can issue its periodic refresh commands.
 //
-// The normalized address is a byte address.  KFSDRAM is word-wide, so bit 0
-// is cleared for the physical word address and DQM selects the requested byte
-// lanes.  This preserves an even-address full word and both odd/even byte
-// accesses without making the legacy XT bus a second memory owner.
+// The normalized address is a byte address.  KFSDRAM addresses physical
+// 16-bit words, so the AT owner maps A >> 1 and selects the byte lane with
+// DQM.  This keeps the 16-bit SDRAM geometry aligned with the AT bus while
+// retaining the board's existing KFSDRAM wiring.
 
 module spk286_at_mister_sdram_owner #(
     parameter logic        SDRAM_NO_REFRESH = 1'b0,
@@ -39,6 +39,13 @@ module spk286_at_mister_sdram_owner #(
     output logic        physical_idle,
     output logic        protocol_error,
 
+    // Passive bring-up observations; no diagnostic signal controls this owner.
+    output logic [23:0] debug_kf_address,
+    output logic [15:0] debug_kf_data_out,
+    output logic        debug_kf_read_request,
+    output logic        debug_kf_read_flag,
+    output logic [3:0]  debug_owner_state,
+
     output logic [12:0] sdram_address,
     output logic        sdram_cke,
     output logic        sdram_cs,
@@ -59,6 +66,8 @@ module spk286_at_mister_sdram_owner #(
     logic [23:0] address_q;
     logic [1:0]  byte_enable_q;
     logic [15:0] data_out_q;
+    logic        response_pending_q;
+    logic [15:0] response_data_q;
 
     logic [23:0] kf_address;
     logic [15:0] kf_data_in;
@@ -75,6 +84,18 @@ module spk286_at_mister_sdram_owner #(
     logic        launch_request;
     logic        physical_write;
     logic [1:0]  physical_byte_enable;
+    logic [23:0] mapped_address;
+
+    // The 80286 reset vector is fetched from FFFFF0h, while the loaded
+    // system BIOS occupies the AT F0000h-Fffffh window.  Real AT chipsets
+    // expose the top 4 KiB as a reset-vector alias; translate it here so
+    // the physical SDRAM stores only one copy of the BIOS image.
+    always_comb begin
+        mapped_address = active_q ? address_q : request_address;
+        if ((mapped_address >= 24'hFFF000) &&
+            (mapped_address <= 24'hFFFFFF))
+            mapped_address = mapped_address - 24'hF00000;
+    end
 
     assign physical_idle = kf_idle && !active_q;
     assign launch_request = !active_q && request_valid &&
@@ -90,16 +111,32 @@ module spk286_at_mister_sdram_owner #(
     assign kf_read_request  = launch_request && !request_owner_refresh &&
                               !request_write;
 
+    // KFSDRAM presents read_flag/data_out at its internal sampling boundary.
+    // Capture that pair first, then expose a stable response to the AT bus.
+    // This prevents the CPU-facing ready/data path from depending on the
+    // same-cycle combinational propagation of the SDRAM controller outputs.
     assign request_ready = active_q &&
                            (owner_refresh_q ? kf_idle :
-                            (write_q ? kf_idle : kf_read_flag));
-    assign request_read_data = kf_data_out;
+                            (write_q ? kf_idle : response_pending_q));
+    assign request_read_data = response_data_q;
     assign request_read_data_valid = active_q && !owner_refresh_q &&
-                                     !write_q && kf_read_flag;
+                                     !write_q && response_pending_q;
 
-    assign kf_address = active_q ? {address_q[23:1], 1'b0}
-                                 : {request_address[23:1], 1'b0};
+    // KFSDRAM is word-addressed while the AT boundary is byte-addressed.
+    // Map the logical byte address to its physical 16-bit word with A >> 1;
+    // DQM below then selects the requested low/high byte lane.  This is a
+    // packed word layout.  The old {mapped_address[23:1], 1'b0} expression
+    // aligned a byte address down and produced a sparse word layout; it was
+    // not a left shift.  Loader and CPU share this mapper in either layout.
+    assign kf_address = {1'b0, mapped_address[23:1]};
     assign kf_data_in = active_q ? data_out_q : request_data_out;
+    assign debug_kf_address = kf_address;
+    assign debug_kf_data_out = kf_data_out;
+    assign debug_kf_read_request = kf_read_request;
+    assign debug_kf_read_flag = kf_read_flag;
+    // Packed owner flags, not a historical 286 bus-state encoding.
+    assign debug_owner_state = {active_q, response_pending_q,
+                                 owner_refresh_q, kf_idle};
 
     always_comb begin
         physical_write       = 1'b0;
@@ -184,6 +221,8 @@ module spk286_at_mister_sdram_owner #(
             address_q      <= 24'h000000;
             byte_enable_q  <= 2'b00;
             data_out_q     <= 16'h0000;
+            response_pending_q <= 1'b0;
+            response_data_q <= 16'h0000;
             protocol_error <= 1'b0;
         end else begin
             if (request_valid && request_command_valid &&
@@ -197,8 +236,14 @@ module spk286_at_mister_sdram_owner #(
                 address_q       <= request_address;
                 byte_enable_q   <= request_byte_enable;
                 data_out_q      <= request_data_out;
+                response_pending_q <= 1'b0;
+            end else if (active_q && !owner_refresh_q && !write_q &&
+                         kf_read_flag && !response_pending_q) begin
+                response_data_q <= kf_data_out;
+                response_pending_q <= 1'b1;
             end else if (active_q && request_ready) begin
                 active_q <= 1'b0;
+                response_pending_q <= 1'b0;
             end
         end
     end
@@ -210,6 +255,8 @@ module spk286_at_mister_sdram_owner #(
                 else $error("AT SDRAM owner completed without an active request");
             assert (!(request_read_data_valid && write_q))
                 else $error("AT SDRAM owner returned read data for a write");
+            assert (!request_read_data_valid || request_ready)
+                else $error("AT SDRAM owner returned data without ready");
         end
     end
 `endif

@@ -50,6 +50,8 @@ module spk286_at_hps_rom_loader (
     logic        main_seen_q;
     logic        ega_seen_q;
     logic        xtide_seen_q;
+    logic [2:0]  download_active;
+    logic [2:0]  download_active_q;
 
     logic        select_main;
     logic        select_ega;
@@ -57,6 +59,12 @@ module spk286_at_hps_rom_loader (
     logic        selected_download;
     logic [1:0]  selected_target;
     logic [23:0] selected_address;
+
+    // File-start detection must not depend on ioctl_addr: HPS may still
+    // present the previous file's final address when download rises.
+    assign download_active[0] = ioctl_download && (ioctl_index[5:0] == 6'd0);
+    assign download_active[1] = ioctl_download && (ioctl_index[5:0] == 6'd3);
+    assign download_active[2] = ioctl_download && (ioctl_index == 8'd2);
 
     always_comb begin
         select_main = (ioctl_index[5:0] == 6'd0) &&
@@ -104,6 +112,7 @@ module spk286_at_hps_rom_loader (
             address_q        <= 24'h000000;
             data_q           <= 16'h0000;
             main_seen_q      <= 1'b0;
+            download_active_q <= 3'b000;
             ega_seen_q       <= 1'b0;
             xtide_seen_q     <= 1'b0;
             main_rom_loaded  <= 1'b0;
@@ -113,12 +122,28 @@ module spk286_at_hps_rom_loader (
         end else if (!sdram_initialized) begin
             state_q          <= STATE_IDLE;
             main_seen_q      <= 1'b0;
+            download_active_q <= 3'b000;
             ega_seen_q       <= 1'b0;
             xtide_seen_q     <= 1'b0;
             main_rom_loaded  <= 1'b0;
             ega_rom_loaded   <= 1'b0;
             xtide_rom_loaded <= 1'b0;
         end else begin
+            download_active_q <= download_active;
+            // Match XT: replacing a file invalidates its previous presence.
+            // A word captured on this same edge sets seen again below.
+            if (download_active[0] && !download_active_q[0]) begin
+                main_seen_q <= 1'b0;
+                main_rom_loaded <= 1'b0;
+            end
+            if (download_active[1] && !download_active_q[1]) begin
+                ega_seen_q <= 1'b0;
+                ega_rom_loaded <= 1'b0;
+            end
+            if (download_active[2] && !download_active_q[2]) begin
+                xtide_seen_q <= 1'b0;
+                xtide_rom_loaded <= 1'b0;
+            end
             if (state_q == STATE_IDLE && selected_download && ioctl_wr) begin
                 state_q   <= STATE_WAIT_ACCEPT;
                 target_q  <= selected_target;
@@ -146,9 +171,9 @@ module spk286_at_hps_rom_loader (
             end
 
             // Presence is latched only after the corresponding download has
-            // ended.  This prevents a partially transferred image from
-            // releasing reset in an AT top-level profile.
-            if (!ioctl_download) begin
+            // ended AND the final accepted SDRAM write has completed. An
+            // early HPS end-of-file cannot release CPU reset while it drains.
+            if (!ioctl_download && (state_q == STATE_IDLE)) begin
                 if (main_seen_q)
                     main_rom_loaded <= 1'b1;
                 if (ega_seen_q)

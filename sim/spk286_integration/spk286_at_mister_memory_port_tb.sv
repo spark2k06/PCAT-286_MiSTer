@@ -3,6 +3,7 @@
 module spk286_at_mister_memory_port_tb;
     logic clk = 1'b0;
     logic reset = 1'b1;
+    logic cancel_cpu = 1'b0;
 
     logic        cpu_valid;
     logic        cpu_command_valid;
@@ -66,6 +67,7 @@ module spk286_at_mister_memory_port_tb;
     spk286_at_mister_memory_port dut (
         .clk(clk),
         .reset(reset),
+        .cancel_cpu(cancel_cpu),
         .cpu_valid(cpu_valid),
         .cpu_command_valid(cpu_command_valid),
         .cpu_write(cpu_write),
@@ -115,7 +117,7 @@ module spk286_at_mister_memory_port_tb;
 
     task automatic check(input logic condition, input string message);
         begin
-            if (!condition) begin
+            if (condition !== 1'b1) begin
                 $display("AT_MISTER_MEMORY_PORT_FAIL %s", message);
                 $fatal(1);
             end
@@ -283,6 +285,129 @@ module spk286_at_mister_memory_port_tb;
         dma_valid = 1'b0;
 
         check(protocol_error, "simultaneous candidate ownership was not diagnosed");
+
+        // Reset between CPU address selection and backend acceptance used
+        // to retain the old address and execute it as the post-reset fetch.
+        @(negedge clk);
+        backend_ready=0;
+        cpu_valid=1;
+        cpu_command_valid=0;
+        cpu_address=24'h012340;
+        @(posedge clk); @(negedge clk);
+        check(backend_valid && backend_address == 24'h012340,
+              "preaccept reset setup");
+        cancel_cpu=1;
+        cpu_valid=0;
+        #1;
+        check(!cpu_accept && !cpu_ready && !backend_command_valid,
+              "CPU control leaked during reset");
+        @(posedge clk); @(negedge clk);
+        check(!backend_valid, "CPU reset did not discard unaccepted address");
+        cancel_cpu=0;
+        cpu_valid=1;
+        cpu_command_valid=1;
+        cpu_address=24'hFFFFF0;
+        @(posedge clk); @(negedge clk);
+        check(backend_address == 24'hFFFFF0 && backend_command_valid,
+              "reset fetch inherited pre-reset address");
+        backend_accept=1;
+        @(posedge clk); #1;
+        backend_accept=0;
+        backend_ready=1;
+        backend_read_data_valid=1;
+        backend_read_data=16'h00EA;
+        #1;
+        check(cpu_ready && cpu_read_data_valid && cpu_read_data == 16'h00EA,
+              "post-reset fetch did not complete");
+        @(posedge clk); #1;
+        cpu_valid=0;
+        cpu_command_valid=0;
+        backend_ready=0;
+        backend_read_data_valid=0;
+
+        // Accepted commands must drain even after a one-clock CPU reset.
+        // Their eventual response must not acknowledge a new CPU request.
+        @(negedge clk);
+        cpu_valid=1;
+        cpu_command_valid=1;
+        cpu_address=24'h056780;
+        @(posedge clk); @(negedge clk);
+        backend_accept=1;
+        @(posedge clk); #1;
+        backend_accept=0;
+        cancel_cpu=1;
+        cpu_valid=0;
+        cpu_command_valid=0;
+        @(posedge clk); @(negedge clk);
+        check(backend_valid && !backend_command_valid && !cpu_ready,
+              "accepted CPU command was not retained for draining");
+        cancel_cpu=0;
+        cpu_valid=1;
+        cpu_command_valid=1;
+        cpu_address=24'hFFFFF0;
+        backend_ready=1;
+        backend_read_data_valid=1;
+        backend_read_data=16'hBAD0;
+        #1;
+        check(!cpu_accept && !cpu_ready && !cpu_read_data_valid &&
+              backend_address == 24'h056780,
+              "discarded pre-reset response leaked after reset ended");
+        @(posedge clk); #1;
+        backend_ready=0;
+        backend_read_data_valid=0;
+        @(posedge clk); @(negedge clk);
+        check(backend_address == 24'hFFFFF0 && backend_command_valid,
+              "new reset fetch did not follow drained access");
+        backend_accept=1;
+        @(posedge clk); #1;
+        backend_accept=0;
+        backend_ready=1;
+        backend_read_data_valid=1;
+        backend_read_data=16'h12EA;
+        #1;
+        check(cpu_ready && cpu_read_data_valid && cpu_read_data == 16'h12EA,
+              "new fetch received the drained stale response");
+        @(posedge clk); #1;
+        cpu_valid=0;
+        cpu_command_valid=0;
+        backend_ready=0;
+        backend_read_data_valid=0;
+
+        // Reset the test's diagnostic latch, then keep CPU reset high while
+        // a BIOS loader transfer proceeds, including a residual CPU valid.
+        reset=1;
+        @(posedge clk); @(negedge clk);
+        reset=0;
+        cancel_cpu=1;
+        cpu_valid=1;
+        cpu_command_valid=1;
+        loader_valid=1;
+        loader_write=1;
+        loader_address=24'h0F1000;
+        loader_data_out=16'hCAFE;
+        @(posedge clk); @(negedge clk);
+        check(backend_owner == OWNER_LOADER && backend_command_valid &&
+              backend_address == 24'h0F1000 && !cpu_accept,
+              "CPU reset blocked the ROM loader");
+        backend_accept=1;
+        #1;
+        check(loader_accept && !cpu_accept, "loader acceptance during CPU reset");
+        @(posedge clk); #1;
+        backend_accept=0;
+        backend_ready=1;
+        #1;
+        check(loader_ready && !cpu_ready, "loader response during CPU reset");
+        @(posedge clk); #1;
+        loader_valid=0;
+        backend_ready=0;
+        repeat (3) @(posedge clk);
+        @(negedge clk);
+        check(!backend_valid && !cpu_accept && !cpu_ready && !protocol_error,
+              "reset CPU became a candidate or produced a false collision");
+        cpu_valid=0;
+        cpu_command_valid=0;
+        cancel_cpu=0;
+        $display("AT_MISTER_MEMORY_PORT_CPU_RESET_PASS preaccept_cancel accepted_drain loader_preserved");
         $display("AT_MISTER_MEMORY_PORT_PASS");
         $finish;
     end

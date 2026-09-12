@@ -26,10 +26,10 @@ owners.
 
 `rtl/spk286_integration/spk286_at_mister_sdram_owner.sv` now implements the
 physical owner below that port. It drives the existing `KFSDRAM` controller,
-maps the byte address to an aligned physical word, and drives SDRAM DQM for
-low-byte, high-byte and full-word writes. KFSDRAM retains ownership of its
-periodic physical refresh cadence; abstract AT refresh beats are acknowledged
-when it is idle.
+maps the AT byte address to a physical 16-bit word (`A >> 1`), and drives
+SDRAM DQM for low-byte, high-byte and full-word writes. KFSDRAM retains
+ownership of its periodic physical refresh cadence; abstract AT refresh beats
+are acknowledged when it is idle.
 
 Byte lane convention is unchanged: lane 0 is the low byte, lane 1 is the high
 byte, and refresh uses both lanes. This keeps the normalized AT contract

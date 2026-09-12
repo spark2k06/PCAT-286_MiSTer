@@ -7,13 +7,18 @@
 **Initial machine profile:** XT-compatible platform with the SPK286 CPU in Real Mode.  
 **Long-term direction:** A separate, progressively developed 286/AT machine core for MiSTer.
 
+The detailed future CPU–chipset and AT-bus contract is maintained in
+[docs/AT_BUS_CPU_CHIPSET_SPEC.md](docs/AT_BUS_CPU_CHIPSET_SPEC.md). That
+document extends this integration roadmap without redefining the current I0–I6
+acceptance boundaries.
+
 ## 1. Purpose and relationship to SPK286 Phase 8
 
 Create a new MiSTer core by reusing the existing PCXT-EGA_MiSTer machine implementation and replacing its MCL86 CPU subsystem with SPK286. Preserve the existing chipset, memory infrastructure, video, storage, audio, keyboard and MiSTer integration wherever their contracts remain applicable.
 
 The initial deliverable is a **286 CPU running in an XT-derived machine**. The project name describes its intended evolution; replacing the CPU alone does not implement an IBM PC/AT chipset, Protected Mode, extended-memory services or full AT compatibility.
 
-**Explicit user priority: deliver the usable SPK286 machine core first, even if the existing PCXT BIOS fails. BIOS investigation/adaptation is a separate subsequent phase and task.** Core acceptance uses a project-owned diagnostic ROM and direct integration tests; successful execution of the production BIOS, POST or DOS is not a prerequisite. Do not bundle BIOS source changes into the core implementation task.
+**Explicit user priority: deliver the usable SPK286 machine core first, even if the existing PCXT BIOS fails.** The observed BIOS failure is currently attributed to the D8–DF coprocessor/ESC CPU blocking reported during bring-up. Implement and validate that CPU behavior first, then retest the existing BIOS unchanged. BIOS source adaptation is not planned unless an independent firmware defect remains. Core acceptance uses a project-owned diagnostic ROM and direct integration tests; successful execution of the production BIOS, POST or DOS is not a prerequisite. Do not bundle BIOS source changes into the core implementation task.
 
 The current `SPK286/docs/PHASE8_PREPARATION.md` defines incremental Phase 8 as CPU-only whole-program interaction verification. It treats a BIOS boot and a MiSTer port as downstream machine work. This project is that downstream consumer. Use separate milestone identifiers `I0`–`I6` below to avoid silently redefining SPK286's phase numbering.
 
@@ -55,7 +60,7 @@ Record source URLs, commits, file hashes, source-selection decisions, dirty over
 5. Connect interrupts, interrupt acknowledgements and shared-bus ownership correctly.
 6. Add deterministic whole-program simulations and integration tests before firmware boot experiments.
 7. Produce a reproducible Quartus build for the selected MiSTer target, with fit/timing evidence.
-8. Deliver the core with a project-owned diagnostic ROM and reproducible loading/testing instructions; report simulation, FPGA build and physical-board results separately. Record any observed production-BIOS failure for the later BIOS task without making that boot a core acceptance requirement.
+8. Deliver the core with a project-owned diagnostic ROM and reproducible loading/testing instructions; report simulation, FPGA build and physical-board results separately. After the D8–DF CPU work, optionally retest the unchanged production BIOS and record the result without making BIOS boot a core acceptance requirement.
 
 ### Deferred beyond the initial integration
 
@@ -65,7 +70,7 @@ Record source URLs, commits, file hashes, source-selection decisions, dirty over
 - Historical cycle-exact 80286 timing or advertised MHz equivalence.
 - New video/audio/storage implementations or a wholesale rewrite of the PCXT chipset.
 - A complete 80287 implementation.
-- Production BIOS adaptation, CPU/FPU detector changes, option-ROM compatibility fixes and a successful POST/DOS boot; these belong to the separate BIOS phase defined in section 11.
+- Production BIOS adaptation, CPU/FPU detector changes, option-ROM compatibility fixes and a successful POST/DOS boot; adaptation is a contingency only if unchanged BIOS still fails for an independent reason after D8–DF is fixed.
 
 The existing XT implementation may already contain peripheral extensions. Retain and document them as baseline features; their presence is not evidence that the machine is an AT.
 
@@ -260,21 +265,21 @@ Start at one conservative measured operating point. Keep real waits, peripheral 
 
 Functional semantics, machine bus scheduling and future Accurate/Fast/Max timing policy must remain separate. Do not insert meaningless CPU micro-operations to reproduce XT bus delays.
 
-## 11. Separate BIOS phase — after core delivery
+## 11. BIOS validation after the D8–DF CPU fix
 
 ### Core task: diagnostic ROM only
 
 Execute a small project-owned Real Mode diagnostic ROM through the real SPK286 and the new bridge. It must start from the native reset vector, perform a far jump, initialize segments/stack, exercise memory and ports, and report an exact signature through ordinary architectural writes. No setup/debug register injection or expected-result-driven devices are permitted in the pass path. This is a core verification asset, not an adaptation or replacement implementation of the production BIOS.
 
-Deliver the core and its usable diagnostic configuration before beginning production BIOS work. The core must preserve a normal ROM-loading path so the subsequent BIOS task can use it without changing the integration architecture.
+Deliver the core and its usable diagnostic configuration before testing production firmware. Preserve a normal ROM-loading path so the unchanged BIOS can be retested after the D8–DF CPU fix without changing the integration architecture.
 
-An optional observation of the existing, unchanged BIOS may be recorded if convenient. It must not become an open-ended investigation, mandatory boot gate or reason to postpone core delivery. Record the image hash, last observed POST/CS:IP, opcode or bus activity, and known limitations where available. A BIOS timeout is not proof of a CPU bug or proof that the CPU is correct.
+An observation of the existing, unchanged BIOS should follow the D8–DF correction when practical. It must not become an open-ended investigation, mandatory boot gate or reason to postpone core delivery. Record the image hash, last observed POST/CS:IP, opcode or bus activity, and known limitations where available. A BIOS timeout is not proof of a CPU bug or proof that the CPU is correct.
 
 Known unsupported firmware assumptions and unknown BIOS compatibility issues remain in the BIOS backlog. If existing core tests or a reduced reproducer demonstrate a violation of the specified CPU/adapter contract, correct that core defect; do not relabel it as a BIOS adaptation issue. Successful POST/DOS execution remains outside core acceptance even after such a correction.
 
-### Subsequent task: production BIOS compatibility
+### Contingency task: independent production BIOS incompatibility
 
-Create this as a separate task only when the user requests its execution. The following is its planned scope, not work authorized as part of core implementation:
+Open this only if the unchanged BIOS still fails after D8–DF has been fixed and the failure is independently shown to be firmware-specific. It is a separate task, not work authorized as part of core implementation:
 
 1. Inventory the selected production BIOS and option ROMs, recording image hashes, build/configuration, reset entry, required instructions and device assumptions.
 2. Reproduce and classify boot failures against the already delivered core.
@@ -283,13 +288,13 @@ Create this as a separate task only when the user requests its execution. The fo
 
 Prefer reproducible source-built firmware or user-supplied images with clear provenance; do not include unrelated disk contents or credentials in the repository.
 
-The inspected Micro8088 `SW/8088_bios/src/cpu.inc` explicitly targets 8088/80C88/V20 identification. It uses TF/segment probes and invokes FNINIT/FNSTCW in the FPU detector. Those ESC/NPX operations are outside the recorded Phase 7 CPU scope. The existing BIOS cannot be assumed runnable unchanged.
+The inspected Micro8088 `SW/8088_bios/src/cpu.inc` explicitly targets 8088/80C88/V20 identification. It uses TF/segment probes and invokes FNINIT/FNSTCW in the FPU detector. Those probes are useful compatibility evidence; the D8–DF ESC blocking issue is now a Phase 8 CPU workstream. Do not assume a BIOS failure remains after that CPU fix without retesting the unchanged image.
 
-In that separate BIOS task, an explicit downstream firmware build/configuration that reports no FPU and avoids unsupported probing may be appropriate. Preserve the truth of the CPU/machine model, record the source change, and test it. Do not disguise an unsupported CPU instruction as a NOP, forge a CPU capability or patch ROM bytes without provenance. Do not implement this firmware change during the core task.
+If a separate firmware task is eventually needed, an explicit downstream firmware build/configuration that reports no FPU and avoids unsupported probing may be appropriate. Preserve the truth of the CPU/machine model, record the source change, and test it. Do not disguise an unsupported CPU instruction as a NOP, forge a CPU capability or patch ROM bytes without provenance. Do not implement this firmware change during the core task.
 
-If BIOS work later requires an actual CPU feature, record a narrowly scoped CPU dependency with independent semantics and verification. Develop it as a separately scoped upstream CPU change or a clearly identified reviewed vendor patch; do not quietly mutate the reference SPK286 checkout. Missing ESC/NPX features outside the accepted CPU baseline do not block the initial core delivery.
+If firmware work later requires an actual CPU feature beyond D8–DF, record a narrowly scoped CPU dependency with independent semantics and verification. Develop it as a separately scoped upstream CPU change or a clearly identified reviewed vendor patch; do not quietly mutate the reference SPK286 checkout. Missing features outside the accepted CPU baseline do not block the initial core delivery.
 
-The later BIOS task should observe POST progression, vector setup, PIT/PIC operation, keyboard, EGA ROM initialization, XTIDE/floppy access and eventual DOS/FreeDOS command execution. A visible splash or POST byte alone is not an operating-system boot. A DOS prompt does not establish Protected Mode or full AT compatibility.
+The optional post-fix BIOS validation should observe POST progression, vector setup, PIT/PIC operation, keyboard, EGA ROM initialization, XTIDE/floppy access and eventual DOS/FreeDOS command execution. A visible splash or POST byte alone is not an operating-system boot. A DOS prompt does not establish Protected Mode or full AT compatibility.
 
 ## 12. Verification requirements
 
@@ -361,9 +366,9 @@ Each milestone is independently deliverable. An unavailable board must not erase
 
 **Core delivery boundary:** deliver the verified core, build artifacts and diagnostic configuration once the applicable core milestones pass, even when the unchanged production BIOS is known to fail. A build-only I5 result must still disclose that physical-board I6 validation is pending; a BIOS failure must not downgrade a passing core diagnostic into a failed core milestone.
 
-The independent later phase uses different identifiers: **B0** BIOS inventory/reproduction, **B1** explicit firmware adaptations, **B2** POST/option-ROM/software validation. B0–B2 are not prerequisites of I0–I6 and are not included in the first core implementation task.
+The contingency firmware work uses different identifiers: **B0** unchanged-BIOS inventory/reproduction after 8B, **B1** independent firmware adaptations only if required, **B2** POST/option-ROM/software validation. B0–B2 are not prerequisites of I0–I6 and are not included in the first core implementation task.
 
-The first implementation session should progress through I0–I3 as a concrete vertical slice, preparing I4 dependencies alongside it. Continue toward a usable I5/I6 core delivery when the requested session scope and available tools permit. Do not start B0–B2 to resolve a BIOS failure before delivering the core. Do not turn the entire long-term AT roadmap into a prerequisite for the first SPK286 diagnostic program.
+The first implementation session should progress through I0–I3 as a concrete vertical slice, preparing I4 dependencies alongside it. Continue toward a usable I5/I6 core delivery when the requested session scope and available tools permit. After 8B, perform B0 only as an unchanged-BIOS confirmation when practical; do not start B1 to mask the original D8–DF CPU failure or postpone core delivery. Do not turn the entire long-term AT roadmap into a prerequisite for the first SPK286 diagnostic program.
 
 ## 16. Source safety, development workflow and handoff
 
@@ -379,12 +384,12 @@ The implementation handoff must include:
 2. Diagram and exact CPU/bridge/chipset ownership, lane, reset and clock contracts.
 3. Imported versus changed files and reasons for chipset changes.
 4. Reproducible commands, actual test totals, expected signatures and diagnostic artifacts.
-5. Diagnostic ROM/image hashes, selected loading configuration and a separate backlog for the later production BIOS task.
+5. Diagnostic ROM/image hashes, selected loading configuration, unchanged-BIOS post-8B result and a contingency backlog only if an independent firmware issue remains.
 6. FPGA tool/version, fit/timing/resource results and `.rbf` hash when built.
 7. Hardware results actually observed, remaining milestones and known evidence notes.
 8. Git state and a clean recovery/build procedure independent of the original absolute source paths.
 
-Report milestone progress precisely. For example, “SPK286 reset-to-program integration validated; FPGA/board validation pending” is a valid intermediate delivery. After the applicable core checks pass, “Core delivered and usable with the diagnostic ROM; production BIOS fails and its adaptation is a separate pending task” is an acceptable final core outcome. “PC/AT-compatible 286 core complete” is not justified by the initial XT-derived profile.
+Report milestone progress precisely. For example, “SPK286 reset-to-program integration validated; FPGA/board validation pending” is a valid intermediate delivery. After the applicable core checks pass, “Core delivered and usable with the diagnostic ROM; unchanged BIOS retest follows the D8–DF CPU fix” is an acceptable intermediate outcome. “PC/AT-compatible 286 core complete” is not justified by the initial XT-derived profile.
 
 ## 17. Preparation sources
 

@@ -2,9 +2,11 @@
 
 ## Initial machine profile
 
-- This is an XT-derived `XT_COMPAT` machine profile with SPK286. It is not a
-  complete IBM PC/AT implementation: dual PIC/DMA organization, 8042, AT
-  RTC/CMOS semantics, 16-bit ISA and extended AT memory remain deferred.
+- The default `XT_COMPAT` machine remains XT-derived. The optional
+  `AT_PROFILE` adds the AT CPU/bus/device composition and real EGA path, but
+  it is not yet a complete IBM PC/AT implementation: real media, physical
+  PS/2 handling, 16-bit ISA timing and full DOS/hardware acceptance remain
+  pending.
 - Historical 80286 timing is not certified. The OSD control schedules the
   legacy XT bus and is named **XT Bus Pace**; no Accurate/Fast/Max CPU timing
   claim is made.
@@ -16,10 +18,14 @@
 
 ## BIOS boundary
 
-Production BIOS adaptation is expressly outside I0-I6. No B0, B1 or B2 work is
-included, and no BIOS source or binary was modified. The current PCXT/Micro8088
-firmware contains 8088/V20/FPU probing assumptions and may fail on this profile.
-That compatibility result is a later task and is not a diagnostic-ROM gate.
+Production BIOS adaptation is expressly outside I0-I6. No BIOS source or binary
+was modified. The bring-up failure that motivated this profile is currently
+attributed to the SPK286 D8–DF coprocessor/ESC decoder blocking; the CPU fix is
+tracked in SPK286 Phase 8 workstream 8B. Retest the original BIOS unchanged after
+that fix before considering any firmware change. The existing PCXT/Micro8088
+firmware contains 8088/V20/FPU probing assumptions, but a BIOS adaptation is
+only a contingency for an independently reproduced failure that remains after
+the CPU correction. It is not an I0-I6 diagnostic-ROM gate.
 
 ## Simulator, FPGA and hardware boundary
 
@@ -29,11 +35,11 @@ That compatibility result is a later task and is not a diagnostic-ROM gate.
   slow for that combination, so its full program run uses a documented narrow
   PIC boundary and separately tests the real KF8259 in a short dual-simulator
   case.
-- I5 produces a successful Quartus compile, fit and RBF. SPK286, the bridge
-  and the complete shared 50 MHz domain close setup and hold timing. The
-  inherited video/HPS/SDIO constraints still report global setup violations,
-  so whole-project timing sign-off is explicitly not claimed; see
-  `I5_FPGA_BUILD.md`.
+- I5 produces a successful Quartus compile, fit and RBF. In the current
+  `AT_PROFILE` build, reset recovery is positive in all analyzed corners
+  (worst case +3.750 ns), while inherited video/HPS/SDIO paths still report
+  global setup violations (worst case -21.009 ns). Whole-project timing
+  sign-off is therefore explicitly not claimed; see `I5_FPGA_BUILD.md`.
 - No physical MiSTer board is authorized or available in this task. I6 is
   prepared through ROM loading, port signatures and LED observation, but stays
   pending until an actual board/configuration is supplied and execution is

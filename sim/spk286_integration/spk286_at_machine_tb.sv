@@ -7,6 +7,8 @@ module spk286_at_machine_tb;
     logic clk = 1'b0;
     logic reset = 1'b1;
     always #5 clk = ~clk;
+    logic clk_video = 1'b0;
+    always #17.45 clk_video = ~clk_video;
 
     logic execute_enable = 1'b1;
     logic counter_clock = 1'b0;
@@ -155,8 +157,11 @@ module spk286_at_machine_tb;
     integer port80_writes = 0;
     integer port81_writes = 0;
     integer pit_data_writes = 0;
+    integer first_bios_read_count = 0;
     logic [7:0] port80_sequence [0:3];
     logic saw_native_reset_fetch = 1'b0;
+    logic saw_native_reset_response = 1'b0;
+    logic saw_native_reset_data = 1'b0;
     logic saw_low_rom_fetch = 1'b0;
 
     function automatic logic [7:0] memory_read_byte(input logic [23:0] address);
@@ -188,8 +193,10 @@ module spk286_at_machine_tb;
     endtask
 
     // Behavioural SDRAM model for the production KFSDRAM owner.  The model
-    // uses the same byte-addressed sparse store as the earlier abstract model,
-    // but observes ACT/READ/WRITE commands and DQM on the physical pins.
+    // uses the logical AT byte map while observing ACT/READ/WRITE commands and
+    // DQM on the physical pins.  The production owner maps the logical byte
+    // address to a physical SDRAM word with A >> 1, so reconstruct the even
+    // byte address at this pin-level boundary.
     logic [12:0] sdram_active_row = 13'h0000;
     logic [1:0]  sdram_active_bank = 2'b00;
     logic [15:0] sdram_read_data_d1 = 16'h0000;
@@ -203,7 +210,7 @@ module spk286_at_machine_tb;
     wire [23:0] sdram_command_address =
         {sdram_active_bank, sdram_active_row, sdram_address[8:0]};
     wire [23:0] sdram_command_byte_address =
-        {sdram_command_address[23:1], 1'b0};
+        {sdram_command_address[22:0], 1'b0};
 
     always_ff @(posedge clk) begin
         if (reset) begin
@@ -246,7 +253,10 @@ module spk286_at_machine_tb;
             port81_writes <= 0;
             pit_data_writes <= 0;
             saw_native_reset_fetch <= 1'b0;
+            saw_native_reset_response <= 1'b0;
+            saw_native_reset_data <= 1'b0;
             saw_low_rom_fetch <= 1'b0;
+            first_bios_read_count <= 0;
         end else begin
             if (backend_accept && (backend_owner == 2'd0)) begin
                 accepted_memory_beats <= accepted_memory_beats + 1;
@@ -255,6 +265,29 @@ module spk286_at_machine_tb;
                 if ((backend_address >= 24'h0F0000) &&
                     (backend_address <= 24'h0FFFFF))
                     saw_low_rom_fetch <= 1'b1;
+            end
+
+            // Capture the first returned CPU reads, not only accepted
+            // commands.  This makes the test fail if the SDRAM address is
+            // right but the returned word/lane/valid timing is wrong.
+            if (backend_ready && (backend_owner == 2'd0) && !backend_write &&
+                (first_bios_read_count < 32)) begin
+                if (first_bios_read_count == 0)
+                    $display("AT_FIRST_READ addr=%06h be=%b data=%04h valid=%b",
+                             backend_address, backend_byte_enable,
+                             backend_read_data, backend_read_data_valid);
+                first_bios_read_count <= first_bios_read_count + 1;
+                if (backend_address == 24'hFFFFF0) begin
+                    saw_native_reset_response <= 1'b1;
+                    if (backend_read_data_valid &&
+                        (((backend_byte_enable == 2'b01) &&
+                          (backend_read_data[7:0] == rom[16'hFFF0])) ||
+                         ((backend_byte_enable == 2'b10) &&
+                          (backend_read_data[15:8] == rom[16'hFFF0])) ||
+                         ((backend_byte_enable == 2'b11) &&
+                          (backend_read_data == {rom[16'hFFF1], rom[16'hFFF0]}))))
+                        saw_native_reset_data <= 1'b1;
+                end
             end
 
             if (backend_accept && (backend_owner == 2'd2))
@@ -305,6 +338,7 @@ module spk286_at_machine_tb;
     // that the future MiSTer SDRAM/HPS owner will use.
     spk286_at_mister_memory_port memory_port (
         .clk(clk), .reset(reset),
+        .cancel_cpu(1'b0),
         .cpu_valid(memory_request_valid),
         .cpu_command_valid(memory_command_valid),
         .cpu_write(memory_write),
@@ -371,7 +405,8 @@ module spk286_at_machine_tb;
     );
 
     spk286_at_machine dut (
-        .clk(clk), .reset(reset), .execute_enable(execute_enable),
+        .clk(clk), .reset(reset), .cpu_reset(reset), .clk_video(clk_video), .splashscreen(1'b0),
+        .execute_enable(execute_enable),
         .counter_clock(counter_clock), .refresh_enable(refresh_enable),
         .keyboard_byte_valid(keyboard_byte_valid), .keyboard_byte(keyboard_byte),
         .periodic_tick(periodic_tick), .second_tick(second_tick),
@@ -453,7 +488,8 @@ module spk286_at_machine_tb;
                 port80_sequence[1] == 8'h72 &&
                 port80_sequence[2] == 8'h71 &&
                 port80_sequence[3] == 8'h86 &&
-                saw_native_reset_fetch && saw_low_rom_fetch &&
+                saw_native_reset_fetch && saw_native_reset_response &&
+                saw_native_reset_data && saw_low_rom_fetch &&
                 irq0_edges != 0 && refresh_beats != 0) begin
                 $display("AT_SYSTEM_BOUNDARY_PASS memory_beats=%0d io_writes=%0d irq0=%0d refresh=%0d port80=%0d",
                          accepted_memory_beats, accepted_io_writes,
@@ -461,8 +497,9 @@ module spk286_at_machine_tb;
                 $finish;
             end
         end
-        $fatal(1, "AT_SYSTEM_WATCHDOG reset_fetch=%b low_rom=%b port80=%0d irq0=%0d refresh=%0d memory=%0d halted=%b intr=%b bus_valid=%b status=%h address=%06h cs_ip=%04h:%04h seq=%02h,%02h,%02h,%02h",
-               saw_native_reset_fetch, saw_low_rom_fetch, port80_writes,
+        $fatal(1, "AT_SYSTEM_WATCHDOG reset_fetch=%b reset_response=%b reset_data=%b low_rom=%b port80=%0d irq0=%0d refresh=%0d memory=%0d halted=%b intr=%b bus_valid=%b status=%h address=%06h cs_ip=%04h:%04h seq=%02h,%02h,%02h,%02h",
+               saw_native_reset_fetch, saw_native_reset_response,
+               saw_native_reset_data, saw_low_rom_fetch, port80_writes,
                irq0_edges, refresh_beats, accepted_memory_beats, cpu_halted,
                intr, cpu_bus_valid, cpu_bus_status, cpu_address, debug_cs,
                debug_ip, port80_sequence[0], port80_sequence[1],

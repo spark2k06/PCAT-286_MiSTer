@@ -11,6 +11,9 @@
 module spk286_at_mister_memory_port (
     input  logic        clk,
     input  logic        reset,
+    // CPU-local reset cancels only CPU ownership. Accepted physical accesses
+    // are drained with their response discarded; loader/DMA/refresh continue.
+    input  logic        cancel_cpu,
 
     input  logic        cpu_valid,
     input  logic        cpu_command_valid,
@@ -80,9 +83,11 @@ module spk286_at_mister_memory_port (
     logic [23:0] address_q;
     logic [1:0] byte_enable_q;
     logic [15:0] data_out_q;
+    logic       cpu_cancelled_q;
 
     logic response_complete;
     logic selected_accept;
+    wire cpu_candidate = cpu_valid && !cancel_cpu;
 
     assign selected_accept = active_q && !accepted_q && backend_accept &&
                              backend_command_valid;
@@ -120,12 +125,13 @@ module spk286_at_mister_memory_port (
             // CPU has a separate command phase.  DMA and refresh enter the
             // backend command phase as soon as their request is selected.
             if (owner_q == OWNER_CPU)
-                backend_command_valid = !accepted_q && cpu_command_valid;
+                backend_command_valid = !accepted_q && cpu_command_valid &&
+                                        !cancel_cpu && !cpu_cancelled_q;
             else
                 backend_command_valid = !accepted_q;
 
             if (owner_q == OWNER_CPU)
-                cpu_accept = selected_accept;
+                cpu_accept = selected_accept && !cancel_cpu && !cpu_cancelled_q;
             else if (owner_q == OWNER_DMA)
                 dma_accept = selected_accept;
             else if (owner_q == OWNER_REFRESH)
@@ -136,8 +142,9 @@ module spk286_at_mister_memory_port (
             // A read response is complete only when the backend supplies
             // valid data.  Writes and refreshes need only the ready response.
             if (owner_q == OWNER_CPU) begin
-                cpu_ready           = response_complete;
-                cpu_read_data_valid = response_complete && !write_q;
+                cpu_ready           = response_complete && !cancel_cpu &&
+                                      !cpu_cancelled_q;
+                cpu_read_data_valid = cpu_ready && !write_q;
             end else if (owner_q == OWNER_DMA) begin
                 dma_ready = response_complete;
             end else if (owner_q == OWNER_REFRESH) begin
@@ -160,9 +167,11 @@ module spk286_at_mister_memory_port (
             address_q     <= 24'h000000;
             byte_enable_q <= 2'b00;
             data_out_q    <= 16'h0000;
+            cpu_cancelled_q <= 1'b0;
             protocol_error <= 1'b0;
         end else begin
             if (!active_q) begin
+                cpu_cancelled_q <= 1'b0;
                 // The loader wins during boot, then CPU wins over refresh,
                 // and refresh wins over DMA.  Normal machine operation
                 // presents only one candidate; detecting a collision here
@@ -176,7 +185,7 @@ module spk286_at_mister_memory_port (
                     address_q     <= loader_address;
                     byte_enable_q <= loader_byte_enable;
                     data_out_q    <= loader_data_out;
-                end else if (cpu_valid) begin
+                end else if (cpu_candidate) begin
                     active_q      <= 1'b1;
                     owner_q       <= OWNER_CPU;
                     write_q       <= cpu_write;
@@ -205,20 +214,27 @@ module spk286_at_mister_memory_port (
                     data_out_q    <= dma_data_out;
                 end
 
-                if ((loader_valid && cpu_valid) ||
+                if ((loader_valid && cpu_candidate) ||
                     (loader_valid && refresh_valid) ||
                     (loader_valid && dma_valid) ||
-                    (cpu_valid && refresh_valid) ||
-                    (cpu_valid && dma_valid) ||
+                    (cpu_candidate && refresh_valid) ||
+                    (cpu_candidate && dma_valid) ||
                     (refresh_valid && dma_valid))
                     protocol_error <= 1'b1;
             end else begin
+                if (cancel_cpu && owner_q == OWNER_CPU)
+                    cpu_cancelled_q <= 1'b1;
                 if (selected_accept)
                     accepted_q <= 1'b1;
 
-                if (response_complete) begin
+                // No physical command exists yet, so this CPU record can
+                // be discarded immediately. A new fetch must never inherit
+                // its stale address when reset releases.
+                if ((cancel_cpu && owner_q == OWNER_CPU && !accepted_q) ||
+                    response_complete) begin
                     active_q   <= 1'b0;
                     accepted_q <= 1'b0;
+                    cpu_cancelled_q <= 1'b0;
                 end
 
                 if (backend_accept && !backend_command_valid)

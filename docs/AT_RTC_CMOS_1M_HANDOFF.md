@@ -64,19 +64,32 @@ The memory fields are fixed to the physical profile:
 | `30h/31h` | `80h/01h` | duplicate extended-memory field |
 | `34h/35h` | `00h/00h` | no memory above 16 MiB |
 
-Other CMOS bytes remain writable by the BIOS and by `hps_ext`; each write in
-the checksummed range updates the stored checksum. Writes attempting to change
-the fixed RAM fields are ignored so software cannot advertise memory that the
-decoder does not provide.
+The RAM fields are protected from `hps_ext` replacement so the initial profile
+always matches the decoder. They remain ordinary CPU-writable CMOS RAM because
+the Landmark CMOS test saves `10h–3Fh`, writes and verifies `55h` and `AAh`
+throughout that range, then restores the saved values. This also requires
+checksum bytes `2Eh/2Fh` to accept direct CPU writes. Each CPU write in the
+checksummed range updates the stored checksum until software explicitly writes
+`2Eh/2Fh`. Other CMOS bytes remain writable by the BIOS and by `hps_ext`.
 
 ## Simulation evidence
 
 The dedicated RTC test runs in both Icarus and Verilator and covers host-time
 import, full year rollover, the 2024 leap day, SET freeze, alarm/update IRQ8,
-status-C clearing, fixed memory fields and checksum maintenance:
+status-C clearing, default memory fields, the exact Landmark `10h–3Fh`
+save/55h/AAh/restore sequence and checksum maintenance:
 
 ```text
 AT_RTC_CMOS_PASS host_time=1 calendar=1 irq=1 memory_kib=1024 checksum=0104
+```
+
+The CPU-level integration test enters the unmodified Landmark routine at
+`F000:91F6`. It executes the original save, `55h`, `AAh`, verify and restore
+operations through ports `70h/71h`, and observes its real pass/fail calls:
+
+```text
+AT_LANDMARK_CMOS_RAM_PASS bytes_10_3f=48 patterns=55_AA_restore
+AT_LANDMARK_CMOS_TEST_PASS
 ```
 
 The integrated device test confirms that an `F400h` write passes through the

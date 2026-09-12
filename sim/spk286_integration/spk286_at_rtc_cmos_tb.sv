@@ -27,6 +27,8 @@ module spk286_at_rtc_cmos_tb;
     wire [15:0] side_effect_count;
     wire [6:0] selected_index;
     wire protocol_error;
+    logic [7:0] saved_cmos [0:47];
+    integer cmos_test_index;
 
     spk286_at_rtc_cmos dut (
         .clk(clk), .reset(reset),
@@ -167,6 +169,34 @@ module spk286_at_rtc_cmos_tb;
         check_cmos(7'h35, 8'h00, "memory above 16 MiB was advertised");
         check_cmos(7'h2E, 8'h01, "initial CMOS checksum high byte was wrong");
         check_cmos(7'h2F, 8'h03, "initial CMOS checksum low byte was wrong");
+
+        // Exact Landmark CMOS RAM algorithm (F000:A26C): save 10h-3Fh,
+        // write/read 55h, write/read AAh, then restore all 48 bytes. This
+        // includes the memory geometry and checksum bytes 2Eh/2Fh.
+        for (cmos_test_index = 0; cmos_test_index < 48;
+             cmos_test_index = cmos_test_index + 1)
+            cmos_read(7'h10 + cmos_test_index[6:0],
+                      saved_cmos[cmos_test_index]);
+        for (cmos_test_index = 0; cmos_test_index < 48;
+             cmos_test_index = cmos_test_index + 1)
+            cmos_write(7'h10 + cmos_test_index[6:0], 8'h55);
+        for (cmos_test_index = 0; cmos_test_index < 48;
+             cmos_test_index = cmos_test_index + 1)
+            check_cmos(7'h10 + cmos_test_index[6:0], 8'h55,
+                       "Landmark 55h CMOS pattern did not read back");
+        for (cmos_test_index = 0; cmos_test_index < 48;
+             cmos_test_index = cmos_test_index + 1)
+            cmos_write(7'h10 + cmos_test_index[6:0], 8'hAA);
+        for (cmos_test_index = 0; cmos_test_index < 48;
+             cmos_test_index = cmos_test_index + 1)
+            check_cmos(7'h10 + cmos_test_index[6:0], 8'hAA,
+                       "Landmark AAh CMOS pattern did not read back");
+        for (cmos_test_index = 0; cmos_test_index < 48;
+             cmos_test_index = cmos_test_index + 1)
+            cmos_write(7'h10 + cmos_test_index[6:0],
+                       saved_cmos[cmos_test_index]);
+        check_cmos(7'h2E, 8'h01, "restored CMOS checksum high byte was wrong");
+        check_cmos(7'h2F, 8'h03, "restored CMOS checksum low byte was wrong");
 
         // F4xx is the hps_ext RTC window used by ao486/z486. Values written
         // there must be the values visible through ports 70h/71h.

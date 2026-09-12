@@ -455,7 +455,7 @@ module spk286_at_bios_first_fetch_tb;
                 1: begin rom[16'hfff1]=8'h4b; rom[16'hfff2]=8'h8c; end
                 2: begin rom[16'hfff1]=8'h74; rom[16'hfff2]=8'h8d; end
                 3,15: begin end // Original reset entry; 15 continues through the first RAM test.
-                4,5,6,7,8,9,11,12,13,14,16,17,18,19,20,21,22: begin
+                4,5,6,7,8,9,11,12,13,14,16,17,18,19,20,21,22,23: begin
                     // Test fixture only: set SS like POST, gate timer2 on,
                     // then execute untouched diagnostic instructions in ROM.
                     case(landmark_case)
@@ -472,6 +472,7 @@ module spk286_at_bios_first_fetch_tb;
                         19: routine_entry=16'h9191; // 8042 AA/55 self-test and AB/00 interface test
                         20: routine_entry=16'h91c0; // 8042 command-byte write and quiet scan lines
                         21,22: routine_entry=16'h923f; // Floppy adapter, then read
+                        23: routine_entry=16'h91f6; // CMOS RAM save, 55h/AAh test and restore
                         12,13,14: routine_entry=16'h8df6; // Same isolated test with DS != ES
                     endcase
                     rom[16'hfff1]=0; rom[16'hfff2]=8'hff;
@@ -497,7 +498,8 @@ module spk286_at_bios_first_fetch_tb;
                         rom[16'hff0c]=0; rom[16'hff0d]=8'hf0;
                     end
                     if(landmark_case==19 || landmark_case==20 ||
-                       landmark_case==21 || landmark_case==22) begin
+                       landmark_case==21 || landmark_case==22 ||
+                       landmark_case==23) begin
                         // These routines call the shared 8042 helpers. Give
                         // their isolated fixture a writable real-mode stack;
                         // an SS in the F000 ROM window cannot retain CALL's
@@ -1081,6 +1083,18 @@ module spk286_at_bios_first_fetch_tb;
                                      floppy_dma_beats,floppy_irq_edges,io_completed,cycles);
                             $finish;
                         end
+                    end
+                end
+                if (landmark_case==23 && dut.u_cpu.cpu.opcode_start &&
+                    debug_cs==16'hf000) begin
+                    if (debug_ip==16'h9b68)
+                        $fatal(1,"LANDMARK_CMOS_RAM_FAIL io_completed=%0d",io_completed);
+                    if (debug_ip==16'h9cb5) begin
+                        if (protocol_error || cpu_fault)
+                            $fatal(1,"Landmark CMOS RAM routine passed with sticky fault");
+                        $display("AT_LANDMARK_CMOS_RAM_PASS bytes_10_3f=48 patterns=55_AA_restore io=%0d cycles=%0d",
+                                 io_completed,cycles);
+                        $finish;
                     end
                 end
             end

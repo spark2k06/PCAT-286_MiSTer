@@ -260,13 +260,11 @@ module spk286_at_rtc_cmos (
                                             status_c_update_q,
                                             4'b0000};
                 7'h0D: current_read_data = 8'h80;
-                7'h15: current_read_data = CMOS_BASE_LOW;
-                7'h16: current_read_data = CMOS_BASE_HIGH;
-                7'h17, 7'h30: current_read_data = CMOS_EXTENDED_LOW;
-                7'h18, 7'h31: current_read_data = CMOS_EXTENDED_HIGH;
+                7'h15, 7'h16, 7'h17, 7'h18,
+                7'h30, 7'h31, 7'h34, 7'h35:
+                    current_read_data = cmos_q[index_q];
                 7'h2E: current_read_data = checksum_q[15:8];
                 7'h2F: current_read_data = checksum_q[7:0];
-                7'h34, 7'h35: current_read_data = 8'h00;
                 7'h37: current_read_data = cmos_q[7'h32];
                 default: current_read_data = cmos_q[index_q];
             endcase
@@ -358,15 +356,23 @@ module spk286_at_rtc_cmos (
                                       {8'h00, mgmt_writedata[7:0]};
                 end
             end else if (cpu_data_write &&
-                         (index_q != 7'h0C) && (index_q != 7'h0D) &&
-                         (index_q != 7'h2E) && (index_q != 7'h2F) &&
-                         !is_fixed_memory_address(index_q)) begin
-                cmos_q[index_q] <= request_byte;
-                if (index_q == 7'h37)
-                    cmos_q[7'h32] <= request_byte;
-                if (is_checksum_address(index_q))
-                    checksum_q <= checksum_q - {8'h00, cmos_q[index_q]} +
-                                  {8'h00, request_byte};
+                         (index_q != 7'h0C) && (index_q != 7'h0D)) begin
+                // 2Eh/2Fh are ordinary CMOS RAM on real hardware. BIOS code
+                // computes and writes the checksum; Landmark also includes
+                // both bytes in its 10h-3Fh RAM pattern test.
+                if (index_q == 7'h2E)
+                    checksum_q[15:8] <= request_byte;
+                else if (index_q == 7'h2F)
+                    checksum_q[7:0] <= request_byte;
+                else begin
+                    cmos_q[index_q] <= request_byte;
+                    if (index_q == 7'h37)
+                        cmos_q[7'h32] <= request_byte;
+                    if (is_checksum_address(index_q))
+                        checksum_q <= checksum_q -
+                                      {8'h00, cmos_q[index_q]} +
+                                      {8'h00, request_byte};
+                end
             end
 
             if (periodic_tick && cmos_q[7'h0B][6]) begin

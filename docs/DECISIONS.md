@@ -175,9 +175,10 @@ calendar after import and implements BCD/binary and 12/24-hour representation,
 Gregorian month/leap-year transitions, SET freeze, alarm/update/periodic
 status-C flags and IRQ8 clear-on-read behavior.
 
-CMOS reports base memory `0280h` (640 KiB), extended memory `0180h` (384 KiB)
-in both standard field pairs, and no memory above 16 MiB. Those hardware-owned
-fields cannot be overwritten through CPU or HPS writes. The standard checksum
-over bytes `10h–2Dh` is maintained incrementally, so all other CMOS
-configuration remains writable while the reported size stays consistent with
-the address decoder.
+CMOS starts with base memory `0280h` (640 KiB), extended memory `0180h`
+(384 KiB) in both standard field pairs, and no memory above 16 MiB. HPS writes
+cannot replace those profile defaults. CPU access retains normal CMOS-RAM
+semantics, including temporary write/read/restore patterns used by hardware
+diagnostics. The standard checksum over bytes `10h–2Dh` is maintained
+incrementally, while checksum bytes `2Eh/2Fh` also remain directly writable as
+required by the IBM AT programming model.

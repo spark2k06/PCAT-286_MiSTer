@@ -530,7 +530,19 @@ module spk286_at_devices_tb;
         check(cpu_reset_pulse_count > cycles,
               "8042 D1/FE reset sequence did not pulse CPU reset");
 
-        // RTC index/data, NMI mask, periodic IRQ8 and deterministic seconds.
+        // RTC index/data, MiSTer F4xx host time, NMI mask, periodic IRQ8 and
+        // deterministic seconds.
+        mgmt_write_word(16'hF400, 16'h0042);
+        router_write(16'h0070, 8'h00);
+        router_read(16'h0071, value);
+        check(value == 8'h42,
+              "RTC did not receive the MiSTer F4xx management write");
+        router_write(16'h0070, 8'h15);
+        router_read(16'h0071, value);
+        check(value == 8'h80, "RTC did not advertise 640 KiB base memory");
+        router_write(16'h0070, 8'h17);
+        router_read(16'h0071, value);
+        check(value == 8'h80, "RTC did not advertise 384 KiB extended memory");
         router_write(16'h0070, 8'h0B);
         router_write(16'h0071, 8'h42);
         check(!nmi_mask, "RTC NMI mask did not clear");

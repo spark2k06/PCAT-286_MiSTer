@@ -28,7 +28,8 @@ closure is still pending. The previous -4.338 ns CPU-to-CX path was another fit.
 Protected-mode tests are excluded only by the new V2 ROM patch; the old V1
 patch did not exclude the early CPU test. V2 checksums are checked independently.
 The timer backend is not yet a complete 8254: read-back
-status is unsupported. RTC calendar/periodic rates and speaker audio are incomplete.
+status is unsupported. RTC periodic-rate division and speaker audio are incomplete;
+calendar/date rollover and MiSTer `F4xx` host-time import are now implemented.
 See `AT_LANDMARK_SKIP_PM_V2.md` for the current ROM and next hardware test.
 See `AT_SDRAM_DQM_HANDOFF.md` for the now hardware-confirmed wiring fix.
 `AT_CRITICAL_RAM_HANDOFF.md` preserves the earlier instrumentation audit.

@@ -62,9 +62,9 @@ module emu_at
     wire [1:0]  at_floppy_request;
     wire [7:0]  at_mgmt_request = {at_floppy_request, 6'b000000};
 
-    // Use the same MiSTer media-management transport as the XT profile and
-    // ao486/z486. Requests 7:6 are floppy A/B; the remaining owners are not
-    // yet attached in the AT profile.
+    // Use the same MiSTer management transport as the XT profile and
+    // ao486/z486. Requests 7:6 are floppy A/B. RTC/CMOS updates are
+    // host-pushed writes in the F4xx window and therefore need no request bit.
     hps_ext hps_ext_at (
         .clk_sys     (CLK_50M),
         .EXT_BUS     (EXT_BUS),

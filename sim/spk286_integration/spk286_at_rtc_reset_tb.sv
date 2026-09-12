@@ -7,6 +7,7 @@ module spk286_at_rtc_reset_tb;
     .request_valid(valid),.request_command_valid(valid),.request_write(1'b0),
     .request_io(1'b1),.request_address(24'h70),.request_byte_enable(2'b10),
     .request_data_out(16'h0),.periodic_tick(1'b0),.second_tick(1'b0),
+    .mgmt_address(16'h0000),.mgmt_writedata(16'h0000),.mgmt_write(1'b0),
     .protocol_error(fault));
   initial begin
     repeat(3) @(negedge clk);

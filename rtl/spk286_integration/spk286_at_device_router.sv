@@ -204,6 +204,8 @@ module spk286_at_device_router (
         .request_accept(rtc_request_accept), .request_ready(rtc_request_ready),
         .request_read_data(rtc_read_data),
         .request_read_data_valid(rtc_read_data_valid),
+        .mgmt_address(mgmt_address), .mgmt_writedata(mgmt_writedata),
+        .mgmt_write(mgmt_write),
         .periodic_tick(periodic_tick), .second_tick(second_tick),
         .irq8(irq8), .nmi_mask(nmi_mask),
         .side_effect_count(rtc_side_effect_count),

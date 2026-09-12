@@ -56,7 +56,10 @@ open A2+ decisions and are not implied by this bridge.
 The first decoder retains the complete 24-bit physical address and classifies
 memory/code requests into conventional RAM (`000000h–09FFFFh`), video aperture
 (`0A0000h–0BFFFFh`), option/reserved region (`0C0000h–0EFFFFh`), system BIOS
-(`0F0000h–0FFFFFh`) and extended RAM (`100000h–FFFFFFh`). I/O and INTA never
+(`0F0000h–0FFFFFh`) and extended RAM (`100000h–15FFFFh`). This is the initial
+1 MiB machine profile: 640 KiB below the video hole and 384 KiB remapped above
+1 MiB. CPU reads above `15FFFFh`, apart from the reset-vector BIOS alias, are
+completed by the unmapped-memory sink with `FFh`. I/O and INTA never
 select the memory path. Conventional, video and extended RAM writes are
 allowed; option-region and BIOS writes are reported as ROM-protected. Presence
 of individual option ROMs and reserved-hole side effects remains a later
@@ -158,3 +161,23 @@ existing AT bridge/PIC/DMA contracts, but it does not silently replace the
 active XT top. Physical PS/2 decoding, real media backends, complete EGA/VGA
 VRAM semantics and DOS boot evidence remain required before A5 system
 acceptance.
+
+## D-AT-011 — RTC management and initial CMOS memory profile
+
+**Date:** 2026-09-12
+**Status:** Accepted for the AT MiSTer profile
+
+The AT RTC consumes the same `hps_ext` management window as ao486 and z486:
+addresses `F400h–F47Fh` update the corresponding MC146818 register. This makes
+the MiSTer host date and time visible through ports `70h/71h` without adding a
+second clock source or an AT-specific HPS protocol. The RTC advances the full
+calendar after import and implements BCD/binary and 12/24-hour representation,
+Gregorian month/leap-year transitions, SET freeze, alarm/update/periodic
+status-C flags and IRQ8 clear-on-read behavior.
+
+CMOS reports base memory `0280h` (640 KiB), extended memory `0180h` (384 KiB)
+in both standard field pairs, and no memory above 16 MiB. Those hardware-owned
+fields cannot be overwritten through CPU or HPS writes. The standard checksum
+over bytes `10h–2Dh` is maintained incrementally, so all other CMOS
+configuration remains writable while the reported size stays consistent with
+the address decoder.

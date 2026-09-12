@@ -4,7 +4,7 @@ root=$(cd "$(dirname "$0")/.." && pwd)
 build="${PCAT_BUILD_DIR:-$root/build/at-pit-ports}"
 mkdir -p "$build"
 cd "$root"
-for test in rtc_reset pit_clock pit_ports; do
+for test in rtc_reset rtc_cmos pit_clock pit_ports; do
   src=(rtl/spk286_integration/spk286_at_rtc_cmos.sv
        rtl/spk286_integration/spk286_at_pit_clock.sv
        rtl/spk286_integration/spk286_at_system_control.sv

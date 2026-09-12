@@ -27,7 +27,7 @@ module spk286_at_machine (
     input  logic         channel_check_event,
     input  logic         external_nmi_event,
 
-    // MiSTer hps_ext media management for the shared floppy controller.
+    // MiSTer hps_ext management for RTC/CMOS and the shared floppy controller.
     input  logic [15:0]  mgmt_address,
     input  logic [15:0]  mgmt_writedata,
     input  logic         mgmt_write,
@@ -320,6 +320,14 @@ module spk286_at_machine (
     logic [15:0] io_sink_read_data;
     logic        io_sink_read_data_valid;
 
+    logic        memory_sink_active_q;
+    logic        memory_sink_read_q;
+    logic [1:0]  memory_sink_lane_q;
+    logic        memory_sink_accept;
+    logic        memory_sink_ready;
+    logic [15:0] memory_sink_read_data;
+    logic        memory_sink_read_data_valid;
+
     logic        rom_write_sink_active_q;
     logic        rom_write_sink_accept;
     logic        rom_write_sink_ready;
@@ -341,6 +349,7 @@ module spk286_at_machine (
     logic        dma_io_candidate;
     logic        io_known_target;
     logic        io_unmapped_candidate;
+    logic        memory_unmapped_candidate;
     logic        cpu_owner_active;
     logic        cpu_memory_candidate;
     logic        device_request_candidate;
@@ -392,6 +401,8 @@ module spk286_at_machine (
                           dma_io_candidate || a5_io_candidate || (at_io && at_address[15:0]==16'h61);
         io_unmapped_candidate = cpu_owner_active && at_io &&
                                 !io_known_target;
+        memory_unmapped_candidate = cpu_owner_active && !at_io && !at_inta &&
+                                    memory_unmapped_request;
         cpu_memory_candidate = cpu_owner_active && !at_io && !at_inta &&
                                memory_cycle && !video_aperture_select &&
                                !rom_write_blocked;
@@ -851,6 +862,20 @@ module spk286_at_machine (
     assign io_sink_read_data = io_sink_lane_q[1] ? 16'hFF00 : 16'h00FF;
     assign io_sink_read_data_valid = io_sink_ready && io_sink_read_q;
 
+    assign memory_sink_accept = memory_unmapped_candidate &&
+                                at_command_valid && !memory_sink_active_q;
+    assign memory_sink_ready = memory_sink_active_q;
+    assign memory_sink_read_data = (memory_sink_lane_q == 2'b11) ?
+                                   16'hFFFF :
+                                   (memory_sink_lane_q[1] ?
+                                    16'hFF00 : 16'h00FF);
+    assign memory_sink_read_data_valid = memory_sink_ready &&
+                                         memory_sink_read_q;
+
+    assign unmapped_request = io_unmapped_candidate ||
+                              memory_unmapped_candidate ||
+                              devices_unmapped_request;
+
     // A blocked ROM write is a completed no-op.  It is kept separate from
     // the unmapped-I/O sink so the memory policy remains visible in traces.
     always_ff @(posedge clk) begin
@@ -858,6 +883,9 @@ module spk286_at_machine (
             io_sink_active_q <= 1'b0;
             io_sink_read_q <= 1'b0;
             io_sink_lane_q <= 2'b00;
+            memory_sink_active_q <= 1'b0;
+            memory_sink_read_q <= 1'b0;
+            memory_sink_lane_q <= 2'b00;
             rom_write_sink_active_q <= 1'b0;
             dma_memory_accept_q <= 1'b0;
             nmi_source_active_q <= 1'b0;
@@ -865,6 +893,8 @@ module spk286_at_machine (
         end else begin
             if (io_sink_active_q)
                 io_sink_active_q <= 1'b0;
+            if (memory_sink_active_q)
+                memory_sink_active_q <= 1'b0;
             if (rom_write_sink_active_q)
                 rom_write_sink_active_q <= 1'b0;
 
@@ -872,6 +902,11 @@ module spk286_at_machine (
                 io_sink_active_q <= 1'b1;
                 io_sink_read_q <= !at_write;
                 io_sink_lane_q <= at_byte_enable;
+            end
+            if (memory_sink_accept) begin
+                memory_sink_active_q <= 1'b1;
+                memory_sink_read_q <= !at_write;
+                memory_sink_lane_q <= at_byte_enable;
             end
             if (rom_write_sink_accept)
                 rom_write_sink_active_q <= 1'b1;
@@ -889,12 +924,14 @@ module spk286_at_machine (
 
     always_comb begin
         at_accept = (memory_command_valid && memory_accept) ||
+                    memory_sink_accept ||
                     rom_write_sink_accept ||
                     devices_request_accept || pic_request_accept ||
                     pit_request_accept || dma_config_accept ||
                     sys_request_accept || io_sink_accept;
 
         at_ready = (memory_request_valid && memory_ready) ||
+                   memory_sink_ready ||
                    rom_write_sink_ready || devices_request_ready ||
                    pic_request_ready || pit_request_ready ||
                    dma_config_ready || sys_request_ready || io_sink_ready;
@@ -904,6 +941,9 @@ module spk286_at_machine (
         if (memory_request_valid && memory_ready &&
             memory_read_data_valid) begin
             at_read_data = memory_read_data;
+            at_read_data_valid = 1'b1;
+        end else if (memory_sink_ready && memory_sink_read_data_valid) begin
+            at_read_data = memory_sink_read_data;
             at_read_data_valid = 1'b1;
         end else if (devices_request_ready && devices_read_data_valid) begin
             at_read_data = devices_read_data;

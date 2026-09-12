@@ -55,6 +55,7 @@ done
 
 sources+=(rtl/spk286_integration/spk286_at_hps_rom_loader.sv
   rtl/spk286_integration/spk286_at_boot_trace.sv
+  rtl/spk286_integration/spk286_at_ram_trace.sv
   sim/spk286_integration/spk286_sdram_pin_model.sv
   sim/spk286_integration/spk286_at_bios_first_fetch_tb.sv)
 verilator -Irtl/KFPC-XT/HDL/KF8253/HDL --binary --timing --trace-fst --trace-depth 3 \
@@ -66,7 +67,7 @@ cd "$root/rtl/video" # Resolve the production splash ROM without warnings.
 # These run the original DMA2/page routines independently, using a test-only
 # reset-vector entry selection. They do not skip tests in the deployed BIOS.
 for scenario in ${AT_LANDMARK_CASES:-1 2}; do
-  timeout 120s "$build_dir/verilator-obj/first_fetch_vlt" "+ROM=$rom_path" \
+  timeout "${AT_LANDMARK_TIMEOUT:-120s}" stdbuf -oL "$build_dir/verilator-obj/first_fetch_vlt" "+ROM=$rom_path" \
     "+LANDMARK_CASE=$scenario" | tee "$build_dir/case-$scenario.log"
 done
 echo AT_LANDMARK_DMA_TEST_PASS

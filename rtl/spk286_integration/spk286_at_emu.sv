@@ -37,6 +37,8 @@ module emu_at
         "P1O[78:74],Boot Fetch Index,00,01,02,03,04,05,06,07,08,09,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31;",
         "P1O[80],Boot Fetch View,Address,Data;",
         "P1O[81],First Fault Trace,Off,On;",
+        "P1O[82],Landmark RAM Trace,Off,On;",
+        "P1O[84:83],RAM Trace Page,Compare,Read path,SDRAM,Registers;",
         "P1-;",
         "-;",
         "R0,Reset & apply settings;",
@@ -63,9 +65,10 @@ module emu_at
     wire [15:0]  hps_status_menumask;
     wire         at_debug_enable = hps_status[71];
     wire [1:0]   at_debug_page = hps_status[73:72];
-    wire         at_debug_fault_view = hps_status[81];
-    wire         at_debug_boot_view = hps_status[79] && !at_debug_fault_view;
-    wire         at_debug_raw_view = at_debug_boot_view || at_debug_fault_view;
+    wire         at_debug_ram_view = hps_status[82];
+    wire         at_debug_fault_view = hps_status[81] && !at_debug_ram_view;
+    wire         at_debug_boot_view = hps_status[79] && !at_debug_fault_view && !at_debug_ram_view;
+    wire         at_debug_raw_view = at_debug_boot_view || at_debug_fault_view || at_debug_ram_view;
     wire [10:0]  ps2_key;
     wire          ps2_kbd_clk_out;
     wire          ps2_kbd_data_out;
@@ -256,6 +259,9 @@ module emu_at
     wire [23:0] at_debug_cs_base;
     wire [15:0] at_debug_ip;
     wire [15:0] at_debug_flags;
+    wire at_debug_instruction_retired;
+    wire [15:0] at_debug_instruction_ip;
+    wire [95:0] at_debug_segment_bases;
     wire [127:0] at_debug_gpr;
     wire [63:0] at_debug_segment_selectors;
     wire        at_debug_fetch_blocked;
@@ -600,6 +606,9 @@ module emu_at
         .debug_cs_base          (at_debug_cs_base),
         .debug_ip               (at_debug_ip),
         .debug_flags            (at_debug_flags),
+        .debug_instruction_retired(at_debug_instruction_retired),
+        .debug_instruction_ip(at_debug_instruction_ip),
+        .debug_segment_bases(at_debug_segment_bases),
         .debug_gpr              (at_debug_gpr),
         .debug_segment_selectors(at_debug_segment_selectors),
         .debug_fetch_blocked    (at_debug_fetch_blocked),
@@ -813,6 +822,37 @@ module emu_at
         .capture_pending        (at_boot_trace_pending)
     );
 
+    wire [127:0] at_ram_trace_words;
+    wire at_ram_trace_captured, at_ram_trace_armed;
+    wire [15:0] at_ram_trace_comparisons;
+    spk286_at_ram_trace u_at_ram_trace (
+        .clk(CLK_50M), .reset(at_boot_reset),
+        .cpu_reset(at_machine_reset | at_cpu_reset_request),
+        .retired(at_debug_instruction_retired),
+        .instruction_ip(at_debug_instruction_ip),
+        .cpu_cs(at_debug_cs),
+        .cpu_cs_base(at_debug_cs_base), .cpu_flags(at_debug_flags),
+        .cpu_opcode(at_debug_opcode), .cpu_gpr(at_debug_gpr),
+        .cpu_segments(at_debug_segment_selectors),
+        .cpu_segment_bases(at_debug_segment_bases),
+        .cpu_valid(at_cpu_bus_valid), .cpu_ready(at_cpu_ready),
+        .cpu_write(at_cpu_bus_write), .cpu_bhe_n(at_cpu_bus_bhe_n),
+        .cpu_status(at_cpu_bus_status), .cpu_address(at_cpu_address),
+        .cpu_data_in(at_cpu_data_in), .backend_accept(backend_accept),
+        .backend_ready(backend_ready), .backend_read_valid(backend_read_data_valid),
+        .backend_code(backend_code_fetch), .backend_write(backend_write),
+        .backend_owner(backend_owner), .backend_be(backend_byte_enable),
+        .backend_address(backend_address), .backend_data_in(backend_read_data),
+        .backend_data_out(backend_data_out), .kf_address(at_trace_kf_address),
+        .kf_data(at_trace_kf_data), .kf_read_request(at_trace_kf_read_request),
+        .kf_read_flag(at_trace_kf_read_flag),
+        .sdram_read_command(!sdram_cs && sdram_ras && !sdram_cas && sdram_we),
+        .owner_state(at_trace_owner_state), .sdram_dqm({sdram_udqm, sdram_ldqm}),
+        .select_page(hps_status[84:83]), .selected_words(at_ram_trace_words),
+        .captured(at_ram_trace_captured), .armed(at_ram_trace_armed),
+        .comparisons(at_ram_trace_comparisons)
+    );
+
     spk286_at_fault_trace u_at_fault_trace (
         .clk(CLK_50M), .reset(at_boot_reset),
         .sources({loader_protocol_error, sdram_owner_protocol_error,
@@ -850,6 +890,7 @@ module emu_at
         .page                    (at_debug_raw_view ? 2'd3 : at_debug_page),
         .boot_trace_view         (at_debug_boot_view),
         .fault_trace_view        (at_debug_fault_view),
+        .ram_trace_view          (at_debug_ram_view),
         .cpu_reset               (at_machine_reset | at_cpu_reset_request),
         .cpu_halted              (at_cpu_halted),
         .cpu_shutdown            (at_cpu_shutdown),
@@ -903,12 +944,12 @@ module emu_at
         .hold_request            (at_debug_hold_request),
         .biu_detail              (at_debug_biu_detail),
         .last_post               (at_debug_last_post),
-        .cpu_cycle_count         (at_debug_boot_view ? {10'd0, at_boot_trace_count} : at_debug_cpu_cycle_count),
-        .xt_cycle_count          (at_debug_boot_view ? {7'd0, at_boot_trace_pending, at_boot_trace_full, at_boot_trace_valid, hps_status[80], hps_status[78:74]} : at_debug_at_cycle_count),
-        .trace0                  (at_debug_fault_view ? at_fault_words[31:0] : at_debug_boot_view ? at_boot_trace_words[31:0] : at_debug_trace0),
-        .trace1                  (at_debug_fault_view ? at_fault_words[63:32] : at_debug_boot_view ? at_boot_trace_words[63:32] : at_debug_trace1),
-        .trace2                  (at_debug_fault_view ? at_fault_words[95:64] : at_debug_boot_view ? at_boot_trace_words[95:64] : at_debug_trace2),
-        .trace3                  (at_debug_fault_view ? at_fault_words[127:96] : at_debug_boot_view ? at_boot_trace_words[127:96] : at_debug_trace3),
+        .cpu_cycle_count         (at_debug_ram_view ? at_ram_trace_comparisons : at_debug_boot_view ? {10'd0, at_boot_trace_count} : at_debug_cpu_cycle_count),
+        .xt_cycle_count          (at_debug_ram_view ? {12'd0, at_ram_trace_armed, at_ram_trace_captured, hps_status[84:83]} : at_debug_boot_view ? {7'd0, at_boot_trace_pending, at_boot_trace_full, at_boot_trace_valid, hps_status[80], hps_status[78:74]} : at_debug_at_cycle_count),
+        .trace0                  (at_debug_ram_view ? at_ram_trace_words[31:0] : at_debug_fault_view ? at_fault_words[31:0] : at_debug_boot_view ? at_boot_trace_words[31:0] : at_debug_trace0),
+        .trace1                  (at_debug_ram_view ? at_ram_trace_words[63:32] : at_debug_fault_view ? at_fault_words[63:32] : at_debug_boot_view ? at_boot_trace_words[63:32] : at_debug_trace1),
+        .trace2                  (at_debug_ram_view ? at_ram_trace_words[95:64] : at_debug_fault_view ? at_fault_words[95:64] : at_debug_boot_view ? at_boot_trace_words[95:64] : at_debug_trace2),
+        .trace3                  (at_debug_ram_view ? at_ram_trace_words[127:96] : at_debug_fault_view ? at_fault_words[127:96] : at_debug_boot_view ? at_boot_trace_words[127:96] : at_debug_trace3),
         .keyboard_keycode        (at_debug_keyboard_keycode),
         .keyboard_irq            (at_debug_keyboard_irq),
         .keyboard_port_b         (at_debug_keyboard_port_b),

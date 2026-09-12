@@ -6,14 +6,21 @@ The user confirms BIOS execution and visible Supersoft POST on MiSTer (`6f07770`
 and subsequent DMA2/page-register PASS in hardware (`785231e` preserves that
 checkpoint). The startup B:1 fault is traced to the RTC protocol flag lacking
 reset; cold/warm simulation and Yosys constant propagation reproduce it.
-The current candidate adds port 61h, correct PIT clocking and all three timer
-channels. Original Landmark parity, five-pattern 16 KiB RAM and PIT routines
-pass in simulation. Hardware confirmation of these new corrections and complete
-POST remain pending. Protected mode remains excluded by the user's existing ROM
-patch; ROM checksums (including SYSTEM BIOS) are intentionally ignored.
-The timer backend is not yet a complete 8254: read-back status is unsupported.
-RTC calendar/periodic-rate behavior and physical speaker audio remain incomplete.
-See `AT_LANDMARK_PIT_PARITY_HANDOFF.md` for evidence, limitations and hardware steps.
+Hardware now confirms the port 61h/PIT corrections: all three timers, both DMA
+controllers/page registers, parity and SYSTEM BIOS pass. AT still fails the 16K
+critical RAM test with all-zero First Fault records and repeats POST. The user
+confirms XT passes that test; its separate later MEMORY REFRESH test fails.
+AT has not reached that later test yet. Unpatched original ROM also fails 16K
+on AT, with both ROM checksums passing. The RAM observer is AT-only.
+Original Landmark five-pattern RAM routines pass pin-level simulation, including
+original header context and distinct DS/ES. Injected storage errors validate the
+new passive Landmark RAM Trace. Physical RAM root cause remains open. The latest
+AT fit has a CPU-to-CX setup path of -4.338 ns; causality is not established.
+Protected mode remains excluded by the user's existing ROM patch; ROM checksums
+are ignored as requested. The timer backend is not yet a complete 8254: read-back
+status is unsupported. RTC calendar/periodic rates and speaker audio are incomplete.
+See `AT_CRITICAL_RAM_HANDOFF.md` for current evidence and the next hardware capture.
+See `AT_LANDMARK_PIT_PARITY_HANDOFF.md` for the previous functional fixes.
 Older I0–I6 statements below describe their original acceptance scope.
 
 ## Initial machine profile

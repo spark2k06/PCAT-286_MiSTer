@@ -26,6 +26,7 @@ module spk286_debug_overlay #(
     input  logic [1:0]            page,
     input  logic                  boot_trace_view,
     input  logic                  fault_trace_view,
+    input  logic                  ram_trace_view,
 
     input  logic                  cpu_reset,
     input  logic                  cpu_halted,
@@ -128,12 +129,12 @@ module spk286_debug_overlay #(
         keyboard_keycode, keyboard_irq, keyboard_port_b, keyboard_pic_int,
         dma_request, dma_acknowledge_n, biu_detail
     };
-    wire [670:0] complete_state_async = {
-        (AT_MODE && fault_trace_view), (AT_MODE && boot_trace_view),
+    wire [671:0] complete_state_async = {
+        (AT_MODE && ram_trace_view), (AT_MODE && fault_trace_view), (AT_MODE && boot_trace_view),
         cpu_state_async, bus_state_async, trace0, trace1, trace2, trace3
     };
-    logic [678:0] source_snapshot = '0;
-    logic [678:0] video_snapshot = '0;
+    logic [679:0] source_snapshot = '0;
+    logic [679:0] video_snapshot = '0;
     logic [7:0] snapshot_sequence = 8'd0;
     logic snapshot_request = 1'b0;
     logic snapshot_acknowledge = 1'b0;
@@ -204,9 +205,10 @@ module spk286_debug_overlay #(
     wire [7:0] d_snapshot_sequence;
     wire d_boot_trace_view;
     wire d_fault_trace_view;
-    wire d_raw_trace_view = d_boot_trace_view || d_fault_trace_view;
+    wire d_ram_trace_view;
+    wire d_raw_trace_view = d_boot_trace_view || d_fault_trace_view || d_ram_trace_view;
     assign {
-        d_snapshot_sequence, d_fault_trace_view, d_boot_trace_view,
+        d_snapshot_sequence, d_ram_trace_view, d_fault_trace_view, d_boot_trace_view,
         cpu_state_snapshot, bus_state_snapshot,
         trace_state_snapshot
     } = video_snapshot;
@@ -771,7 +773,9 @@ module spk286_debug_overlay #(
             default: begin
                 case (row)
                     4'd0: begin
-                        if (d_fault_trace_view)
+                        if (d_ram_trace_view)
+                            character = text_at("AT LANDMARK RAM TRACE", 21, col);
+                        else if (d_fault_trace_view)
                             character = text_at("AT FIRST FAULT TRACE", 20, col);
                         else if (d_boot_trace_view)
                             character = text_at("AT BOOT FETCH TRACE", 19, col);
@@ -785,7 +789,12 @@ module spk286_debug_overlay #(
                     4'd4: character = d_raw_trace_view ? raw_trace_at(d_trace2, 7'd50, col) : trace_at(d_trace2, 7'd50, col);
                     4'd5: character = d_raw_trace_view ? raw_trace_at(d_trace3, 7'd51, col) : trace_at(d_trace3, 7'd51, col);
                     4'd7: begin
-                        if (d_fault_trace_view)
+                        if (d_ram_trace_view) begin
+                            character = text_at("PAGE:0 VALID:0 ARMED:0", 22, col);
+                            if (col == 5) character = hex_digit({2'd0, d_xt_cycle_count[1:0]});
+                            else if (col == 13) character = bit_digit(d_xt_cycle_count[2]);
+                            else if (col == 21) character = bit_digit(d_xt_cycle_count[3]);
+                        end else if (d_fault_trace_view)
                             character = text_at("T0:FIRST MASK T1:CSIP", 21, col);
                         else if (d_boot_trace_view) begin
                             character = text_at("IDX:00 VIEW:0 VALID:0", 21, col);
@@ -796,7 +805,13 @@ module spk286_debug_overlay #(
                         end else character = text_at("S0 INTA 1 IOR 2 IOW", 19, col);
                     end
                     4'd8: begin
-                        if (d_fault_trace_view)
+                        if (d_ram_trace_view) begin
+                            character = text_at("COMPARISONS:0000", 16, col);
+                            if (col >= 12 && col <= 15) begin
+                                nibble_shift = (15-col)*4;
+                                character = hex_digit(d_cpu_cycle_count[nibble_shift +: 4]);
+                            end
+                        end else if (d_fault_trace_view)
                             character = text_at("T2:OP+ADDR T3:FLAGS+LIVE", 24, col);
                         else if (d_boot_trace_view) begin
                             character = text_at("COUNT:00 FULL:0 WAIT:0", 22, col);
@@ -808,7 +823,7 @@ module spk286_debug_overlay #(
                         end else character = text_at("S3 HALT 4 CODE 5 MEMR 6 MEMW", 28, col);
                     end
                     4'd10: begin
-                        character = d_fault_trace_view ?
+                        character = (d_fault_trace_view || d_ram_trace_view) ?
                                     text_at("HELD UNTIL CORE RESET", 21, col) : d_boot_trace_view ?
                                     text_at("READY=0 MEANS PENDING", 21, col) :
                                     text_at("POST:00 XT#:0000", 16, col);

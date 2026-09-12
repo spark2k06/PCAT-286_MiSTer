@@ -17,6 +17,7 @@ module spk286_debug_overlay_tb;
     logic [1:0] page = 2'd0;
     logic boot_trace_view = 1'b0;
     logic fault_trace_view = 1'b0;
+    logic ram_trace_view = 1'b0;
 `ifdef TEST_AT_BOOT_TRACE
     localparam bit TEST_AT_MODE = 1'b1;
 `else
@@ -100,7 +101,7 @@ module spk286_debug_overlay_tb;
         .AT_MODE(TEST_AT_MODE)
     ) dut (
         .rst, .src_rst, .src_clk, .clk, .pxl_cen, .HS, .VS, .HB, .VB,
-        .rgb_in, .page, .boot_trace_view, .fault_trace_view,
+        .rgb_in, .page, .boot_trace_view, .fault_trace_view, .ram_trace_view,
         .cpu_reset, .cpu_halted, .cpu_shutdown, .cpu_control_error,
         .cpu_unsupported_opcode, .cpu_microcode_fault,
         .cpu_operand_blocked, .cpu_event_completed, .cpu_event_vector,
@@ -337,6 +338,21 @@ module spk286_debug_overlay_tb;
             $display("AT_FAULT_TRACE_OVERLAY_PASS");
         end
         if (!TEST_AT_MODE && dut.d_fault_trace_view !== 1'b0) fail("XT fault view isolation");
+        ram_trace_view = 1'b1;
+        xt_cycle_count = 16'h000F;
+        cpu_cycle_count = 16'h0123;
+        request_snapshot(2'd3);
+        if (TEST_AT_MODE) begin
+            if (!dut.d_ram_trace_view) fail("RAM trace CDC bit");
+            expect_character(2'd3,0,3,"L");
+            expect_character(2'd3,7,5,"3");
+            expect_character(2'd3,7,13,"1");
+            expect_character(2'd3,7,21,"1");
+            expect_character(2'd3,8,15,"3");
+            expect_character(2'd3,2,3,"8");
+            $display("AT_RAM_TRACE_OVERLAY_PASS");
+        end else if (dut.d_ram_trace_view !== 1'b0) fail("XT RAM trace isolation");
+        ram_trace_view = 1'b0;
         fault_trace_view = 1'b0;
         boot_trace_view = 1'b0;
         request_snapshot(2'd0);

@@ -5,7 +5,8 @@
 // isolated DMA routines (1/2), original-entry investigation (3), and original
 // parity/memory/PIT/refresh-status routines (4..9), NMI (10), RAM header (11),
 // distinct DS/ES (12), injected low/high-byte faults (13/14), and original POST
-// through RAM (15), PM-skip CPU/RAM continuations (16/17), ROM checksums (18).
+// through RAM (15), PM-skip CPU/RAM continuations (16/17), ROM checksums (18),
+// and the original 8042 controller/scan-lines routines (19/20).
 // Cases other than 0/3/15 set
 // a test-only entry/setup in the private ROM buffer, never in the user ROM.
 module spk286_at_bios_first_fetch_tb;
@@ -429,7 +430,7 @@ module spk286_at_bios_first_fetch_tb;
                 1: begin rom[16'hfff1]=8'h4b; rom[16'hfff2]=8'h8c; end
                 2: begin rom[16'hfff1]=8'h74; rom[16'hfff2]=8'h8d; end
                 3,15: begin end // Original reset entry; 15 continues through the first RAM test.
-                4,5,6,7,8,9,11,12,13,14,16,17,18: begin
+                4,5,6,7,8,9,11,12,13,14,16,17,18,19,20: begin
                     // Test fixture only: set SS like POST, gate timer2 on,
                     // then execute untouched diagnostic instructions in ROM.
                     case(landmark_case)
@@ -443,6 +444,8 @@ module spk286_at_bios_first_fetch_tb;
                         16: routine_entry=16'h8e62; // Real-mode entry to PROTECTED MODE CPU
                         17: routine_entry=16'h94cd; // Later protected-mode RAM entry
                         18: routine_entry=16'h89cb; // Both original ROM checksum routines
+                        19: routine_entry=16'h9191; // 8042 AA/55 self-test and AB/00 interface test
+                        20: routine_entry=16'h91c0; // 8042 command-byte write and quiet scan lines
                         12,13,14: routine_entry=16'h8df6; // Same isolated test with DS != ES
                     endcase
                     rom[16'hfff1]=0; rom[16'hfff2]=8'hff;
@@ -467,6 +470,20 @@ module spk286_at_bios_first_fetch_tb;
                         rom[16'hff09]=8'hea; rom[16'hff0a]=8'hcd; rom[16'hff0b]=8'h94;
                         rom[16'hff0c]=0; rom[16'hff0d]=8'hf0;
                     end
+                    if(landmark_case==19 || landmark_case==20) begin
+                        // These routines call the shared 8042 helpers. Give
+                        // their isolated fixture a writable real-mode stack;
+                        // an SS in the F000 ROM window cannot retain CALL's
+                        // return address through the production memory path.
+                        // CLI; MOV AX,0; MOV SS,AX; MOV SP,0800;
+                        // JMP FAR F000:routine_entry.
+                        rom[16'hff03]=0;
+                        rom[16'hff06]=8'hbc; rom[16'hff07]=0; rom[16'hff08]=8'h08;
+                        rom[16'hff09]=8'hea;
+                        rom[16'hff0a]=routine_entry[7:0];
+                        rom[16'hff0b]=routine_entry[15:8];
+                        rom[16'hff0c]=0; rom[16'hff0d]=8'hf0;
+                    end
                     if(landmark_case>=12 && landmark_case<=14) begin
                         // MOV AX,B800; MOV DS,AX; JMP FAR F000:8DF6.
                         rom[16'hff0c]=8'hb8; rom[16'hff0d]=0; rom[16'hff0e]=8'hb8;
@@ -484,6 +501,20 @@ module spk286_at_bios_first_fetch_tb;
                         rom[16'hff16]=8'he6; rom[16'hff17]=8'h41;
                         rom[16'hff18]=8'hea; rom[16'hff19]=8'h48;
                         rom[16'hff1a]=8'h8e; rom[16'hff1b]=0; rom[16'hff1c]=8'hf0;
+                    end
+                    if(landmark_case==19) begin
+                        // Keep the original commands and comparisons, but
+                        // shorten only the no-response timeout in helper
+                        // F000:A39B. A missing AB reply must fail quickly in
+                        // simulation instead of consuming 20*65536 polls.
+                        rom[16'ha3a6]=8'h90; rom[16'ha3a7]=8'h90;
+                    end
+                    if(landmark_case==20) begin
+                        // Preserve the scan-lines test and its two timeout
+                        // phases while reducing each empty poll loop to one
+                        // status read per outer iteration.
+                        rom[16'h91da]=8'h90; rom[16'h91db]=8'h90;
+                        rom[16'h91e8]=8'h90; rom[16'h91e9]=8'h90;
                     end
                 end
                 10: begin // Integration fixture: pending parity -> RTC unmask -> one NMI -> IRET.
@@ -900,6 +931,17 @@ module spk286_at_bios_first_fetch_tb;
                         $fatal(1,"Landmark routine passed with sticky fault");
                     $display("LANDMARK_ROUTINE_PASS case=%0d io_completed=%0d cycles=%0d",landmark_case,io_completed,cycles);
                     $finish;
+                end
+                if ((landmark_case==19 || landmark_case==20) &&
+                    dut.u_cpu.cpu.opcode_start && debug_cs==16'hf000) begin
+                    if (debug_ip==16'h9b68)
+                        $fatal(1,"LANDMARK_KEYBOARD_FAIL case=%0d io_completed=%0d",landmark_case,io_completed);
+                    if (debug_ip==16'h9cb5) begin
+                        if (protocol_error || cpu_fault)
+                            $fatal(1,"Landmark keyboard routine passed with sticky fault");
+                        $display("LANDMARK_KEYBOARD_PASS case=%0d io_completed=%0d cycles=%0d",landmark_case,io_completed,cycles);
+                        $finish;
+                    end
                 end
             end
             if((landmark_case==0 && (cpu_fault || protocol_error)) || memory_port_protocol_error || sdram_owner_protocol_error || loader_error || cpu_shutdown)

@@ -42,6 +42,10 @@ Older I0–I6 statements below describe their original acceptance scope.
   it is not yet a complete IBM PC/AT implementation: real media, physical
   PS/2 handling, 16-bit ISA timing and full DOS/hardware acceptance remain
   pending.
+  The CPU-visible 8042 now implements the IBM AT commands and status needed by
+  the Landmark U126 and scan-lines diagnostics. The physical HPS path still
+  needs complete make/break/extended conversion and keyboard-device command
+  exchange; see `AT_8042_KEYBOARD_HANDOFF.md`.
 - Historical 80286 timing is not certified. The OSD control schedules the
   legacy XT bus and is named **XT Bus Pace**; no Accurate/Fast/Max CPU timing
   claim is made.

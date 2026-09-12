@@ -451,13 +451,12 @@ module emu_at
 
     wire keyboard_byte_valid;
     wire [7:0] keyboard_byte = ps2_key[7:0];
-    logic ps2_key_toggle_q;
-    always_ff @(posedge CLK_50M or posedge RESET) begin
-        if (RESET)
-            ps2_key_toggle_q <= 1'b0;
-        else
-            ps2_key_toggle_q <= ps2_key[10];
-    end
+    logic ps2_key_toggle_q = 1'b0;
+    // hps_io keeps its event toggle across a core reset. Track that level on
+    // every clock, including reset, so an odd previous event is not replayed
+    // as a new keyboard byte when the AT is released.
+    always_ff @(posedge CLK_50M)
+        ps2_key_toggle_q <= ps2_key[10];
     assign keyboard_byte_valid = ps2_key[10] ^ ps2_key_toggle_q;
 
     // Keep the AT machine in reset until the private video PLL is usable as

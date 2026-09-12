@@ -380,7 +380,51 @@ module spk286_at_devices_tb;
         repeat (3) @(negedge clk);
         reset = 1'b0;
 
-        // 8042 keyboard output buffer, IRQ1 and output-port A20 control.
+        // IBM 5170 8042 command protocol exercised by the Landmark U126 and
+        // keyboard-scan-lines diagnostics.
+        router_read(16'h0064, value);
+        check(value[4] && !value[2] && !value[1] && !value[0],
+              "8042 power-on status was incorrect");
+        router_write(16'h0064, 8'hAA);
+        router_read(16'h0064, value);
+        check(value[3] && value[2] && value[0],
+              "8042 self-test did not set command/system/output status");
+        router_read(16'h0060, value);
+        check(value == 8'h55, "8042 AA self-test response was not 55h");
+        router_write(16'h0064, 8'hAB);
+        router_read(16'h0060, value);
+        check(value == 8'h00, "8042 AB interface-test response was not 00h");
+
+        router_write(16'h0064, 8'h60);
+        router_read(16'h0064, value);
+        check(value[3], "8042 status did not remember a command-port write");
+        router_write(16'h0060, 8'h44);
+        router_read(16'h0064, value);
+        check(!value[3] && value[2] && !value[0],
+              "8042 command-byte write produced incorrect status");
+        router_write(16'h0064, 8'h20);
+        router_read(16'h0060, value);
+        check(value == 8'h44, "8042 command-byte readback was incorrect");
+
+        router_write(16'h0064, 8'hAD);
+        router_write(16'h0064, 8'h20);
+        router_read(16'h0060, value);
+        check(value[4], "8042 disable command did not set command-byte bit 4");
+        router_write(16'h0064, 8'hAE);
+        router_write(16'h0064, 8'h20);
+        router_read(16'h0060, value);
+        check(!value[4], "8042 enable command did not clear command-byte bit 4");
+        router_write(16'h0064, 8'hC0);
+        router_read(16'h0060, value);
+        check(value == 8'hA0, "8042 AT input-port image was incorrect");
+        router_write(16'h0064, 8'hE0);
+        router_read(16'h0060, value);
+        check(value == 8'h03, "8042 idle test-input image was incorrect");
+
+        // Restore translated keyboard input with IRQ1 enabled, then exercise
+        // the host-byte output buffer and output-port A20 control.
+        router_write(16'h0064, 8'h60);
+        router_write(16'h0060, 8'h45);
         keyboard_byte = 8'h1C;
         keyboard_byte_valid = 1'b1;
         @(posedge clk);
@@ -395,8 +439,12 @@ module spk286_at_devices_tb;
         router_write(16'h0060, 8'h03);
         check(a20_enable && !cpu_reset_request,
               "8042 output port did not enable A20 safely");
+        router_write(16'h0064, 8'hD0);
+        router_read(16'h0060, value);
+        check(value == 8'h03, "8042 output-port readback was incorrect");
         router_read(16'h0064, value);
-        check(value[2] && !value[0], "8042 status register was incorrect");
+        check(value[4] && value[3] && value[2] && !value[1] && !value[0],
+              "8042 status register was incorrect");
 
         // Both documented AT reset forms must produce a CPU-local pulse.
         cycles = cpu_reset_pulse_count;

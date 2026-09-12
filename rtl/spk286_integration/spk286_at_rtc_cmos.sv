@@ -97,6 +97,7 @@ module spk286_at_rtc_cmos (
             io_byte_enable_q <= 2'b00;
             io_read_data_q <= 8'h00;
             io_read_data_valid_q <= 1'b0;
+            protocol_error <= 1'b0;
             index_q <= 7'h00;
             nmi_mask_q <= 1'b1;
             irq8_q <= 1'b0;

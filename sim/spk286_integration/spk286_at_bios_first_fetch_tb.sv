@@ -2,8 +2,9 @@
 
 // Production CPU, HPS loader, AT bridge, KFSDRAM and physical SDRAM pin model.
 // By default verify first BIOS fetches. Optional LANDMARK_CASE values select
-// isolated DMA routines (1/2) or a bounded original-entry investigation (3).
-// Only cases 1/2 alter the reset entry in the test's private ROM buffer.
+// isolated DMA routines (1/2), original-entry investigation (3), and original
+// parity/memory/PIT/refresh-status routines (4..9). Cases other than 0/3 set
+// a test-only entry/setup in the private ROM buffer, never in the user ROM.
 module spk286_at_bios_first_fetch_tb;
     logic clk = 1'b0;
     logic reset = 1'b1;
@@ -16,6 +17,21 @@ module spk286_at_bios_first_fetch_tb;
     // This exercises its exact instruction bytes, not a claimed full POST.
     integer landmark_case = 0;
     integer io_completed = 0;
+    logic [15:0] routine_entry;
+    logic [7:0] last_port61;
+    integer ram_reads=0, ram_writes=0;
+    function automatic [7:0] memory_pattern(input integer beat);
+        case(beat / 16384)
+            0: memory_pattern=8'hff;
+            1: memory_pattern=8'h01;
+            2: memory_pattern=8'h55;
+            3: memory_pattern=8'haa;
+            4: memory_pattern=8'h00;
+            default: memory_pattern=8'hxx;
+        endcase
+    endfunction
+    integer nmi_pulses=0, nmi_markers=0, parity_pulse_cycles=0;
+    logic nmi_prev=0, resumed_after_nmi=0;
     integer io_wait_cycles = 0;
     integer max_cpu_cycles = 200000;
     logic protocol_reported = 0;
@@ -23,25 +39,9 @@ module spk286_at_bios_first_fetch_tb;
     logic execute_enable = 1'b1;
     logic cpu_boot_reset = 1;
     logic machine_boot_reset = 1;
-    logic counter_clock = 1'b0;
+    wire counter_clock;
     logic refresh_enable = 1'b1;
-    logic pit_clock_active = 1'b0;
-    integer pit_clock_rising_edges = 0;
-    always_ff @(posedge clk) begin
-        if (reset) begin
-            counter_clock <= 1'b0;
-            pit_clock_active <= 1'b0;
-            pit_clock_rising_edges <= 0;
-        end else if (!pit_clock_active) begin
-            counter_clock <= 1'b0;
-        end else if (pit_clock_rising_edges < 32) begin
-            counter_clock <= ~counter_clock;
-            if (!counter_clock)
-                pit_clock_rising_edges <= pit_clock_rising_edges + 1;
-        end else begin
-            counter_clock <= 1'b0;
-        end
-    end
+    spk286_at_pit_clock pit_clock(.clk(clk), .reset(reset), .counter_clock(counter_clock));
 
     logic keyboard_byte_valid = 1'b0;
     logic [7:0] keyboard_byte = 8'h00;
@@ -352,8 +352,6 @@ module spk286_at_bios_first_fetch_tb;
                     port81_writes <= port81_writes + 1;
                 if (cpu_address[15:0] == 16'h0040) begin
                     pit_data_writes <= pit_data_writes + 1;
-                    if (pit_data_writes == 1)
-                        pit_clock_active <= 1'b1;
                 end
             end
         end
@@ -378,9 +376,107 @@ module spk286_at_bios_first_fetch_tb;
                 1: begin rom[16'hfff1]=8'h4b; rom[16'hfff2]=8'h8c; end
                 2: begin rom[16'hfff1]=8'h74; rom[16'hfff2]=8'h8d; end
                 3: begin end // Original reset entry through pre-PIT POST.
+                4,5,6,7,8,9: begin
+                    // Test fixture only: set SS like POST, gate timer2 on,
+                    // then execute untouched diagnostic instructions in ROM.
+                    case(landmark_case)
+                        4: routine_entry=16'h8dcb; // Parity precheck
+                        5: routine_entry=16'h8df6; // Full 16 KiB, five patterns
+                        6: routine_entry=16'h8a45; // PIT0
+                        7: routine_entry=16'h8adb; // PIT1
+                        8: routine_entry=16'h8af3; // PIT2
+                        9: routine_entry=16'h8e48; // Original refresh status loops
+                    endcase
+                    rom[16'hfff1]=0; rom[16'hfff2]=8'hff;
+                    // CLI; MOV AX,F000; MOV SS,AX; XOR CX,CX;
+                    // MOV AL,1; OUT 61,AL; JMP FAR F000:entry.
+                    rom[16'hff00]=8'hfa; rom[16'hff01]=8'hb8;
+                    rom[16'hff02]=0; rom[16'hff03]=8'hf0;
+                    rom[16'hff04]=8'h8e; rom[16'hff05]=8'hd0;
+                    rom[16'hff06]=8'h31; rom[16'hff07]=8'hc9;
+                    rom[16'hff08]=8'hb0; rom[16'hff09]=1;
+                    rom[16'hff0a]=8'he6; rom[16'hff0b]=8'h61;
+                    rom[16'hff0c]=8'hea;
+                    rom[16'hff0d]=routine_entry[7:0];
+                    rom[16'hff0e]=routine_entry[15:8];
+                    rom[16'hff0f]=0; rom[16'hff10]=8'hf0;
+                    if(landmark_case==9) begin
+                        // POST normally leaves PIT1 in mode2, count18.
+                        rom[16'hff0c]=8'hb0; rom[16'hff0d]=8'h74;
+                        rom[16'hff0e]=8'he6; rom[16'hff0f]=8'h43;
+                        rom[16'hff10]=8'hb0; rom[16'hff11]=8'h12;
+                        rom[16'hff12]=8'he6; rom[16'hff13]=8'h41;
+                        rom[16'hff14]=8'hb0; rom[16'hff15]=0;
+                        rom[16'hff16]=8'he6; rom[16'hff17]=8'h41;
+                        rom[16'hff18]=8'hea; rom[16'hff19]=8'h48;
+                        rom[16'hff1a]=8'h8e; rom[16'hff1b]=0; rom[16'hff1c]=8'hf0;
+                    end
+                end
+                10: begin // Integration fixture: pending parity -> RTC unmask -> one NMI -> IRET.
+                    rom[16'hfff1]=0; rom[16'hfff2]=8'hff;
+                    rom[16'hff00]=8'hfa;
+                    rom[16'hff01]=8'hb8;
+                    rom[16'hff02]=8'h00;
+                    rom[16'hff03]=8'h00;
+                    rom[16'hff04]=8'h8e;
+                    rom[16'hff05]=8'hd8;
+                    rom[16'hff06]=8'h8e;
+                    rom[16'hff07]=8'hd0;
+                    rom[16'hff08]=8'hbc;
+                    rom[16'hff09]=8'h00;
+                    rom[16'hff0a]=8'h10;
+                    rom[16'hff0b]=8'hc7;
+                    rom[16'hff0c]=8'h06;
+                    rom[16'hff0d]=8'h08;
+                    rom[16'hff0e]=8'h00;
+                    rom[16'hff0f]=8'h40;
+                    rom[16'hff10]=8'hff;
+                    rom[16'hff11]=8'hc7;
+                    rom[16'hff12]=8'h06;
+                    rom[16'hff13]=8'h0a;
+                    rom[16'hff14]=8'h00;
+                    rom[16'hff15]=8'h00;
+                    rom[16'hff16]=8'hf0;
+                    rom[16'hff17]=8'hb0;
+                    rom[16'hff18]=8'h00;
+                    rom[16'hff19]=8'he6;
+                    rom[16'hff1a]=8'h61;
+                    rom[16'hff1b]=8'hb0;
+                    rom[16'hff1c]=8'h10;
+                    rom[16'hff1d]=8'he6;
+                    rom[16'hff1e]=8'h80;
+                    rom[16'hff1f]=8'h90;
+                    rom[16'hff20]=8'h90;
+                    rom[16'hff21]=8'h90;
+                    rom[16'hff22]=8'h90;
+                    rom[16'hff23]=8'h90;
+                    rom[16'hff24]=8'h90;
+                    rom[16'hff25]=8'h90;
+                    rom[16'hff26]=8'h90;
+                    rom[16'hff27]=8'hb0;
+                    rom[16'hff28]=8'h00;
+                    rom[16'hff29]=8'he6;
+                    rom[16'hff2a]=8'h70;
+                    rom[16'hff2b]=8'hb0;
+                    rom[16'hff2c]=8'h20;
+                    rom[16'hff2d]=8'he6;
+                    rom[16'hff2e]=8'h80;
+                    rom[16'hff2f]=8'hf4;
+                    rom[16'hff30]=8'heb;
+                    rom[16'hff31]=8'hfd;
+                    rom[16'hff40]=8'hb0;
+                    rom[16'hff41]=8'h30;
+                    rom[16'hff42]=8'he6;
+                    rom[16'hff43]=8'h80;
+                    rom[16'hff44]=8'hb0;
+                    rom[16'hff45]=8'h0c;
+                    rom[16'hff46]=8'he6;
+                    rom[16'hff47]=8'h61;
+                    rom[16'hff48]=8'hcf;
+                end
                 default: $fatal(1,"unsupported LANDMARK_CASE");
             endcase
-            max_cpu_cycles = 20000000;
+            max_cpu_cycles = 50000000;
             $display("LANDMARK_CASE=%0d entry=f000:%02h%02h",landmark_case,rom[16'hfff2],rom[16'hfff1]);
         end
         for (index = 0; index < 4; index = index + 1)
@@ -530,6 +626,33 @@ module spk286_at_bios_first_fetch_tb;
         cpu_boot_reset=0;
         for(cycles=0;cycles<max_cpu_cycles;cycles=cycles+1) begin
             @(negedge clk);
+            if (landmark_case==10) begin
+                if(parity_pulse_cycles>0) begin
+                    parity_pulse_cycles=parity_pulse_cycles-1;
+                    if(parity_pulse_cycles==0) parity_event=0;
+                end
+                if(nmi && !nmi_prev) begin
+                    nmi_pulses=nmi_pulses+1;
+                    if(nmi_mask || !dut.system_check_pending) $fatal(1,"NMI_SOURCE_OR_MASK");
+                end
+                nmi_prev=nmi;
+                if(cpu_bus_valid && cpu_ready && cpu_bus_write && cpu_bus_status==4'ha && cpu_address==24'h80) begin
+                    case(cpu_data_out[7:0])
+                        8'h10: begin
+                            if(!nmi_mask) $fatal(1,"NMI_NOT_MASKED_AT_RESET");
+                            parity_event=1; parity_pulse_cycles=4;
+                        end
+                        8'h30: nmi_markers=nmi_markers+1;
+                        8'h20: resumed_after_nmi=1;
+                    endcase
+                end
+                if(cpu_halted && resumed_after_nmi) begin
+                    if(nmi_pulses!=1 || nmi_markers!=1 || dut.system_check_pending || protocol_error || cpu_fault)
+                        $fatal(1,"NMI_INTEGRATION_FAIL pulses=%0d handlers=%0d pending=%b",nmi_pulses,nmi_markers,dut.system_check_pending);
+                    $display("AT_PORT61_NMI_INTEGRATION_PASS pending_masked_unmask_handler_clear_iret cycles=%0d",cycles);
+                    $finish;
+                end
+            end
             if (landmark_case != 0) begin
                 if (cpu_bus_valid && cpu_ready && (cpu_bus_status==4'ha || cpu_bus_status==4'h9)) begin
                     io_completed=io_completed+1;
@@ -548,6 +671,43 @@ module spk286_at_bios_first_fetch_tb;
                 if (landmark_case==3 && debug_ip==16'h8a45) begin
                     $display("LANDMARK_EARLY_BOOT_PASS cycles=%0d io=%0d",cycles,io_completed);
                     $finish;
+                end
+                if (cpu_bus_valid && cpu_ready && cpu_bus_status==4'h9 && cpu_address==24'h61)
+                    last_port61=cpu_data_in[15:8];
+                if (backend_ready && backend_owner==0 && backend_address<24'h4000) begin
+                    if(landmark_case==5) begin
+                        // Independent of CPU flags and the SDRAM model: verify
+                        // every address, byte lane and each original ROM pattern.
+                        if(backend_byte_enable !== (backend_address[0] ? 2'b10 : 2'b01))
+                            $fatal(1,"RAM_BYTE_LANE addr=%h be=%b",backend_address,backend_byte_enable);
+                        if(backend_write) begin
+                            if(backend_address !== 24'(ram_writes % 16384) ||
+                               (backend_address[0] ? backend_data_out[15:8] : backend_data_out[7:0]) !== memory_pattern(ram_writes))
+                                $fatal(1,"RAM_WRITE_ORACLE beat=%0d addr=%h data=%h",ram_writes,backend_address,backend_data_out);
+                        end else begin
+                            if(!backend_read_data_valid || backend_address !== 24'(ram_reads % 16384) ||
+                               (backend_address[0] ? backend_read_data[15:8] : backend_read_data[7:0]) !== memory_pattern(ram_reads))
+                                $fatal(1,"RAM_READ_ORACLE beat=%0d addr=%h data=%h",ram_reads,backend_address,backend_read_data);
+                            if(ram_reads % 16384 == 16383)
+                                $display("LANDMARK_RAM_PATTERN_PASS pattern=%02h bytes=16384 addresses_and_lanes_checked",memory_pattern(ram_reads));
+                        end
+                    end
+                    if(backend_write) ram_writes=ram_writes+1;
+                    else ram_reads=ram_reads+1;
+                end
+                // Observe a real fetch at the remote result handler. The
+                // debug IP can advance before the previous opcode retires.
+                if(landmark_case>=4 && backend_accept && backend_code_fetch && backend_owner==0) begin
+                    if(backend_address==24'h0f9b68 || (landmark_case==5 &&
+                       (backend_address==24'h0f9e49 || backend_address==24'h0f9e93)))
+                        $fatal(1,"LANDMARK_PERIPHERAL_FAIL case=%0d target=%h port61=%h ram_reads=%0d writes=%0d",landmark_case,backend_address,last_port61,ram_reads,ram_writes);
+                    if(backend_address==24'h0f9cb5) begin
+                        if(protocol_error || cpu_fault) $fatal(1,"routine passed with fault");
+                        if(landmark_case==5 && (ram_reads!=81920 || ram_writes!=81920))
+                            $fatal(1,"memory coverage incomplete reads=%0d writes=%0d",ram_reads,ram_writes);
+                        $display("LANDMARK_PERIPHERAL_PASS case=%0d cycles=%0d io=%0d port61=%h ram_reads=%0d writes=%0d",landmark_case,cycles,io_completed,last_port61,ram_reads,ram_writes);
+                        $finish;
+                    end
                 end
                 if (io_wait_cycles>1000)
                     $fatal(1,"LANDMARK_IO_STALL case=%0d csip=%h:%h port=%h at=%h be=%b accept=%b ready=%b bridge=%0d io_completed=%0d",landmark_case,debug_cs,debug_ip,cpu_address,dut.at_address,dut.at_byte_enable,dut.at_accept,dut.at_ready,dut.u_bridge.state_q,io_completed);
@@ -574,9 +734,9 @@ module spk286_at_bios_first_fetch_tb;
                 $finish;
             end
         end
-        $fatal(1,"watchdog reads=%0d cpu=%0d csip=%h:%h hlt=%b",fetch_returns,cpu_fetch_returns,debug_cs,debug_ip,cpu_halted);
+        $fatal(1,"watchdog reads=%0d cpu=%0d csip=%h:%h hlt=%b ram_reads=%0d ram_writes=%0d gpr=%h",fetch_returns,cpu_fetch_returns,debug_cs,debug_ip,cpu_halted,ram_reads,ram_writes,dut.debug_gpr);
     end
     initial begin
-        #1000000000; $fatal(1,"HPS/SDRAM startup watchdog");
+        #2000000000; $fatal(1,"HPS/SDRAM startup watchdog");
     end
 endmodule

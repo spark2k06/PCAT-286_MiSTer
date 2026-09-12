@@ -52,7 +52,11 @@ mapfile -t AT_SOURCES < <(
 )
 
 KF8259_DIR="$ROOT_DIR/rtl/KFPC-XT/HDL/KF8259/HDL"
+KF8253_DIR="$ROOT_DIR/rtl/KFPC-XT/HDL/KF8253/HDL"
 SOURCE_FILES=(
+  "$KF8253_DIR/KF8253.sv"
+  "$KF8253_DIR/KF8253_Counter.sv"
+  "$KF8253_DIR/KF8253_Control_Logic.sv"
   "$ROOT_DIR/sim/spk286_integration/hps_io_elab_stub.sv"
   "$ROOT_DIR/sim/spk286_integration/pll_system_elab_stub.sv"
   "$ROOT_DIR/rtl/common/jtframe_ram.v"
@@ -76,7 +80,7 @@ for source in "$ROOT_DIR"/rtl/video/*.v "$ROOT_DIR"/rtl/video/*.sv; do
   SOURCE_FILES+=("$source")
 done
 
-iverilog -g2012 -Wall -Wno-timescale \
+iverilog -g2012 -I"$KF8253_DIR" -Wall -Wno-timescale \
   -t null \
   -s emu_at \
   -I"$ROOT_DIR" \

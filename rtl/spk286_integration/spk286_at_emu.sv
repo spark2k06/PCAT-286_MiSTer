@@ -424,17 +424,16 @@ module emu_at
     );
 
     logic counter_clock;
+    spk286_at_pit_clock u_pit_clock(.clk(CLK_50M), .reset(RESET), .counter_clock(counter_clock));
     logic periodic_tick;
     logic second_tick;
     logic [25:0] tick_counter;
     always_ff @(posedge CLK_50M or posedge RESET) begin
         if (RESET) begin
-            counter_clock <= 1'b0;
             periodic_tick <= 1'b0;
             second_tick   <= 1'b0;
             tick_counter  <= 26'd0;
         end else begin
-            counter_clock <= ~counter_clock;
             periodic_tick <= (tick_counter[11:0] == 12'h000);
             second_tick   <= (tick_counter == 26'd49_999_999);
             if (tick_counter == 26'd49_999_999)

@@ -24,6 +24,11 @@ sources+=(
   rtl/spk286_integration/spk286_at_dma.sv
   rtl/spk286_integration/spk286_at_refresh.sv
   rtl/spk286_integration/spk286_at_pit.sv
+  rtl/spk286_integration/spk286_at_pit_clock.sv
+  rtl/spk286_integration/spk286_at_system_control.sv
+  rtl/KFPC-XT/HDL/KF8253/HDL/KF8253.sv
+  rtl/KFPC-XT/HDL/KF8253/HDL/KF8253_Counter.sv
+  rtl/KFPC-XT/HDL/KF8253/HDL/KF8253_Control_Logic.sv
   rtl/spk286_integration/spk286_at_8042.sv
   rtl/spk286_integration/spk286_at_rtc_cmos.sv
   rtl/spk286_integration/spk286_at_storage_video.sv
@@ -43,27 +48,27 @@ for source in rtl/KFPC-XT/HDL/KF8259/HDL/*.sv; do
   pic_sources+=("$source")
 done
 
-iverilog -g2012 -t null -Irtl/KFPC-XT/HDL/KF8259/HDL \
+iverilog -g2012 -Irtl/KFPC-XT/HDL/KF8253/HDL -t null -Irtl/KFPC-XT/HDL/KF8259/HDL \
   -s spk286_at_machine "${sources[@]}" "${pic_sources[@]}" \
   >"$build_dir/iverilog-build.log" 2>&1
 echo AT_MACHINE_ICARUS_ELAB_PASS
 
-verilator --lint-only --timing --top-module spk286_at_machine \
+verilator -Irtl/KFPC-XT/HDL/KF8253/HDL --lint-only --timing --top-module spk286_at_machine \
   -Wno-fatal -Irtl/KFPC-XT/HDL/KF8259/HDL \
   "${sources[@]}" "${pic_sources[@]}" \
   >"$build_dir/verilator-production-lint.log" 2>&1
 echo AT_MACHINE_PRODUCTION_LINT_PASS
 
 rm -rf "$build_dir/verilator-obj"
-verilator --binary --timing -DAT_MACHINE_PIC_MODEL \
+verilator -Irtl/KFPC-XT/HDL/KF8253/HDL --binary --timing -DAT_MACHINE_PIC_MODEL \
   --top-module spk286_at_machine_tb \
   -Wno-fatal -Irtl/KFPC-XT/HDL/KF8259/HDL \
   --Mdir "$build_dir/verilator-obj" -o at_machine_vlt \
   "${sources[@]}" sim/spk286_integration/spk286_at_machine_pic_model.sv \
   sim/spk286_integration/spk286_at_machine_tb.sv \
   >"$build_dir/verilator-build.log" 2>&1
-timeout 120s "$build_dir/verilator-obj/at_machine_vlt" "+ROM=$rom_path" \
-  "+MAX_CYCLES=${AT_SYSTEM_MAX_CYCLES:-2000000}" \
+(cd "$root/rtl/video" && timeout 120s "$build_dir/verilator-obj/at_machine_vlt" "+ROM=$rom_path" \
+  "+MAX_CYCLES=${AT_SYSTEM_MAX_CYCLES:-2000000}") \
   | tee "$build_dir/verilator-run.log"
 
 echo AT_MACHINE_BOUNDARY_TEST_PASS

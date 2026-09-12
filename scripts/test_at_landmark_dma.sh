@@ -29,6 +29,11 @@ sources+=(
   "${AT_DMA_SOURCE:-rtl/spk286_integration/spk286_at_dma.sv}"
   rtl/spk286_integration/spk286_at_refresh.sv
   rtl/spk286_integration/spk286_at_pit.sv
+  rtl/spk286_integration/spk286_at_pit_clock.sv
+  rtl/spk286_integration/spk286_at_system_control.sv
+  rtl/KFPC-XT/HDL/KF8253/HDL/KF8253.sv
+  rtl/KFPC-XT/HDL/KF8253/HDL/KF8253_Counter.sv
+  rtl/KFPC-XT/HDL/KF8253/HDL/KF8253_Control_Logic.sv
   rtl/spk286_integration/spk286_at_8042.sv
   rtl/spk286_integration/spk286_at_rtc_cmos.sv
   rtl/spk286_integration/spk286_at_storage_video.sv
@@ -52,7 +57,7 @@ sources+=(rtl/spk286_integration/spk286_at_hps_rom_loader.sv
   rtl/spk286_integration/spk286_at_boot_trace.sv
   sim/spk286_integration/spk286_sdram_pin_model.sv
   sim/spk286_integration/spk286_at_bios_first_fetch_tb.sv)
-verilator --binary --timing --trace-fst --trace-depth 3 \
+verilator -Irtl/KFPC-XT/HDL/KF8253/HDL --binary --timing --trace-fst --trace-depth 3 \
   --top-module spk286_at_bios_first_fetch_tb -Wno-fatal -j 4 \
   -Irtl/KFPC-XT/HDL/KF8259/HDL --Mdir "$build_dir/verilator-obj" -o first_fetch_vlt \
   "${sources[@]}" "${pic_sources[@]}" \

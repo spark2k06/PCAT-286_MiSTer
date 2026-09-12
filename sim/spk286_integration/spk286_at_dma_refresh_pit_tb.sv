@@ -155,7 +155,7 @@ module spk286_at_dma_refresh_pit_tb;
     integer pit_irq_count = 0;
 
     spk286_at_pit pit (
-        .clk(clk), .reset(reset), .counter_clock(pit_counter_clock),
+        .clk(clk), .reset(reset), .counter_clock(pit_counter_clock), .counter_2_gate(1'b1),
         .request_valid(pit_request_valid),
         .request_command_valid(pit_request_command_valid),
         .request_write(pit_request_write), .request_io(pit_request_io),
@@ -225,14 +225,21 @@ module spk286_at_dma_refresh_pit_tb;
             pit_request_write = 1'b0;
             pit_request_io = 1'b0;
             #1;
-            check(pit_request_ready, "PIT register write did not complete");
+            begin : wait_pit_ready
+                integer wait_cycles;
+                wait_cycles=0;
+                while(!pit_request_ready && wait_cycles<16) begin
+                    @(negedge clk); wait_cycles=wait_cycles+1;
+                end
+                check(pit_request_ready, "PIT register write did not complete");
+            end
             @(posedge clk);
         end
     endtask
 
     task automatic pit_tick;
         begin
-            // counter_clock is a sampled PIT tick enable at this boundary.
+            // One full sampled PIT clock period (KF8253 counts falling edges).
             @(negedge clk);
             pit_counter_clock = 1'b1;
             @(posedge clk);

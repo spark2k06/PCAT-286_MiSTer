@@ -65,7 +65,8 @@ module emu_at
     wire [1:0]  at_floppy_present;
     wire [1:0]  at_floppy_request;
     wire [2:0]  at_ide_request;
-    wire [7:0]  at_mgmt_request = {at_ide_request, at_floppy_request};
+    wire [7:0]  at_mgmt_request = {at_floppy_request, 3'b000,
+                                   at_ide_request};
 
     // Use the same MiSTer management transport and request bit layout as the
     // XT profile. Requests 7:6 are floppy A/B and 2:0 belong to XT-IDE.

@@ -344,6 +344,11 @@ module spk286_task_switch_service (
                 current_ldtr_q <= current_ldtr; nested_call_q <= nested_call;
                 jump_task_q <= jump_task; return_task_q <= return_task;
                 return_target_resolved_q <= 1'b0;
+                // Never publish a previous task's LDT cache while the new
+                // descriptor is still being validated (or when it faults).
+                incoming_ldtr_limit_q <= 16'h0000; incoming_ldtr_base_q <= 24'h000000;
+                incoming_ldtr_access_q <= 8'h00; incoming_ldtr_class_q <= spk286_protected_pkg::DESC_INVALID;
+                incoming_ldtr_valid_q <= 1'b0; incoming_ldtr_present_q <= 1'b0;
                 state_q <= ST_CHECK;
             end else if (state_q == ST_CHECK) begin
                 if (return_task_q && !return_target_resolved_q) begin

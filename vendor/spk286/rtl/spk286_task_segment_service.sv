@@ -177,8 +177,8 @@ module spk286_task_segment_service (
 
     always_comb begin
         segment_required = 4'b1111;
-        segment_required[0] = task_segments_q[12:0] != 13'd0;
-        segment_required[3] = task_segments_q[60:48] != 13'd0;
+        segment_required[0] = task_segments_q[15:2] != 14'd0;
+        segment_required[3] = task_segments_q[63:50] != 14'd0;
         for (integer k = 0; k < 4; k = k + 1) begin
             segment_invalid[k] = precheck_fault_q[k] ||
                                  (segment_required[k] &&
@@ -215,10 +215,10 @@ module spk286_task_segment_service (
 
     always_comb begin
         write_needed = 1'b0;
-        if (update_accessed && write_index_q == 2'd0 && !(task_segments_q[12:0] == 13'd0)) write_needed = !descriptor_accessed[0];
+        if (update_accessed && write_index_q == 2'd0 && segment_required[0]) write_needed = !descriptor_accessed[0];
         if (update_accessed && write_index_q == 2'd1) write_needed = !descriptor_accessed[1];
         if (update_accessed && write_index_q == 2'd2) write_needed = !descriptor_accessed[2];
-        if (update_accessed && write_index_q == 2'd3 && !(task_segments_q[60:48] == 13'd0)) write_needed = !descriptor_accessed[3];
+        if (update_accessed && write_index_q == 2'd3 && segment_required[3]) write_needed = !descriptor_accessed[3];
     end
 
     assign busy = state_q == ST_CHECK || state_q == ST_READ || state_q == ST_VALIDATE || state_q == ST_WRITE;
@@ -230,7 +230,7 @@ module spk286_task_segment_service (
     assign memory_byte = state_q == ST_WRITE;
     assign memory_address = (state_q == ST_READ) ?
                             (descriptor_address_q[segment_index_q] + {21'd0, word_index_q, 1'b0}) :
-                            (descriptor_address_q[write_index_q] + 24'd4);
+                            (descriptor_address_q[write_index_q] + 24'd5);
     assign memory_write_data = {8'h00, descriptor_access[write_index_q] | 8'h01};
     assign cache_selectors = cache_selectors_q;
     assign cache_bases = cache_bases_q;
@@ -322,7 +322,7 @@ module spk286_task_segment_service (
                     state_q <= ST_FAULT;
                 end else begin
                     for (integer j = 0; j < 4; j = j + 1) begin
-                        if (!((j == 0 || j == 3) && task_segments_q[j * 16 +: 13] == 13'd0)) begin
+                        if (segment_required[j]) begin
                             cache_selectors_q[j * 16 +: 16] <= task_segments_q[j * 16 +: 16];
                             cache_bases_q[j * 24 +: 24] <= descriptor_base[j];
                             cache_limits_q[j * 16 +: 16] <= descriptor_limit[j];

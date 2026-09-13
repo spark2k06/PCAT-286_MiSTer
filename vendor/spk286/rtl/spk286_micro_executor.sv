@@ -1093,9 +1093,15 @@ module spk286_micro_executor (
     assign redirect_operation = allowed && operation == spk286_microcode_pkg::MC_REDIRECT && target_valid_q;
     assign task_commit_gpr_write = task_commit_active_q && task_commit_phase_q <= 4'd7;
     assign task_commit_flags_write = task_commit_active_q && task_commit_phase_q == 4'd8;
-    assign task_commit_redirect = task_commit_flags_write;
+    // The early redirect publishes IP for late faults. Once CS is validated,
+    // flush again so no byte fetched with the outgoing CS base can execute.
+    assign task_commit_redirect = task_commit_flags_write || task_commit_segment_write;
     assign task_commit_tr_write = task_commit_active_q && task_commit_phase_q == 4'd9;
-    assign task_commit_ldtr_write = task_commit_tr_write;
+    // Publish the incoming selector with TR, then refresh the hidden LDTR
+    // once its descriptor is validated. Do not wait for segment success:
+    // a later CS/SS/ES/DS fault must retain the already validated LDT.
+    assign task_commit_ldtr_write = task_commit_tr_write ||
+                                   (task_commit_active_q && task_commit_phase_q == 4'd10 && task_loaded_ldtr_valid);
     // General registers/FLAGS/TR/LDTR publish as soon as the TSS image has
     // loaded.  Segment hidden caches publish only after the late descriptor
     // validation has completed; otherwise an in-flight validation would

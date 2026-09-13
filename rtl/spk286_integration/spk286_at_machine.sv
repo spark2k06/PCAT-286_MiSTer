@@ -390,6 +390,10 @@ module spk286_at_machine (
             is_a5_io_port = (port == 16'h0060) || (port == 16'h0064) ||
                             (port == 16'h0070) || (port == 16'h0071) ||
                             ((port >= 16'h01F0) && (port <= 16'h01F7)) ||
+                            // Forward XT-IDE before the unmapped-I/O FFh sink.
+                            // 308h is the high-byte latch; 309h stays unmapped.
+                            ((port >= 16'h0300) && (port <= 16'h030F) &&
+                             (port != 16'h0309)) ||
                             ((port >= 16'h03B0) && (port <= 16'h03DF)) ||
                             ((port >= 16'h03F0) && (port <= 16'h03F7));
         end

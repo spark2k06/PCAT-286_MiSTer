@@ -21,6 +21,8 @@ module spk286_at_machine (
 
     input  logic         keyboard_byte_valid,
     input  logic [7:0]   keyboard_byte,
+    output logic         keyboard_byte_ready,
+    output logic         keyboard_translate_set1,
     input  logic         periodic_tick,
     input  logic         second_tick,
     input  logic         parity_event,
@@ -560,6 +562,8 @@ module spk286_at_machine (
         .unmapped_request       (devices_unmapped_request),
         .keyboard_byte_valid    (keyboard_byte_valid),
         .keyboard_byte          (keyboard_byte),
+        .keyboard_byte_ready    (keyboard_byte_ready),
+        .keyboard_translate_set1(keyboard_translate_set1),
         .keyboard_output_valid  (keyboard_output_valid),
         .keyboard_output_byte   (keyboard_output_byte),
         .irq1                   (),

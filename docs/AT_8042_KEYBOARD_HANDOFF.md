@@ -95,11 +95,13 @@ No cambia ningún puerto de módulo ni el protocolo request/accept/ready del
 chipset. La prioridad del buffer impide que un evento HPS simultáneo sustituya
 la respuesta interna de un comando del 8042.
 
-La entrada física AT continúa recibiendo directamente el código de ocho bits
-de `hps_io`. Todavía no convierte de forma completa los indicadores
-make/break/extended (`ps2_key[9:8]`) ni implementa el diálogo de comandos con un
-teclado físico. Eso no interviene en estas dos pruebas de controlador, pero se
-debe completar antes de considerar terminado el teclado AT para uso normal.
+En esta revisión del 12 de septiembre, la entrada física AT aún recibía
+directamente el código de ocho bits de `hps_io`, sin convertir los indicadores
+make/break/extended (`ps2_key[9:8]`). Esto no intervenía en las dos pruebas de
+controlador, pero impedía escribir correctamente. La conversión de eventos y
+la cola de entrada se completan en la revisión del 13 de septiembre descrita
+en [AT_HPS_KEYBOARD_INPUT.md](AT_HPS_KEYBOARD_INPUT.md). El diálogo de comandos
+con un teclado físico sigue siendo un alcance distinto.
 
 ## Verificación
 

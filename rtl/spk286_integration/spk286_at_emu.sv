@@ -483,14 +483,10 @@ module emu_at
     end
 
     wire keyboard_byte_valid;
-    wire [7:0] keyboard_byte = ps2_key[7:0];
-    logic ps2_key_toggle_q = 1'b0;
-    // hps_io keeps its event toggle across a core reset. Track that level on
-    // every clock, including reset, so an odd previous event is not replayed
-    // as a new keyboard byte when the AT is released.
-    always_ff @(posedge CLK_50M)
-        ps2_key_toggle_q <= ps2_key[10];
-    assign keyboard_byte_valid = ps2_key[10] ^ ps2_key_toggle_q;
+    wire [7:0] keyboard_byte;
+    wire keyboard_byte_ready;
+    wire keyboard_translate_set1;
+    wire keyboard_event_overflow;
 
     // Keep the AT machine in reset until the private video PLL is usable as
     // well as until the system BIOS has arrived.  The BIOS loader and SDRAM
@@ -517,6 +513,17 @@ module emu_at
     // Reuse the XT reset controls without clearing the loaded ROM flags.
     wire at_boot_reset = RESET | hps_status[0] | hps_buttons[1] |
                          !main_rom_loaded | !at_video_pll_locked;
+
+    spk286_at_keyboard u_at_keyboard (
+        .clk                    (CLK_50M),
+        .reset                  (at_boot_reset),
+        .ps2_key                (ps2_key),
+        .translate_set1         (keyboard_translate_set1),
+        .keyboard_byte_ready    (keyboard_byte_ready),
+        .keyboard_byte_valid    (keyboard_byte_valid),
+        .keyboard_byte          (keyboard_byte),
+        .overflow               (keyboard_event_overflow)
+    );
 
     // Keep the XT-compatible second-SD routing selection stable until the
     // machine is reset, matching the XT profile's use_mmc latch.  Bits 22:21
@@ -619,6 +626,8 @@ module emu_at
         .refresh_enable         (1'b1),
         .keyboard_byte_valid    (keyboard_byte_valid),
         .keyboard_byte          (keyboard_byte),
+        .keyboard_byte_ready    (keyboard_byte_ready),
+        .keyboard_translate_set1(keyboard_translate_set1),
         .periodic_tick          (periodic_tick),
         .second_tick             (second_tick),
         .parity_event           (1'b0),
@@ -995,7 +1004,7 @@ module emu_at
         .xt_cycle_active         (at_debug_cycle_active),
         .xt_ready                (at_debug_ready),
         .bridge_idle             (at_debug_bridge_idle),
-        .bridge_error            (machine_protocol_error),
+        .bridge_error            (machine_protocol_error | keyboard_event_overflow),
         .hold_request            (at_debug_hold_request),
         .biu_detail              (at_debug_biu_detail),
         .last_post               (at_debug_last_post),
@@ -1024,7 +1033,7 @@ module emu_at
             at_use_debug_q <= at_debug_enable;
     end
 
-    wire at_video_fault = cpu_fault | machine_protocol_error |
+    wire at_video_fault = cpu_fault | machine_protocol_error | keyboard_event_overflow |
                           memory_port_protocol_error |
                           sdram_owner_protocol_error |
                           loader_protocol_error;
@@ -1051,7 +1060,7 @@ module emu_at
     assign HDMI_FREEZE  = 1'b0;
     assign HDMI_BLACKOUT = 1'b0;
     assign HDMI_BOB_DEINT = 1'b0;
-    assign LED_USER     = cpu_fault | machine_protocol_error |
+    assign LED_USER     = cpu_fault | machine_protocol_error | keyboard_event_overflow |
                           memory_port_protocol_error |
                           sdram_owner_protocol_error |
                           loader_protocol_error;

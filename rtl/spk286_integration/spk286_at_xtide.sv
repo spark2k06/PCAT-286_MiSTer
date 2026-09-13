@@ -37,7 +37,9 @@ module spk286_at_xtide (
     logic        busy_q;
     logic        read_q;
     logic        word_q;
+    logic        high_byte_port_q;
     logic [1:0]  byte_enable_q;
+    logic [7:0]  data_high_q;
     logic        protocol_error_q;
 
     logic [3:0]  ide_io_address;
@@ -56,15 +58,19 @@ module spk286_at_xtide (
     logic selected;
     logic lane_valid;
     logic data_word;
+    logic high_byte_port;
     logic mgmt_selected;
     logic [7:0] request_byte;
 
     always_comb begin
-        // XT2IDE selects 300h-307h as the command block.  Its control
-        // decoder only asserts CS3 for 30Ah-30Fh; 308h and 309h are holes.
+        // XT2IDE selects 300h-307h as the command block.  Port 308h is the
+        // auxiliary high-byte latch for the 16-bit data register, while 309h
+        // is the only hole in the 300h-30Fh window.  The control decoder
+        // responds to 30Ah-30Fh.
         selected = request_valid && request_command_valid && request_io &&
                    (request_address[15:4] == 12'h030) &&
                    ((!request_address[3]) ||
+                    (request_address[3:0] == 4'h8) ||
                     (request_address[2:1] != 2'b00));
         lane_valid = ((request_address[0] == 1'b0) &&
                       (request_byte_enable == 2'b01)) ||
@@ -73,6 +79,8 @@ module spk286_at_xtide (
         data_word = selected &&
                     (request_address[15:0] == 16'h0300) &&
                     (request_byte_enable == 2'b11);
+        high_byte_port = selected &&
+                         (request_address[15:0] == 16'h0308);
         mgmt_selected = (mgmt_address[15:8] == 8'hF0);
         request_byte = request_byte_enable[1] ?
                        request_data_out[15:8] : request_data_out[7:0];
@@ -85,7 +93,9 @@ module spk286_at_xtide (
                          {1'b0, request_address[2:0]};
         ide_io_writedata = data_word ?
                            {16'h0000, request_data_out} :
-                           {24'h000000, request_byte};
+                           ((request_address[15:0] == 16'h0300) ?
+                            {16'h0000, data_high_q, request_byte} :
+                            {24'h000000, request_byte});
     end
 
     assign request_accept = selected && !busy_q &&
@@ -93,6 +103,7 @@ module spk286_at_xtide (
     assign request_ready = busy_q;
     assign request_read_data_valid = busy_q && read_q;
     assign request_read_data = word_q ? ide_io_readdata[15:0] :
+                               high_byte_port_q ? {8'h00, data_high_q} :
                                (byte_enable_q[1] ?
                                 {ide_io_readdata[7:0], 8'h00} :
                                 {8'h00, ide_io_readdata[7:0]});
@@ -103,24 +114,34 @@ module spk286_at_xtide (
     // ide.v samples io_read/io_write on this edge.  request_accept is a
     // one-cycle pulse while the router is idle, so it is already the edge
     // detector used by the normalized endpoint.
-    assign ide_io_read = request_accept && !request_write;
-    assign ide_io_write = request_accept && request_write;
+    assign ide_io_read = request_accept && !request_write && !high_byte_port;
+    assign ide_io_write = request_accept && request_write && !high_byte_port;
 
     always_ff @(posedge clk) begin
         if (reset) begin
             busy_q <= 1'b0;
             read_q <= 1'b0;
             word_q <= 1'b0;
+            high_byte_port_q <= 1'b0;
             byte_enable_q <= 2'b00;
+            data_high_q <= 8'hFF;
             protocol_error_q <= 1'b0;
         end else begin
-            if (busy_q)
+            if (busy_q) begin
                 busy_q <= 1'b0;
-            else if (request_accept) begin
+                // XT2IDE makes the high byte of a data read available at 308h
+                // after the corresponding read from 300h.
+                if (read_q && !high_byte_port_q && !word_q &&
+                    (request_address[15:0] == 16'h0300))
+                    data_high_q <= ide_io_readdata[15:8];
+            end else if (request_accept) begin
                 busy_q <= 1'b1;
                 read_q <= !request_write;
                 word_q <= data_word;
+                high_byte_port_q <= high_byte_port;
                 byte_enable_q <= request_byte_enable;
+                if (high_byte_port && request_write)
+                    data_high_q <= request_byte;
             end
 
             if (selected && !(lane_valid || data_word))

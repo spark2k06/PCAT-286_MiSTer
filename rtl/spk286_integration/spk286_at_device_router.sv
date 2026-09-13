@@ -149,6 +149,7 @@ module spk286_at_device_router (
                                        (request_address[15:0] <= 16'h03F7)) ||
                                       ((request_address[15:4] == 12'h030) &&
                                        ((!request_address[3]) ||
+                                        (request_address[3:0] == 4'h8) ||
                                         (request_address[2:1] != 2'b00))))) ||
                                     (!request_io &&
                                      (request_address[23:0] >= 24'h0A0000) &&

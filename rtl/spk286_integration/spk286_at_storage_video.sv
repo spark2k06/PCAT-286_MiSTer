@@ -140,13 +140,13 @@ module spk286_at_storage_video (
                                 !request_io &&
                                 (request_address[23:0] >= 24'h0A0000) &&
                                 (request_address[23:0] <= 24'h0BFFFF);
-        // Keep the two unused XT2IDE holes (308h and 309h) unmapped.  The
-        // actual controller responds to the command block 300h-307h and the
-        // control block 30Ah-30Fh.
+        // Match XT2IDE: 308h is the data high-byte latch, 309h is the only
+        // hole, and 30Ah-30Fh form the control block.
         xtide_selected = request_valid && request_command_valid &&
                          request_io &&
                          (request_address[15:4] == 12'h030) &&
                          ((!request_address[3]) ||
+                          (request_address[3:0] == 4'h8) ||
                           (request_address[2:1] != 2'b00));
         device_selected = ata_selected || floppy_selected ||
                           video_io_selected || video_memory_selected ||

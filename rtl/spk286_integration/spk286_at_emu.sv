@@ -27,6 +27,10 @@ module emu_at
         "S1,IMGIMAVFD,Floppy B:;",
         "OJK,Write Protect,None,A:,B:,A: & B:;",
         "-;",
+        "S2,VHD,IDE 0-0;",
+        "S3,VHD,IDE 0-1;",
+        "OLM,2nd SD card,Disable,IDE 0-0,IDE 0-1;",
+        "-;",
         "P1,System & BIOS;",
         "P1-;",
         "P1O7,Boot Splash Screen,Yes,No;",
@@ -60,11 +64,13 @@ module emu_at
     wire        at_mgmt_write;
     wire [1:0]  at_floppy_present;
     wire [1:0]  at_floppy_request;
-    wire [7:0]  at_mgmt_request = {at_floppy_request, 6'b000000};
+    wire [2:0]  at_ide_request;
+    wire [7:0]  at_mgmt_request = {at_ide_request, at_floppy_request};
 
-    // Use the same MiSTer management transport as the XT profile and
-    // ao486/z486. Requests 7:6 are floppy A/B. RTC/CMOS updates are
-    // host-pushed writes in the F4xx window and therefore need no request bit.
+    // Use the same MiSTer management transport and request bit layout as the
+    // XT profile. Requests 7:6 are floppy A/B and 2:0 belong to XT-IDE.
+    // RTC/CMOS updates are host-pushed writes in the F4xx window and therefore
+    // need no request bit.
     hps_ext hps_ext_at (
         .clk_sys     (CLK_50M),
         .EXT_BUS     (EXT_BUS),
@@ -511,6 +517,17 @@ module emu_at
     wire at_boot_reset = RESET | hps_status[0] | hps_buttons[1] |
                          !main_rom_loaded | !at_video_pll_locked;
 
+    // Keep the XT-compatible second-SD routing selection stable until the
+    // machine is reset, matching the XT profile's use_mmc latch.  Bits 22:21
+    // are free in the AT profile and are reserved for this shared OSD field.
+    logic [1:0] at_use_mmc_q;
+    always_ff @(posedge CLK_50M or posedge RESET) begin
+        if (RESET)
+            at_use_mmc_q <= 2'b00;
+        else if (at_boot_reset)
+            at_use_mmc_q <= hps_status[22:21];
+    end
+
     // Keep the AT splash lifetime aligned with the XT profile.  Previously
     // this was wired directly to hps_status[7], which made the default
     // "Yes" setting hold the image forever while the CPU continued running
@@ -611,9 +628,11 @@ module emu_at
         .mgmt_write             (at_mgmt_write),
         .mgmt_read              (at_mgmt_read),
         .mgmt_readdata          (at_mgmt_din),
+        .use_mmc                (at_use_mmc_q),
         .floppy_write_protect   (hps_status[20:19]),
         .floppy_present         (at_floppy_present),
         .floppy_request         (at_floppy_request),
+        .ide_request            (at_ide_request),
         .cpu_address            (at_cpu_address),
         .cpu_data_out           (at_cpu_data_out),
         .cpu_data_in            (at_cpu_data_in),

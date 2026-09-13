@@ -33,9 +33,11 @@ module spk286_at_machine (
     input  logic         mgmt_write,
     input  logic         mgmt_read,
     output logic [15:0]  mgmt_readdata,
+    input  logic [1:0]   use_mmc,
     input  logic [1:0]   floppy_write_protect,
     output logic [1:0]   floppy_present,
     output logic [1:0]   floppy_request,
+    output logic [2:0]   ide_request,
 
     // CPU memory/code-fetch target.  The request metadata is retained by the
     // bridge and remains stable from command through READY.
@@ -585,6 +587,8 @@ module spk286_at_machine (
         .floppy_write_protect   (floppy_write_protect),
         .floppy_present         (floppy_present),
         .floppy_request         (floppy_request),
+        .use_mmc                (use_mmc),
+        .ide_request            (ide_request),
         .irq6                   (irq6),
         .irq14                  (irq14),
         .ata_selected           (ata_selected),

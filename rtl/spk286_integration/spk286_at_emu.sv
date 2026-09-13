@@ -325,6 +325,8 @@ module emu_at
     wire        at_debug_ready;
     wire        at_debug_hold_request;
     wire        at_debug_bridge_idle;
+    wire        at_speaker_active;
+    wire        at_speaker_level;
 
     wire        dma_memory_valid;
     wire        dma_memory_write;
@@ -707,6 +709,8 @@ module emu_at
         .cpu_fault              (cpu_fault),
         .debug_fault_sources    (at_machine_fault_sources),
         .cpu_reset_request      (at_cpu_reset_request),
+        .speaker_active         (at_speaker_active),
+        .speaker_level          (at_speaker_level),
         .protocol_error         (machine_protocol_error),
         .video_red              (at_video_red_raw),
         .video_green            (at_video_green_raw),
@@ -1034,9 +1038,14 @@ module emu_at
     assign LED_POWER    = 2'b00;
     assign LED_DISK     = {1'b0, main_rom_loaded};
     assign BUTTONS      = hps_buttons;
-    assign AUDIO_L      = 16'h0000;
-    assign AUDIO_R      = 16'h0000;
-    assign AUDIO_S      = 1'b0;
+    // Minimal PC speaker PCM.  The AT machine supplies a square-wave logic
+    // level from PIT channel 2; present it as a centered signed sample and
+    // leave the output at digital silence while the speaker is gated off.
+    assign AUDIO_L      = !at_speaker_active ? 16'h0000 :
+                          at_speaker_level ? 16'h4000 : 16'hC000;
+    assign AUDIO_R      = !at_speaker_active ? 16'h0000 :
+                          at_speaker_level ? 16'h4000 : 16'hC000;
+    assign AUDIO_S      = 1'b1;
     assign AUDIO_MIX    = 2'b00;
     assign ADC_BUS      = 4'hz;
     assign SD_SCK       = 1'bz;

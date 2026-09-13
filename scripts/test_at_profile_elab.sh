@@ -69,6 +69,8 @@ SOURCE_FILES=(
   "$ROOT_DIR/rtl/common/simple_ram.v"
   "$ROOT_DIR/rtl/common/simple_fifo.v"
   "$ROOT_DIR/rtl/common/floppy.v"
+  "$ROOT_DIR/rtl/common/ide.v"
+  "$ROOT_DIR/sim/spk286_integration/dpram_model.sv"
   "$ROOT_DIR/rtl/hps_ext.v"
   "$KF8253_DIR/KF8253.sv"
   "$KF8253_DIR/KF8253_Counter.sv"

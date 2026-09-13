@@ -332,7 +332,7 @@ module spk286_at_bios_first_fetch_tb;
         if(!reset && sdram_owner.u_KFSDRAM.read_flag_comb && pin_dq_valid!==2'b11)
             $fatal(1,"KF samples invalid DQ addr=%h valid=%b",sdram_owner.kf_address,pin_dq_valid);
         if(!cpu_boot_reset) begin
-            if(dut.u_cpu.cpu.msw_q[0]) $fatal(1,"PE set during first-fetch test");
+            if(dut.u_cpu.cpu.debug_protected_msw[0]) $fatal(1,"PE set during first-fetch test");
             if(backend_accept && backend_code_fetch) captured_word_address<=sdram_owner.kf_address;
             if(backend_ready && backend_code_fetch && backend_owner==0) begin
                 if(!backend_read_data_valid) $fatal(1,"fetch without VLD");
@@ -836,7 +836,7 @@ module spk286_at_bios_first_fetch_tb;
         for(cycles=0;cycles<max_cpu_cycles;cycles=cycles+1) begin
             @(negedge clk);
             if (landmark_case>=16 && landmark_case<=18) begin
-                if (dut.u_cpu.cpu.msw_q[0] || cpu_reset_request)
+                if (dut.u_cpu.cpu.debug_protected_msw[0] || cpu_reset_request)
                     $fatal(1,"PM_SKIP_ACTIVATED_PE_OR_RESET case=%0d",landmark_case);
                 if (dut.at_ready && dut.at_write && !dut.at_io && dut.at_byte_enable[0]) begin
                     for (integer ch=0; ch<7; ch=ch+1) begin

@@ -12,18 +12,18 @@ rom_path=$(realpath "$rom_path")
 mkdir -p "$build_dir"
 cd "$root"
 
-sources=(
-  vendor/spk286/microcode/generated/spk286_microcode_pkg.sv
-  vendor/spk286/microcode/generated/spk286_microcode_rom.sv
+# Use the current production CPU/package order (including PM5), rather than
+# the pre-PM operand replacement and alphabetical package discovery.
+mapfile -t sources < <(
+  sed -n 's/.*SYSTEMVERILOG_FILE "\(vendor\/spk286\/[^\"]*\.sv\)".*/\1/p' \
+    rtl/spk286_integration/spk286_integration.qip
 )
-for source in vendor/spk286/rtl/*.sv; do
-  [[ "$source" == "vendor/spk286/rtl/spk286_operand.sv" ]] || sources+=("$source")
-done
 sources+=(
   rtl/common/simple_ram.v
   rtl/common/simple_fifo.v
   rtl/common/floppy.v
-  rtl/spk286_integration/spk286_operand_timing.sv
+  rtl/common/ide.v
+  sim/spk286_integration/dpram_model.sv
   rtl/spk286_integration/spk286_machine_cpu.sv
   rtl/spk286_integration/spk286_at_bus_bridge.sv
   rtl/spk286_integration/spk286_at_memory_decode.sv
@@ -40,6 +40,7 @@ sources+=(
   rtl/spk286_integration/spk286_at_8042.sv
   rtl/spk286_integration/spk286_at_rtc_cmos.sv
   rtl/spk286_integration/spk286_at_fdc.sv
+  rtl/spk286_integration/spk286_at_xtide.sv
   rtl/spk286_integration/spk286_at_storage_video.sv
   rtl/spk286_integration/spk286_at_video_adapter.sv
   rtl/KFPC-XT/HDL/ega_vram_bram_frontend.sv
@@ -70,6 +71,7 @@ verilator -Irtl/KFPC-XT/HDL/KF8253/HDL --binary --timing --trace-fst --trace-dep
 cd "$root/rtl/video" # Resolve the production splash ROM without warnings.
 for rom in "$rom_path" \
   "$root/SW/ROMs/pcxt_xtsergey.rom" \
+  "$root/SW/ROMs/xtsergey_mod_at.rom" \
   "$root/SW/ROMs/test/Supersoft_Landmark_1.2.0_AT_5170_64K.BIN" \
   "$root/SW/ROMs/test/IBM_AT_5170_15NOV85_62X082x_64K.BIN"; do
   if [[ ! -f "$rom" ]]; then

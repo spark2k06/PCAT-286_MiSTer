@@ -60,6 +60,12 @@ module spk286_at_bus_bridge (
     output logic         bridge_idle,
     output logic         protocol_error
 );
+`ifdef SPK286_P01_FAST_MEMORY_START
+    localparam logic FAST_MEMORY_START = 1'b1;
+`else
+    localparam logic FAST_MEMORY_START = 1'b0;
+`endif
+
     localparam logic [3:0] STATE_IDLE     = 4'd0;
     localparam logic [3:0] STATE_SNAPSHOT = 4'd1;
     localparam logic [3:0] STATE_DECODE   = 4'd2;
@@ -93,6 +99,11 @@ module spk286_at_bus_bridge (
     logic request_is_code;
     logic request_is_read;
     logic completion_valid;
+    wire fast_memory_request = FAST_MEMORY_START &&
+                               cpu_memory_word_capable &&
+                               ((cpu_bus_status == 4'h5) ||
+                                (cpu_bus_status == 4'h6) ||
+                                (cpu_bus_status == 4'hD));
     wire native_word_request = cpu_memory_word_capable &&
                                ((cpu_bus_status == 4'h5) ||
                                 (cpu_bus_status == 4'h6) ||
@@ -227,7 +238,12 @@ module spk286_at_bus_bridge (
                         read_low_byte_q      <= 8'd0;
                         cpu_data_in          <= 16'd0;
                         if (live_request_valid)
-                            state_q <= STATE_SNAPSHOT;
+                            // P01 removes two bookkeeping-only states for
+                            // decoded RAM/ROM. The complete request is already
+                            // retained above; I/O, INTA, EGA and unmapped
+                            // accesses preserve the reference sequence.
+                            state_q <= fast_memory_request ? STATE_ADDRESS :
+                                       STATE_SNAPSHOT;
                         else begin
                             protocol_error <= 1'b1;
                             state_q <= STATE_COMPLETE;

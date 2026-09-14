@@ -98,7 +98,7 @@ post_message "AT SDC reset asynchronous pins: [get_collection_size $reset_pins]"
 
 # Common MiSTer exceptions which also apply to the AT output pipeline.
 set pll_frame [get_registers -nowarn {pll_hdmi_adj:pll_hdmi_adj|ivss}]
-if {[get_collection_size $pll_frame]} {
+if {[get_collection_size $pll_frame] && !$at_cdc_enabled} {
     set_false_path -from [get_registers {pll_hdmi_adj:pll_hdmi_adj|i_vss_delay}] -to $pll_frame
 }
 set scaler_reset [get_registers -nowarn {ascal:ascal|i_reset_na ascal:ascal|o_reset_na ascal:ascal|avl_reset_na}]
@@ -106,3 +106,39 @@ if {[get_collection_size $scaler_reset]} { set_false_path -to $scaler_reset }
 
 # No extra retiming exception between the three related video PLL outputs.
 # STA must analyze the real base/X2/+90 degree phase relationships.
+
+if {$at_cdc_enabled && $at_require_new} {
+    # Concrete instance endpoints, not domain-wide exemptions. 5 ns is less
+    # than one 148.5 MHz destination period. Capture waits for two toggle
+    # stages; the payload remains frozen until the acknowledgement returns.
+    proc at_snapshot {instance} {
+        set src [at_regs "${instance}_payload" "*${instance}|payload_q\[*\]"]
+        set dst [at_regs "${instance}_capture" "*${instance}|dst_data\[*\]"]
+        set req [at_regs "${instance}_req" "*${instance}|req_q"]
+        set ack [at_regs "${instance}_ack" "*${instance}|ack_q"]
+        set req_meta [at_regs "${instance}_req_meta" "*${instance}|req_meta"]
+        set ack_meta [at_regs "${instance}_ack_meta" "*${instance}|ack_meta"]
+        set_false_path -from $req -to $req_meta
+        set_false_path -from $ack -to $ack_meta
+        set_max_delay -from $src -to $dst 5.0
+        set_false_path -hold -from $src -to $dst
+    }
+    foreach instance {
+        video_stats time_stats
+        vga_osd*config_mailbox hdmi_osd*config_mailbox
+        input_geometry output_geometry
+    } {
+        at_snapshot $instance
+    }
+    at_sync metrics_video_edges $AT_VIDEO_OUT {*video_calc*g_at_edges*vs_meta *video_calc*g_at_edges*hs_meta *video_calc*g_at_edges*de_meta}
+    at_sync metrics_hdmi_edge $AT_HDMI {*video_calc*g_at_edges*hdmi_meta}
+    at_sync pll_cfg_video $AT_CPU {*pll_hdmi_adj|cfg_video_meta}
+    at_sync pll_cfg_mgmt $AT_CPU {*pll_hdmi_adj|cfg_mgmt_meta *pll_hdmi_adj|llena_meta}
+    at_sync pll_input_window $AT_VIDEO_OUT {*pll_hdmi_adj|ivss_meta}
+    at_sync pll_output_window $AT_HDMI {*pll_hdmi_adj|ovss_meta}
+    set cdc_reset_pins [get_pins -nowarn -compatibility_mode {
+        *pll_hdmi_adj|video_reset_*|clrn *pll_hdmi_adj|video_reset_*|prn
+        *pll_hdmi_adj|mgmt_reset_*|clrn *pll_hdmi_adj|mgmt_reset_*|prn
+    }]
+    if {[get_collection_size $cdc_reset_pins]} { set_false_path -to $cdc_reset_pins }
+}

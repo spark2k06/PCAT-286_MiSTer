@@ -20,7 +20,9 @@ run_dir=$(realpath -m "${1:-$root/build/at-no-debug/$(date -u +%Y%m%dT%H%M%S)-$$
 
 python3 "$root/scripts/p05_snapshot.py" "$run_dir" --revision PCAT-286_AT
 work="$run_dir/work"
-out="$work/output_files_pcat286_at"
+output_dir=$(sed -n 's/.*-name PROJECT_OUTPUT_DIRECTORY \([^ ]*\).*/\1/p' "$work/PCAT-286_AT.qsf" | tr -d '\r"')
+[[ "$output_dir" == output_files_pcat286_at || "$output_dir" == output_files_pcat286_at_cdc ]]
+out="$work/$output_dir"
 rbf="$out/PCAT-286_AT.rbf"
 [[ ! -e "$work/db" && ! -e "$work/incremental_db" && ! -e "$out" ]]
 bash "$work/scripts/test_at_profile_elab.sh" | tee "$run_dir/profile-check.log"

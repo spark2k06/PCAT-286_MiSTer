@@ -28,7 +28,6 @@ foreach revision $revisions {
             OPTIMIZE_HOLD_TIMING ALL_PATHS
             SEED 2
             GENERATE_RBF_FILE ON
-            PROJECT_OUTPUT_DIRECTORY output_files_pcat286_at
         } {
             set actual [get_global_assignment -name $name]
             if {![string equal -nocase $actual $expected]} {
@@ -36,6 +35,13 @@ foreach revision $revisions {
             }
             puts "AT_PRODUCTION_SETTING $name=$actual"
         }
+        set expected_out output_files_pcat286_at
+        if {[lsearch -exact $macros SPK286_AT_CDC] >= 0} {
+            set expected_out output_files_pcat286_at_cdc
+        }
+        set actual_out [get_global_assignment -name PROJECT_OUTPUT_DIRECTORY]
+        if {$actual_out ne $expected_out} { error "Wrong output directory: $actual_out" }
+        puts "AT_PRODUCTION_SETTING PROJECT_OUTPUT_DIRECTORY=$actual_out"
     }
     puts "P05_AT_PROJECT_PASS revision=$revision sdc=$sdc_files macros=$macros"
     project_close -dont_export_assignments

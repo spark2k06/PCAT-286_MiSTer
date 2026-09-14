@@ -7,6 +7,10 @@ Fecha: 2026-09-13. Base funcional: commit `4a05f97`, rama
 
 ## 1. Objetivo y documentos
 
+Experimento AT del 14/09/2026: referencia
+[sin debug, seed 2](P05_NODEBUG_SEED2_SNAPSHOT.md) y candidato
+[CDC de control y metadatos](P05_AT_CDC_EXPERIMENT.md).
+
 Mejorar el rendimiento útil de SPK286 en la máquina AT, conservar la corrección
 funcional y preparar perfiles de temporización verificables. El aumento de
 frecuencia física no se fija como requisito ni se promete una puntuación final.

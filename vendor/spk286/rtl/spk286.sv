@@ -370,6 +370,32 @@ module spk286 (
     assign protected_segment_is_readable = selected_segment_access[1];
     assign protected_segment_is_writable = !protected_segment_is_code && selected_segment_access[1];
     assign protected_segment_is_expand_down = !protected_segment_is_code && selected_segment_access[2];
+`ifdef SPK286_P05_PARALLEL_LIMIT_CHECK
+    // P05: compare the starting offset in parallel with the late width bit.
+    // offset + !byte > limit iff offset > limit || (!byte && offset == limit).
+    // This preserves the 17-bit (non-wrapping) check without placing a
+    // conditional increment carry chain ahead of the limit comparator.
+    assign protected_access_fault = operand_request && operand_select_rm && !operand_register_direct &&
+                                   !protected_descriptor_access && !protected_tss_access && !protected_event_access &&
+                                   !io_transfer && !vector_request &&
+                                    (protected_call_stack_access ?
+                                    (service_segment != 2'd2 ||
+                                     (protected_call_stack_expand_down ?
+                                      ({1'b0, service_offset} <= {1'b0, protected_call_stack_limit} ||
+                                       (!operand_byte && service_offset == 16'hFFFF)) :
+                                      (service_offset > protected_call_stack_limit ||
+                                       (!operand_byte && service_offset == protected_call_stack_limit)))) :
+                                    (protected_segment_is_loaded &&
+                                     (!protected_segment_is_valid || !protected_segment_is_present ||
+                                      (protected_segment_is_code ? (!protected_segment_is_readable || operand_write) :
+                                       (stack_request ? (!protected_segment_is_writable || service_segment != 2'd2) :
+                                        (operand_write && !protected_segment_is_writable))) ||
+                                      (protected_segment_is_expand_down ?
+                                       ({1'b0, service_offset} <= {1'b0, selected_segment_limit} ||
+                                        (!operand_byte && service_offset == 16'hFFFF)) :
+                                       (service_offset > selected_segment_limit ||
+                                        (!operand_byte && service_offset == selected_segment_limit))))));
+`else
     assign protected_access_fault = operand_request && operand_select_rm && !operand_register_direct &&
                                    !protected_descriptor_access && !protected_tss_access && !protected_event_access &&
                                    !io_transfer && !vector_request &&
@@ -388,6 +414,7 @@ module spk286 (
                                        ({1'b0, service_offset} <= {1'b0, selected_segment_limit} ||
                                         ({1'b0, service_offset} + (operand_byte ? 17'd0 : 17'd1) > 17'h0FFFF)) :
                                        ({1'b0, service_offset} + (operand_byte ? 17'd0 : 17'd1) > {1'b0, selected_segment_limit})))));
+`endif
     assign protected_access_ss_fault = protected_access_fault && service_segment == 2'd2;
     assign protected_fetch_fault = protected_msw[0] && protected_segment_protected[2'd1] &&
                                    (!protected_segment_valid[2'd1] || !protected_segment_present[2'd1] ||

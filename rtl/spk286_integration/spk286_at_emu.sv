@@ -20,6 +20,19 @@ module emu_at
         "h5-,HALTED: no EGA BIOS selected;"
     };
 
+`ifndef SPK286_AT_NO_DEBUG
+    localparam CONF_STR_AT_DEBUG = {
+        "P1O[71],SPK286 Debug,Off,On;",
+        "P1O[73:72],Debug Page,CPU,Registers,Bus,Trace;",
+        "P1O[79],Boot Fetch Trace,Off,On;",
+        "P1O[78:74],Boot Fetch Index,00,01,02,03,04,05,06,07,08,09,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31;",
+        "P1O[80],Boot Fetch View,Address,Data;",
+        "P1O[81],First Fault Trace,Off,On;",
+        "P1O[82],Landmark RAM Trace,Off,On;",
+        "P1O[84:83],RAM Trace Page,Compare,Read path,SDRAM,Registers;"
+    };
+`endif
+
     localparam CONF_STR_AT = {
         "PCAT-286;",
         CONF_STR_HALT_AT,
@@ -38,14 +51,11 @@ module emu_at
         "P1FC2,ROM,EC00 BIOS:;",
         "P1FC3,ROM,EGA BIOS:;",
         "P1-;",
-        "P1O[71],SPK286 Debug,Off,On;",
-        "P1O[73:72],Debug Page,CPU,Registers,Bus,Trace;",
-        "P1O[79],Boot Fetch Trace,Off,On;",
-        "P1O[78:74],Boot Fetch Index,00,01,02,03,04,05,06,07,08,09,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31;",
-        "P1O[80],Boot Fetch View,Address,Data;",
-        "P1O[81],First Fault Trace,Off,On;",
-        "P1O[82],Landmark RAM Trace,Off,On;",
-        "P1O[84:83],RAM Trace Page,Compare,Read path,SDRAM,Registers;",
+        // An empty packed Verilog string is an 8-bit NUL, not zero bytes.
+        // Omit the entire element so the host can read the remaining entries.
+`ifndef SPK286_AT_NO_DEBUG
+        CONF_STR_AT_DEBUG,
+`endif
         "P1-;",
         "-;",
         "R0,Reset & apply settings;",
@@ -648,24 +658,24 @@ module emu_at
     // Reset release for each output pipeline is synchronized to its own
     // phase. This keeps PLL lock/BIOS-load reset out of recovery paths in the
     // 57.272 MHz output registers.
-    always_ff @(posedge at_video_clk_57) begin
-        if (RESET) begin
+    always_ff @(posedge at_video_clk_57 or posedge at_boot_reset) begin
+        if (at_boot_reset) begin
             at_video_pipe_reset_57_q1 <= 1'b1;
             at_video_pipe_reset_57_q2 <= 1'b1;
         end else begin
             // The output pipeline must remain live while the splash is
             // displayed; only the AT machine itself is held in reset.
-            at_video_pipe_reset_57_q1 <= at_boot_reset;
+            at_video_pipe_reset_57_q1 <= 1'b0;
             at_video_pipe_reset_57_q2 <= at_video_pipe_reset_57_q1;
         end
     end
 
-    always_ff @(posedge at_video_clk_57_ps) begin
-        if (RESET) begin
+    always_ff @(posedge at_video_clk_57_ps or posedge at_boot_reset) begin
+        if (at_boot_reset) begin
             at_video_pipe_reset_57_ps_q1 <= 1'b1;
             at_video_pipe_reset_57_ps_q2 <= 1'b1;
         end else begin
-            at_video_pipe_reset_57_ps_q1 <= at_boot_reset;
+            at_video_pipe_reset_57_ps_q1 <= 1'b0;
             at_video_pipe_reset_57_ps_q2 <= at_video_pipe_reset_57_ps_q1;
         end
     end
@@ -737,6 +747,7 @@ module emu_at
         .cpu_ready              (at_cpu_ready),
         .cpu_halted             (at_cpu_halted),
         .cpu_shutdown           (at_cpu_shutdown),
+`ifndef SPK286_AT_NO_DEBUG
         .debug_control_error    (at_debug_control_error),
         .debug_unsupported_opcode(at_debug_unsupported_opcode),
         .debug_microcode_fault  (at_debug_microcode_fault),
@@ -791,6 +802,7 @@ module emu_at
         .debug_at_ready         (at_debug_ready),
         .cpu_hold_request       (at_debug_hold_request),
         .bridge_idle            (at_debug_bridge_idle),
+`endif
         .memory_request_valid   (cpu_memory_valid),
         .memory_command_valid   (cpu_memory_command_valid),
         .memory_write           (cpu_memory_write),
@@ -922,6 +934,7 @@ module emu_at
     wire        at_debug_vb_out;
     wire [23:0] at_debug_rgb_out;
 
+`ifndef SPK286_AT_NO_DEBUG
     wire [127:0] at_boot_trace_words;
     wire at_boot_trace_valid;
     wire [5:0] at_boot_trace_count;
@@ -1105,14 +1118,37 @@ module emu_at
         .VB_out                  (at_debug_vb_out),
         .rgb_out                 (at_debug_rgb_out)
     );
+`endif
+
+`ifndef SPK286_AT_NO_DEBUG
+    (* altera_attribute = "-name SYNCHRONIZER_IDENTIFICATION FORCED_IF_ASYNCHRONOUS" *)
+    logic at_debug_enable_sync1_q;
+    (* altera_attribute = "-name SYNCHRONIZER_IDENTIFICATION FORCED_IF_ASYNCHRONOUS" *)
+    logic at_debug_enable_sync2_q;
+    always_ff @(posedge at_video_clk_57_ps) begin
+        if (at_video_pipe_reset_57_ps) begin
+            at_debug_enable_sync1_q <= 1'b0;
+            at_debug_enable_sync2_q <= 1'b0;
+        end else begin
+            at_debug_enable_sync1_q <= at_debug_enable;
+            at_debug_enable_sync2_q <= at_debug_enable_sync1_q;
+        end
+    end
 
     logic at_use_debug_q;
     always_ff @(posedge at_video_clk_57_ps) begin
         if (at_video_pipe_reset_57_ps)
             at_use_debug_q <= 1'b0;
         else if (at_video_vb_out_q)
-            at_use_debug_q <= at_debug_enable;
+            at_use_debug_q <= at_debug_enable_sync2_q;
     end
+`else
+    logic at_use_debug_q;
+    assign at_use_debug_q = 1'b0;
+    assign at_debug_hb_out = 1'b0;
+    assign at_debug_vb_out = 1'b0;
+    assign at_debug_rgb_out = 24'h000000;
+`endif
 
     wire at_video_fault = cpu_fault | machine_protocol_error | keyboard_event_overflow |
                           memory_port_protocol_error |

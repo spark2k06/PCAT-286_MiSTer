@@ -26,7 +26,7 @@ if ! grep -q '"P1,System & BIOS;"' \
      "$ROOT_DIR/rtl/spk286_integration/spk286_at_emu.sv" || \
    ! grep -q '"V,v"' \
      "$ROOT_DIR/rtl/spk286_integration/spk286_at_emu.sv"; then
-  echo "AT_PROFILE OSD configuration must declare a page and video marker" >&2
+  echo "AT_PROFILE OSD configuration must declare a page and version marker" >&2
   exit 1
 fi
 
@@ -99,15 +99,26 @@ for source in "$ROOT_DIR"/rtl/video/*.v "$ROOT_DIR"/rtl/video/*.sv; do
 done
 
 iverilog -g2012 -I"$KF8253_DIR" -Wall -Wno-timescale \
-  -t null \
-  -s emu_at \
+    -DSPK286_P05_PARALLEL_LIMIT_CHECK \
+    -DSPK286_AT_NO_DEBUG \
+  -o "$BUILD_DIR/config.vvp" \
+  -s spk286_at_config_tb \
   -I"$ROOT_DIR" \
   -I"$KF8259_DIR" \
   "${SOURCE_FILES[@]}" \
+  "$ROOT_DIR/sim/spk286_integration/spk286_at_config_tb.sv" \
   >"$BUILD_DIR/compile.log" 2>&1 || {
     cat "$BUILD_DIR/compile.log"
     exit 1
   }
 
+(
+  cd "$ROOT_DIR/rtl/video"
+  vvp "$BUILD_DIR/config.vvp"
+) >"$BUILD_DIR/config.log" 2>&1 || {
+  cat "$BUILD_DIR/config.log"
+  exit 1
+}
+grep 'AT_CONFIG_.*_PASS' "$BUILD_DIR/config.log"
 echo "AT_PROFILE_SELECTOR_PASS"
 echo "AT_PROFILE_ELAB_PASS"

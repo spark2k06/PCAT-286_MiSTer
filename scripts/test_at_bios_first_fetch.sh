@@ -47,6 +47,7 @@ sources+=(
   rtl/spk286_integration/spk286_at_device_router.sv
   rtl/spk286_integration/spk286_at_machine.sv
   rtl/spk286_integration/spk286_at_mister_memory_port.sv
+  rtl/spk286_integration/spk286_at_sdram_read_buffer.sv
   rtl/KFPC-XT/HDL/KFSDRAM/HDL/KFSDRAM.sv
   rtl/spk286_integration/spk286_at_mister_sdram_owner.sv
 )

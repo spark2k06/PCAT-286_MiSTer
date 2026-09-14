@@ -366,6 +366,39 @@ module emu_at
     wire        backend_read_data_valid;
     wire        memory_port_protocol_error;
 
+    wire        p03_out_valid;
+    wire        p03_out_command_valid;
+    wire [1:0]  p03_out_owner;
+    wire        p03_out_write;
+    wire        p03_out_refresh;
+    wire        p03_out_code_fetch;
+    wire        p03_out_burst;
+    wire [3:0]  p03_out_cycle_class;
+    wire [23:0] p03_out_address;
+    wire [1:0]  p03_out_byte_enable;
+    wire [15:0] p03_out_data_out;
+    wire        p03_in_accept;
+    wire        p03_in_ready;
+    wire [15:0] p03_in_read_data;
+    wire        p03_in_read_data_valid;
+    wire        p03_out_accept;
+    wire        p03_out_ready;
+    wire [15:0] p03_out_read_data;
+    wire        p03_out_read_data_valid;
+    wire [31:0] p03_hit_count;
+    wire [31:0] p03_miss_count;
+    wire [31:0] p03_fill_count;
+    wire [31:0] p03_physical_read_count;
+    wire [31:0] p03_invalidation_count;
+
+    // Keep the existing logical-backend trace names pointed at the response
+    // seen by the memory port. The physical owner handshake is intentionally
+    // private to the P03 fill/bypass state machine.
+    assign backend_accept          = p03_in_accept;
+    assign backend_ready           = p03_in_ready;
+    assign backend_read_data       = p03_in_read_data;
+    assign backend_read_data_valid = p03_in_read_data_valid;
+
     spk286_at_mister_memory_port u_at_memory_port (
         .clk                    (CLK_50M),
         .reset                  (RESET),
@@ -412,11 +445,58 @@ module emu_at
         .backend_address        (backend_address),
         .backend_byte_enable    (backend_byte_enable),
         .backend_data_out       (backend_data_out),
-        .backend_accept         (backend_accept),
-        .backend_ready          (backend_ready),
-        .backend_read_data      (backend_read_data),
-        .backend_read_data_valid(backend_read_data_valid),
+        .backend_accept         (p03_in_accept),
+        .backend_ready          (p03_in_ready),
+        .backend_read_data      (p03_in_read_data),
+        .backend_read_data_valid(p03_in_read_data_valid),
         .protocol_error         (memory_port_protocol_error)
+    );
+
+    // P03 is placed below the single-owner memory port. The port still
+    // serializes CPU, DMA, loader and refresh ownership; the buffer can
+    // therefore invalidate one line on every accepted write without adding
+    // a second coherence arbiter.
+    spk286_at_sdram_read_buffer #(
+        .ENABLE(1'b1)
+    ) u_at_sdram_read_buffer (
+        .clk                     (CLK_50M),
+        .reset                   (RESET),
+        .cancel_cpu              (at_machine_reset | at_cpu_reset_request),
+        .enable                  (1'b1),
+        .in_valid                (backend_valid),
+        .in_command_valid        (backend_command_valid),
+        .in_owner                (backend_owner),
+        .in_write                (backend_write),
+        .in_refresh              (backend_refresh),
+        .in_code_fetch           (backend_code_fetch),
+        .in_cycle_class          (backend_cycle_class),
+        .in_address              (backend_address),
+        .in_byte_enable          (backend_byte_enable),
+        .in_data_out             (backend_data_out),
+        .in_accept               (p03_in_accept),
+        .in_ready                (p03_in_ready),
+        .in_read_data            (p03_in_read_data),
+        .in_read_data_valid      (p03_in_read_data_valid),
+        .out_valid               (p03_out_valid),
+        .out_command_valid       (p03_out_command_valid),
+        .out_owner               (p03_out_owner),
+        .out_write               (p03_out_write),
+        .out_refresh             (p03_out_refresh),
+        .out_code_fetch          (p03_out_code_fetch),
+        .out_burst               (p03_out_burst),
+        .out_cycle_class         (p03_out_cycle_class),
+        .out_address             (p03_out_address),
+        .out_byte_enable         (p03_out_byte_enable),
+        .out_data_out            (p03_out_data_out),
+        .out_accept              (p03_out_accept),
+        .out_ready               (p03_out_ready),
+        .out_read_data           (p03_out_read_data),
+        .out_read_data_valid     (p03_out_read_data_valid),
+        .debug_hit_count         (p03_hit_count),
+        .debug_miss_count        (p03_miss_count),
+        .debug_fill_count        (p03_fill_count),
+        .debug_physical_read_count(p03_physical_read_count),
+        .debug_invalidation_count(p03_invalidation_count)
     );
 
     wire        sdram_owner_protocol_error;
@@ -428,19 +508,20 @@ module emu_at
     spk286_at_mister_sdram_owner u_at_sdram_owner (
         .clk                    (CLK_50M),
         .reset                  (RESET),
-        .request_valid          (backend_valid),
-        .request_command_valid  (backend_command_valid),
-        .request_owner_refresh  (backend_refresh),
-        .request_write          (backend_write),
-        .request_code_fetch     (backend_code_fetch),
-        .request_cycle_class    (backend_cycle_class),
-        .request_address        (backend_address),
-        .request_byte_enable    (backend_byte_enable),
-        .request_data_out       (backend_data_out),
-        .request_accept         (backend_accept),
-        .request_ready          (backend_ready),
-        .request_read_data      (backend_read_data),
-        .request_read_data_valid(backend_read_data_valid),
+        .request_valid          (p03_out_valid),
+        .request_command_valid  (p03_out_command_valid),
+        .request_owner_refresh  (p03_out_refresh),
+        .request_write          (p03_out_write),
+        .request_code_fetch     (p03_out_code_fetch),
+        .request_burst          (p03_out_burst),
+        .request_cycle_class    (p03_out_cycle_class),
+        .request_address        (p03_out_address),
+        .request_byte_enable    (p03_out_byte_enable),
+        .request_data_out       (p03_out_data_out),
+        .request_accept         (p03_out_accept),
+        .request_ready          (p03_out_ready),
+        .request_read_data      (p03_out_read_data),
+        .request_read_data_valid(p03_out_read_data_valid),
         .physical_idle          (physical_idle),
         .protocol_error         (sdram_owner_protocol_error),
         .debug_kf_address       (at_trace_kf_address),

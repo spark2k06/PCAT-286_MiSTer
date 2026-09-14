@@ -30,11 +30,23 @@ module spk286_at_memory_perf_tb;
     wire [15:0] backend_out, backend_in;
     wire [3:0] backend_class;
     wire port_error, owner_error, physical_idle;
+    wire        p03_out_valid, p03_out_command;
+    wire [1:0]  p03_out_owner;
+    wire        p03_out_write, p03_out_refresh, p03_out_code, p03_out_burst;
+    wire [3:0]  p03_out_class;
+    wire [23:0] p03_out_address;
+    wire [1:0]  p03_out_lanes;
+    wire [15:0] p03_out_data;
+    wire        p03_in_accept, p03_in_ready, p03_in_read_valid;
+    wire [15:0] p03_in_data;
+    wire        p03_out_accept, p03_out_ready, p03_out_read_valid;
+    wire [15:0] p03_out_read_data;
     wire [12:0] dram_address;
     wire dram_cke, dram_cs, dram_ras, dram_cas, dram_we, dram_oe;
     wire [1:0] dram_ba, dram_dqm, dq_valid;
     wire [15:0] dram_in, dram_out;
     wire integer dram_reads, dram_writes;
+    integer p03_enable = 0;
 
     spk286_machine_cpu cpu (
         .clk(clk), .reset(cpu_reset), .execute_enable(1'b1),
@@ -82,19 +94,47 @@ module spk286_at_memory_perf_tb;
         .backend_write(backend_write), .backend_refresh(backend_refresh),
         .backend_code_fetch(backend_code), .backend_cycle_class(backend_class),
         .backend_address(backend_address), .backend_byte_enable(backend_lanes),
-        .backend_data_out(backend_out), .backend_accept(backend_accept),
-        .backend_ready(backend_ready), .backend_read_data(backend_in),
-        .backend_read_data_valid(backend_read_valid), .protocol_error(port_error)
+        .backend_data_out(backend_out), .backend_accept(p03_in_accept),
+        .backend_ready(p03_in_ready), .backend_read_data(p03_in_data),
+        .backend_read_data_valid(p03_in_read_valid), .protocol_error(port_error)
+    );
+    assign backend_accept = p03_in_accept;
+    assign backend_ready = p03_in_ready;
+    assign backend_in = p03_in_data;
+    assign backend_read_valid = p03_in_read_valid;
+
+    spk286_at_sdram_read_buffer buffer (
+        .clk(clk), .reset(reset), .cancel_cpu(cpu_reset),
+        .enable(p03_enable != 0),
+        .in_valid(backend_valid), .in_command_valid(backend_command),
+        .in_owner(2'd0), .in_write(backend_write),
+        .in_refresh(backend_refresh), .in_code_fetch(backend_code),
+        .in_cycle_class(backend_class), .in_address(backend_address),
+        .in_byte_enable(backend_lanes), .in_data_out(backend_out),
+        .in_accept(p03_in_accept), .in_ready(p03_in_ready),
+        .in_read_data(p03_in_data), .in_read_data_valid(p03_in_read_valid),
+        .out_valid(p03_out_valid), .out_command_valid(p03_out_command),
+        .out_owner(p03_out_owner), .out_write(p03_out_write),
+        .out_refresh(p03_out_refresh), .out_code_fetch(p03_out_code),
+        .out_burst(p03_out_burst),
+        .out_cycle_class(p03_out_class), .out_address(p03_out_address),
+        .out_byte_enable(p03_out_lanes), .out_data_out(p03_out_data),
+        .out_accept(p03_out_accept), .out_ready(p03_out_ready),
+        .out_read_data(p03_out_read_data),
+        .out_read_data_valid(p03_out_read_valid),
+        .debug_hit_count(), .debug_miss_count(), .debug_fill_count(),
+        .debug_physical_read_count(), .debug_invalidation_count()
     );
     spk286_at_mister_sdram_owner #(.SDRAM_INIT_WAIT(16'd8)) owner (
-        .clk(clk), .reset(reset), .request_valid(backend_valid),
-        .request_command_valid(backend_command),
-        .request_owner_refresh(backend_refresh), .request_write(backend_write),
-        .request_code_fetch(backend_code), .request_cycle_class(backend_class),
-        .request_address(backend_address), .request_byte_enable(backend_lanes),
-        .request_data_out(backend_out), .request_accept(backend_accept),
-        .request_ready(backend_ready), .request_read_data(backend_in),
-        .request_read_data_valid(backend_read_valid), .physical_idle(physical_idle),
+        .clk(clk), .reset(reset), .request_valid(p03_out_valid),
+        .request_command_valid(p03_out_command),
+        .request_owner_refresh(p03_out_refresh), .request_write(p03_out_write),
+        .request_code_fetch(p03_out_code), .request_burst(p03_out_burst),
+        .request_cycle_class(p03_out_class),
+        .request_address(p03_out_address), .request_byte_enable(p03_out_lanes),
+        .request_data_out(p03_out_data), .request_accept(p03_out_accept),
+        .request_ready(p03_out_ready), .request_read_data(p03_out_read_data),
+        .request_read_data_valid(p03_out_read_valid), .physical_idle(physical_idle),
         .protocol_error(owner_error), .sdram_address(dram_address),
         .sdram_cke(dram_cke), .sdram_cs(dram_cs), .sdram_ras(dram_ras),
         .sdram_cas(dram_cas), .sdram_we(dram_we), .sdram_ba(dram_ba),
@@ -116,8 +156,8 @@ module spk286_at_memory_perf_tb;
     integer write_cycles = 0, write_requests = 0;
     logic bus_pending = 0;
     task automatic report_stage;
-        $display("AT_PERF native=%0d stage=%0d cycles=%0d retired=%0d sdram_reads=%0d sdram_writes=%0d bus_busy=%0d queue_empty=%0d",
-            native_width, stage, cycles-mark_cycles, instructions-mark_instructions,
+        $display("AT_PERF p03=%0d native=%0d stage=%0d cycles=%0d retired=%0d sdram_reads=%0d sdram_writes=%0d bus_busy=%0d queue_empty=%0d",
+            p03_enable, native_width, stage, cycles-mark_cycles, instructions-mark_instructions,
             dram_reads-mark_reads, dram_writes-mark_writes,
             busy-mark_busy, empty_queue-mark_empty);
     endtask
@@ -164,9 +204,9 @@ module spk286_at_memory_perf_tb;
                 for (integer i=0; i<1024; i=i+1)
                     if (dram.mem['h2000+i] !== 16'hA55A)
                         $fatal(1, "AT_PERF string mismatch index=%0d", i);
-                $display("AT_MEMORY_PERF_PASS native=%0d cycles=%0d retired=%0d reads=%0d read_cycles=%0d writes=%0d write_cycles=%0d",
-                    native_width, cycles, instructions, read_requests, read_cycles,
-                    write_requests, write_cycles);
+                $display("AT_MEMORY_PERF_PASS p03=%0d native=%0d cycles=%0d retired=%0d reads=%0d read_cycles=%0d writes=%0d write_cycles=%0d sdram_reads=%0d sdram_writes=%0d",
+                    p03_enable, native_width, cycles, instructions, read_requests, read_cycles,
+                    write_requests, write_cycles, dram_reads, dram_writes);
                 $finish;
             end
             if (cycles > 2000000) $fatal(1, "AT_PERF timeout cs=%h ip=%h",cs,instruction_ip);
@@ -178,6 +218,7 @@ module spk286_at_memory_perf_tb;
     initial begin
         if (!$value$plusargs("ROM=%s", rom_path)) $fatal(1, "ROM path required");
         if ($value$plusargs("NATIVE=%d", native_width)) begin end
+        if ($value$plusargs("P03=%d", p03_enable)) begin end
         fd = $fopen(rom_path,"rb");
         if (!fd) $fatal(1, "Cannot open ROM");
         count = $fread(rom,fd);

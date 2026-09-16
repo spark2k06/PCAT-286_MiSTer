@@ -96,8 +96,7 @@ module spk286_fetch (
             end else if (!suspend && response_slot_available && !blocked &&
                          (restart_pending_q || request)) begin
                 // P02 may retire the response and capture the next fetch on
-                // the same edge. The BIU then sees the new code cycle without
-                // an idle boundary; the base profile keeps the old bubble.
+                // the same edge; the base profile keeps the old bubble.
                 active_q <= 1'b1;
                 canceled_q <= 1'b0;
                 restart_pending_q <= 1'b0;

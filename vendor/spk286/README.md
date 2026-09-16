@@ -3,6 +3,11 @@
 SPK286 is an open-source, synthesizable SystemVerilog project targeting an
 Intel 80286-compatible FPGA soft-core.
 
+This vendored PCAT copy includes the downstream
+[SALC D6 compatibility extension](docs/PCAT_SALC_COMPATIBILITY.md), needed by
+AT XTIDE Universal BIOS after disk detection. Historical phase manifests
+below retain their original scope.
+
 SPK286 is a **CPU-only project**. Its scope ends at the processor boundary:
 architectural execution, microcode, prefetch, segmentation/protection,
 exceptions, the Bus Interface Unit (BIU), timing policy, and the native external

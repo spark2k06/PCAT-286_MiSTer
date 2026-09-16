@@ -10,14 +10,14 @@ Hardware now confirms the port 61h/PIT corrections: all three timers, both DMA
 controllers/page registers, parity and SYSTEM BIOS pass. Before the DQM fix,
 AT failed 16K with both original and patched ROM and repeated POST. XT passed
 16K but failed its separate later MEMORY REFRESH; it remains reference-only.
-The AT-only RAM observer supplied the data needed to diagnose that difference.
-The new RAM Trace identifies the first read at 006E40 returning FF00 instead of
-FFFF. The old AT owner reproduces this with actual MiSTer XS/XSDS DQM wiring:
+The AT memory tests supplied the data needed to diagnose that difference. The
+first read at 006E40 returned FF00 instead of FFFF. The old AT owner reproduces
+this with actual MiSTer XS/XSDS DQM wiring:
 A12/A11 stayed zero on WRITE, so byte writes overwrote the neighboring lane.
 The AT-only fix drives the masks on these pins for column commands, preserving
 all row bits on ACTIVE. The corrected pin model now includes this wiring;
 both it and dedicated DQM are tested. Original-ROM five-pattern RAM cases pass,
-including original header and distinct DS/ES, plus injected error controls.
+including original header and distinct DS/ES.
 The user now confirms both 16K CRITICAL and MEMORY REFRESH PASS in AT hardware.
 The next stop is PROTECTED MODE CPU: SKIP_PM V1 missed the early A3B3 path.
 V2 skips both unsupported PM paths with an explicit SKIPPED status and repairs
@@ -32,7 +32,6 @@ status is unsupported. RTC periodic-rate division and speaker audio are incomple
 calendar/date rollover and MiSTer `F4xx` host-time import are now implemented.
 See `AT_LANDMARK_SKIP_PM_V2.md` for the current ROM and next hardware test.
 See `AT_SDRAM_DQM_HANDOFF.md` for the now hardware-confirmed wiring fix.
-`AT_CRITICAL_RAM_HANDOFF.md` preserves the earlier instrumentation audit.
 See `AT_LANDMARK_PIT_PARITY_HANDOFF.md` for the previous functional fixes.
 Older I0–I6 statements below describe their original acceptance scope.
 

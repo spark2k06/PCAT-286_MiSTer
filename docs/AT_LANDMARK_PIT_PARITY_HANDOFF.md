@@ -22,7 +22,7 @@ checksums por instrucción del usuario. No se afirma un POST completo.
 
 | Síntoma | Evidencia | Corrección |
 |---|---|---|
-| `B:1` desde el arranque | First Fault: T0=`0000A000`, T1=`F000FFF0`, T2=`00000000`, T3=`81E8A000`. Bits 13 RTC y 15 agregado; CPU en reset. `protocol_error` del RTC carecía de reset. Icarus devuelve X en frío y retiene 1 tras reset; Yosys optimiza el RTL anterior a constante 1. | Inicializar el indicador en el reset real del RTC. |
+| `B:1` desde el arranque | `protocol_error` del RTC carecía de reset. Icarus devuelve X en frío y retiene 1 tras reset; Yosys optimiza el RTL anterior a constante 1. | Inicializar el indicador en el reset real del RTC. |
 | Paridad U126/8042 | La rutina F000:8DCB lee 61h y prueba C0h. El AT no decodificaba ese puerto: respondía FF en la lane alta. Se observa el fetch real del manejador de fallo 0F9B68h. | Puerto B del AT independiente del 8042: latches de paridad/channel check, controles y lectura de estado. |
 | Región crítica de 16 KiB | La rutina F000:9F14 escribe un patrón y compara cada byte; después lee 61h. Con el RTL anterior, el primer byte coincide, pero FF provoca el salto a 0F9E93h, la salida de **paridad**, tras 1 lectura y 16.385 escrituras (incluye reescritura del byte al fallar). | La misma corrección de 61h permite terminar cinco patrones, 81.920 escrituras y 81.920 lecturas. Ningún cambio de SDRAM. |
 | PIT1/PIT2 y lectura de contadores | El PIT AT anterior sólo descontaba canal 0. No tenía puntero de lectura independiente ni latch correcto. La nueva prueba detecta que leer 1234h devuelve 3333h en el anterior después de un tick. | Adaptador de transacciones AT sobre los tres KF8253 existentes; verificados contra secuencias y resultados observables, no sólo contra su implementación. |
@@ -30,8 +30,7 @@ checksums por instrucción del usuario. No se afirma un POST completo.
 | Estado de refresco | Leer 61h devolvía FF; bit 4 no podía mostrar ambas fases. | Bit 4 cambia por flancos ascendentes de OUT1. Los bucles originales 8E48h/8E52h observan las dos fases. |
 
 El indicador B:1 anterior era una alarma de protocolo falsa; por sí solo no
-demostraba un fallo de ejecución. Además ocupaba First Fault desde reset y
-evitaría que esa captura mostrase un fallo posterior.
+demostraba un fallo de ejecución.
 
 `SYSTEM BIOS` también es checksum: F000:973Eh selecciona DS=E000h, suma 65.536
 bytes con LODSB/ADD AH,AL y comprueba AH=0. No se ha parcheado ni considerado
@@ -59,8 +58,6 @@ siguiente determinará si existe además otro fallo.
   fuerzan a cero para ocultar errores. La paridad pendiente se enmascara mediante
   70h bit 7 y puede generar NMI al habilitarse. Un nivel retenido produce un NMI.
 - La salida de depuración `debug_keyboard_port_b` muestra ahora ese puerto.
-  First Fault conserva sus bits: bit 15 incluye también errores de protocolo de
-  61h. Una máscara 8000h sin fuentes 11..14 apunta al nuevo puerto.
 - La planificación física de AUTO REFRESH SDRAM sigue independiente del PIT,
   como exige la memoria usada en MiSTer. El bit 4 representa solicitudes del
   temporizador AT; no certifica retención física ni finalización de AUTO REFRESH.
@@ -105,16 +102,15 @@ opcode previo. Se elevó el límite a 50 millones de ciclos para terminar los
 
 Regresiones adicionales: DMA2/páginas originales (casos 1/2), primeras lecturas
 de cuatro BIOS, A4 DMA/PIT/arbitraje, frontera de máquina (PIC real en elaboración
-/lint; modelo de PIC en el escenario histórico), A5 dispositivos, First Fault y
-overlay XT/AT, y elaboración del perfil de producción. Los recursos del splash
+/lint; modelo de PIC en el escenario histórico), A5 dispositivos, overlay XT/AT,
+y elaboración del perfil de producción. Los recursos del splash
 se resuelven desde el directorio de vídeo en las pruebas A5/máquina.
 
 Además, un oráculo independiente de los flags de CPU comprueba la secuencia
 de todas las direcciones, la lane y el dato de cada uno de los cinco patrones.
 
-Las evidencias y comandos reproducibles están en
-`analysis/at_pit_parity_20260912/`. No hay cambio en la convención de dirección,
-lanes ni protocolo SDRAM: son las mismas rutas físicas probadas antes del cambio.
+No hay cambio en la convención de dirección, lanes ni protocolo SDRAM: son las
+mismas rutas físicas probadas antes del cambio.
 No se ha simulado todo el POST ni se certifica todo modo real del 286.
 
 ## Timing del RBF anterior suministrado por el usuario
@@ -140,20 +136,17 @@ son distintos del puerto ausente y del reset RTC, reproducidos independientement
 1. Sintetizar el perfil AT_FAST desde esta revisión. Generar un nombre nuevo,
    por ejemplo `PCAT-286_20260912_pit_port61_rtc_AT_FAST.rbf`; guardar SHA-256
    e informes de timing. Conservar el checkpoint DMA anterior.
-2. Cargar exactamente la ROM SKIP_PM indicada arriba. Hacer un reset completo
-   del core (o recarga del RBF); el reset sólo de CPU no borra First Fault.
-3. Comprobar `B:0` y First Fault T0=00000000 desde el arranque. Si cambia,
-   capturar la página First Fault completa antes de otro reset.
-4. Dejar correr al menos tres pasadas. Resultados esperados de esta corrección:
+2. Cargar exactamente la ROM SKIP_PM indicada arriba y hacer un reset completo
+   del core (o recarga del RBF).
+3. Comprobar `B:0` desde el arranque y dejar correr al menos tres pasadas.
+4. Resultados esperados de esta corrección:
    Timer0/1/2, DMA1/2/páginas, paridad y 16K CRITICAL MEMORY REGION en PASSED.
    MEMORY REFRESH debería poder superar también la lectura de sus dos fases;
    su prueba completa de retención queda para esta validación física.
 5. Ignorar ROM A/B y SYSTEM BIOS (checksums). Registrar cualquier otra línea
    nueva y el número de pasadas; una foto con el overlay apagado permite leerlo.
-6. Si persiste un fallo o una parada: enviar POST sin overlay, página CPU y
-   First Fault. Para un problema de memoria, añadir página Registers y Bus
-   mientras se reproduce, sin resetear. Si T0 sigue cero, la ausencia de una
-   alarma de protocolo no demuestra por sí sola que todos los datos sean correctos.
+6. Si persiste un fallo o una parada: enviar POST sin overlay y las páginas CPU,
+   Registers, Bus y Trace mientras se reproduce.
 
 ## Referencias primarias
 

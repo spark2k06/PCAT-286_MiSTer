@@ -83,7 +83,6 @@ module spk286_at_device_router (
     output logic [9:0]  video_active_lines,
     output logic [15:0] side_effect_count,
     output logic [15:0] irq_request,
-    output wire [3:0]   debug_fault_sources,
     output logic        protocol_error
 );
     localparam logic [2:0] ROUTER_IDLE   = 3'd0;
@@ -306,9 +305,6 @@ module spk286_at_device_router (
         irq_request[14] = irq14;
         ide_request = storage_ide_request;
     end
-
-    assign debug_fault_sources = {storage_protocol_error, rtc_protocol_error,
-                                  kbd_protocol_error, router_protocol_error_q};
 
     assign protocol_error = router_protocol_error_q | kbd_protocol_error |
                             rtc_protocol_error | storage_protocol_error;

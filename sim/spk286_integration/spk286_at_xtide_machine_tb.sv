@@ -18,7 +18,6 @@ module spk286_at_xtide_machine_tb;
     wire [2:0] ide_request;
     wire [15:0] irq_request;
     wire protocol_error, unmapped_request;
-    wire [15:0] fault_sources;
     integer sink_reads = 0, ide_commands = 0;
 
     hps_ext transport (
@@ -43,8 +42,7 @@ module spk286_at_xtide_machine_tb;
         .memory_read_data(16'd0), .memory_read_data_valid(1'b0),
         .dma_memory_accept(1'b0), .dma_memory_ready(1'b0), .dma_memory_data_in(16'd0),
         .refresh_memory_accept(1'b0), .refresh_memory_ready(1'b0),
-        .unmapped_request(unmapped_request), .protocol_error(protocol_error),
-        .debug_fault_sources(fault_sources)
+        .unmapped_request(unmapped_request), .protocol_error(protocol_error)
     );
     always @(posedge clk) if (!reset) begin
         if (dut.io_sink_accept && !dut.at_write) sink_reads <= sink_reads + 1;
@@ -222,7 +220,7 @@ module spk286_at_xtide_machine_tb;
         cpu_read_expect(16'h0307, 8'h40);
         check(ide_commands == 3, "Command was duplicated or dropped");
         check(sink_reads == 3, "Valid XT-IDE reads reached the FFh sink");
-        check(!protocol_error, $sformatf("AT protocol fault: %04h", fault_sources));
+        check(!protocol_error, "AT protocol fault");
         $display("AT_XTIDE_MACHINE_PASS cpu_idle=%0d identify_words=256 read_words=256 write_words=256 hps=1 decode=1",
                  dut.u_cpu.idle_cycles);
         $finish;

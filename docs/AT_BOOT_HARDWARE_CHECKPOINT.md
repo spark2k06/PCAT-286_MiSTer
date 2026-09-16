@@ -15,9 +15,8 @@ Source: `output_files_pcat286_at_fast/PCAT-286_AT_FAST.rbf`, last written
 2026-09-12 11:47:05 local time. This is the latest local synthesis associated
 with the user's report; the flashed file hash was not supplied independently.
 
-The audited RTL source manifest from the preceding review is unchanged.
-Previous simulation/regression results and first-fetch waveforms are preserved
-under `analysis/at_boot_audit_20260912`.
+The audited RTL source manifest from the preceding review is unchanged. Previous
+simulation and regression results were used only to validate this checkpoint.
 
 External diagnostic ROM images, disk images, unrelated analysis executables,
 old failed bitstreams, and transient Quartus output directories remain local.

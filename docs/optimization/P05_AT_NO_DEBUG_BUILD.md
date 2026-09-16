@@ -56,7 +56,6 @@ RBF analizado: `output_files_pcat286_at/PCAT-286_AT.rbf`, 3.656.496 bytes,
 SHA-256 `a7b571f4a1878cbefcf4bb9ba92573788e0a6f9b2c98fd3b586603a665eb5eea`.
 
 TimeQuest se ejecutó sobre una copia de su base de datos, sin síntesis ni fit.
-Los informes están en `analysis/p05/20260914-no-debug-original-fit/reports/`.
 La configuración actual no sustituye el placement de esa base de datos antigua.
 
 - `no_debug=1 observers=0`: el fit sí eliminó overlay y trazas de boot/RAM/fallo.

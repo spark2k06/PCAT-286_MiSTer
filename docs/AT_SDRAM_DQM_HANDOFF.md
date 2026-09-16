@@ -9,9 +9,9 @@ Fecha: 12 de septiembre de 2026. Base anterior: `c581864`.
 
 ## Diagnóstico y alcance
 
-Las cuatro páginas de Landmark RAM Trace permiten identificar una escritura
-por byte que no preserva el otro byte de la palabra física. El propietario AT
-calculaba correctamente BE y las salidas DQMH/DQML, pero dejaba **A12/A11=00**
+La prueba independiente de memoria permite identificar una escritura por byte
+que no preserva el otro byte de la palabra física. El propietario AT calculaba
+correctamente BE y las salidas DQMH/DQML, pero dejaba **A12/A11=00**
 al emitir WRITE. Los módulos MiSTer XS/XSDS conectan las máscaras del chip a
 **A12= DQMH y A11= DQML**. Por tanto, ambos bytes quedaban habilitados aunque
 el AT sólo quisiera escribir uno.
@@ -21,31 +21,6 @@ primera lectura de Landmark, dirección **006E40h**, palabra devuelta **FF00h**.
 La corrección pasa la rutina completa de cinco patrones en simulación con la
 ROM original. La confirmación del nuevo RBF en la placa queda para el usuario.
 No se ha sintetizado ni generado un RBF en esta revisión.
-
-## Evidencia física recibida
-
-Las imágenes originales y la transcripción están en
-`analysis/at_dqm_wiring_20260912/hardware-page-0.png` a `hardware-page-3.png` y
-`hardware-decoded.json`. Las palabras se conservan en orden visible T0..T3:
-
-| Página | T0 | T1 | T2 | T3 |
-|---|---|---|---|---|
-| Compare | C1FF0000 | F0009F37 | 40000001 | 008606E4 |
-| Read path | F5006E40 | E4006E40 | F0003720 | 0000FF00 |
-| SDRAM | FF000600 | 06E4F000 | 00006E40 | 000F0000 |
-| Registers | FFFFB800 | 40000000 | 0200AE3F | FF008E03 |
-
-`VALID=1`, `ARMED=1`, `COMPARISONS=0001`. La comparación retirada en
-F000:9F37 espera AH=FF, recibe BL=00 y deja ZF=0. DI ya es 0001, ES=06E4 y
-su base oculta=006E40: el byte comparado está en 006E40+(DI-1)=006E40.
-CPU y backend solicitan ese mismo byte; KF usa la palabra 003720, es decir
-006E40 >> 1. KF captura FF00, backend devuelve FF00, la lane baja entrega 00
-al CPU. La comparación informa correctamente del error que recibió.
-
-La última escritura capturada es 00AE3F, BE=10, dato FF00, al final del patrón.
-La captura no contiene todas las escrituras anteriores ni una medida eléctrica
-externa. La reproducción siguiente completa esa parte de la cadena con señales
-simuladas de los pines y con el cableado documentado de la placa.
 
 ## Cableado comprobado y defecto del modelo anterior
 
@@ -137,12 +112,8 @@ absoluta para un AT.
 - Control de sensibilidad de reloj: el desplazamiento artificial de +4 ns
   produce la lectura Z esperada; el modelo no retiene datos indefinidamente.
 - Control anterior con DQM dedicado: PASS. Con A12/A11: FAIL exacto FF00.
-- `test_at_landmark_ram.sh`, **ROM original**, casos 13/14: errores inyectados
-  FF -> FE en bytes par/impar detectados correctamente por BIOS y traza.
 - Casos 11/12: PASS de FF/01/55/AA/00; cada caso verifica **81.920 escrituras y
   81.920 lecturas**, direcciones y lanes, sin fallos del CPU o protocolo.
-  Caso 11: 29.011.397 ciclos; caso 12: 23.791.827 ciclos. Al éxito se exige
-  traza armada, VALID=0 y contador saturado FFFF.
 - Primer fetch y carga HPS de cuatro ROM: PASS, 32 lecturas de instrucción.
 - Propietario SDRAM, frontera de máquina, lint de producción y elaboración
   del perfil AT: PASS. El diff pasa `git diff --check`.
@@ -151,26 +122,15 @@ Comandos reproducibles desde la raíz del repositorio, en WSL/Bash:
 
 ```bash
 bash scripts/test_at_sdram_capture.sh
-AT_SYSTEM_ROM="$PWD/SW/ROMs/test/Supersoft_Landmark_1.2.0_AT_5170_64K.BIN" \
-  AT_LANDMARK_TIMEOUT=180s bash scripts/test_at_landmark_ram.sh
 bash scripts/test_at_bios_first_fetch.sh
 bash scripts/test_at_mister_sdram_owner.sh
 bash scripts/test_at_machine_boundary.sh
 bash scripts/test_at_profile_elab.sh
 ```
 
-Control negativo reproducible; debe terminar con `expected=ffff actual=ff00`:
-
-```bash
-AT_SDRAM_OWNER_SOURCE="$PWD/analysis/at_dqm_wiring_20260912/sdram_owner_before.sv.txt" \
-  PCAT_BUILD_DIR="$PWD/build/at-dqm-negative-control" \
-  bash scripts/test_at_sdram_capture.sh
-```
-
 No se afirma un PASS simulado del POST completo desde reset: la prueba larga
 anterior fue inconclusa. Los casos de Landmark seleccionan una entrada en el
 buffer del testbench; no alteran ningún archivo BIOS ni omiten sus comparaciones.
-Las ondas, logs y hashes de ROM están en `analysis/at_dqm_wiring_20260912/`.
 
 ## Timing, configuración y otros problemas
 
@@ -199,9 +159,9 @@ una prueba AT una vez que la BIOS supere 16K.
    `E9A3F0605996FF6802F44AD1744675C01DF9B5832273BB7472C878A6AAD03EC6`.
 3. Hacer reset completo del core. Verificar **16K CRITICAL MEMORY REGION PASSED**
    y anotar el resultado de **MEMORY REFRESH** cuando aparezca.
-4. Si pasa, capturar el diagnóstico y conservar el timing del nuevo fit.
-   En la traza se espera ARMED=1, VALID=0, COMPARISONS=FFFF al completar 16K.
-5. Si sigue fallando, enviar las mismas cuatro páginas tras un reset completo.
+4. Si pasa, conservar el diagnóstico de las páginas activas y el timing del
+   nuevo fit.
+5. Si sigue fallando, enviar CPU, Registers, Bus y Trace tras un reset completo.
    Si repite exactamente FF00 pese a sintetizar este cambio, hará falta además
    identificar modelo/revisión del módulo SDRAM y capturar con SignalTap
    A[12:0], DQ, BA, CS/RAS/CAS/WE, DQM dedicado y BE durante las escrituras a

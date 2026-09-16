@@ -93,7 +93,6 @@ memory response without adding a register or changing cycle behavior.
 `scripts/test_i5_timing_equivalence.sh` compares every output and internal
 state element of the two implementations for directed cases and 50,000
 randomized cycles in both Icarus and Verilator. This generic refactor is a
-candidate for a later SPK286 upstream change. The Quartus 17 compilation-unit
-wrapper is also potentially reusable as optional tool compatibility. The XT
-bridge, local reset release, bus pacing and machine timing constraints are
-consumer-specific and do not belong in the CPU repository.
+candidate for a later SPK286 upstream change. The XT bridge, local reset
+release, bus pacing and machine timing constraints are consumer-specific and
+do not belong in the CPU repository.

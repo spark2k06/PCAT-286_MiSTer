@@ -58,8 +58,7 @@ de disponer de una base de datos escribible altere el fit original.
 
 ## Rutas extraídas del fit existente
 
-Modelo extraído: **Slow 1100mV 100C**, Quartus Prime 17.0.2 Lite. Evidencia
-guardada en `analysis/at_timing_audit_20260912/`.
+Modelo extraído: **Slow 1100mV 100C**, Quartus Prime 17.0.2 Lite.
 
 | Grupo | Inicio -> final | Slack | Interpretación |
 | --- | --- | ---: | --- |
@@ -180,20 +179,5 @@ Referencias auxiliares: `XT_CE_Generator.sv:26`, `PERIPHERALS.sv:468`,
   validación de placa ni se atribuye aún una causa única a `F000:FFFx`,
   `CS=00xx` o `HLT=1`.
 
-## Reproducción de la extracción
-
-Los scripts y reportes están en `analysis/at_timing_audit_20260912`.
-La variante `audit_fixed.tcl` aplica la SDC actual del repositorio al netlist
-existente. El runner copia la base de datos a `/build` dentro de un contenedor
-efímero; monta las fuentes como sólo lectura. Ejecutar desde WSL:
-
-```sh
-docker run --rm \
-  -v /mnt/d/GitHub/PCAT-286_MiSTer:/source:ro \
-  -v /mnt/d/GitHub/PCAT-286_MiSTer/analysis/at_timing_audit_20260912:/audit \
-  -w /audit raetro/quartus:mister bash /audit/run_fixed.sh
-```
-
-No es una compilación completa. Los reportes iniciales sin corrección se
-conservan como evidencia histórica del fit, y `baseline_PCAT-286.sdc`
-conserva la SDC anterior al cambio de esta auditoría.
+La extracción fue una auditoría puntual sobre un fit anterior, no una
+compilación completa ni parte del flujo de producción actual.

@@ -132,9 +132,8 @@ bash scripts/test_at_landmark_pm_skip.sh
 
 Los casos se seleccionan con `AT_LANDMARK_CASES`, y el archivo con
 `AT_SYSTEM_ROM`. Elegir V1 y el caso 16 o 18 debe producir los fallos de control
-anteriores. Las capturas, hashes, listados de código y logs están en
-`analysis/at_pm_patch_20260912/`. El RBF del usuario sólo se identificó por su
-hash en disco; no se leyó directamente la FPGA ni se compiló de nuevo.
+anteriores. El RBF del usuario sólo se identificó por su hash en disco; no se
+leyó directamente la FPGA ni se compiló de nuevo.
 
 ## Prueba en MiSTer
 

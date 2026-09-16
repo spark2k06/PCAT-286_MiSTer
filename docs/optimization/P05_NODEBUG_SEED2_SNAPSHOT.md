@@ -31,7 +31,6 @@ La siguiente experiencia CDC debe partir de esta referencia en otra rama.
 | Hold salida SDRAM, Slow 100 C | +0.423 ns |
 | TNS setup multicorner | -3745.07 ns |
 
-Informes locales: `analysis/p05/20260914-no-debug-seed2-fit/reports/`.
 El inventario fisico confirma cero observadores de debug.
 
 Recorridos relevantes: `video_calc` de reloj de video a 50 MHz; configuracion

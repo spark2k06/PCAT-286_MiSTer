@@ -91,58 +91,10 @@ recorded as an inconclusive investigation, not a passing full-BIOS test.
 That probe also inherits the short first-fetch bench's limited PIT clock
 stimulus, so it is not a faithful timer or full-boot measurement.
 
-A passive **First Fault Trace** is now available on AT OSD bit 81, without
-changing the shared XT configuration bits. It captures independently of OSD
-visibility. The first nonzero source sample is retained until the machine's
-boot reset; later CPU-only resets do not erase it. Sampling observes registered
-fault outputs on the next source-clock edge; CS/IP is the observed CPU state,
-not a reconstructed instruction-start address.
-
-Enable **System & BIOS → SPK286 Debug → On**, then **First Fault Trace → On**.
-This view takes priority over Boot Fetch Trace and displays four raw words:
-
-| Word | Meaning |
-| --- | --- |
-| T0 | First source mask; zero means no fault was captured |
-| T1 | First CS in bits 31:16, IP in 15:0 |
-| T2 | First opcode in 31:24, CPU bus address in 23:0 |
-| T3 | First bus flags in 31:19, current source mask in 18:0 |
-
-Source-mask bits:
-
-| Bit | Source |
-| --- | --- |
-| 0 | CPU shutdown |
-| 1 | CPU control error |
-| 2 | Unsupported opcode |
-| 3 | Microcode fault |
-| 4 | Operand blocked |
-| 5 | CPU-to-AT bridge protocol |
-| 6 | Arbiter protocol |
-| 7 | PIC protocol |
-| 8 | PIT protocol |
-| 9 | DMA protocol |
-| 10 | Refresh protocol |
-| 11 | Device router protocol |
-| 12 | 8042 protocol |
-| 13 | RTC/CMOS protocol |
-| 14 | Storage/video wrapper protocol |
-| 15 | Aggregate device error (also represented by bits 11–14) |
-| 16 | MiSTer memory-port protocol |
-| 17 | SDRAM owner protocol |
-| 18 | HPS ROM-loader protocol |
-
-T3 first flags: bit 31 CPU reset, 30 HLT, 29 CPU bus valid, 28 CPU ready,
-27 normalized I/O, 26 CPU write, 25 normalized code fetch, 24:21 CPU bus
-status, 20 CPU A0, 19 CPU BHE_n. Bits 16–18 add memory/loader visibility;
-they were not included in the old B indicator. The indicator itself remains
-unchanged; the new trace explains its sources rather than masking them.
-
-Interface additions are observation-only: `debug_fault_sources[3:0]` on the
-AT device router and `[15:0]` on the AT machine; the overlay has an AT-gated
-`fault_trace_view` input. XT rendering ignores both AT raw-view selectors,
-covered by the dual-simulator overlay regression. The new module is listed
-in the production QIP and verified by full AT profile elaboration.
+For any later stop, use the four live pages of **SPK286 Debug**: CPU, Registers,
+Bus and Trace. They expose the current machine state and the rolling bus
+activity without adding a retained diagnostic recorder to the production
+design.
 
 ## Remaining visible diagnostic errors
 
@@ -181,7 +133,6 @@ Run under WSL from the repository:
 
 ```sh
 bash scripts/test_at_dma_registers.sh
-bash scripts/test_at_fault_trace.sh
 bash scripts/test_at_landmark_dma.sh
 bash scripts/test_at_bios_first_fetch.sh
 bash scripts/test_debug_overlay.sh
@@ -205,36 +156,31 @@ active. External device accesses and complete board electrical timing are not
 modeled. The direct register test adds distinct values at every page port to
 catch aliasing that Landmark's same-value pattern alone would not detect.
 
-To reproduce the negative DMA2 result, set `AT_DMA_SOURCE` to the archived
-`analysis/at_landmark_dma_20260912/spk286_at_dma.before.sv` and use a separate
-`PCAT_BUILD_DIR`; case 1 must fail. Use `AT_LANDMARK_CASES=2` for the 84h timeout.
+Use a separate `PCAT_BUILD_DIR` when comparing alternative DMA implementations;
+case 1 is the negative control and `AT_LANDMARK_CASES=2` exercises the 84h path.
 The optional `AT_LANDMARK_CASES=3` is the bounded original-entry investigation,
 not part of the default passing regression; its watchdog limitation is above.
 
 For the next hardware run:
 
 1. Build the usual AT_FAST profile. Give the new RBF a distinct name, for example
-   `PCAT-286_20260912_dma_registers_fault_trace_AT_FAST.rbf`.
+    `PCAT-286_20260912_dma_registers_AT_FAST.rbf`.
 2. Load the same SKIP_PM ROM, then perform a core reset. Expect DMA2 and DMA
    page-register diagnostics to continue; this expectation needs board validation.
 3. Capture the diagnostic screen showing the next stopping point or errors.
-4. If B remains 1, enable First Fault Trace and photograph all T0–T3 rows.
-   The capture is already retained; it does not need to be enabled before the
-   error. Avoid resetting again until that photo is taken.
-5. If execution stops, disable First Fault Trace and Boot Fetch Trace, choose
-   Debug Page **Bus**, and take one additional photo. Include **CPU** and
-   **Registers** pages if the CPU state has changed from the current stop.
+4. If execution stops, choose Debug Page **Bus** and take one additional photo.
+   Include **CPU**, **Registers** and **Trace** if the machine state has changed
+   from the current stop.
 
 Final default regressions pass: DMA registers (8,311 I/O accesses, seven
-channels and 14 transfer beats) in Icarus/Verilator; fault capture in both;
-Landmark DMA2 and page routines; first-fetch checks for four ROMs; XT/AT overlay
+channels and 14 transfer beats) in Icarus/Verilator; Landmark DMA2 and page
+routines; first-fetch checks for four ROMs; XT/AT overlay
 in both simulators; full AT profile elaboration; production-machine lint;
 machine boundary; A4 and A5 device regressions. The existing A4/A5 machine
 benches still warn about an unavailable splash ROM in their working directory;
 those benches do not validate the raster image. The physical first-fetch and
 Landmark benches resolve the production video ROM path.
 
-Evidence and ROM checksums are under `analysis/at_landmark_dma_20260912`.
 No new RBF is generated or claimed validated here.
 
 ## Primary technical references

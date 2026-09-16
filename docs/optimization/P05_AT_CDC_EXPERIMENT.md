@@ -116,8 +116,7 @@ El test de perfil mantiene `AT_CONFIG_NO_DEBUG_PASS bytes=401`.
 
 Se ha reanalizado tambien **el fit antiguo**, sin sintetizar RTL nuevo, con
 las reglas del experimento. Resultado: 0 errores de ejecucion STA, 6 avisos
-heredados; no implica timing aprobado. Informes:
-`analysis/p05/20260914-seed2-cdc-final-rules/reports/`.
+heredados; no implica timing aprobado.
 Las colecciones de los helpers nuevos se omiten SOLO en esta reanalisis
 marcada `P05_REFERENCE_FIT=1`; no existen en el fit de referencia.
 

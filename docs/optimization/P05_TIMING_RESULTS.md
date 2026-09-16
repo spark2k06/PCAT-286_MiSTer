@@ -53,7 +53,6 @@ Imagen Docker usada para STA:
 
 ## 3. Rutas observadas en el fit anterior
 
-Informes de referencia: `analysis/p05/20260914-baseline/reports/`.
 Los cuatro modelos disponibles se analizaron, no sólo Slow/100 °C.
 Todos los valores siguientes son ns; un valor negativo incumple el requisito.
 
@@ -143,8 +142,7 @@ explícitamente el fit anterior, que todavía no contiene esos registros.
 
 La selección de SDC y macro se comprobó con Quartus en las dos revisiones AT
 sin compilarlas: `build/p05/project-selection.log`.
-Reanálisis con el listado AT separado:
-`analysis/p05/20260914-at-isolated/` (mismo fit anterior, sólo constraints).
+Reanálisis con el listado AT separado (mismo fit anterior, sólo constraints).
 Resultado: cuatro modelos procesados, 0 errores y 8 avisos de TimeQuest,
 frente a 104 avisos en la auditoría de referencia.
 
@@ -235,7 +233,7 @@ python3 scripts/test_p05_limit_equivalence.py --output build/p05/new-limit-proof
 python3 scripts/p05_snapshot.py build/p05/new-at-fit --revision PCAT-286_AT --with-fit
 
 # Sólo TimeQuest sobre una copia desechable de esa base de datos.
-bash scripts/run_p05_audit.sh build/p05/new-at-fit/work PCAT-286_AT analysis/p05/new-at-fit
+bash scripts/run_p05_audit.sh build/p05/new-at-fit/work PCAT-286_AT build/p05/new-at-fit/audit
 ```
 
 `run_p05_audit.sh` no sintetiza. Monta la referencia como sólo lectura, copia

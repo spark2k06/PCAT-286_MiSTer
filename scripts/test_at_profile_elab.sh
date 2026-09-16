@@ -17,48 +17,48 @@ if ! grep -q 'assign hdmi_tx_clk = hdmi_clk_out;' "$ROOT_DIR/sys/sys_top.v"; the
 fi
 
 if ! grep -q '\.clk_sys              (CLK_50M)' \
-     "$ROOT_DIR/rtl/spk286_integration/spk286_at_emu.sv"; then
+     "$ROOT_DIR/PCAT-286.sv"; then
   echo "AT_PROFILE HPS clock must remain on CLK_50M" >&2
   exit 1
 fi
 
 if ! grep -q '"P1,System & BIOS;"' \
-     "$ROOT_DIR/rtl/spk286_integration/spk286_at_emu.sv" || \
+     "$ROOT_DIR/PCAT-286.sv" || \
    ! grep -q '"V,v"' \
-     "$ROOT_DIR/rtl/spk286_integration/spk286_at_emu.sv"; then
+     "$ROOT_DIR/PCAT-286.sv"; then
   echo "AT_PROFILE OSD configuration must declare a page and version marker" >&2
   exit 1
 fi
 
 if ! grep -q '"P1O7,Boot Splash Screen,Yes,No;"' \
-     "$ROOT_DIR/rtl/spk286_integration/spk286_at_emu.sv" || \
+     "$ROOT_DIR/PCAT-286.sv" || \
    ! grep -q '"P1FC0,ROM,PCAT BIOS:;"' \
-     "$ROOT_DIR/rtl/spk286_integration/spk286_at_emu.sv" || \
+     "$ROOT_DIR/PCAT-286.sv" || \
    ! grep -q '"P1FC2,ROM,EC00 BIOS:;"' \
-     "$ROOT_DIR/rtl/spk286_integration/spk286_at_emu.sv" || \
+     "$ROOT_DIR/PCAT-286.sv" || \
    ! grep -q '"P1FC3,ROM,EGA BIOS:;"' \
-     "$ROOT_DIR/rtl/spk286_integration/spk286_at_emu.sv" || \
+     "$ROOT_DIR/PCAT-286.sv" || \
    ! grep -q '"P1O\[71\],SPK286 Debug,Off,On;"' \
-     "$ROOT_DIR/rtl/spk286_integration/spk286_at_emu.sv" || \
+     "$ROOT_DIR/PCAT-286.sv" || \
    ! grep -q '"P1O\[73:72\],Debug Page,CPU,Registers,Bus,Trace;"' \
-     "$ROOT_DIR/rtl/spk286_integration/spk286_at_emu.sv"; then
+     "$ROOT_DIR/PCAT-286.sv"; then
   echo "AT_PROFILE OSD bits/file slots must match PCAT-286.sv" >&2
   exit 1
 fi
 
 if ! grep -q '"S0,IMGIMAVFD,Floppy A:;"' \
-     "$ROOT_DIR/rtl/spk286_integration/spk286_at_emu.sv" || \
+     "$ROOT_DIR/PCAT-286.sv" || \
    ! grep -q '"S1,IMGIMAVFD,Floppy B:;"' \
-     "$ROOT_DIR/rtl/spk286_integration/spk286_at_emu.sv" || \
+     "$ROOT_DIR/PCAT-286.sv" || \
    ! grep -q '"OJK,Write Protect,None,A:,B:,A: & B:;"' \
-     "$ROOT_DIR/rtl/spk286_integration/spk286_at_emu.sv" || \
+     "$ROOT_DIR/PCAT-286.sv" || \
    ! grep -q '\.floppy_write_protect   (hps_status\[20:19\])' \
-     "$ROOT_DIR/rtl/spk286_integration/spk286_at_emu.sv"; then
-  echo "AT_PROFILE floppy image slots/write-protect bits must match XT" >&2
+     "$ROOT_DIR/PCAT-286.sv"; then
+  echo "AT_PROFILE floppy image slots/write-protect bits must match PCAT-286 AT" >&2
   exit 1
 fi
 
-mapfile -t AT_SOURCES < <(
+mapfile -t INTEGRATION_SOURCES < <(
   sed -n 's/.*SYSTEMVERILOG_FILE "\([^"]*\.sv\)".*/\1/p' \
     "$ROOT_DIR/rtl/spk286_integration/spk286_integration.qip"
 )
@@ -66,6 +66,7 @@ mapfile -t AT_SOURCES < <(
 KF8259_DIR="$ROOT_DIR/rtl/KFPC-XT/HDL/KF8259/HDL"
 KF8253_DIR="$ROOT_DIR/rtl/KFPC-XT/HDL/KF8253/HDL"
 SOURCE_FILES=(
+  "$ROOT_DIR/PCAT-286.sv"
   "$ROOT_DIR/rtl/common/simple_ram.v"
   "$ROOT_DIR/rtl/common/simple_fifo.v"
   "$ROOT_DIR/rtl/common/floppy.v"
@@ -89,7 +90,7 @@ SOURCE_FILES=(
   "$KF8259_DIR/KF8259_Bus_Control_Logic.sv"
   "$KF8259_DIR/KF8259.sv"
 )
-for source in "${AT_SOURCES[@]}"; do
+for source in "${INTEGRATION_SOURCES[@]}"; do
   SOURCE_FILES+=("$ROOT_DIR/$source")
 done
 

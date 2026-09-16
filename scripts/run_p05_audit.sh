@@ -15,7 +15,7 @@ output=$(realpath -m "$3")
 mkdir -p "$output"
 docker image inspect raetro/quartus:mister --format '{{.Id}}' > "$output/container-image.txt"
 if [[ -n "$overlay" ]]; then
-  sha256sum "$root/$revision.qsf" "$root/files_pcat286_at.qip" "$root/PCAT-286_AT.sdc" "$root/sys/sys_top.sdc" > "$output/overlay-sdc.sha256"
+  sha256sum "$root/$revision.qsf" "$root/files.qip" "$root/SYSTEM.sdc" "$root/sys/sys_top.sdc" > "$output/overlay-sdc.sha256"
 fi
 docker run --rm \
   -v "$source_work:/reference:ro" \
@@ -30,7 +30,7 @@ docker run --rm \
     cp -a /reference/db /build/db
     cp /reference/*.qpf /reference/*.qsf /reference/*.qip /reference/*.sdc /reference/*.tcl /build/
     if [[ -n "$P05_SDC_OVERLAY" ]]; then
-      cp "/candidate/$P05_REVISION.qsf" /candidate/files_pcat286_at.qip /candidate/PCAT-286_AT.sdc /build/
+      cp "/candidate/$P05_REVISION.qsf" /candidate/files.qip /candidate/SYSTEM.sdc /build/
       cp -a /reference/sys /build/sys
       cp /candidate/sys/sys_top.sdc /build/sys/sys_top.sdc
       export P05_REFERENCE_FIT=1

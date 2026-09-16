@@ -1,48 +1,39 @@
-# Read-only project selection check; run in an isolated copy of project files.
+# Read-only single-project check; run in an isolated copy when using Quartus.
 package require ::quartus::project
+
 set revisions $quartus(args)
-if {![llength $revisions]} { set revisions {PCAT-286_AT PCAT-286_AT_FAST} }
-foreach revision $revisions {
-    project_open $revision -revision $revision
-    set sdc_files {}
-    foreach_in_collection a [get_all_global_assignments -name SDC_FILE] {
-        lappend sdc_files [file tail [lindex $a 2]]
-    }
-    if {[lsearch -exact $sdc_files PCAT-286_AT.sdc] < 0 ||
-        [lsearch -exact $sdc_files PCAT-286.sdc] >= 0 ||
-        [lsearch -exact $sdc_files sys_top.sdc] < 0} {
-        error "$revision selected wrong SDC set: $sdc_files"
-    }
-    set macros {}
-    foreach_in_collection a [get_all_global_assignments -name VERILOG_MACRO] {
-        lappend macros [lindex $a 2]
-    }
-    foreach required {AT_PROFILE SPK286_P05_PARALLEL_LIMIT_CHECK SPK286_AT_NO_DEBUG} {
-        if {[lsearch -exact $macros $required] < 0} {
-            error "$revision missing macro: $required ($macros)"
-        }
-    }
-    if {$revision eq "PCAT-286_AT"} {
-        foreach {name expected} {
-            SMART_RECOMPILE OFF
-            OPTIMIZE_HOLD_TIMING ALL_PATHS
-            SEED 2
-            GENERATE_RBF_FILE ON
-        } {
-            set actual [get_global_assignment -name $name]
-            if {![string equal -nocase $actual $expected]} {
-                error "$revision: $name is '$actual', expected '$expected'"
-            }
-            puts "AT_PRODUCTION_SETTING $name=$actual"
-        }
-        set expected_out output_files_pcat286_at
-        if {[lsearch -exact $macros SPK286_AT_CDC] >= 0} {
-            set expected_out output_files_pcat286_at_cdc
-        }
-        set actual_out [get_global_assignment -name PROJECT_OUTPUT_DIRECTORY]
-        if {$actual_out ne $expected_out} { error "Wrong output directory: $actual_out" }
-        puts "AT_PRODUCTION_SETTING PROJECT_OUTPUT_DIRECTORY=$actual_out"
-    }
-    puts "P05_AT_PROJECT_PASS revision=$revision sdc=$sdc_files macros=$macros"
-    project_close -dont_export_assignments
+if {![llength $revisions]} { set revisions {PCAT-286} }
+if {[llength $revisions] != 1 || [lindex $revisions 0] ne "PCAT-286"} {
+    error "Only the PCAT-286 AT project is supported: $revisions"
 }
+
+project_open PCAT-286 -revision PCAT-286
+
+set sdc_files {}
+foreach_in_collection a [get_all_global_assignments -name SDC_FILE] {
+    lappend sdc_files [file tail [lindex $a 2]]
+}
+if {[lsearch -exact $sdc_files SYSTEM.sdc] < 0 ||
+    [lsearch -exact $sdc_files PCAT-286.sdc] >= 0 ||
+    [lsearch -exact $sdc_files PCAT-286_AT.sdc] >= 0 ||
+    [lsearch -exact $sdc_files sys_top.sdc] < 0} {
+    error "PCAT-286 selected wrong SDC set: $sdc_files"
+}
+
+set macros {}
+foreach_in_collection a [get_all_global_assignments -name VERILOG_MACRO] {
+    lappend macros [lindex $a 2]
+}
+foreach required {AT_PROFILE SPK286_P05_PARALLEL_LIMIT_CHECK SPK286_AT_NO_DEBUG} {
+    if {[lsearch -exact $macros $required] < 0} {
+        error "PCAT-286 missing macro: $required ($macros)"
+    }
+}
+
+set output_dir [get_global_assignment -name PROJECT_OUTPUT_DIRECTORY]
+if {$output_dir ne "output_files"} {
+    error "PCAT-286 selected wrong output directory: $output_dir"
+}
+
+puts "PCAT_AT_PROJECT_PASS revision=PCAT-286 sdc=$sdc_files output=$output_dir macros=$macros"
+project_close -dont_export_assignments

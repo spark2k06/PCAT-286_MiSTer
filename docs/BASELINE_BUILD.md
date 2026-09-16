@@ -1,20 +1,16 @@
-# Imported PCXT baseline build
+# PCAT-286 project build
 
-The I0 baseline is the clean PCXT commit identified in
-`SOURCE_PROVENANCE.md`, imported without its historical release artifacts. The
-original Quartus project remains `PCXT-EGA.qpf` / `PCXT-EGA.qsf` and uses
-`sys_top`, `PCXT-EGA.sv`, `files.qip`, `config.tcl` and the imported `sys/`
-framework.
+The checkout is intentionally scoped to the single PCAT-286 AT profile. The
+project files are `PCAT-286.qpf`, `PCAT-286.qsf`, `SYSTEM.sdc`, `config.tcl`
+and `files.qip`; inherited PCXT project revisions are not part of this tree.
 
-The upstream project records Quartus 17.0.2 Lite and targets the MiSTer Cyclone
-V device through the standard `sys` assignments. On a host with that compatible
-Quartus installation:
+With Quartus Prime 17.0.2 Lite installed, build with:
 
 ```sh
-quartus_sh --flow compile PCXT-EGA
+quartus_sh --flow compile PCAT-286.qsf
 ```
 
-No Quartus executable was found on PATH during I0. Consequently, the imported
-baseline was inventory- and hash-verified, but no new baseline synthesis, fit,
-timing result or RBF is claimed at I0. Portable integration simulations do not
-depend on Quartus.
+Artifacts are emitted under `output_files/`. The AT-specific source manifest
+and constraints are kept separate from the common `sys/` framework so the
+project retains the original organizational layout while targeting only the
+current AT machine.

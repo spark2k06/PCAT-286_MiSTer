@@ -388,10 +388,6 @@ module spk286_at_machine (
             is_a5_io_port = (port == 16'h0060) || (port == 16'h0064) ||
                             (port == 16'h0070) || (port == 16'h0071) ||
                             ((port >= 16'h01F0) && (port <= 16'h01F7)) ||
-                            // Forward XT-IDE before the unmapped-I/O FFh sink.
-                            // 308h is the high-byte latch; 309h stays unmapped.
-                            ((port >= 16'h0300) && (port <= 16'h030F) &&
-                             (port != 16'h0309)) ||
                             ((port >= 16'h03B0) && (port <= 16'h03DF)) ||
                             ((port >= 16'h03F0) && (port <= 16'h03F7));
         end
@@ -471,6 +467,13 @@ module spk286_at_machine (
     // authoritative map, including the high reset-ROM alias. The ordinary
     // decode below continues to own routing and write protection.
     wire cpu_memory_word_capable;
+    // The standard AT IDE data register is an ISA16 target. Keep all other
+    // I/O on the bridge's byte-serialized path.
+    wire cpu_io_word_capable = cpu_bus_valid &&
+                                ((cpu_bus_status == 4'h9) ||
+                                 (cpu_bus_status == 4'hA)) &&
+                                !cpu_address[0] && !cpu_bus_bhe_n &&
+                                (cpu_address[15:0] == 16'h01F0);
     spk286_at_memory_decode u_cpu_width_decode (
         .request_valid          (cpu_bus_valid),
         .request_write          (cpu_bus_write),
@@ -496,6 +499,7 @@ module spk286_at_machine (
         .cpu_bus_status         (cpu_bus_status),
         .cpu_bus_lock           (cpu_bus_lock),
         .cpu_memory_word_capable (cpu_memory_word_capable),
+        .cpu_io_word_capable    (cpu_io_word_capable),
         .cpu_ready              (cpu_ready_i),
         .cpu_data_in            (cpu_data_in_i),
         .at_valid               (at_valid),

@@ -147,11 +147,7 @@ module spk286_at_device_router (
                                       ((request_address[15:0] >= 16'h03B0) &&
                                        (request_address[15:0] <= 16'h03DF)) ||
                                       ((request_address[15:0] >= 16'h03F0) &&
-                                       (request_address[15:0] <= 16'h03F7)) ||
-                                      ((request_address[15:4] == 12'h030) &&
-                                       ((!request_address[3]) ||
-                                        (request_address[3:0] == 4'h8) ||
-                                        (request_address[2:1] != 2'b00))))) ||
+                                       (request_address[15:0] <= 16'h03F7)))) ||
                                     (!request_io &&
                                      (request_address[23:0] >= 24'h0A0000) &&
                                      (request_address[23:0] <= 24'h0BFFFF)));
@@ -165,7 +161,7 @@ module spk286_at_device_router (
                       (request_address[15:0] == 16'h01F0) &&
                       (request_byte_enable == 2'b11)) ||
                      (device_storage_candidate && request_io &&
-                      (request_address[15:0] == 16'h0300) &&
+                      (request_address[15:0] == 16'h01F0) &&
                       (request_byte_enable == 2'b11));
 
         selected_device = DEVICE_NONE;

@@ -277,6 +277,7 @@ module emu_at
     wire        at_cpu_ready;
     wire        at_cpu_halted;
     wire        at_cpu_shutdown;
+    wire        at_debug_bridge_error;
     wire        at_debug_control_error;
     wire        at_debug_unsupported_opcode;
     wire        at_debug_microcode_fault;
@@ -721,6 +722,7 @@ module emu_at
         .cpu_halted             (at_cpu_halted),
         .cpu_shutdown           (at_cpu_shutdown),
 `ifndef SPK286_AT_NO_DEBUG
+        .debug_bridge_error     (at_debug_bridge_error),
         .debug_control_error    (at_debug_control_error),
         .debug_unsupported_opcode(at_debug_unsupported_opcode),
         .debug_microcode_fault  (at_debug_microcode_fault),
@@ -974,7 +976,7 @@ module emu_at
         .xt_cycle_active         (at_debug_cycle_active),
         .xt_ready                (at_debug_ready),
         .bridge_idle             (at_debug_bridge_idle),
-        .bridge_error            (machine_protocol_error | keyboard_event_overflow),
+        .bridge_error            (at_debug_bridge_error | keyboard_event_overflow),
         .hold_request            (at_debug_hold_request),
         .biu_detail              (at_debug_biu_detail),
         .last_post               (at_debug_last_post),

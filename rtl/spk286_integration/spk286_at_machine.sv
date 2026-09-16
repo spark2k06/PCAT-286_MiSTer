@@ -182,6 +182,7 @@ module spk286_at_machine (
     output logic [15:0]  refresh_count,
     output logic [15:0]  dma_side_effect_count,
     output logic [15:0]  device_side_effect_count,
+    output logic         debug_bridge_error,
     output logic         protocol_error
 );
     localparam logic [3:0] CYCLE_INTA = 4'h0;
@@ -1014,12 +1015,14 @@ module spk286_at_machine (
         end
     end
 
+    assign debug_bridge_error = bridge_protocol_error | arbiter_protocol_error |
+                                pic_protocol_error | pit_protocol_error |
+                                dma_protocol_error | refresh_protocol_error |
+                                devices_protocol_error | sys_protocol_error;
+
     assign cpu_fault = spk_shutdown | spk_control_error |
                        spk_unsupported_opcode | spk_microcode_fault |
-                       spk_operand_blocked | bridge_protocol_error |
-                       arbiter_protocol_error | pic_protocol_error |
-                       pit_protocol_error | dma_protocol_error |
-                       refresh_protocol_error | devices_protocol_error | sys_protocol_error;
+                       spk_operand_blocked | debug_bridge_error;
 
     assign protocol_error = cpu_fault;
 endmodule

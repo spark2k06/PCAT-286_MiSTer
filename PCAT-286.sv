@@ -58,6 +58,13 @@ module emu_at
         "P2O[69:67],HSync Width,Auto,1,2,3,4,5,6,7;",
         "P2OA,VGA 13h+ CRT,Native 70Hz,TV 60Hz;",
         "P2-;",
+        "P3,Hardware;",
+        "P3-;",
+        "P3ONO,Joystick 1, Analog, Digital, Disabled;",
+        "P3OPQ,Joystick 2, Analog, Digital, Disabled;",
+        "P3OR,Sync Joy to CPU Speed,No,Yes;",
+        "P3oM,Swap Joysticks,No,Yes;",
+        "P3-;",
         "-;",
         "R0,Reset & apply settings;",
         "J,Fire 1,Fire 2;",
@@ -112,6 +119,12 @@ module emu_at
     wire [2:0]   at_crt_v_osd = hps_status[52:50];
     wire [2:0]   at_vsync_width_osd = hps_status[66:64];
     wire [2:0]   at_hsync_width_osd = hps_status[69:67];
+    wire         at_joy1_digital_osd = hps_status[23];
+    wire         at_joy1_disable_osd = hps_status[24];
+    wire         at_joy2_digital_osd = hps_status[25];
+    wire         at_joy2_disable_osd = hps_status[26];
+    wire         at_joy_sync_osd = hps_status[27];
+    wire         at_joy_swap_osd = hps_status[54];
 
     wire [7:0] at286ctl_cpu;
     wire [7:0] at286ctl_exp;
@@ -145,6 +158,11 @@ module emu_at
     wire [2:0] at286ctl_eff_crt_v;
     wire [2:0] at286ctl_eff_vsync_width;
     wire [2:0] at286ctl_eff_hsync_width;
+    wire [4:0] at_joy_opts = {at286ctl_eff_joy_sync,
+                               at286ctl_eff_joy2_disable,
+                               at286ctl_eff_joy2_digital,
+                               at286ctl_eff_joy1_disable,
+                               at286ctl_eff_joy1_digital};
 
     // The AT profile currently implements the real VGA/EGA video path and
     // PC speaker; the remaining compatibility fields stay available in the
@@ -156,9 +174,9 @@ module emu_at
         .osd_speed(2'd0), .osd_fake286(1'b0), .osd_opl2(2'd2),
         .osd_cms(1'b0), .osd_sb(1'b0), .osd_sb_irq(3'd5),
         .osd_ems(1'b0), .osd_umb(1'b0),
-        .osd_joy1_digital(1'b0), .osd_joy1_disable(1'b0),
-        .osd_joy2_digital(1'b0), .osd_joy2_disable(1'b0),
-        .osd_joy_sync(1'b0), .osd_joy_swap(1'b0),
+        .osd_joy1_digital(at_joy1_digital_osd), .osd_joy1_disable(at_joy1_disable_osd),
+        .osd_joy2_digital(at_joy2_digital_osd), .osd_joy2_disable(at_joy2_disable_osd),
+        .osd_joy_sync(at_joy_sync_osd), .osd_joy_swap(at_joy_swap_osd),
         .osd_mt32_gm(1'b0), .osd_tandy(1'b0), .osd_mpu401(1'b0),
         .reg_crt(at286ctl_crt), .reg_sync(at286ctl_sync),
         .osd_crt_h(at_crt_h_osd), .osd_crt_v(at_crt_v_osd),
@@ -781,6 +799,12 @@ module emu_at
         .crt_v_offset           (at286ctl_eff_crt_v),
         .vsync_width_osd        (at286ctl_eff_vsync_width),
         .hsync_width_osd        (at286ctl_eff_hsync_width),
+        .joy_clk_select         (at286ctl_eff_speed),
+        .joy_opts               (at_joy_opts),
+        .joy0                   (joystick_0[13:0]),
+        .joy1                   (joystick_1[13:0]),
+        .joya0                  (joystick_l_analog_0),
+        .joya1                  (joystick_l_analog_1),
         .execute_enable         (1'b1),
         .counter_clock          (counter_clock),
         .refresh_enable         (1'b1),

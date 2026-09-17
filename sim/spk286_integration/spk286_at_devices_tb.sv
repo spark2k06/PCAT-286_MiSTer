@@ -11,6 +11,12 @@ module spk286_at_devices_tb;
     logic vga_enabled = 1'b0;
     logic [39:0] at286ctl_status_effective = 40'h0;
     logic [17:0] at286ctl_status_osd_match = 18'h0;
+    logic [1:0]  joy_clk_select = 2'd0;
+    logic [4:0]  joy_opts = 5'b00101;
+    logic [13:0] joy0 = 14'h0000;
+    logic [13:0] joy1 = 14'h0000;
+    logic [15:0] joya0 = 16'h0000;
+    logic [15:0] joya1 = 16'h0000;
 
     // CPU-facing normalized request.
     logic        request_valid = 1'b0;
@@ -126,6 +132,8 @@ module spk286_at_devices_tb;
         .vga_enabled(vga_enabled), .vga_mode13_native(1'b0),
         .crt_h_offset(4'h0), .crt_v_offset(3'h0),
         .vsync_width_osd(3'h0), .hsync_width_osd(3'h0),
+        .joy_clk_select(joy_clk_select), .joy_opts(joy_opts),
+        .joy0(joy0), .joy1(joy1), .joya0(joya0), .joya1(joya1),
         .request_valid(request_valid),
         .request_command_valid(request_command_valid),
         .request_write(request_write), .request_io(request_io),
@@ -510,6 +518,13 @@ module spk286_at_devices_tb;
         // not only as an isolated register-block simulation.
         router_read(16'h8980, value);
         check(value == 8'h45, "AT286CTL signature was not visible on the AT bus");
+
+        router_write(16'h0201, 8'h00);
+        repeat (36000) @(posedge clk);
+        router_read(16'h0201, value);
+        check(value == 8'hF0,
+              "gameport did not expose an idle digital joystick after strobe");
+
         router_write(16'h8983, 8'h02);
         router_read(16'h8983, value);
         check(value == 8'h02 && at286ctl_vid == 8'h02,

@@ -78,6 +78,7 @@ SOURCE_FILES=(
   "$ROOT_DIR/sim/spk286_integration/hps_io_elab_stub.sv"
   "$ROOT_DIR/sim/spk286_integration/pll_system_elab_stub.sv"
   "$ROOT_DIR/rtl/common/jtframe_ram.v"
+  "$ROOT_DIR/rtl/common/tandy_pcjr_joy.sv"
   "$ROOT_DIR/rtl/common/spk286_debug_overlay.sv"
   "$ROOT_DIR/rtl/KFPC-XT/HDL/ega_vram_bram_frontend.sv"
   "$ROOT_DIR/rtl/KFPC-XT/HDL/KFSDRAM/HDL/KFSDRAM.sv"

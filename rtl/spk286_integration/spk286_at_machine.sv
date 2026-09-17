@@ -23,6 +23,12 @@ module spk286_at_machine (
     input  logic [2:0]   crt_v_offset,
     input  logic [2:0]   vsync_width_osd,
     input  logic [2:0]   hsync_width_osd,
+    input  logic [1:0]   joy_clk_select,
+    input  logic [4:0]   joy_opts,
+    input  logic [13:0]  joy0,
+    input  logic [13:0]  joy1,
+    input  logic [15:0]  joya0,
+    input  logic [15:0]  joya1,
     input  logic         execute_enable,
     input  logic         counter_clock,
     input  logic         refresh_enable,
@@ -420,6 +426,7 @@ module spk286_at_machine (
                             (port == 16'h0070) || (port == 16'h0071) ||
                             ((port >= 16'h8980) && (port <= 16'h898F)) ||
                             ((port >= 16'h01F0) && (port <= 16'h01F7)) ||
+                            ((port >= 16'h0200) && (port <= 16'h0207)) ||
                             ((port >= 16'h03B0) && (port <= 16'h03DF)) ||
                             ((port >= 16'h03F0) && (port <= 16'h03F7));
         end
@@ -604,6 +611,12 @@ module spk286_at_machine (
         .crt_v_offset           (crt_v_offset),
         .vsync_width_osd        (vsync_width_osd),
         .hsync_width_osd        (hsync_width_osd),
+        .joy_clk_select         (joy_clk_select),
+        .joy_opts               (joy_opts),
+        .joy0                   (joy0),
+        .joy1                   (joy1),
+        .joya0                  (joya0),
+        .joya1                  (joya1),
         .request_valid          (device_request_candidate),
         .request_command_valid  (at_command_valid),
         .request_write          (at_write),

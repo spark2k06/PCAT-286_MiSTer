@@ -19,6 +19,8 @@ sources=(
   rtl/spk286_integration/spk286_at_video_adapter.sv
   rtl/spk286_integration/at286ctl.sv
   rtl/KFPC-XT/HDL/ega_vram_bram_frontend.sv
+  rtl/common/tandy_pcjr_joy.sv
+  rtl/spk286_integration/spk286_at_gameport.sv
   rtl/spk286_integration/spk286_at_device_router.sv
   rtl/spk286_integration/spk286_at_arbiter.sv
   rtl/spk286_integration/spk286_at_dma.sv

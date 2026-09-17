@@ -19,6 +19,12 @@ module spk286_at_device_router (
     input  logic [2:0]  crt_v_offset,
     input  logic [2:0]  vsync_width_osd,
     input  logic [2:0]  hsync_width_osd,
+    input  logic [1:0]  joy_clk_select,
+    input  logic [4:0]  joy_opts,
+    input  logic [13:0] joy0,
+    input  logic [13:0] joy1,
+    input  logic [15:0] joya0,
+    input  logic [15:0] joya1,
 
     input  logic        request_valid,
     input  logic        request_command_valid,
@@ -111,6 +117,7 @@ module spk286_at_device_router (
     localparam logic [3:0] DEVICE_RTC     = 4'd2;
     localparam logic [3:0] DEVICE_STORAGE = 4'd3;
     localparam logic [3:0] DEVICE_AT286CTL = 4'd4;
+    localparam logic [3:0] DEVICE_GAMEPORT = 4'd5;
     localparam logic [3:0] DEVICE_UNMAPPED = 4'd15;
 
     logic [2:0] router_state_q;
@@ -125,6 +132,7 @@ module spk286_at_device_router (
     logic       device_rtc_candidate;
     logic       device_storage_candidate;
     logic       device_at286ctl_candidate;
+    logic       device_gameport_candidate;
     logic       device_candidate;
     logic       lane_valid;
 
@@ -148,6 +156,12 @@ module spk286_at_device_router (
     logic       storage_read_data_valid;
     logic       storage_protocol_error;
     logic [15:0] storage_side_effect_count;
+    logic        gameport_request_accept;
+    logic        gameport_request_ready;
+    logic [15:0] gameport_read_data;
+    logic        gameport_read_data_valid;
+    logic [15:0] gameport_side_effect_count;
+    logic        gameport_protocol_error;
     logic [2:0]  storage_ide_request;
     logic [7:0]  at286ctl_data_out;
     logic        at286ctl_output_enable;
@@ -173,11 +187,16 @@ module spk286_at_device_router (
                                      (request_address[23:0] >= 24'h0A0000) &&
                                      (request_address[23:0] <= 24'h0BFFFF)));
         device_at286ctl_candidate = request_valid && request_command_valid &&
+                                     request_io &&
+                                     (request_address[15:0] >= 16'h8980) &&
+                                     (request_address[15:0] <= 16'h898F);
+        device_gameport_candidate = request_valid && request_command_valid &&
                                     request_io &&
-                                    (request_address[15:0] >= 16'h8980) &&
-                                    (request_address[15:0] <= 16'h898F);
+                                    (request_address[15:0] >= 16'h0200) &&
+                                    (request_address[15:0] <= 16'h0207);
         device_candidate = device_8042_candidate || device_rtc_candidate ||
-                           device_storage_candidate || device_at286ctl_candidate;
+                           device_storage_candidate || device_at286ctl_candidate ||
+                           device_gameport_candidate;
         lane_valid = ((request_address[0] == 1'b0) &&
                       (request_byte_enable == 2'b01)) ||
                      ((request_address[0] == 1'b1) &&
@@ -198,6 +217,8 @@ module spk286_at_device_router (
             selected_device = DEVICE_RTC;
         else if (device_at286ctl_candidate)
             selected_device = DEVICE_AT286CTL;
+        else if (device_gameport_candidate)
+            selected_device = DEVICE_GAMEPORT;
         else if (device_storage_candidate)
             selected_device = DEVICE_STORAGE;
         else if (request_valid && request_command_valid && request_io)
@@ -227,6 +248,30 @@ module spk286_at_device_router (
         .a20_enable(a20_enable), .cpu_reset_request(cpu_reset_request),
         .side_effect_count(kbd_side_effect_count),
         .protocol_error(kbd_protocol_error)
+    );
+
+    spk286_at_gameport u_gameport (
+        .clk                    (clk),
+        .reset                  (reset),
+        .request_valid          (device_gameport_candidate),
+        .request_command_valid  (request_command_valid),
+        .request_write          (request_write),
+        .request_io             (request_io),
+        .request_address        (request_address),
+        .request_byte_enable    (request_byte_enable),
+        .request_data_out       (request_data_out),
+        .request_accept         (gameport_request_accept),
+        .request_ready          (gameport_request_ready),
+        .request_read_data      (gameport_read_data),
+        .request_read_data_valid(gameport_read_data_valid),
+        .clk_select             (joy_clk_select),
+        .joy_opts               (joy_opts),
+        .joy0                   (joy0),
+        .joy1                   (joy1),
+        .joya0                  (joya0),
+        .joya1                  (joya1),
+        .side_effect_count      (gameport_side_effect_count),
+        .protocol_error         (gameport_protocol_error)
     );
 
     spk286_at_rtc_cmos u_rtc (
@@ -337,6 +382,8 @@ module spk286_at_device_router (
                 request_accept = rtc_request_accept;
             else if (device_at286ctl_candidate)
                 request_accept = lane_valid;
+            else if (device_gameport_candidate)
+                request_accept = gameport_request_accept;
             else if (device_storage_candidate)
                 request_accept = storage_request_accept;
             else if (unmapped_request && lane_valid)
@@ -353,7 +400,7 @@ module spk286_at_device_router (
         end
 
         side_effect_count = kbd_side_effect_count + rtc_side_effect_count +
-                             storage_side_effect_count;
+                             storage_side_effect_count + gameport_side_effect_count;
         irq_request = 16'h0000;
         irq_request[1] = irq1;
         irq_request[6] = irq6;
@@ -363,7 +410,8 @@ module spk286_at_device_router (
     end
 
     assign protocol_error = router_protocol_error_q | kbd_protocol_error |
-                            rtc_protocol_error | storage_protocol_error;
+                            rtc_protocol_error | storage_protocol_error |
+                            gameport_protocol_error;
 
     always_ff @(posedge clk) begin
         if (reset) begin
@@ -412,6 +460,11 @@ module spk286_at_device_router (
                         response_data_valid_q <= storage_read_data_valid;
                     end else if (target_device_q == DEVICE_AT286CTL) begin
                         router_state_q <= ROUTER_DONE;
+                    end else if (target_device_q == DEVICE_GAMEPORT &&
+                                 gameport_request_ready) begin
+                        router_state_q <= ROUTER_DONE;
+                        response_data_q <= gameport_read_data;
+                        response_data_valid_q <= gameport_read_data_valid;
                     end else if (target_device_q == DEVICE_UNMAPPED) begin
                         router_state_q <= ROUTER_DONE;
                         response_data_q <= 16'hFFFF;

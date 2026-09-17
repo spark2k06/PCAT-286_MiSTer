@@ -5,6 +5,16 @@
 // cannot redirect the response to another device.
 `timescale 1ns/1ps
 
+`ifndef ENABLE_OPL2
+`define ENABLE_OPL2 0
+`endif
+`ifndef ENABLE_CMS
+`define ENABLE_CMS 0
+`endif
+`ifndef ENABLE_TANDY_AUDIO
+`define ENABLE_TANDY_AUDIO 0
+`endif
+
 module spk286_at_device_router (
     input  logic        clk,
     input  logic        reset,
@@ -25,6 +35,9 @@ module spk286_at_device_router (
     input  logic [13:0] joy1,
     input  logic [15:0] joya0,
     input  logic [15:0] joya1,
+    input  logic [1:0]  at286ctl_eff_opl2,
+    input  logic        at286ctl_eff_cms,
+    input  logic        at286ctl_eff_tandy,
 
     input  logic        request_valid,
     input  logic        request_command_valid,
@@ -104,6 +117,10 @@ module spk286_at_device_router (
     output logic [7:0]  at286ctl_exp2,
     output logic [7:0]  at286ctl_crt,
     output logic [7:0]  at286ctl_sync,
+    output logic signed [15:0] opl2_sound,
+    output logic signed [15:0] cms_sound_l,
+    output logic signed [15:0] cms_sound_r,
+    output logic signed [10:0] tandy_sound,
     output logic [15:0] side_effect_count,
     output logic [15:0] irq_request,
     output logic        protocol_error
@@ -118,6 +135,7 @@ module spk286_at_device_router (
     localparam logic [3:0] DEVICE_STORAGE = 4'd3;
     localparam logic [3:0] DEVICE_AT286CTL = 4'd4;
     localparam logic [3:0] DEVICE_GAMEPORT = 4'd5;
+    localparam logic [3:0] DEVICE_SOUND    = 4'd6;
     localparam logic [3:0] DEVICE_UNMAPPED = 4'd15;
 
     logic [2:0] router_state_q;
@@ -133,6 +151,7 @@ module spk286_at_device_router (
     logic       device_storage_candidate;
     logic       device_at286ctl_candidate;
     logic       device_gameport_candidate;
+    logic       device_sound_candidate;
     logic       device_candidate;
     logic       lane_valid;
 
@@ -162,6 +181,12 @@ module spk286_at_device_router (
     logic        gameport_read_data_valid;
     logic [15:0] gameport_side_effect_count;
     logic        gameport_protocol_error;
+    logic        sound_request_accept;
+    logic        sound_request_ready;
+    logic [15:0] sound_read_data;
+    logic        sound_read_data_valid;
+    logic [15:0] sound_side_effect_count;
+    logic        sound_protocol_error;
     logic [2:0]  storage_ide_request;
     logic [7:0]  at286ctl_data_out;
     logic        at286ctl_output_enable;
@@ -194,9 +219,28 @@ module spk286_at_device_router (
                                     request_io &&
                                     (request_address[15:0] >= 16'h0200) &&
                                     (request_address[15:0] <= 16'h0207);
+        device_sound_candidate = request_valid && request_command_valid &&
+                                 request_io &&
+                                 (((`ENABLE_OPL2) &&
+                                   (at286ctl_eff_opl2 != 2'd2) &&
+                                   (((request_address[15:0] == 16'h0388) ||
+                                     (request_address[15:0] == 16'h0389)) ||
+                                    ((at286ctl_eff_opl2 == 2'd1) &&
+                                     ((request_address[15:0] == 16'h0228) ||
+                                      (request_address[15:0] == 16'h0229))))) ||
+                                  ((`ENABLE_CMS) && at286ctl_eff_cms &&
+                                   (request_address[15:4] == 12'h022) &&
+                                   (((request_write) &&
+                                     !request_address[3]) ||
+                                    ((!request_write) &&
+                                     ((request_address[3:0] == 4'h4) ||
+                                      (request_address[3:0] == 4'hB))))) ||
+                                  ((`ENABLE_TANDY_AUDIO) && at286ctl_eff_tandy &&
+                                   request_write &&
+                                   (request_address[15:4] == 12'h00C)));
         device_candidate = device_8042_candidate || device_rtc_candidate ||
                            device_storage_candidate || device_at286ctl_candidate ||
-                           device_gameport_candidate;
+                           device_gameport_candidate || device_sound_candidate;
         lane_valid = ((request_address[0] == 1'b0) &&
                       (request_byte_enable == 2'b01)) ||
                      ((request_address[0] == 1'b1) &&
@@ -219,6 +263,8 @@ module spk286_at_device_router (
             selected_device = DEVICE_AT286CTL;
         else if (device_gameport_candidate)
             selected_device = DEVICE_GAMEPORT;
+        else if (device_sound_candidate)
+            selected_device = DEVICE_SOUND;
         else if (device_storage_candidate)
             selected_device = DEVICE_STORAGE;
         else if (request_valid && request_command_valid && request_io)
@@ -272,6 +318,32 @@ module spk286_at_device_router (
         .joya1                  (joya1),
         .side_effect_count      (gameport_side_effect_count),
         .protocol_error         (gameport_protocol_error)
+    );
+
+    spk286_at_sound u_sound (
+        .clk                    (clk),
+        .reset                  (reset),
+        .warm_reset             (cpu_reset_request),
+        .opl2_io                (at286ctl_eff_opl2),
+        .cms_en                 (at286ctl_eff_cms),
+        .tandy_en               (at286ctl_eff_tandy),
+        .request_valid          (device_sound_candidate),
+        .request_command_valid  (request_command_valid),
+        .request_write          (request_write),
+        .request_io             (request_io),
+        .request_address        (request_address),
+        .request_byte_enable    (request_byte_enable),
+        .request_data_out       (request_data_out),
+        .request_accept         (sound_request_accept),
+        .request_ready          (sound_request_ready),
+        .request_read_data      (sound_read_data),
+        .request_read_data_valid(sound_read_data_valid),
+        .opl2_sound             (opl2_sound),
+        .cms_sound_l            (cms_sound_l),
+        .cms_sound_r            (cms_sound_r),
+        .tandy_sound            (tandy_sound),
+        .side_effect_count      (sound_side_effect_count),
+        .protocol_error         (sound_protocol_error)
     );
 
     spk286_at_rtc_cmos u_rtc (
@@ -384,6 +456,8 @@ module spk286_at_device_router (
                 request_accept = lane_valid;
             else if (device_gameport_candidate)
                 request_accept = gameport_request_accept;
+            else if (device_sound_candidate)
+                request_accept = sound_request_accept;
             else if (device_storage_candidate)
                 request_accept = storage_request_accept;
             else if (unmapped_request && lane_valid)
@@ -400,7 +474,8 @@ module spk286_at_device_router (
         end
 
         side_effect_count = kbd_side_effect_count + rtc_side_effect_count +
-                             storage_side_effect_count + gameport_side_effect_count;
+                             storage_side_effect_count + gameport_side_effect_count +
+                             sound_side_effect_count;
         irq_request = 16'h0000;
         irq_request[1] = irq1;
         irq_request[6] = irq6;
@@ -411,7 +486,7 @@ module spk286_at_device_router (
 
     assign protocol_error = router_protocol_error_q | kbd_protocol_error |
                             rtc_protocol_error | storage_protocol_error |
-                            gameport_protocol_error;
+                            gameport_protocol_error | sound_protocol_error;
 
     always_ff @(posedge clk) begin
         if (reset) begin
@@ -465,6 +540,11 @@ module spk286_at_device_router (
                         router_state_q <= ROUTER_DONE;
                         response_data_q <= gameport_read_data;
                         response_data_valid_q <= gameport_read_data_valid;
+                    end else if (target_device_q == DEVICE_SOUND &&
+                                 sound_request_ready) begin
+                        router_state_q <= ROUTER_DONE;
+                        response_data_q <= sound_read_data;
+                        response_data_valid_q <= sound_read_data_valid;
                     end else if (target_device_q == DEVICE_UNMAPPED) begin
                         router_state_q <= ROUTER_DONE;
                         response_data_q <= 16'hFFFF;

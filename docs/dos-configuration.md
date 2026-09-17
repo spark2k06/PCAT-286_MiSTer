@@ -1,7 +1,7 @@
 # DOS configuration reference
 
 The files in [`hdd/`](../hdd/) are a working reference for a DOS installation
-that uses the PCXT-EGA core's current memory and audio layout. They are not
+that uses the PCAT-286 core's current memory and audio layout. They are not
 required by the RTL, but they keep the DOS drivers, the OSD and software
 detection in agreement.
 
@@ -14,11 +14,14 @@ The supplied configuration expects these core options:
 - **Hardware → 2MB EMS D000-DFFF: Enabled** exposes the four 16 KiB EMS
   page-frame banks at `D0000h-DFFFFh`. The backing store is up to 2 MiB and
   the Lo-tech-compatible page registers are at port `260h`.
-- **Audio & Video → Audio 220h: Sound Blaster** selects the Sound Blaster
-  instead of C/MS, since both devices overlap at `220h` and collide at
-  `226h/227h`.
-- **Hardware → Sound Blaster IRQ: 5** is the default. IRQ 7 is also supported,
-  but DOS software and its `BLASTER` variable must select the same value.
+- **Audio & Video → C/MS Audio: Enabled** exposes the C/MS pair at `220h`.
+- **Audio & Video → OPL2: Adlib 388h** exposes the OPL2 at `388h`; the second
+  OSD choice also enables its `228h` FM alias.
+- **Audio & Video → Tandy Sound: Enabled** exposes the SN76489 at `0C0h-0CFh`.
+
+Sound Blaster DSP, DMA, IRQ and its OSD selection are intentionally not part
+of this AT profile. C/MS, OPL2 and Tandy are core hardware and require no DOS
+driver or environment variable.
 
 The core also decodes SDRAM at `E0000h-EBFFFh`, but that region is deliberately
 not registered as a DOS UMB. The EMS frame lies between the C400h and E000h
@@ -51,48 +54,18 @@ If UMB or EMS is disabled in the OSD or temporarily with AT286CTL, remove or
 comment the matching driver line for that boot. A DOS driver cannot create a
 memory device that the core has taken off the bus.
 
-## AUTOEXEC.BAT and Sound Blaster variables
+## AUTOEXEC.BAT and built-in audio
 
 [`hdd/AUTOEXEC.BAT`](../hdd/AUTOEXEC.BAT) provides this starting point:
 
 ```bat
 @ECHO OFF
 SET PATH=C:\UTIL;%PATH%
-SET BLASTER=A220 I5 D1 T4
-SET SOUND=C:\SB
-SET MIDI=SYNTH:1 MAP:E MODE:0
 C:\UTIL\CTMOUSE\CTMOUSE.EXE
 ```
 
-The `BLASTER` fields describe the actual hardware rather than configuring it:
-
-| Field | Meaning in this core |
-|---|---|
-| `A220` | Sound Blaster base address `220h` |
-| `I5` | IRQ 5, the default OSD choice |
-| `D1` | 8-bit DMA channel 1 |
-| `T4` | Sound Blaster Pro-compatible card type |
-
-`SET SOUND=C:\SB` is the installation directory used by Creative utilities;
-change it to the real directory or omit it when those utilities are not
-installed. `SET MIDI=...` is another Creative software convention and does not
-control the core's separate MPU-401 at `330h`.
-
-When a game needs IRQ 7, change the hardware override and the environment
-together:
-
-```bat
-@ECHO OFF
-SET BLASTER=A220 I7 D1 T4
-AT286CTL sb sbirq=7
-GAME.EXE
-AT286CTL reset
-SET BLASTER=A220 I5 D1 T4
-```
-
-Omitting `sbirq=` or using `sbirq=auto` follows the OSD. `AT286CTL status`
-shows the effective IRQ and adds `(OSD)` when it matches the current menu
-setting.
+The built-in devices are selected by their OSD options or by the per-program
+`AT286CTL` overrides; no `BLASTER`, `SOUND` or `MIDI` variable configures them.
 
 The final line in the supplied example starts CuteMouse. It probes PS/2 first
 and then the serial ports, so the core's COM1 mouse normally needs no command
@@ -107,8 +80,7 @@ batch file should therefore name every override that program needs, then use
 
 ```bat
 @ECHO OFF
-SET BLASTER=A220 I5 D1 T4
-AT286CTL 4.77 sb sbirq=5 joy1=digital
+AT286CTL 4.77 adlib cms tandy joy1=digital
 GAME.EXE
 AT286CTL reset
 ```

@@ -22,11 +22,9 @@ OPTIONS
             sbfm           OPL2 at 388h and 228h
             noadlib        no OPL2
             cms  nocms      C/MS at 220h or not
-            sb   nosb       Sound Blaster at 220h or not
-            sbirq=auto|5|7  Sound Blaster IRQ (OSD default is IRQ5)
 
-            "sbirq=5" and "sbirq=7" select the Sound Blaster interrupt line.
-            "sbirq=auto" (or omitting the option) follows the OSD.
+            Sound Blaster is not built in the PCAT-286 profile. Its legacy
+            register fields are reserved for compatibility and have no effect.
 
   Memory    ems  noems
             umb  noumb
@@ -41,7 +39,7 @@ OPTIONS
 
   Tandy     tandy  notandy
 
-            The SN76489 at 0C0h. Left unnamed, this defers to the OSD's Tandy
+            The SN76489 at 0C0h-0CFh. Left unnamed, this defers to the OSD's Tandy
             Sound menu option like everything else here. Whether the chip
             exists at all is still set when the core is built, though, so it
             can never switch on a chip that was not built in.
@@ -65,22 +63,13 @@ OPTIONS
   status    print effective values and mark values matching the OSD
 
 
-SOUND BLASTER ENVIRONMENT
--------------------------
+AUDIO DEVICES
+-------------
 
-The default core setup is base 220h, IRQ5 and DMA channel 1. DOS games that
-use the conventional Creative environment should see:
-
-    SET BLASTER=A220 I5 D1 T4
-    SET SOUND=C:\SB
-    SET MIDI=SYNTH:1 MAP:E MODE:0
-
-BLASTER describes the hardware; it does not enable it. If "sbirq=7" or the
-OSD selects IRQ7, use I7 for that program too. SOUND is the directory expected
-by Creative utilities and must match their actual installation. MIDI is also
-a software convention and does not configure the core's separate MPU-401 at
-330h. The repository's hdd\AUTOEXEC.BAT and docs\dos-configuration.md contain
-complete examples.
+AdLib/OPL2, C/MS and Tandy are built into the core and need no DOS driver or
+environment variable. Use their OSD entries, or the adlib/cms/tandy overrides,
+to select them for a program. Sound Blaster DSP, DMA and IRQ support are not
+part of this PCAT-286 profile.
 
 
 HOW IT BEHAVES

@@ -79,8 +79,8 @@ match the OSD.
 | MT32-pi mode | 2 | OSD | MT-32 | General MIDI | — | |
 | MPU-401 | 2 | OSD | enabled | disabled | — | |
 | Tandy sound | 2 | OSD | disabled | enabled | — | |
-| Sound Blaster | 2 | OSD | enabled | disabled | — | |
-| Sound Blaster IRQ | 2 | OSD | IRQ5 | IRQ7 | reserved | |
+| Sound Blaster | 2 | reserved | not built | not built | — | |
+| Sound Blaster IRQ | 2 | reserved | not connected | not connected | reserved | |
 
 Speed is the only field wider than two bits, because it picks between four
 choices rather than three. Values above `4` are not choices, so they read as
@@ -88,10 +88,12 @@ defer rather than aliasing onto a speed.
 
 The effective status bytes use canonical menu values rather than the raw
 override encodings: speed is `0..3` for 4.77/7.16/9.54/Max; OPL2 is `0..2`
-for Adlib/SB FM/disabled; Audio 220h is `0..2` for C/MS/Sound Blaster/disabled;
+for Adlib/SB FM/disabled; Audio 220h is `0..2` for C/MS/disabled;
 joysticks are `0..2` for analog/digital/disabled; and the remaining boolean
 fields use `0=off` or `0=disabled`, `1=on` or `1=enabled`. Tandy uses the low
-bit of its two-bit field, and Sound Blaster IRQ uses `0=IRQ5`, `1=IRQ7`.
+bit of its two-bit field. Sound Blaster fields remain reserved compatibility
+fields in the control-register layout and do not connect to hardware in this
+profile.
 
 The OSD-match mask is ordered as follows: bit 0 speed, 1 Fake 286 FLAGS, 2
 OPL2, 3 Audio 220h, 4 EMS, 5 UMB, 6 joystick 1, 7 joystick 2, 8 swap, 9 joy
@@ -133,34 +135,13 @@ device you wanted it to find, and `nompu` takes the card away for that program
 without disturbing anything else — no reset needed, same as every other field
 here.
 
-## The Sound Blaster takes 220h from the C/MS
+## The 220h C/MS interface
 
-Both cards live at 220h and they collide on `226h`/`227h`, where one puts
-its DSP reset and the other its detection register. Only one of them can
-answer, so the OSD offers them as a single three-way choice and cannot ask
-for both.
-
-These two fields are independent, though, and a program can set either.
-When both say yes the Sound Blaster wins: a program that went out of its
-way to ask for one is a better guess at intent than a default left
-enabled. Asking for the Sound Blaster therefore takes the C/MS away for
-that program, and giving it back is a matter of clearing the field.
-
-The *Hardware → Sound Blaster IRQ* OSD option selects the default interrupt
-line, independently as IRQ5 or IRQ7.
-The OSD's default is IRQ5; `AT286CTL sbirq=5` and `AT286CTL sbirq=7` select a
-line for the current program, while omitting the option (or using
-`sbirq=auto`) follows the OSD. The override is stored in bits `[5:4]` of
-`8986h`, with `0` meaning OSD, `1` meaning IRQ5 and `2` meaning IRQ7.
-
-DOS software normally receives the same setup through
-`SET BLASTER=A220 I5 D1 T4`: base `220h`, IRQ 5, DMA channel 1 and Sound
-Blaster Pro type 4. When AT286CTL selects IRQ 7, the environment must use `I7`
-for that program as well. `SET SOUND=C:\SB` and
-`SET MIDI=SYNTH:1 MAP:E MODE:0` are optional Creative-software conventions;
-they do not create or configure hardware. The complete startup examples live
-in [`docs/dos-configuration.md`](dos-configuration.md) and
-[`hdd/AUTOEXEC.BAT`](../hdd/AUTOEXEC.BAT).
+The AT profile exposes only the C/MS device at `220h`; its two chips are
+selected in the source-compatible `220h-227h` write range, with the detection
+reads at `224h` and `22Bh`. The Sound Blaster DSP and its IRQ/DMA path are not
+built, so no program-level setting can enable them or take `220h` away from
+C/MS. OPL2 and Tandy remain independent at `388h`/`228h` and `0C0h-0CFh`.
 
 ## Screen geometry
 

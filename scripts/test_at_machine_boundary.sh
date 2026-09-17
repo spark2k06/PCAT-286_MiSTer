@@ -49,6 +49,7 @@ sources+=(
   rtl/KFPC-XT/HDL/ega_vram_bram_frontend.sv
   rtl/common/tandy_pcjr_joy.sv
   rtl/spk286_integration/spk286_at_gameport.sv
+  rtl/spk286_integration/spk286_at_sound.sv
   rtl/spk286_integration/spk286_at_device_router.sv
   rtl/spk286_integration/spk286_at_machine.sv
   rtl/spk286_integration/spk286_at_mister_memory_port.sv

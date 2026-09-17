@@ -7,6 +7,16 @@
 // to the SDRAM/HPS/media/video owners without changing the CPU contract.
 `timescale 1ns/1ps
 
+`ifndef ENABLE_OPL2
+`define ENABLE_OPL2 0
+`endif
+`ifndef ENABLE_CMS
+`define ENABLE_CMS 0
+`endif
+`ifndef ENABLE_TANDY_AUDIO
+`define ENABLE_TANDY_AUDIO 0
+`endif
+
 module spk286_at_machine (
     input  logic         clk,
     input  logic         reset,
@@ -17,6 +27,9 @@ module spk286_at_machine (
     input  logic         splashscreen,
     input  logic [39:0]  at286ctl_status_effective,
     input  logic [17:0]  at286ctl_status_osd_match,
+    input  logic [1:0]   at286ctl_eff_opl2,
+    input  logic         at286ctl_eff_cms,
+    input  logic         at286ctl_eff_tandy,
     input  logic         vga_enabled,
     input  logic         vga_mode13_native,
     input  logic [3:0]   crt_h_offset,
@@ -99,6 +112,10 @@ module spk286_at_machine (
     output logic         nmi_mask,
     output logic         speaker_active,
     output logic         speaker_level,
+    output logic signed [15:0] opl2_sound,
+    output logic signed [15:0] cms_sound_l,
+    output logic signed [15:0] cms_sound_r,
+    output logic signed [10:0] tandy_sound,
 
     output logic [3:0]   selected_device,
     output logic         unmapped_request,
@@ -378,6 +395,7 @@ module spk286_at_machine (
     logic        cpu_owner_active;
     logic        cpu_memory_candidate;
     logic        device_request_candidate;
+    logic        sound_io_candidate;
     logic        warm_boot_marker_event;
 
     // The 8042 reset is a CPU-local warm reset.  It must flush the CPU and
@@ -437,10 +455,34 @@ module spk286_at_machine (
     always_comb begin
         pic_io_candidate = at_io && is_pic_port(at_address[15:0]);
         pit_io_candidate = at_io && is_pit_port(at_address[15:0]);
-        dma_io_candidate = at_io && is_dma_port(at_address[15:0]);
+        sound_io_candidate = at_io &&
+                             (((`ENABLE_OPL2) &&
+                               (at286ctl_eff_opl2 != 2'd2) &&
+                               (((at_address[15:0] == 16'h0388) ||
+                                 (at_address[15:0] == 16'h0389)) ||
+                                ((at286ctl_eff_opl2 == 2'd1) &&
+                                 ((at_address[15:0] == 16'h0228) ||
+                                  (at_address[15:0] == 16'h0229))))) ||
+                              ((`ENABLE_CMS) && at286ctl_eff_cms &&
+                               (at_address[15:4] == 12'h022) &&
+                               (((at_write) && !at_address[3]) ||
+                                ((!at_write) &&
+                                 ((at_address[3:0] == 4'h4) ||
+                                  (at_address[3:0] == 4'hB))))) ||
+                              ((`ENABLE_TANDY_AUDIO) && at286ctl_eff_tandy &&
+                               at_write &&
+                               (at_address[15:4] == 12'h00C)));
+        // Tandy's C0h-CFh decode takes the first half of the AT secondary-DMA
+        // page, just as it does on the source XT profile. Keep D0h-DFh for
+        // the DMA controller when Tandy sound is enabled.
+        dma_io_candidate = at_io && is_dma_port(at_address[15:0]) &&
+                           !((`ENABLE_TANDY_AUDIO) && at286ctl_eff_tandy &&
+                             (at_address[15:4] == 12'h00C));
         a5_io_candidate = at_io && is_a5_io_port(at_address[15:0]);
         io_known_target = at_inta || pic_io_candidate || pit_io_candidate ||
-                          dma_io_candidate || a5_io_candidate || (at_io && at_address[15:0]==16'h61);
+                          dma_io_candidate || a5_io_candidate ||
+                          sound_io_candidate ||
+                          (at_io && at_address[15:0]==16'h61);
         io_unmapped_candidate = cpu_owner_active && at_io &&
                                 !io_known_target;
         memory_unmapped_candidate = cpu_owner_active && !at_io && !at_inta &&
@@ -449,7 +491,7 @@ module spk286_at_machine (
                                memory_cycle && !video_aperture_select &&
                                !rom_write_blocked;
         device_request_candidate = cpu_owner_active &&
-                                   (a5_io_candidate ||
+                                   (a5_io_candidate || sound_io_candidate ||
                                     video_aperture_select);
     end
 
@@ -617,6 +659,9 @@ module spk286_at_machine (
         .joy1                   (joy1),
         .joya0                  (joya0),
         .joya1                  (joya1),
+        .at286ctl_eff_opl2     (at286ctl_eff_opl2),
+        .at286ctl_eff_cms      (at286ctl_eff_cms),
+        .at286ctl_eff_tandy    (at286ctl_eff_tandy),
         .request_valid          (device_request_candidate),
         .request_command_valid  (at_command_valid),
         .request_write          (at_write),
@@ -697,6 +742,10 @@ module spk286_at_machine (
         .at286ctl_exp2          (at286ctl_exp2),
         .at286ctl_crt           (at286ctl_crt),
         .at286ctl_sync          (at286ctl_sync),
+        .opl2_sound             (opl2_sound),
+        .cms_sound_l            (cms_sound_l),
+        .cms_sound_r            (cms_sound_r),
+        .tandy_sound            (tandy_sound),
         .side_effect_count      (device_side_effect_count),
         .irq_request             (devices_irq_request),
         .protocol_error          (devices_protocol_error)

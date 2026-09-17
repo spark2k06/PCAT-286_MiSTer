@@ -825,7 +825,8 @@ device acceptance therefore remains open.
 4. Reuse versus replacement of the KFPC-XT bus controller and arbiter.
 5. Physical versus normalized modelling of 82288/82289 command/arbitration
    phases.
-6. IRQ routing for EGA, AdLib, Sound Blaster, serial, floppy, ATA and RTC.
+6. IRQ routing for EGA, AdLib, serial, floppy, ATA and RTC. Sound Blaster is
+   outside the current PCAT-286 profile.
 7. DMA channel assignments and device request/acknowledge polarity.
 8. 80287 socket behaviour: absent, deterministic no-coprocessor profile or
    future device model.

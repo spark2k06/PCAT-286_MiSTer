@@ -5,6 +5,19 @@
 // SDRAM owner.
 `timescale 1ns/1ps
 
+`ifndef ENABLE_OPL2
+`define ENABLE_OPL2 0
+`endif
+`ifndef ENABLE_CMS
+`define ENABLE_CMS 0
+`endif
+`ifndef ENABLE_TANDY_AUDIO
+`define ENABLE_TANDY_AUDIO 0
+`endif
+`ifndef ENABLE_SB
+`define ENABLE_SB 0
+`endif
+
 module emu_at
 (
 `include "sys/emu_ports.vh"
@@ -25,6 +38,16 @@ module emu_at
         "P1O[73:72],Debug Page,CPU,Registers,Bus,Trace;"
     };
 `endif
+
+    // Keep the source profile's audio menu and status-bit placement.  The
+    // 220h selector has only the C/MS choices in this build: Sound Blaster is
+    // deliberately not part of the AT profile.
+    localparam CONF_STR_A220 = (`ENABLE_CMS ?
+        "P2OT,C/MS Audio,Enabled,Disabled;" : "");
+    localparam CONF_STR_OPL2 = (`ENABLE_OPL2 ?
+        "P2oAB,OPL2,Adlib 388h,SB FM 388h/228h, Disabled;" : "");
+    localparam CONF_STR_TANDY = (`ENABLE_TANDY_AUDIO ?
+        "P2oN,Tandy Sound,Disabled,Enabled;" : "");
 
     localparam CONF_STR_AT = {
         "PCAT-286;",
@@ -51,6 +74,13 @@ module emu_at
 `endif
         "P1-;",
         "P2,Audio & Video;",
+        "P2-;",
+        CONF_STR_A220,
+        CONF_STR_OPL2,
+        CONF_STR_TANDY,
+        "P2o01,Speaker Volume,1,2,3,4;",
+        "P2o45,Audio Boost,No,2x,4x;",
+        "P2o67,Stereo Mix,none,25%,50%,100%;",
         "P2-;",
         "P2oEH,CRT H offset,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15;",
         "P2oIK,CRT V offset,0,1,2,3,4,5,6,7;",
@@ -125,6 +155,7 @@ module emu_at
     wire         at_joy2_disable_osd = hps_status[26];
     wire         at_joy_sync_osd = hps_status[27];
     wire         at_joy_swap_osd = hps_status[54];
+    wire         at_a220_cms_osd = `ENABLE_CMS ? ~hps_status[29] : 1'b0;
 
     wire [7:0] at286ctl_cpu;
     wire [7:0] at286ctl_exp;
@@ -171,17 +202,17 @@ module emu_at
         .reg_cpu(at286ctl_cpu), .reg_exp(at286ctl_exp),
         .reg_vid(at286ctl_vid), .reg_inp(at286ctl_inp),
         .reg_midi(at286ctl_midi), .reg_exp2(at286ctl_exp2),
-        .osd_speed(2'd0), .osd_fake286(1'b0), .osd_opl2(2'd2),
-        .osd_cms(1'b0), .osd_sb(1'b0), .osd_sb_irq(3'd5),
+        .osd_speed(2'd0), .osd_fake286(1'b0), .osd_opl2(hps_status[43:42]),
+        .osd_cms(at_a220_cms_osd), .osd_sb(1'b0), .osd_sb_irq(3'd5),
         .osd_ems(1'b0), .osd_umb(1'b0),
         .osd_joy1_digital(at_joy1_digital_osd), .osd_joy1_disable(at_joy1_disable_osd),
         .osd_joy2_digital(at_joy2_digital_osd), .osd_joy2_disable(at_joy2_disable_osd),
         .osd_joy_sync(at_joy_sync_osd), .osd_joy_swap(at_joy_swap_osd),
-        .osd_mt32_gm(1'b0), .osd_tandy(1'b0), .osd_mpu401(1'b0),
+        .osd_mt32_gm(1'b0), .osd_tandy(hps_status[55]), .osd_mpu401(1'b0),
         .reg_crt(at286ctl_crt), .reg_sync(at286ctl_sync),
         .osd_crt_h(at_crt_h_osd), .osd_crt_v(at_crt_v_osd),
         .osd_vsync_w(at_vsync_width_osd), .osd_hsync_w(at_hsync_width_osd),
-        .build_sb(1'b0), .build_tandy(1'b0),
+        .build_sb(1'b0), .build_tandy(`ENABLE_TANDY_AUDIO ? 1'b1 : 1'b0),
         .eff_speed(at286ctl_eff_speed), .eff_fake286(at286ctl_eff_fake286),
         .eff_opl2(at286ctl_eff_opl2), .eff_cms(at286ctl_eff_cms),
         .eff_sb(at286ctl_eff_sb), .eff_sb_irq(at286ctl_eff_sb_irq),
@@ -433,6 +464,10 @@ module emu_at
     wire        at_debug_bridge_idle;
     wire        at_speaker_active;
     wire        at_speaker_level;
+    wire signed [15:0] at_opl2_sound;
+    wire signed [15:0] at_cms_sound_l;
+    wire signed [15:0] at_cms_sound_r;
+    wire signed [10:0] at_tandy_sound;
 
     wire        dma_memory_valid;
     wire        dma_memory_write;
@@ -793,6 +828,9 @@ module emu_at
         .splashscreen           (at_splashscreen),
         .at286ctl_status_effective(at286ctl_status_effective),
         .at286ctl_status_osd_match(at286ctl_status_osd_match),
+        .at286ctl_eff_opl2     (at286ctl_eff_opl2),
+        .at286ctl_eff_cms      (at286ctl_eff_cms),
+        .at286ctl_eff_tandy    (at286ctl_eff_tandy),
         .vga_enabled            (at286ctl_eff_vga13),
         .vga_mode13_native      (at_vga_mode13_native_osd),
         .crt_h_offset           (at286ctl_eff_crt_h),
@@ -923,6 +961,10 @@ module emu_at
         .cpu_reset_request      (at_cpu_reset_request),
         .speaker_active         (at_speaker_active),
         .speaker_level          (at_speaker_level),
+        .opl2_sound             (at_opl2_sound),
+        .cms_sound_l            (at_cms_sound_l),
+        .cms_sound_r            (at_cms_sound_r),
+        .tandy_sound            (at_tandy_sound),
         .protocol_error         (machine_protocol_error),
         .video_red              (at_video_red_raw),
         .video_green            (at_video_green_raw),
@@ -1189,15 +1231,78 @@ module emu_at
     assign LED_POWER    = 2'b00;
     assign LED_DISK     = {1'b0, main_rom_loaded};
     assign BUTTONS      = hps_buttons;
-    // Minimal PC speaker PCM.  The AT machine supplies a square-wave logic
-    // level from PIT channel 2; present it as a centered signed sample and
-    // leave the output at digital silence while the speaker is gated off.
-    assign AUDIO_L      = !at_speaker_active ? 16'h0000 :
-                          at_speaker_level ? 16'h4000 : 16'hC000;
-    assign AUDIO_R      = !at_speaker_active ? 16'h0000 :
-                          at_speaker_level ? 16'h4000 : 16'hC000;
+
+    // MiSTer audio mixer. This retains the source profile's volume, boost
+    // and stereo-mix controls while summing only the PC speaker, OPL2, C/MS
+    // and Tandy sources. Sound Blaster is intentionally absent.
+    wire signed [16:0] audio_opl2 = {at_opl2_sound[15], at_opl2_sound};
+    wire signed [16:0] audio_cms_l = {at_cms_sound_l[15], at_cms_sound_l};
+    wire signed [16:0] audio_cms_r = {at_cms_sound_r[15], at_cms_sound_r};
+    wire [16:0] audio_tandy = `ENABLE_TANDY_AUDIO ?
+        {{{2{at_tandy_sound[10]}}, {4{at_tandy_sound[10]}}, at_tandy_sound}
+          << hps_status[33:32], 2'b00} : 17'd0;
+    wire [15:0] audio_speaker_amplitude =
+        16'h0800 << hps_status[33:32];
+    wire signed [16:0] audio_speaker = !at_speaker_active ? 17'sd0 :
+        at_speaker_level ? $signed({1'b0, audio_speaker_amplitude}) :
+                            -$signed({1'b0, audio_speaker_amplitude});
+    wire signed [16:0] audio_sum_l = audio_opl2 + audio_cms_l +
+                                      $signed(audio_tandy) + audio_speaker;
+    wire signed [16:0] audio_sum_r = audio_opl2 + audio_cms_r +
+                                      $signed(audio_tandy) + audio_speaker;
+
+    localparam integer COMP_F1 = 4;
+    localparam integer COMP_A1 = 2;
+    localparam integer COMP_X1 = ((32767 * (COMP_F1 - 1)) /
+                                  ((COMP_F1 * COMP_A1) - 1)) + 1;
+    localparam integer COMP_B1 = COMP_X1 * COMP_A1;
+    localparam integer COMP_F2 = 8;
+    localparam integer COMP_A2 = 4;
+    localparam integer COMP_X2 = ((32767 * (COMP_F2 - 1)) /
+                                  ((COMP_F2 * COMP_A2) - 1)) + 1;
+    localparam integer COMP_B2 = COMP_X2 * COMP_A2;
+
+    function automatic [15:0] compress_audio(input [15:0] inp);
+        reg [15:0] v;
+        reg [15:0] v1;
+        reg [15:0] v2;
+        begin
+            v  = inp[15] ? (~inp) + 1'd1 : inp;
+            v1 = (v < COMP_X1) ? (v * COMP_A1) :
+                 (((v - COMP_X1) / COMP_F1) + COMP_B1);
+            v2 = (v < COMP_X2) ? (v * COMP_A2) :
+                 (((v - COMP_X2) / COMP_F2) + COMP_B2);
+            v = hps_status[37] ? v2 : v1;
+            compress_audio = inp[15] ? ~(v - 1'd1) : v;
+        end
+    endfunction
+
+    logic signed [15:0] audio_out_l_q;
+    logic signed [15:0] audio_out_r_q;
+    logic signed [15:0] audio_cmp_l_q;
+    logic signed [15:0] audio_cmp_r_q;
+    always_ff @(posedge CLK_50M or posedge RESET) begin
+        if (RESET) begin
+            audio_out_l_q <= 16'sd0;
+            audio_out_r_q <= 16'sd0;
+            audio_cmp_l_q <= 16'sd0;
+            audio_cmp_r_q <= 16'sd0;
+        end else begin
+            audio_out_l_q <= (^audio_sum_l[16:15]) ?
+                             {audio_sum_l[16], {15{audio_sum_l[15]}}} :
+                             audio_sum_l[15:0];
+            audio_out_r_q <= (^audio_sum_r[16:15]) ?
+                             {audio_sum_r[16], {15{audio_sum_r[15]}}} :
+                             audio_sum_r[15:0];
+            audio_cmp_l_q <= compress_audio(audio_out_l_q);
+            audio_cmp_r_q <= compress_audio(audio_out_r_q);
+        end
+    end
+
+    assign AUDIO_L      = hps_status[37:36] ? audio_cmp_l_q : audio_out_l_q;
+    assign AUDIO_R      = hps_status[37:36] ? audio_cmp_r_q : audio_out_r_q;
     assign AUDIO_S      = 1'b1;
-    assign AUDIO_MIX    = 2'b00;
+    assign AUDIO_MIX    = hps_status[39:38];
     assign ADC_BUS      = 4'hz;
     assign SD_SCK       = 1'bz;
     assign SD_MOSI      = 1'bz;

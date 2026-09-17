@@ -50,6 +50,14 @@ module emu_at
         CONF_STR_AT_DEBUG,
 `endif
         "P1-;",
+        "P2,Audio & Video;",
+        "P2-;",
+        "P2oEH,CRT H offset,0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15;",
+        "P2oIK,CRT V offset,0,1,2,3,4,5,6,7;",
+        "P2O[66:64],VSync Width,Auto,1,2,3,4,5,6,7;",
+        "P2O[69:67],HSync Width,Auto,1,2,3,4,5,6,7;",
+        "P2OA,VGA 13h+ CRT,Native 70Hz,TV 60Hz;",
+        "P2-;",
         "-;",
         "R0,Reset & apply settings;",
         "J,Fire 1,Fire 2;",
@@ -99,6 +107,82 @@ module emu_at
     wire [15:0]  hps_status_menumask;
     wire         at_debug_enable = hps_status[71];
     wire [1:0]   at_debug_page = hps_status[73:72];
+    wire         at_vga_mode13_native_osd = ~hps_status[10];
+    wire [3:0]   at_crt_h_osd = hps_status[49:46];
+    wire [2:0]   at_crt_v_osd = hps_status[52:50];
+    wire [2:0]   at_vsync_width_osd = hps_status[66:64];
+    wire [2:0]   at_hsync_width_osd = hps_status[69:67];
+
+    wire [7:0] at286ctl_cpu;
+    wire [7:0] at286ctl_exp;
+    wire [7:0] at286ctl_vid;
+    wire [7:0] at286ctl_inp;
+    wire [7:0] at286ctl_midi;
+    wire [7:0] at286ctl_exp2;
+    wire [7:0] at286ctl_crt;
+    wire [7:0] at286ctl_sync;
+    wire [39:0] at286ctl_status_effective;
+    wire [17:0] at286ctl_status_osd_match;
+    wire [1:0] at286ctl_eff_speed;
+    wire        at286ctl_eff_fake286;
+    wire [1:0] at286ctl_eff_opl2;
+    wire        at286ctl_eff_cms;
+    wire        at286ctl_eff_sb;
+    wire [2:0] at286ctl_eff_sb_irq;
+    wire        at286ctl_eff_ems;
+    wire        at286ctl_eff_umb;
+    wire        at286ctl_eff_vga13;
+    wire        at286ctl_eff_joy1_digital;
+    wire        at286ctl_eff_joy1_disable;
+    wire        at286ctl_eff_joy2_digital;
+    wire        at286ctl_eff_joy2_disable;
+    wire        at286ctl_eff_joy_sync;
+    wire        at286ctl_eff_joy_swap;
+    wire        at286ctl_eff_mt32_gm;
+    wire        at286ctl_eff_tandy;
+    wire        at286ctl_eff_mpu401;
+    wire [3:0] at286ctl_eff_crt_h;
+    wire [2:0] at286ctl_eff_crt_v;
+    wire [2:0] at286ctl_eff_vsync_width;
+    wire [2:0] at286ctl_eff_hsync_width;
+
+    // The AT profile currently implements the real VGA/EGA video path and
+    // PC speaker; the remaining compatibility fields stay available in the
+    // register map and resolve to their hardware-safe defaults.
+    at286ctl_resolve u_at286ctl_resolve (
+        .reg_cpu(at286ctl_cpu), .reg_exp(at286ctl_exp),
+        .reg_vid(at286ctl_vid), .reg_inp(at286ctl_inp),
+        .reg_midi(at286ctl_midi), .reg_exp2(at286ctl_exp2),
+        .osd_speed(2'd0), .osd_fake286(1'b0), .osd_opl2(2'd2),
+        .osd_cms(1'b0), .osd_sb(1'b0), .osd_sb_irq(3'd5),
+        .osd_ems(1'b0), .osd_umb(1'b0),
+        .osd_joy1_digital(1'b0), .osd_joy1_disable(1'b0),
+        .osd_joy2_digital(1'b0), .osd_joy2_disable(1'b0),
+        .osd_joy_sync(1'b0), .osd_joy_swap(1'b0),
+        .osd_mt32_gm(1'b0), .osd_tandy(1'b0), .osd_mpu401(1'b0),
+        .reg_crt(at286ctl_crt), .reg_sync(at286ctl_sync),
+        .osd_crt_h(at_crt_h_osd), .osd_crt_v(at_crt_v_osd),
+        .osd_vsync_w(at_vsync_width_osd), .osd_hsync_w(at_hsync_width_osd),
+        .build_sb(1'b0), .build_tandy(1'b0),
+        .eff_speed(at286ctl_eff_speed), .eff_fake286(at286ctl_eff_fake286),
+        .eff_opl2(at286ctl_eff_opl2), .eff_cms(at286ctl_eff_cms),
+        .eff_sb(at286ctl_eff_sb), .eff_sb_irq(at286ctl_eff_sb_irq),
+        .eff_ems(at286ctl_eff_ems), .eff_umb(at286ctl_eff_umb),
+        .eff_vga13(at286ctl_eff_vga13),
+        .eff_joy1_digital(at286ctl_eff_joy1_digital),
+        .eff_joy1_disable(at286ctl_eff_joy1_disable),
+        .eff_joy2_digital(at286ctl_eff_joy2_digital),
+        .eff_joy2_disable(at286ctl_eff_joy2_disable),
+        .eff_joy_sync(at286ctl_eff_joy_sync),
+        .eff_joy_swap(at286ctl_eff_joy_swap),
+        .eff_mt32_gm(at286ctl_eff_mt32_gm), .eff_tandy(at286ctl_eff_tandy),
+        .eff_mpu401(at286ctl_eff_mpu401),
+        .eff_crt_h(at286ctl_eff_crt_h), .eff_crt_v(at286ctl_eff_crt_v),
+        .eff_vsync_w(at286ctl_eff_vsync_width),
+        .eff_hsync_w(at286ctl_eff_hsync_width),
+        .status_effective(at286ctl_status_effective),
+        .status_osd_match(at286ctl_status_osd_match)
+    );
     wire [10:0]  ps2_key;
     wire          ps2_kbd_clk_out;
     wire          ps2_kbd_data_out;
@@ -678,6 +762,9 @@ module emu_at
     wire [11:0] at_video_active_dots_raw;
     wire [9:0]  at_video_active_lines_raw;
 
+    // AT286CTL is clocked by the AT bus and its effective video fields are
+    // fed to the EGA/VGA adapter through the machine boundary.
+
     spk286_at_machine u_at_machine (
         .clk                    (CLK_50M),
         // Keep the AT devices and EGA raster alive during the splash.  Only
@@ -686,6 +773,14 @@ module emu_at
         .cpu_reset              (at_machine_reset),
         .clk_video              (at_video_clk_28),
         .splashscreen           (at_splashscreen),
+        .at286ctl_status_effective(at286ctl_status_effective),
+        .at286ctl_status_osd_match(at286ctl_status_osd_match),
+        .vga_enabled            (at286ctl_eff_vga13),
+        .vga_mode13_native      (at_vga_mode13_native_osd),
+        .crt_h_offset           (at286ctl_eff_crt_h),
+        .crt_v_offset           (at286ctl_eff_crt_v),
+        .vsync_width_osd        (at286ctl_eff_vsync_width),
+        .hsync_width_osd        (at286ctl_eff_hsync_width),
         .execute_enable         (1'b1),
         .counter_clock          (counter_clock),
         .refresh_enable         (1'b1),
@@ -820,7 +915,15 @@ module emu_at
         .video_vmode_toggle     (at_video_vmode_toggle_raw),
         .video_mode350          (at_video_mode350_raw),
         .video_active_dots      (at_video_active_dots_raw),
-        .video_active_lines     (at_video_active_lines_raw)
+        .video_active_lines     (at_video_active_lines_raw),
+        .at286ctl_cpu           (at286ctl_cpu),
+        .at286ctl_exp           (at286ctl_exp),
+        .at286ctl_vid           (at286ctl_vid),
+        .at286ctl_inp           (at286ctl_inp),
+        .at286ctl_midi          (at286ctl_midi),
+        .at286ctl_exp2          (at286ctl_exp2),
+        .at286ctl_crt           (at286ctl_crt),
+        .at286ctl_sync          (at286ctl_sync)
     );
 
     // The AT device owns the EGA registers, planar VRAM and raster.  The EGA

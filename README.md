@@ -210,13 +210,13 @@ fixed VGA planar 16-colour profile:
 | Unchained 320×240 | Four pixels per byte across four planes | 320×240 |
 
 The extension starts disabled, exactly as on an IBM EGA, and `VGATSR.COM`
-enables it through XTEGACTL. `VGA 13h+ CRT` then selects its output raster:
+enables it through AT286CTL. `VGA 13h+ CRT` then selects its output raster:
 `Native` uses the standard 800-clock, 31.5 kHz / 70 Hz VGA timing, while `60Hz`
 keeps a 15.70 kHz / 59.9 Hz television-compatible raster. The 360×200 Native
 profile retains a 912-clock line for its wider picture, and 320×240 borrows
 vertical blanking.
 
-An IBM-compatible warm boot clears the VGA 13h+ XTEGACTL field when the BIOS
+An IBM-compatible warm boot clears the VGA 13h+ AT286CTL field when the BIOS
 writes its standard `1234h` marker to `0040:0072`, so the private VGA raster
 releases the connector and the original EGA text mode is visible again.
 `VGATSR.COM` must be run again before another VGA session.
@@ -234,7 +234,7 @@ for software that does not touch the DAC.
 subfunctions — `INT 10h AH=10h` with `AL=10h/12h/15h/17h` are VGA additions and
 an EGA BIOS drops them silently — so the TSR hooks `INT 10h` and serves them,
 along with the queries a game uses to detect a VGA in the first place. It
-refuses to install if the core does not expose the required XTEGACTL interface,
+refuses to install if the core does not expose the required AT286CTL interface,
 so an older incompatible RBF is not falsely advertised as VGA-capable.
 
 For VGA mode 0Dh, VGATSR first lets the existing EGA BIOS establish the normal
@@ -272,7 +272,7 @@ every unrecognised `INT 10h` call straight through to the real BIOS.
 
 But explicit activation exists for a reason, and not loading the TSR is the
 right call when you want the machine to behave and be detected as a real EGA
-with no VGA trace at all — this is why the ports are gated on the XTEGACTL
+with no VGA trace at all — this is why the ports are gated on the AT286CTL
 state rather than left decoding permanently:
 
 * **Port-level fingerprint.** With the extension active, ports `3C7h`–`3C9h` answer as

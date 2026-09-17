@@ -1,12 +1,12 @@
-XTEGACTL - per-program hardware control for the PCXT-EGA core
+AT286CTL - per-program hardware control for the PCAT-286 core
 =============================================================
 
 Sets the machine up the way a program wants it, from DOS, without walking the
 OSD. Meant to sit in a batch file next to the thing it configures:
 
-    XTEGACTL 4.77 adlib joy1=digital
+    AT286CTL 4.77 adlib joy1=digital
     GAME.EXE
-    XTEGACTL reset
+    AT286CTL reset
 
 Every setting applies immediately. There is nothing here that needs a machine
 reset, and that is the whole point of the tool.
@@ -88,10 +88,10 @@ HOW IT BEHAVES
 
 Anything not named on the command line is left to the OSD. The menu stays in
 charge of it, and changing the menu still works. VGA 13h+ is the exception:
-it starts disabled, `VGATSR.COM` enables it, and ordinary XTEGACTL commands
+it starts disabled, `VGATSR.COM` enables it, and ordinary AT286CTL commands
 leave that state untouched.
 
-`XTEGACTL status` reports the effective value of every runtime setting, even
+`AT286CTL status` reports the effective value of every runtime setting, even
 when that value comes from the OSD. Values followed by `(OSD)` match the live
 menu setting; an explicit program override that happens to select the same
 value is also marked `(OSD)`. VGA 13h+ is reported as the actual `on`/`off`
@@ -104,7 +104,7 @@ misleading zero values.
 
 Settings are not cumulative. Each run rewrites the whole register file, so a
 setting left behind by one program never leaks into the next. That means a
-batch file only has to name what it needs, and "XTEGACTL reset" puts
+batch file only has to name what it needs, and "AT286CTL reset" puts
 everything back. `reset` also disables VGA 13h+; run `VGATSR.COM` again if
 the extension is needed afterwards.
 
@@ -137,23 +137,23 @@ IF IT SAYS THE CORE DOES NOT HAVE THE PORT BLOCK
 
 The tool checks for a signature byte before writing anything. This tool
 travels in the disk image while the RBF is updated separately, so running a
-new XTEGACTL on an older core is a normal thing to end up doing. Rather than
+new AT286CTL on an older core is a normal thing to end up doing. Rather than
 writing into dead ports and appearing to do nothing, it stops and says so.
-Update the PCXT-EGA RBF.
+Update the PCAT-286 RBF.
 
 
 RELATION TO XTCTL
 -----------------
 
-XTEGACTL replaces XTCTL on this core. It is not a new version of it: the port
+AT286CTL replaces XTCTL on this core. It is not a new version of it: the port
 moved, the register layout is different, and the option names are different.
 XTCTL is still what the parent PCXT core uses, and it still works there.
 
-On PCXT-EGA, XTCTL's composite, border and a000hoff options had quietly become
+On PCAT-286, XTCTL's composite, border and a000hoff options had quietly become
 no-ops - the features they controlled do not exist in this fork - and its
 speed option names never matched the speeds they selected: "5Mhz" selected
 4.77 MHz, "8Mhz" selected 7.16, "10Mhz" selected 9.54, and "AT4Mhz" selected
-the maximum. XTEGACTL names the actual speeds.
+the maximum. AT286CTL names the actual speeds.
 
 
 BUILDING
@@ -181,9 +181,9 @@ Then unpack it and set the toolchain environment (the portable package uses
     wmake -a
 
 Note -l=com in the makefile. Without it the linker emits an MZ executable, and
-calling that XTEGACTL.COM does not make it one: DOS would load the header bytes
+calling that AT286CTL.COM does not make it one: DOS would load the header bytes
 as code and the program would die on its first instruction.
 
-XTEGACTL writes diagnostics directly through DOS rather than using `stdio`.
+AT286CTL writes diagnostics directly through DOS rather than using `stdio`.
 This avoids the Open Watcom startup allocation for stream structures, which can
 fail before `main` on a DOS configuration with very little conventional memory.

@@ -7,6 +7,10 @@ module spk286_at_devices_tb;
     logic clk_video = 1'b0;
     logic splashscreen = 1'b0;
     always #17.45 clk_video = ~clk_video;
+    logic clear_vga13 = 1'b0;
+    logic vga_enabled = 1'b0;
+    logic [39:0] at286ctl_status_effective = 40'h0;
+    logic [17:0] at286ctl_status_osd_match = 18'h0;
 
     // CPU-facing normalized request.
     logic        request_valid = 1'b0;
@@ -46,6 +50,7 @@ module spk286_at_devices_tb;
     wire         floppy_selected;
     wire         video_io_selected;
     wire         video_memory_selected;
+    wire [7:0]   at286ctl_vid;
     wire [15:0]  side_effect_count;
     wire [15:0]  irq_request;
     wire         devices_protocol_error;
@@ -115,6 +120,12 @@ module spk286_at_devices_tb;
     spk286_at_device_router devices (
         .clk(clk), .reset(reset),
         .clk_video(clk_video), .splashscreen(splashscreen),
+        .clear_vga13(clear_vga13),
+        .at286ctl_status_effective(at286ctl_status_effective),
+        .at286ctl_status_osd_match(at286ctl_status_osd_match),
+        .vga_enabled(vga_enabled), .vga_mode13_native(1'b0),
+        .crt_h_offset(4'h0), .crt_v_offset(3'h0),
+        .vsync_width_osd(3'h0), .hsync_width_osd(3'h0),
         .request_valid(request_valid),
         .request_command_valid(request_command_valid),
         .request_write(request_write), .request_io(request_io),
@@ -151,6 +162,7 @@ module spk286_at_devices_tb;
          .ata_selected(ata_selected), .floppy_selected(floppy_selected),
         .video_io_selected(video_io_selected),
         .video_memory_selected(video_memory_selected),
+        .at286ctl_vid(at286ctl_vid),
         .side_effect_count(side_effect_count), .irq_request(irq_request),
         .protocol_error(devices_protocol_error)
     );
@@ -494,6 +506,32 @@ module spk286_at_devices_tb;
         check(!devices.u_storage_video.u_video.video_reset,
               "video reset did not release after two local edges");
 
+        // AT286CTL must be reachable through the normalized AT I/O router,
+        // not only as an isolated register-block simulation.
+        router_read(16'h8980, value);
+        check(value == 8'h45, "AT286CTL signature was not visible on the AT bus");
+        router_write(16'h8983, 8'h02);
+        router_read(16'h8983, value);
+        check(value == 8'h02 && at286ctl_vid == 8'h02,
+              "AT286CTL VGA field did not round-trip through the AT router");
+        clear_vga13 = 1'b1;
+        @(posedge clk);
+        clear_vga13 = 1'b0;
+        #1;
+        check(at286ctl_vid == 8'h00,
+              "AT286CTL VGA field was not cleared on warm boot marker");
+
+        // VGATSR enters the private route through the EGA VGA-control port
+        // after AT286CTL has enabled the extension.
+        vga_enabled = 1'b1;
+        router_write(16'h03CD, 8'h13);
+        repeat (16) @(posedge clk_video);
+        #1;
+        check(devices.u_storage_video.u_video.u_ega.vga_mode13_active,
+              "VGA control write did not activate the private route");
+        check(devices.u_storage_video.u_video.vga_packed_memory_active,
+              "VGA mode 13h did not select the packed framebuffer aperture");
+
         // IBM 5170 8042 command protocol exercised by the Landmark U126 and
         // keyboard-scan-lines diagnostics.
         router_read(16'h0064, value);
@@ -669,6 +707,8 @@ module spk286_at_devices_tb;
         @(negedge clk);
         while (!request_ready) @(negedge clk);
         @(posedge clk);
+        check(devices.u_storage_video.u_video.u_vga_framebuffer.mem[16'h0000] == 8'h5A,
+              "VGA packed framebuffer did not receive the A0000 write");
         router_read_lane(16'h0000, 2'b01, value);
         // The read above intentionally exercises an unmapped deterministic
         // sink; the aperture read follows with a memory request.

@@ -66,7 +66,7 @@ Intentional edits to imported PCXT paths are recorded in
 `docs/imports/pcxt-modified-files.txt`. New integration paths are not PCXT
 imports and therefore do not appear in the PCXT source manifest.
 
-The PCXT README and XTEGACTL reference are adapted only to remove inherited
+The PCXT README and AT286CTL reference are adapted only to remove inherited
 MCL86/8088 claims and describe the PCAT-286 menu contract. Their originals are
 identified by the PCXT manifest and selected commit. Production RTL changes
 are kept in new `PCAT-286*`, `files_pcat286.qip`, `Chipset_SPK286.sv`,

@@ -15,6 +15,14 @@ module spk286_at_machine (
     input  logic         cpu_reset,
     input  logic         clk_video,
     input  logic         splashscreen,
+    input  logic [39:0]  at286ctl_status_effective,
+    input  logic [17:0]  at286ctl_status_osd_match,
+    input  logic         vga_enabled,
+    input  logic         vga_mode13_native,
+    input  logic [3:0]   crt_h_offset,
+    input  logic [2:0]   crt_v_offset,
+    input  logic [2:0]   vsync_width_osd,
+    input  logic [2:0]   hsync_width_osd,
     input  logic         execute_enable,
     input  logic         counter_clock,
     input  logic         refresh_enable,
@@ -108,6 +116,14 @@ module spk286_at_machine (
     output logic         video_mode350,
     output logic [11:0]  video_active_dots,
     output logic [9:0]   video_active_lines,
+    output logic [7:0]   at286ctl_cpu,
+    output logic [7:0]   at286ctl_exp,
+    output logic [7:0]   at286ctl_vid,
+    output logic [7:0]   at286ctl_inp,
+    output logic [7:0]   at286ctl_midi,
+    output logic [7:0]   at286ctl_exp2,
+    output logic [7:0]   at286ctl_crt,
+    output logic [7:0]   at286ctl_sync,
 
     output logic         cpu_hold_request,
     output logic         cpu_hlda,
@@ -356,11 +372,26 @@ module spk286_at_machine (
     logic        cpu_owner_active;
     logic        cpu_memory_candidate;
     logic        device_request_candidate;
+    logic        warm_boot_marker_event;
 
     // The 8042 reset is a CPU-local warm reset.  It must flush the CPU and
     // its retained bus transaction, but must not reset CMOS or the other AT
     // devices because the BIOS uses CMOS shutdown codes to resume POST.
     wire       cpu_core_reset = reset | cpu_reset | devices_cpu_reset_request;
+
+    // IBM AT BIOSes announce a warm reboot by storing 1234h at physical
+    // address 0040:0072. Keep this as a one-cycle event so AT286CTL can drop
+    // only its VGA+ enable while preserving other per-program overrides.
+    always_ff @(posedge clk or posedge reset) begin
+        if (reset)
+            warm_boot_marker_event <= 1'b0;
+        else
+            warm_boot_marker_event <= cpu_owner_active && at_command_valid &&
+                                      !at_io && at_write &&
+                                      (at_address[19:0] == 20'h00472) &&
+                                      (at_byte_enable == 2'b11) &&
+                                      (at_data_out == 16'h1234);
+    end
 
     function automatic logic is_pic_port(input logic [15:0] port);
         begin
@@ -387,6 +418,7 @@ module spk286_at_machine (
         begin
             is_a5_io_port = (port == 16'h0060) || (port == 16'h0064) ||
                             (port == 16'h0070) || (port == 16'h0071) ||
+                            ((port >= 16'h8980) && (port <= 16'h898F)) ||
                             ((port >= 16'h01F0) && (port <= 16'h01F7)) ||
                             ((port >= 16'h03B0) && (port <= 16'h03DF)) ||
                             ((port >= 16'h03F0) && (port <= 16'h03F7));
@@ -563,6 +595,15 @@ module spk286_at_machine (
         .reset                  (reset),
         .clk_video              (clk_video),
         .splashscreen           (splashscreen),
+        .clear_vga13            (warm_boot_marker_event),
+        .at286ctl_status_effective(at286ctl_status_effective),
+        .at286ctl_status_osd_match(at286ctl_status_osd_match),
+        .vga_enabled            (vga_enabled),
+        .vga_mode13_native      (vga_mode13_native),
+        .crt_h_offset           (crt_h_offset),
+        .crt_v_offset           (crt_v_offset),
+        .vsync_width_osd        (vsync_width_osd),
+        .hsync_width_osd        (hsync_width_osd),
         .request_valid          (device_request_candidate),
         .request_command_valid  (at_command_valid),
         .request_write          (at_write),
@@ -635,6 +676,14 @@ module spk286_at_machine (
         .video_mode350          (video_mode350),
         .video_active_dots      (video_active_dots),
         .video_active_lines     (video_active_lines),
+        .at286ctl_cpu           (at286ctl_cpu),
+        .at286ctl_exp           (at286ctl_exp),
+        .at286ctl_vid           (at286ctl_vid),
+        .at286ctl_inp           (at286ctl_inp),
+        .at286ctl_midi          (at286ctl_midi),
+        .at286ctl_exp2          (at286ctl_exp2),
+        .at286ctl_crt           (at286ctl_crt),
+        .at286ctl_sync          (at286ctl_sync),
         .side_effect_count      (device_side_effect_count),
         .irq_request             (devices_irq_request),
         .protocol_error          (devices_protocol_error)

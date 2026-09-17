@@ -1,4 +1,4 @@
-# XTEGACTL
+# AT286CTL
 
 > **PCAT-286 integration note:** the legacy speed field now selects **XT Bus
 > Pace**, not an SPK286 CPU frequency. The legacy Fake 286 FLAGS field is
@@ -7,19 +7,19 @@
 > The existing **Sync Joy to CPU Speed** name and behavior are intentionally
 > retained for a later input-specific task.
 
-Per-program hardware control for the PCXT-EGA core. A DOS program writes a
+Per-program hardware control for the PCAT-286 core. A DOS program writes a
 small block of I/O ports to set the machine up the way it wants before it runs,
 so a batch file can do what the user would otherwise do by hand in the OSD.
 
 ```
-XTEGACTL 4.77 adlib joy1=digital
+AT286CTL 4.77 adlib joy1=digital
 GAME.EXE
-XTEGACTL reset
+AT286CTL reset
 ```
 
-RTL: [`xtegactl.sv`](../rtl/KFPC-XT/HDL/xtegactl.sv) (port block) and
-[`xtegactl_resolve.sv`](../rtl/KFPC-XT/HDL/xtegactl_resolve.sv) (what the
-fields mean). Tool: [`SW/XTEGACTL`](../SW/XTEGACTL).
+RTL: [`at286ctl.sv`](../rtl/spk286_integration/at286ctl.sv) (port block) and
+[`at286ctl_resolve.sv`](../rtl/spk286_integration/at286ctl_resolve.sv) (what the
+fields mean). Tool: [`SW/AT286CTL`](../SW/AT286CTL).
 
 The DOS utility is kept small enough for the core's low-memory environment.
 Its diagnostics use direct DOS console output instead of `stdio`; this avoids
@@ -27,7 +27,7 @@ the Open Watcom startup allocation for unused stream structures before `main`.
 
 ## The contract
 
-**Everything XTEGACTL can change takes effect immediately.** No field needs a
+**Everything AT286CTL can change takes effect immediately.** No field needs a
 machine reset, there is no apply-and-reboot command, and there is no state that
 has to survive a reset. That single rule is what the whole design is arranged
 around, and it is why several otherwise plausible settings are absent.
@@ -35,14 +35,14 @@ around, and it is why several otherwise plausible settings are absent.
 **Zero means "leave it to the OSD"** for every field except VGA 13h+. Those
 fields encode 1..N as the choices in the same order the menu lists them. VGA
 13h+ is deliberately different: zero is disabled after reset and `VGATSR.COM`
-owns activation. This prevents an OSD timing choice or an unrelated XTEGACTL
+owns activation. This prevents an OSD timing choice or an unrelated AT286CTL
 profile from removing a live VGA device.
 
 ## Register map
 
 The block is at **8980h–898Fh**. All sixteen ports are decoded. The last seven
 ports are a read-only status extension: they report the effective values after
-the OSD and XTEGACTL overrides have been resolved, plus which values currently
+the OSD and AT286CTL overrides have been resolved, plus which values currently
 match the OSD.
 
 | Port | Access | Contents |
@@ -99,7 +99,7 @@ sync, 10 MT32-pi, 11 MPU-401, 12 Tandy, 13 Sound Blaster IRQ, 14 CRT H, 15
 CRT V, 16 VSync and 17 HSync. The two high bits (16 and 17) are carried in
 `898Dh[7:6]`; the other flags are in `898Eh` and `898Fh`. A field is marked as
 matching when its effective value equals the live OSD value, even if an
-explicit XTEGACTL override selected that same value.
+explicit AT286CTL override selected that same value.
 
 VGA 13h+ controls only *whether* the extension is present, not *which* timing
 profile it uses. It starts disabled after every reset; an IBM-compatible warm
@@ -108,8 +108,8 @@ boot also clears it when the BIOS writes the standard `1234h` marker to
 must be run again after that warm boot. The user keeps deciding the output
 timing — Native 70 Hz or TV 60 Hz — independently from the OSD.
 
-The `XTEGACTL` command-line utility therefore does not expose `vga13` or
-`novga13`: normal profiles preserve the current VGA 13h+ state. `XTEGACTL
+The `AT286CTL` command-line utility therefore does not expose `vga13` or
+`novga13`: normal profiles preserve the current VGA 13h+ state. `AT286CTL
 reset` disables the extension, and the user can run `VGATSR.COM` again to
 enable it and install the hook.
 
@@ -148,14 +148,14 @@ that program, and giving it back is a matter of clearing the field.
 
 The *Hardware → Sound Blaster IRQ* OSD option selects the default interrupt
 line, independently as IRQ5 or IRQ7.
-The OSD's default is IRQ5; `XTEGACTL sbirq=5` and `XTEGACTL sbirq=7` select a
+The OSD's default is IRQ5; `AT286CTL sbirq=5` and `AT286CTL sbirq=7` select a
 line for the current program, while omitting the option (or using
 `sbirq=auto`) follows the OSD. The override is stored in bits `[5:4]` of
 `8986h`, with `0` meaning OSD, `1` meaning IRQ5 and `2` meaning IRQ7.
 
 DOS software normally receives the same setup through
 `SET BLASTER=A220 I5 D1 T4`: base `220h`, IRQ 5, DMA channel 1 and Sound
-Blaster Pro type 4. When XTEGACTL selects IRQ 7, the environment must use `I7`
+Blaster Pro type 4. When AT286CTL selects IRQ 7, the environment must use `I7`
 for that program as well. `SET SOUND=C:\SB` and
 `SET MIDI=SYNTH:1 MAP:E MODE:0` are optional Creative-software conventions;
 they do not create or configure hardware. The complete startup examples live
@@ -176,9 +176,9 @@ and the register's do.
 The sync widths at `8988h` use the same zero-as-defer rule as the other
 fields: zero follows the OSD and a non-zero value is a per-program override.
 Their OSD entries use the first six extended status bits, `status[69:64]`,
-which are persisted by the normal core CFG file. With both XTEGACTL fields
+which are persisted by the normal core CFG file. With both AT286CTL fields
 clear, the core therefore follows the saved or currently selected OSD values;
-writing a non-zero field takes precedence until XTEGACTL is reset.
+writing a non-zero field takes precedence until AT286CTL is reset.
 
 ## Why the block is at 8980h
 
@@ -251,7 +251,7 @@ the user's decision rather than the program's.
 
 ## Relation to XTCTL
 
-XTEGACTL replaces XTCTL on this core, and the old 8888h port is retired. It is
+AT286CTL replaces XTCTL on this core, and the old 8888h port is retired. It is
 not a new version of XTCTL: the address, the register layout and the option
 names are all different. XTCTL remains the parent PCXT core's tool and is
 untouched there.
@@ -268,13 +268,13 @@ names never matched what they selected:
 | `10Mhz` | 9.54 MHz |
 | `AT4Mhz` | Max |
 
-XTEGACTL names the actual speeds.
+AT286CTL names the actual speeds.
 
 ## Detection
 
 The tool reads the signature at `8980h` and refuses to run if it is not `45h`.
 This is not ceremony: the tool travels in the disk image while the RBF is
-updated separately and often, so running a new XTEGACTL on an older core is a
+updated separately and often, so running a new AT286CTL on an older core is a
 normal thing to end up doing. An undecoded port leaves
 `data_bus_out_from_chipset` low and the read returns whatever the bus was
 holding, never the last value written, so the check is reliable — but without

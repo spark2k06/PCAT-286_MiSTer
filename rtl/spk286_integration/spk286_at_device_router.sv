@@ -10,6 +10,15 @@ module spk286_at_device_router (
     input  logic        reset,
     input  logic        clk_video,
     input  logic        splashscreen,
+    input  logic        clear_vga13,
+    input  logic [39:0] at286ctl_status_effective,
+    input  logic [17:0] at286ctl_status_osd_match,
+    input  logic        vga_enabled,
+    input  logic        vga_mode13_native,
+    input  logic [3:0]  crt_h_offset,
+    input  logic [2:0]  crt_v_offset,
+    input  logic [2:0]  vsync_width_osd,
+    input  logic [2:0]  hsync_width_osd,
 
     input  logic        request_valid,
     input  logic        request_command_valid,
@@ -81,6 +90,14 @@ module spk286_at_device_router (
     output logic        video_mode350,
     output logic [11:0] video_active_dots,
     output logic [9:0]  video_active_lines,
+    output logic [7:0]  at286ctl_cpu,
+    output logic [7:0]  at286ctl_exp,
+    output logic [7:0]  at286ctl_vid,
+    output logic [7:0]  at286ctl_inp,
+    output logic [7:0]  at286ctl_midi,
+    output logic [7:0]  at286ctl_exp2,
+    output logic [7:0]  at286ctl_crt,
+    output logic [7:0]  at286ctl_sync,
     output logic [15:0] side_effect_count,
     output logic [15:0] irq_request,
     output logic        protocol_error
@@ -93,6 +110,7 @@ module spk286_at_device_router (
     localparam logic [3:0] DEVICE_8042    = 4'd1;
     localparam logic [3:0] DEVICE_RTC     = 4'd2;
     localparam logic [3:0] DEVICE_STORAGE = 4'd3;
+    localparam logic [3:0] DEVICE_AT286CTL = 4'd4;
     localparam logic [3:0] DEVICE_UNMAPPED = 4'd15;
 
     logic [2:0] router_state_q;
@@ -106,6 +124,7 @@ module spk286_at_device_router (
     logic       device_8042_candidate;
     logic       device_rtc_candidate;
     logic       device_storage_candidate;
+    logic       device_at286ctl_candidate;
     logic       device_candidate;
     logic       lane_valid;
 
@@ -130,6 +149,8 @@ module spk286_at_device_router (
     logic       storage_protocol_error;
     logic [15:0] storage_side_effect_count;
     logic [2:0]  storage_ide_request;
+    logic [7:0]  at286ctl_data_out;
+    logic        at286ctl_output_enable;
 
     always_comb begin
         device_8042_candidate = request_valid && request_command_valid &&
@@ -151,8 +172,12 @@ module spk286_at_device_router (
                                     (!request_io &&
                                      (request_address[23:0] >= 24'h0A0000) &&
                                      (request_address[23:0] <= 24'h0BFFFF)));
+        device_at286ctl_candidate = request_valid && request_command_valid &&
+                                    request_io &&
+                                    (request_address[15:0] >= 16'h8980) &&
+                                    (request_address[15:0] <= 16'h898F);
         device_candidate = device_8042_candidate || device_rtc_candidate ||
-                           device_storage_candidate;
+                           device_storage_candidate || device_at286ctl_candidate;
         lane_valid = ((request_address[0] == 1'b0) &&
                       (request_byte_enable == 2'b01)) ||
                      ((request_address[0] == 1'b1) &&
@@ -171,6 +196,8 @@ module spk286_at_device_router (
             selected_device = DEVICE_8042;
         else if (device_rtc_candidate)
             selected_device = DEVICE_RTC;
+        else if (device_at286ctl_candidate)
+            selected_device = DEVICE_AT286CTL;
         else if (device_storage_candidate)
             selected_device = DEVICE_STORAGE;
         else if (request_valid && request_command_valid && request_io)
@@ -221,9 +248,40 @@ module spk286_at_device_router (
         .selected_index(), .protocol_error(rtc_protocol_error)
     );
 
+    // AT286CTL is a motherboard control block, not a storage/video child.
+    // It is decoded here so the normalized AT bus gives it an exclusive owner
+    // and the CPU cannot accidentally reach an older DMA-page decode.
+    at286ctl u_at286ctl (
+        .clock            (clk),
+        .reset            (reset),
+        .clear_vga13      (clear_vga13),
+        .address          (request_address[15:0]),
+        .address_enable_n (!device_at286ctl_candidate),
+        .io_read_n        (!(device_at286ctl_candidate && !request_write)),
+        .io_write_n       (!(device_at286ctl_candidate && request_write)),
+        .data_in          (request_byte_enable[1] ? request_data_out[15:8] :
+                           request_data_out[7:0]),
+        .data_out         (at286ctl_data_out),
+        .output_enable    (at286ctl_output_enable),
+        .reg_cpu          (at286ctl_cpu),
+        .reg_exp          (at286ctl_exp),
+        .reg_vid          (at286ctl_vid),
+        .reg_inp          (at286ctl_inp),
+        .reg_midi         (at286ctl_midi),
+        .reg_exp2         (at286ctl_exp2),
+        .reg_crt          (at286ctl_crt),
+        .reg_sync         (at286ctl_sync),
+        .status_effective (at286ctl_status_effective),
+        .status_osd_match (at286ctl_status_osd_match)
+    );
+
     spk286_at_storage_video u_storage_video (
         .clk(clk), .reset(reset),
         .clk_video(clk_video), .splashscreen(splashscreen),
+        .vga_enabled(vga_enabled),
+        .vga_mode13_native(vga_mode13_native),
+        .crt_h_offset(crt_h_offset), .crt_v_offset(crt_v_offset),
+        .vsync_width_osd(vsync_width_osd), .hsync_width_osd(hsync_width_osd),
         .use_mmc(use_mmc),
         .request_valid(device_storage_candidate),
         .request_command_valid(request_command_valid),
@@ -277,6 +335,8 @@ module spk286_at_device_router (
                 request_accept = kbd_request_accept;
             else if (device_rtc_candidate)
                 request_accept = rtc_request_accept;
+            else if (device_at286ctl_candidate)
+                request_accept = lane_valid;
             else if (device_storage_candidate)
                 request_accept = storage_request_accept;
             else if (unmapped_request && lane_valid)
@@ -325,6 +385,13 @@ module spk286_at_device_router (
                             unmapped_read_q <= !request_write;
                             unmapped_lane_q <= request_byte_enable;
                         end
+                        if (selected_device == DEVICE_AT286CTL) begin
+                            response_data_q <= request_byte_enable[1] ?
+                                                {at286ctl_data_out, 8'h00} :
+                                                {8'h00, at286ctl_data_out};
+                            response_data_valid_q <= !request_write &&
+                                                     at286ctl_output_enable;
+                        end
                     end
                     if (unmapped_request && !lane_valid)
                         router_protocol_error_q <= 1'b1;
@@ -343,6 +410,8 @@ module spk286_at_device_router (
                         router_state_q <= ROUTER_DONE;
                         response_data_q <= storage_read_data;
                         response_data_valid_q <= storage_read_data_valid;
+                    end else if (target_device_q == DEVICE_AT286CTL) begin
+                        router_state_q <= ROUTER_DONE;
                     end else if (target_device_q == DEVICE_UNMAPPED) begin
                         router_state_q <= ROUTER_DONE;
                         response_data_q <= 16'hFFFF;

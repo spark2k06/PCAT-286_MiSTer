@@ -47,7 +47,7 @@ overhead into that UMB. `LTEMM.EXE /p:D000` registers the core's fixed EMS
 page frame; no `/i:` argument is needed because `260h` is already LTEMM's
 default I/O port.
 
-If UMB or EMS is disabled in the OSD or temporarily with XTEGACTL, remove or
+If UMB or EMS is disabled in the OSD or temporarily with AT286CTL, remove or
 comment the matching driver line for that boot. A DOS driver cannot create a
 memory device that the core has taken off the bus.
 
@@ -84,13 +84,13 @@ together:
 ```bat
 @ECHO OFF
 SET BLASTER=A220 I7 D1 T4
-XTEGACTL sb sbirq=7
+AT286CTL sb sbirq=7
 GAME.EXE
-XTEGACTL reset
+AT286CTL reset
 SET BLASTER=A220 I5 D1 T4
 ```
 
-Omitting `sbirq=` or using `sbirq=auto` follows the OSD. `XTEGACTL status`
+Omitting `sbirq=` or using `sbirq=auto` follows the OSD. `AT286CTL status`
 shows the effective IRQ and adds `(OSD)` when it matches the current menu
 setting.
 
@@ -101,16 +101,16 @@ for explicit port, IRQ and protocol options.
 
 ## Per-program profiles
 
-XTEGACTL rewrites its complete override register set on every invocation. A
+AT286CTL rewrites its complete override register set on every invocation. A
 batch file should therefore name every override that program needs, then use
-`XTEGACTL reset` on exit:
+`AT286CTL reset` on exit:
 
 ```bat
 @ECHO OFF
 SET BLASTER=A220 I5 D1 T4
-XTEGACTL 4.77 sb sbirq=5 joy1=digital
+AT286CTL 4.77 sb sbirq=5 joy1=digital
 GAME.EXE
-XTEGACTL reset
+AT286CTL reset
 ```
 
 Anything not named remains under OSD control. These overrides apply

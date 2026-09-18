@@ -62,6 +62,24 @@ if ! grep -q '"P1O7,Boot Splash Screen,Yes,No;"' \
   exit 1
 fi
 
+if ! grep -q 'P3oO,MPU-401,Enabled,Disabled;' \
+     "$ROOT_DIR/PCAT-286.sv" || \
+   ! grep -q 'P3O6,USER I/O,MIDI,COM2;' \
+     "$ROOT_DIR/PCAT-286.sv" || \
+   ! grep -q 'h3P4,MT32-pi;' \
+     "$ROOT_DIR/PCAT-286.sv" || \
+   ! grep -q 'spk286_at_serial.sv' \
+     "$ROOT_DIR/rtl/spk286_integration/spk286_integration.qip" || \
+   ! grep -q '`ifndef SPK286_AT_SIM_MODEL' \
+     "$ROOT_DIR/rtl/spk286_integration/spk286_at_serial.sv" || \
+   ! grep -q 'rtl/uart/uart.qip' \
+     "$ROOT_DIR/files.qip" || \
+   ! grep -q 'mt32pi u_mt32pi' \
+     "$ROOT_DIR/PCAT-286.sv"; then
+  echo "AT_PROFILE MIDI/MT32-pi integration is incomplete" >&2
+  exit 1
+fi
+
 if ! grep -q '"S0,IMGIMAVFD,Floppy A:;"' \
      "$ROOT_DIR/PCAT-286.sv" || \
    ! grep -q '"S1,IMGIMAVFD,Floppy B:;"' \
@@ -96,6 +114,7 @@ SOURCE_FILES=(
   "$ROOT_DIR/rtl/common/jtframe_ram.v"
   "$ROOT_DIR/rtl/common/tandy_pcjr_joy.sv"
   "$ROOT_DIR/rtl/common/spk286_debug_overlay.sv"
+  "$ROOT_DIR/sys/mt32pi.sv"
   "$ROOT_DIR/rtl/KFPC-XT/HDL/ega_vram_bram_frontend.sv"
   "$ROOT_DIR/rtl/KFPC-XT/HDL/KFSDRAM/HDL/KFSDRAM.sv"
   "$KF8259_DIR/KF8259_Common_Package.svh"
@@ -159,8 +178,10 @@ iverilog -g2012 -I"$KF8253_DIR" -Wall -Wno-timescale \
     -DENABLE_OPL2=1 \
     -DENABLE_CMS=1 \
     -DENABLE_TANDY_AUDIO=1 \
+    -DENABLE_MIDI=1 \
     -DSPK286_P05_PARALLEL_LIMIT_CHECK \
     -DSPK286_AT_NO_DEBUG \
+    -DSPK286_AT_SIM_MODEL \
   -o "$BUILD_DIR/config.vvp" \
   -s spk286_at_config_tb \
   -I"$ROOT_DIR" \

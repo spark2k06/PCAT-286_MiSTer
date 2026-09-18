@@ -3,6 +3,9 @@
 `ifndef ENABLE_CMS
 `define ENABLE_CMS 0
 `endif
+`ifndef ENABLE_MIDI
+`define ENABLE_MIDI 0
+`endif
 
 // Regression for XT-IDE accesses being intercepted by the machine's FFh sink.
 // Exercise CPU bus -> real AT bridge/decode/router/IDE and the real hps_ext
@@ -37,6 +40,10 @@ module spk286_at_xtide_machine_tb;
         .splashscreen(1'b0), .execute_enable(1'b1), .counter_clock(1'b0),
         .at286ctl_eff_opl2(2'd0), .at286ctl_eff_cms(1'b1),
         .at286ctl_eff_tandy(1'b0),
+        .at286ctl_eff_mpu401(`ENABLE_MIDI),
+        .midi_baudce(1'b1), .uart_baudce(1'b1),
+        .midi_rx(1'b1), .uart2_rx(1'b1),
+        .uart2_cts_n(1'b1), .uart2_dsr_n(1'b1), .uart2_dcd_n(1'b1),
         .refresh_enable(1'b0), .keyboard_byte_valid(1'b0), .keyboard_byte(8'd0),
         .periodic_tick(1'b0), .second_tick(1'b0), .parity_event(1'b0),
         .channel_check_event(1'b0), .external_nmi_event(1'b0),

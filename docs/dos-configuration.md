@@ -18,10 +18,21 @@ The supplied configuration expects these core options:
 - **Audio & Video → OPL2: Adlib 388h** exposes the OPL2 at `388h`; the second
   OSD choice also enables its `228h` FM alias.
 - **Audio & Video → Tandy Sound: Enabled** exposes the SN76489 at `0C0h-0CFh`.
+- **Hardware → MPU-401: Enabled** exposes the UART-mode MPU-401 at `330h/331h`
+  and routes its interrupt through AT IRQ9 (the IRQ2 cascade remains reserved
+  for the slave PIC).
+  Reset and UART-entry `FEh` acknowledgements are polled through `331h/330h`;
+  the adapted AT BIOS leaves IRQ9 masked until a MIDI driver installs its
+  handler, and IRQ9 is then reserved for received MIDI bytes.
+  With **USER I/O → MIDI**, it connects to an external MT32-pi; **COM2** uses
+  the same USER I/O connector for the standard UART at `2F8h-2FFh`.
+- The MT32-pi page keeps the source choices for MT-32/General MIDI mode,
+  ROM, SoundFont, reset and the optional external bridge.
 
 Sound Blaster DSP, DMA, IRQ and its OSD selection are intentionally not part
 of this AT profile. C/MS, OPL2 and Tandy are core hardware and require no DOS
-driver or environment variable.
+driver or environment variable. MPU-401 UART mode is the MIDI transport; the
+MT32-pi itself remains external hardware connected through USER I/O.
 
 The core also decodes SDRAM at `E0000h-EBFFFh`, but that region is deliberately
 not registered as a DOS UMB. The EMS frame lies between the C400h and E000h

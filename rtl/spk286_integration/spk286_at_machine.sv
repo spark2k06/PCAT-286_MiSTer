@@ -16,6 +16,9 @@
 `ifndef ENABLE_TANDY_AUDIO
 `define ENABLE_TANDY_AUDIO 0
 `endif
+`ifndef ENABLE_MIDI
+`define ENABLE_MIDI 0
+`endif
 
 module spk286_at_machine (
     input  logic         clk,
@@ -30,6 +33,14 @@ module spk286_at_machine (
     input  logic [1:0]   at286ctl_eff_opl2,
     input  logic         at286ctl_eff_cms,
     input  logic         at286ctl_eff_tandy,
+    input  logic         at286ctl_eff_mpu401,
+    input  logic         midi_baudce,
+    input  logic         uart_baudce,
+    input  logic         midi_rx,
+    input  logic         uart2_rx,
+    input  logic         uart2_cts_n,
+    input  logic         uart2_dsr_n,
+    input  logic         uart2_dcd_n,
     input  logic         vga_enabled,
     input  logic         vga_mode13_native,
     input  logic [3:0]   crt_h_offset,
@@ -116,6 +127,10 @@ module spk286_at_machine (
     output logic signed [15:0] cms_sound_l,
     output logic signed [15:0] cms_sound_r,
     output logic signed [10:0] tandy_sound,
+    output logic         midi_tx,
+    output logic         uart2_tx,
+    output logic         uart2_rts_n,
+    output logic         uart2_dtr_n,
 
     output logic [3:0]   selected_device,
     output logic         unmapped_request,
@@ -445,6 +460,10 @@ module spk286_at_machine (
                             ((port >= 16'h8980) && (port <= 16'h898F)) ||
                             ((port >= 16'h01F0) && (port <= 16'h01F7)) ||
                             ((port >= 16'h0200) && (port <= 16'h0207)) ||
+                            ((`ENABLE_MIDI) &&
+                             (port >= 16'h02F8) && (port <= 16'h02FF)) ||
+                            ((`ENABLE_MIDI) &&
+                             (port >= 16'h0330) && (port <= 16'h0331)) ||
                             ((port >= 16'h03B0) && (port <= 16'h03DF)) ||
                             ((port >= 16'h03F0) && (port <= 16'h03F7));
         end
@@ -662,6 +681,18 @@ module spk286_at_machine (
         .at286ctl_eff_opl2     (at286ctl_eff_opl2),
         .at286ctl_eff_cms      (at286ctl_eff_cms),
         .at286ctl_eff_tandy    (at286ctl_eff_tandy),
+        .at286ctl_eff_mpu401   (at286ctl_eff_mpu401),
+        .midi_baudce           (midi_baudce),
+        .uart_baudce           (uart_baudce),
+        .midi_rx               (midi_rx),
+        .uart2_rx              (uart2_rx),
+        .uart2_cts_n           (uart2_cts_n),
+        .uart2_dsr_n           (uart2_dsr_n),
+        .uart2_dcd_n           (uart2_dcd_n),
+        .midi_tx               (midi_tx),
+        .uart2_tx              (uart2_tx),
+        .uart2_rts_n           (uart2_rts_n),
+        .uart2_dtr_n           (uart2_dtr_n),
         .request_valid          (device_request_candidate),
         .request_command_valid  (at_command_valid),
         .request_write          (at_write),

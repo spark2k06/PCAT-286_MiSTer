@@ -113,6 +113,9 @@ module spk286_at_8042 (
             output_buffer_q <= 8'h00;
             output_buffer_valid_q <= 1'b0;
             command_byte_q <= 8'h01;
+            // The IBM AT releases the CPU reset line with its A20 gate
+            // closed. BIOS POST opens it explicitly through the 8042
+            // output-port protocol (P2=01h; only bits 0 and 1 are modelled).
             output_port_q <= 8'h01;
             write_command_byte_q <= 1'b0;
             write_output_port_q <= 1'b0;

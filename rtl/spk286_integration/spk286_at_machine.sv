@@ -308,7 +308,6 @@ module spk286_at_machine (
     // the F0000h BIOS window before the memory owner, even while A20 is off.
     logic [23:0] at_memory_address;
     logic [23:0] memory_backend_address;
-    logic [23:0] dma_bus_address;
     logic        ems_aperture_select;
     logic        ems_runtime_enabled;
     logic        umb_region_select;
@@ -983,15 +982,11 @@ module spk286_at_machine (
     assign dma_memory_valid = dma_transfer_valid;
     assign dma_memory_write = dma_transfer_write_to_memory;
     assign dma_memory_read = dma_transfer_read_from_memory;
-    // The motherboard A20 gate is shared by CPU/DMA memory cycles.  This is
-    // observable for old EXEPACK loaders which rely on 20-bit wraparound.
-    always_comb begin
-        dma_bus_address = dma_transfer_address;
-        if (!a20_enable)
-            dma_bus_address = {dma_transfer_address[23:21], 1'b0,
-                               dma_transfer_address[19:0]};
-        dma_memory_address = ems_backend_address(dma_bus_address);
-    end
+    // The AT A20 gate belongs to the CPU memory path.  Legacy 8237 DMA
+    // presents its programmed physical address directly on the bus; 86Box
+    // models this with mem_read_phys()/mem_write_phys(), which bypass the
+    // CPU rammask.  Keep DMA independent of the CPU A20 state.
+    assign dma_memory_address = ems_backend_address(dma_transfer_address);
     assign dma_memory_byte_enable = dma_transfer_byte_enable;
     assign dma_memory_data_out = dma_transfer_data_out;
 

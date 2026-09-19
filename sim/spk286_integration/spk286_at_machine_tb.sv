@@ -516,9 +516,13 @@ module spk286_at_machine_tb;
         repeat (8) @(posedge clk);
         reset = 1'b0;
 
-        // The 8042 starts with A20 disabled.  The machine boundary must
-        // reproduce the AT wrap at bit 20 for both CPU and DMA memory
-        // transactions; the raw bridge address remains unchanged.
+        // The IBM AT 8042 starts with A20 disabled; BIOS POST opens it
+        // explicitly through the output-port protocol.
+        // When explicitly gated, the machine boundary must reproduce the
+        // AT wrap at bit 20 for CPU memory transactions; the raw bridge
+        // address remains unchanged. Legacy DMA is independent of A20.
+        if (a20_enable)
+            $fatal(1, "A20_RESET_STATE_FAILURE expected disabled at reset");
         force dut.at_address = 24'h10_1234;
         force dut.at_io = 1'b0;
         force dut.a20_enable = 1'b0;
@@ -547,8 +551,8 @@ module spk286_at_machine_tb;
             $fatal(1, "A20_IO_GATE_FAILURE address=%06h", dut.at_memory_address);
         force dut.dma_transfer_address = 24'h10_5678;
         #1;
-        if (dma_memory_address !== 24'h00_5678)
-            $fatal(1, "A20_OFF_DMA_GATE_FAILURE address=%06h", dma_memory_address);
+        if (dma_memory_address !== 24'h10_5678)
+            $fatal(1, "A20_DMA_MUST_BYPASS_GATE address=%06h", dma_memory_address);
         release dut.dma_transfer_address;
         release dut.at_io;
         release dut.a20_enable;

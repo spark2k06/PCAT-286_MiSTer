@@ -289,6 +289,15 @@ module spk286_at_machine (
     logic        at_read_data_valid;
     logic        bridge_protocol_error;
 
+    // The 8042 owns the AT A20 gate.  SPK286 deliberately exposes the
+    // carry into A20 as part of its physical address, so the motherboard
+    // must clear only address bit 20 while the gate is closed.  Keep the
+    // raw bridge address for diagnostics and apply this view to memory
+    // decode/transactions (I/O ports are unaffected).  The reset-vector
+    // alias is deliberately exempt: this profile maps FFF000h-FFFFFFh to
+    // the F0000h BIOS window before the memory owner, even while A20 is off.
+    logic [23:0] at_memory_address;
+
     logic        memory_cycle;
     logic        conventional_ram_select;
     logic        video_aperture_select;
@@ -472,6 +481,14 @@ module spk286_at_machine (
     assign cpu_owner_active = cpu_grant && at_valid;
 
     always_comb begin
+        at_memory_address = at_address;
+        if (!at_io && !a20_enable &&
+            !((at_address >= 24'hFFF000) &&
+              (at_address <= 24'hFFFFFF)))
+            at_memory_address[20] = 1'b0;
+    end
+
+    always_comb begin
         pic_io_candidate = at_io && is_pic_port(at_address[15:0]);
         pit_io_candidate = at_io && is_pit_port(at_address[15:0]);
         sound_io_candidate = at_io &&
@@ -632,7 +649,7 @@ module spk286_at_machine (
         .request_valid          (cpu_owner_active),
         .request_write          (at_write),
         .cycle_class            (at_cycle_class),
-        .address                (at_address),
+        .address                (at_memory_address),
         .memory_cycle           (memory_cycle),
         .conventional_ram_select(conventional_ram_select),
         .video_aperture_select  (video_aperture_select),
@@ -650,7 +667,7 @@ module spk286_at_machine (
     assign memory_write = at_write;
     assign memory_code_fetch = at_code_fetch;
     assign memory_cycle_class = at_cycle_class;
-    assign memory_address = at_address;
+    assign memory_address = at_memory_address;
     assign memory_byte_enable = at_byte_enable;
     assign memory_data_out = at_data_out;
 
@@ -697,7 +714,7 @@ module spk286_at_machine (
         .request_command_valid  (at_command_valid),
         .request_write          (at_write),
         .request_io             (at_io),
-        .request_address        (at_address),
+        .request_address        (at_memory_address),
         .request_byte_enable    (at_byte_enable),
         .request_data_out       (at_data_out),
         .request_accept         (devices_request_accept),
@@ -892,7 +909,12 @@ module spk286_at_machine (
     assign dma_memory_valid = dma_transfer_valid;
     assign dma_memory_write = dma_transfer_write_to_memory;
     assign dma_memory_read = dma_transfer_read_from_memory;
-    assign dma_memory_address = dma_transfer_address;
+    // The motherboard A20 gate is shared by CPU/DMA memory cycles.  This is
+    // observable for old EXEPACK loaders which rely on 20-bit wraparound.
+    assign dma_memory_address = (!a20_enable) ?
+                                {dma_transfer_address[23:21], 1'b0,
+                                 dma_transfer_address[19:0]} :
+                                dma_transfer_address;
     assign dma_memory_byte_enable = dma_transfer_byte_enable;
     assign dma_memory_data_out = dma_transfer_data_out;
 

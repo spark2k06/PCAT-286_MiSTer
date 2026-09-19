@@ -515,6 +515,45 @@ module spk286_at_machine_tb;
 
         repeat (8) @(posedge clk);
         reset = 1'b0;
+
+        // The 8042 starts with A20 disabled.  The machine boundary must
+        // reproduce the AT wrap at bit 20 for both CPU and DMA memory
+        // transactions; the raw bridge address remains unchanged.
+        force dut.at_address = 24'h10_1234;
+        force dut.at_io = 1'b0;
+        force dut.a20_enable = 1'b0;
+        #1;
+        if (dut.at_memory_address !== 24'h00_1234 ||
+            memory_address !== 24'h00_1234)
+            $fatal(1, "A20_OFF_CPU_GATE_FAILURE raw=%06h gated=%06h output=%06h",
+                   dut.at_address, dut.at_memory_address, memory_address);
+        force dut.at_address = 24'hFF_FFF0;
+        #1;
+        if (dut.at_memory_address !== 24'hFF_FFF0 ||
+            memory_address !== 24'hFF_FFF0)
+            $fatal(1, "A20_RESET_ALIAS_FAILURE gated=%06h output=%06h",
+                   dut.at_memory_address, memory_address);
+        force dut.at_address = 24'h10_1234;
+        force dut.a20_enable = 1'b1;
+        #1;
+        if (dut.at_memory_address !== 24'h10_1234 ||
+            memory_address !== 24'h10_1234)
+            $fatal(1, "A20_ON_CPU_GATE_FAILURE raw=%06h gated=%06h output=%06h",
+                   dut.at_address, dut.at_memory_address, memory_address);
+        force dut.at_io = 1'b1;
+        force dut.a20_enable = 1'b0;
+        #1;
+        if (dut.at_memory_address !== 24'h10_1234)
+            $fatal(1, "A20_IO_GATE_FAILURE address=%06h", dut.at_memory_address);
+        force dut.dma_transfer_address = 24'h10_5678;
+        #1;
+        if (dma_memory_address !== 24'h00_5678)
+            $fatal(1, "A20_OFF_DMA_GATE_FAILURE address=%06h", dma_memory_address);
+        release dut.dma_transfer_address;
+        release dut.at_io;
+        release dut.a20_enable;
+        release dut.at_address;
+
         for (cycles = 0; cycles < max_cycles; cycles = cycles + 1) begin
             @(negedge clk);
             if (runtime_mpu_test && !runtime_mpu_switched &&

@@ -19,6 +19,12 @@
 `ifndef ENABLE_MIDI
 `define ENABLE_MIDI 0
 `endif
+`ifndef ENABLE_EMS
+`define ENABLE_EMS 0
+`endif
+`ifndef ENABLE_UMB
+`define ENABLE_UMB 0
+`endif
 
 module spk286_at_machine (
     input  logic         clk,
@@ -34,6 +40,8 @@ module spk286_at_machine (
     input  logic         at286ctl_eff_cms,
     input  logic         at286ctl_eff_tandy,
     input  logic         at286ctl_eff_mpu401,
+    input  logic         at286ctl_eff_ems,
+    input  logic         at286ctl_eff_umb,
     input  logic         midi_baudce,
     input  logic         uart_baudce,
     input  logic         midi_rx,
@@ -162,6 +170,8 @@ module spk286_at_machine (
     output logic [7:0]   at286ctl_exp2,
     output logic [7:0]   at286ctl_crt,
     output logic [7:0]   at286ctl_sync,
+    output logic [6:0]   ems_map[0:3],
+    output logic         ems_window_enabled[0:3],
 
     output logic         cpu_hold_request,
     output logic         cpu_hlda,
@@ -297,6 +307,15 @@ module spk286_at_machine (
     // alias is deliberately exempt: this profile maps FFF000h-FFFFFFh to
     // the F0000h BIOS window before the memory owner, even while A20 is off.
     logic [23:0] at_memory_address;
+    logic [23:0] memory_backend_address;
+    logic [23:0] dma_bus_address;
+    logic        ems_aperture_select;
+    logic        ems_runtime_enabled;
+    logic        umb_region_select;
+    logic        umb_runtime_enabled;
+
+    assign ems_runtime_enabled = (`ENABLE_EMS) && at286ctl_eff_ems;
+    assign umb_runtime_enabled = (`ENABLE_UMB) && at286ctl_eff_umb;
 
     logic        memory_cycle;
     logic        conventional_ram_select;
@@ -307,6 +326,46 @@ module spk286_at_machine (
     logic        memory_write_allowed;
     logic        rom_write_blocked;
     logic        memory_unmapped_request;
+
+    function automatic logic ems_page_selected(input logic [23:0] address);
+        begin
+            ems_page_selected = 1'b0;
+            if (ems_runtime_enabled &&
+                (address >= 24'h0D0000) &&
+                (address <= 24'h0DFFFF)) begin
+                case (address[15:14])
+                    2'b00: ems_page_selected = ems_window_enabled[0];
+                    2'b01: ems_page_selected = ems_window_enabled[1];
+                    2'b10: ems_page_selected = ems_window_enabled[2];
+                    2'b11: ems_page_selected = ems_window_enabled[3];
+                    default: ems_page_selected = 1'b0;
+                endcase
+            end
+        end
+    endfunction
+
+    function automatic logic [23:0] ems_backend_address(
+        input logic [23:0] address
+    );
+        logic [6:0] selected_page;
+        begin
+            selected_page = 7'h00;
+            case (address[15:14])
+                2'b00: selected_page = ems_map[0];
+                2'b01: selected_page = ems_map[1];
+                2'b10: selected_page = ems_map[2];
+                2'b11: selected_page = ems_map[3];
+                default: selected_page = 7'h00;
+            endcase
+            // Preserve the source core's physical EMS layout:
+            // {1'b1, page[6:0], offset[13:0]} = 0x200000..0x3FFFFF.
+            if (ems_page_selected(address))
+                ems_backend_address = {2'b00, 1'b1, selected_page,
+                                        address[13:0]};
+            else
+                ems_backend_address = address;
+        end
+    endfunction
 
     logic        cpu_grant;
     logic        external_grant;
@@ -473,6 +532,8 @@ module spk286_at_machine (
                              (port >= 16'h02F8) && (port <= 16'h02FF)) ||
                             ((`ENABLE_MIDI) &&
                              (port >= 16'h0330) && (port <= 16'h0331)) ||
+                            (ems_runtime_enabled &&
+                             (port >= 16'h0260) && (port <= 16'h0263)) ||
                             ((port >= 16'h03B0) && (port <= 16'h03DF)) ||
                             ((port >= 16'h03F0) && (port <= 16'h03F7));
         end
@@ -596,11 +657,15 @@ module spk286_at_machine (
         .request_write          (cpu_bus_write),
         .cycle_class            (cpu_bus_status),
         .address                (cpu_address),
+        .ems_enabled            (ems_runtime_enabled),
+        .ems_window_enabled     (ems_window_enabled),
+        .umb_enabled            (umb_runtime_enabled),
         .word_capable           (cpu_memory_word_capable),
         .memory_cycle           (),
         .conventional_ram_select(), .video_aperture_select(),
         .option_region_select   (), .system_bios_select(),
-        .extended_ram_select    (), .write_allowed(),
+        .extended_ram_select    (), .ems_aperture_select(),
+        .write_allowed(),
         .rom_write_blocked      (), .unmapped_request()
     );
 
@@ -650,12 +715,17 @@ module spk286_at_machine (
         .request_write          (at_write),
         .cycle_class            (at_cycle_class),
         .address                (at_memory_address),
+        .ems_enabled            (ems_runtime_enabled),
+        .ems_window_enabled     (ems_window_enabled),
+        .umb_enabled            (umb_runtime_enabled),
         .memory_cycle           (memory_cycle),
         .conventional_ram_select(conventional_ram_select),
         .video_aperture_select  (video_aperture_select),
         .option_region_select   (option_region_select),
         .system_bios_select     (system_bios_select),
         .extended_ram_select    (extended_ram_select),
+        .ems_aperture_select    (ems_aperture_select),
+        .umb_region_select      (umb_region_select),
         .word_capable           (),
         .write_allowed          (memory_write_allowed),
         .rom_write_blocked      (rom_write_blocked),
@@ -667,7 +737,8 @@ module spk286_at_machine (
     assign memory_write = at_write;
     assign memory_code_fetch = at_code_fetch;
     assign memory_cycle_class = at_cycle_class;
-    assign memory_address = at_memory_address;
+    assign memory_backend_address = ems_backend_address(at_memory_address);
+    assign memory_address = memory_backend_address;
     assign memory_byte_enable = at_byte_enable;
     assign memory_data_out = at_data_out;
 
@@ -699,6 +770,7 @@ module spk286_at_machine (
         .at286ctl_eff_cms      (at286ctl_eff_cms),
         .at286ctl_eff_tandy    (at286ctl_eff_tandy),
         .at286ctl_eff_mpu401   (at286ctl_eff_mpu401),
+        .at286ctl_eff_ems      (ems_runtime_enabled),
         .midi_baudce           (midi_baudce),
         .uart_baudce           (uart_baudce),
         .midi_rx               (midi_rx),
@@ -790,6 +862,8 @@ module spk286_at_machine (
         .at286ctl_exp2          (at286ctl_exp2),
         .at286ctl_crt           (at286ctl_crt),
         .at286ctl_sync          (at286ctl_sync),
+        .ems_map                (ems_map),
+        .ems_window_enabled     (ems_window_enabled),
         .opl2_sound             (opl2_sound),
         .cms_sound_l            (cms_sound_l),
         .cms_sound_r            (cms_sound_r),
@@ -911,10 +985,13 @@ module spk286_at_machine (
     assign dma_memory_read = dma_transfer_read_from_memory;
     // The motherboard A20 gate is shared by CPU/DMA memory cycles.  This is
     // observable for old EXEPACK loaders which rely on 20-bit wraparound.
-    assign dma_memory_address = (!a20_enable) ?
-                                {dma_transfer_address[23:21], 1'b0,
-                                 dma_transfer_address[19:0]} :
-                                dma_transfer_address;
+    always_comb begin
+        dma_bus_address = dma_transfer_address;
+        if (!a20_enable)
+            dma_bus_address = {dma_transfer_address[23:21], 1'b0,
+                               dma_transfer_address[19:0]};
+        dma_memory_address = ems_backend_address(dma_bus_address);
+    end
     assign dma_memory_byte_enable = dma_transfer_byte_enable;
     assign dma_memory_data_out = dma_transfer_data_out;
 
@@ -1004,7 +1081,9 @@ module spk286_at_machine (
                                         video_aperture_select |
                                         option_region_select |
                                         system_bios_select |
-                                        extended_ram_select;
+                                        extended_ram_select |
+                                        ems_aperture_select |
+                                        umb_region_select;
     assign debug_at_cycle_active   = at_valid;
     assign debug_at_ready         = at_ready;
 

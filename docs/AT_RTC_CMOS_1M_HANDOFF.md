@@ -55,6 +55,12 @@ The RTC now supports:
 - status-C read-to-clear and status-D valid-RAM bit;
 - the standard CMOS checksum over `10h–2Dh`.
 
+CMOS and its checksum are initialized at FPGA configuration, not on each
+machine reset. HPS writes are accepted while reset is asserted; CPU port
+accesses remain inhibited. Subsequent machine resets retain CMOS contents.
+This models retention within the loaded core, not persistence to an SD-card
+file or a physical battery across FPGA reconfiguration.
+
 The memory fields are fixed to the physical profile:
 
 | CMOS | Value | Meaning |
@@ -120,3 +126,50 @@ panel, verify:
 
 Also perform a soft core reset and confirm that the host date/time is supplied
 again. No new RBF was generated in this change set.
+
+## Phoenix boot follow-up: host upload was discarded during reset
+
+The Phoenix A286 v1.01 hardware state probe reported `CMOS10=00` instead of
+the drive types supplied by MiSTer. Before INT13 reset, BDA `48B..496` was
+`00 00 00 FD 01 93 00 00 00 00 08 00`. After reset it began with `80`,
+and the directory read returned `AX=0200`, Carry set, with FDC result bytes
+`44 05 00 00 01 02 02` at BDA `442..448`.
+
+The local `Main_MiSTer/support/x86/x86.cpp::x86_init()` holds status bit 0
+high while writing the complete CMOS through `F400..F47F`, then releases it.
+`PCAT-286.sv::at_boot_reset` includes that bit and reaches the RTC through the
+AT machine/router. The previous RTC reset branch cleared the CMOS array on
+every clock and skipped the HPS management writes altogether. Earlier RTC
+tests uploaded configuration only AFTER reset, so they missed this ordering.
+
+The correction retains configuration/time/checksum across machine reset and
+accepts the host upload during reset. It does not force a particular floppy
+type, patch Phoenix, change A20 or alter the memory map. The existing FDC
+rate-validation change remains in place.
+
+The RTC regression now covers host uploads during initial and later resets,
+CPU-written configuration/time/shutdown/checksum retention, CPU I/O exclusion
+during reset, ignored out-of-range management writes, hardware RAM-size
+protection and checksum maintenance. Before the fix it fails with
+`host floppy types were lost during reset`. Run it with:
+
+```sh
+bash scripts/test_at_rtc_cmos.sh
+```
+
+The existing integrated device fixture now explicitly programs 500 kbit/s
+for its 1.2 MB medium; it previously relied on the FDC ignoring data rate.
+
+The local diagnostic in `build/phoenix-boot-probe` can inject the captured
+BDA state into the original Phoenix INT13 handler connected to the real FDC
+RTL. `phoenix_fdc_cosim.py --state --hardware-state` reproduces the directory
+read error: the BIOS sends READ DATA at 250 kbit/s with EOT=9; ST1=05 becomes
+AH=02. With BDA drive types 44 and correctly detected media, `--state` passes
+the directory and IO.SYS-sector reads. These tests substitute the CPU and
+DMA/IRQ/timer adapters and do NOT execute POST or a full FPGA/DOS boot.
+
+Hardware now confirms the complete expected state with two 1.44 MB units:
+`CMOS10=44`, `CMOS0E=00`, valid `0311/0311` checksum, `BDA48F=44`, successful
+R/D/1 calls and 500 kbit/s media state. DOS advances to `Iniciando MS-DOS...`
+from floppy, but then stops at the same stage observed when booting the HDD.
+That common DOS initialization hang remains separate and unresolved.

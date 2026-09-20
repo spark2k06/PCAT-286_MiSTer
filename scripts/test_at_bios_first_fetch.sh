@@ -30,7 +30,7 @@ sources+=(
   rtl/spk286_integration/spk286_at_pic.sv
   rtl/spk286_integration/spk286_at_dma.sv
   rtl/spk286_integration/spk286_at_refresh.sv
-  rtl/spk286_integration/spk286_at_pit.sv
+  "${AT_PIT_SOURCE:-rtl/spk286_integration/spk286_at_pit.sv}"
   rtl/spk286_integration/spk286_at_pit_clock.sv
   rtl/spk286_integration/spk286_at_system_control.sv
   rtl/KFPC-XT/HDL/KF8253/HDL/KF8253.sv

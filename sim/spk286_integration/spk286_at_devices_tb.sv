@@ -800,6 +800,9 @@ module spk286_at_devices_tb;
         fdc_write_fifo(8'h03);
         fdc_write_fifo(8'hCF);
         fdc_write_fifo(8'h02);
+        // The mounted 80x2x15 medium requires 500 kbit/s. The controller now
+        // rejects reads at its power-on rate of 250 kbit/s.
+        router_write(16'h03F7, 8'h00);
 
         // Program DMA1 channel 2 exactly as an AT floppy read: physical
         // 010200h, 512 byte count, device-to-memory, single transfer mode.

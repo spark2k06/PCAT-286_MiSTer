@@ -1,6 +1,6 @@
 # Known limitations and pending evidence
 
-## Latest AT hardware evidence (2026-09-12)
+## Latest AT hardware evidence (2026-09-20)
 
 The user confirms BIOS execution and visible Supersoft POST on MiSTer (`6f07770`),
 and subsequent DMA2/page-register PASS in hardware (`785231e` preserves that
@@ -27,8 +27,12 @@ The STA summary archived before the DQM fix had FPGA_CLK2_50 setup -7.563 ns; ti
 closure is still pending. The previous -4.338 ns CPU-to-CX path was another fit.
 Protected-mode tests are excluded only by the new V2 ROM patch; the old V1
 patch did not exclude the early CPU test. V2 checksums are checked independently.
-The timer backend is not yet a complete 8254: read-back
-status is unsupported. RTC periodic-rate division and speaker audio are incomplete;
+The timer backend is not yet a fully validated 8254. AT count/status read-back
+is now implemented, simulator-tested and hardware-confirmed: Phoenix detects
+both 1.44 MB drives as type 4, clears CMOS0E and completes the diagnostic
+R/D/1 reads. See `AT_PHOENIX_PIT_READBACK_HANDOFF.md`. DOS still stops during
+the later common initialization path from both floppy and HDD.
+RTC periodic-rate division and speaker audio are incomplete;
 calendar/date rollover and MiSTer `F4xx` host-time import are now implemented.
 See `AT_LANDMARK_SKIP_PM_V2.md` for the current ROM and next hardware test.
 See `AT_SDRAM_DQM_HANDOFF.md` for the now hardware-confirmed wiring fix.

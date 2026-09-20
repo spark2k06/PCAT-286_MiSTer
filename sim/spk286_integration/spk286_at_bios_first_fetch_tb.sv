@@ -61,8 +61,19 @@ module spk286_at_bios_first_fetch_tb;
     logic cpu_boot_reset = 1;
     logic machine_boot_reset = 1;
     wire counter_clock;
+    wire normal_counter_clock;
+    logic fast_counter_clock=0;
+    logic [25:0] fast_pit_phase=0;
+    always @(posedge clk) begin
+        if(reset) begin fast_pit_phase<=0; fast_counter_clock<=0; end
+        else if(fast_pit_phase>=26'd26_136_360) begin
+            fast_pit_phase<=fast_pit_phase-26'd26_136_360;
+            fast_counter_clock<=~fast_counter_clock;
+        end else fast_pit_phase<=fast_pit_phase+26'd23_863_640;
+    end
+    assign counter_clock=$test$plusargs("PHOENIX_FDC_FAST") ? fast_counter_clock : normal_counter_clock;
     logic refresh_enable = 1'b1;
-    spk286_at_pit_clock pit_clock(.clk(clk), .reset(reset), .counter_clock(counter_clock));
+    spk286_at_pit_clock pit_clock(.clk(clk), .reset(reset), .counter_clock(normal_counter_clock));
 
     logic keyboard_byte_valid = 1'b0;
     logic [7:0] keyboard_byte = 8'h00;
@@ -834,6 +845,21 @@ module spk286_at_bios_first_fetch_tb;
             $dumpfile(wave_path); $dumpvars(0,spk286_at_bios_first_fetch_tb);
         end
         machine_boot_reset=0;
+        if($test$plusargs("PHOENIX_FDC")) begin
+            // Optional investigative acceleration scales PIT and FDC equally.
+            // This is NOT a production timing test; omit it for real 50 MHz.
+            if($test$plusargs("PHOENIX_FDC_FAST"))
+                force dut.u_devices.u_storage_video.u_fdc.u_fdc.clk_rate=28'd5_000_000;
+            for(integer drive=0;drive<2;drive=drive+1) begin
+                floppy_mgmt_write(16'hF200+16'(drive*128),16'd1);
+                floppy_mgmt_write(16'hF201+16'(drive*128),16'd0);
+                floppy_mgmt_write(16'hF202+16'(drive*128),16'd80);
+                floppy_mgmt_write(16'hF203+16'(drive*128),16'd18);
+                floppy_mgmt_write(16'hF204+16'(drive*128),16'd2880);
+                floppy_mgmt_write(16'hF205+16'(drive*128),16'd2);
+            end
+            floppy_mgmt_write(16'hF410,16'h0044);
+        end
         if(landmark_case==21 || landmark_case==22) begin
             // 1.2 MB AT drive: 80 cylinders, 15 sectors, two heads.
             floppy_mgmt_write(16'hF200,16'h0001);
@@ -861,6 +887,21 @@ module spk286_at_bios_first_fetch_tb;
         cpu_boot_reset=0;
         for(cycles=0;cycles<max_cpu_cycles;cycles=cycles+1) begin
             @(negedge clk);
+            if($test$plusargs("PHOENIX_FDC")) begin
+                if(dut.at_ready && dut.at_io &&
+                   ((dut.at_address>=24'h3f0 && dut.at_address<=24'h3f7 && dut.at_address!=24'h3f4) ||
+                    (dut.at_address==24'h71 && dut.at_write)))
+                    $display("PHOENIX_IO cycle=%0d wr=%b port=%h out=%h in=%h ip=%h",cycles,dut.at_write,dut.at_address,dut.at_data_out,dut.at_read_data,debug_ip);
+                if(dut.u_cpu.cpu.opcode_start && debug_cs==16'hf000 &&
+                   (debug_ip==16'ha125 || debug_ip==16'ha169 || debug_ip==16'h9b55 || debug_ip==16'h9d22))
+                    $display("PHOENIX_ENTRY cycle=%0d ip=%h gpr=%h BDA48E=%h BDA43E=%h",cycles,debug_ip,dut.debug_gpr,pins.mem[16'h247],pins.mem[16'h21f]);
+                if(cpu_halted) begin
+                    $display("PHOENIX_POST_RESULT BDA48F=%h cycles=%0d",pins.mem[16'h247][15:8],cycles);
+                    if(pins.mem[16'h247][15:8]!==8'h44) $fatal(1,"PHOENIX_DRIVE_TYPE_MISMATCH");
+                    $display("PHOENIX_POST_FDC_PASS");
+                    $finish;
+                end
+            end
             if (landmark_case>=16 && landmark_case<=18) begin
                 if (dut.u_cpu.cpu.debug_protected_msw[0] || cpu_reset_request)
                     $fatal(1,"PM_SKIP_ACTIVATED_PE_OR_RESET case=%0d",landmark_case);

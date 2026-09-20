@@ -54,6 +54,11 @@ module spk286_at_bios_first_fetch_tb;
     integer max_cpu_cycles = 200000;
     logic protocol_reported = 0;
     logic trace_boot = 1'b0;
+    logic phoenix_pm87 = 1'b0;
+    logic phoenix_pm87_saw_pe = 1'b0;
+    logic phoenix_pm87_saw_shutdown = 1'b0;
+    integer phoenix_pm87_shutdown_cycles = 0;
+    integer reset_vector_fetches = 0;
     logic trace_irq0_prev = 1'b0;
     integer trace_lines = 0;
 
@@ -304,7 +309,8 @@ module spk286_at_bios_first_fetch_tb;
         if(!reset && sdram_owner.u_KFSDRAM.read_flag_comb && pin_dq_valid!==2'b11)
             $fatal(1,"KF samples invalid DQ addr=%h valid=%b",sdram_owner.kf_address,pin_dq_valid);
         if(!cpu_boot_reset) begin
-            if(dut.u_cpu.cpu.debug_protected_msw[0]) $fatal(1,"PE set during first-fetch test");
+            if(dut.u_cpu.cpu.debug_protected_msw[0] && !phoenix_pm87)
+                $fatal(1,"PE set during first-fetch test");
             if(backend_accept && backend_code_fetch) captured_word_address<=sdram_owner.kf_address;
             if(backend_ready && backend_code_fetch && backend_owner==0) begin
                 if(!backend_read_data_valid) $fatal(1,"fetch without VLD");
@@ -342,6 +348,7 @@ module spk286_at_bios_first_fetch_tb;
             port81_writes <= 0;
             pit_data_writes <= 0;
             saw_native_reset_fetch <= 1'b0;
+            reset_vector_fetches <= 0;
             saw_native_reset_response <= 1'b0;
             saw_native_reset_data <= 1'b0;
             saw_low_rom_fetch <= 1'b0;
@@ -358,8 +365,11 @@ module spk286_at_bios_first_fetch_tb;
             end
             if (backend_accept && (backend_owner == 2'd0)) begin
                 accepted_memory_beats <= accepted_memory_beats + 1;
-                if (backend_address == 24'hFFFFF0)
+                if (backend_address == 24'hFFFFF0) begin
                     saw_native_reset_fetch <= 1'b1;
+                    if (backend_code_fetch)
+                        reset_vector_fetches <= reset_vector_fetches + 1;
+                end
                 if ((backend_address >= 24'h0F0000) &&
                     (backend_address <= 24'h0FFFFF))
                     saw_low_rom_fetch <= 1'b1;
@@ -671,6 +681,7 @@ module spk286_at_bios_first_fetch_tb;
         if ($value$plusargs("MAX_CPU_CYCLES=%d", max_cpu_cycles))
             $display("MAX_CPU_CYCLES=%0d", max_cpu_cycles);
         trace_boot = $test$plusargs("TRACE_BOOT");
+        phoenix_pm87 = $test$plusargs("PHOENIX_PM87");
         for (index = 0; index < 4; index = index + 1)
             port80_sequence[index] = 8'h00;
     end
@@ -679,7 +690,7 @@ module spk286_at_bios_first_fetch_tb;
     // that the future MiSTer SDRAM/HPS owner will use.
     spk286_at_mister_memory_port memory_port (
         .clk(clk), .reset(reset),
-        .cancel_cpu(cpu_boot_reset),
+        .cancel_cpu(cpu_boot_reset | cpu_reset_request),
         .cpu_valid(memory_request_valid),
         .cpu_command_valid(memory_command_valid),
         .cpu_write(memory_write),
@@ -722,7 +733,7 @@ module spk286_at_bios_first_fetch_tb;
 
     spk286_at_sdram_read_buffer #(.ENABLE(1'b1)) p03_buffer (
         .clk(clk), .reset(reset),
-        .cancel_cpu(cpu_boot_reset), .enable(1'b1),
+        .cancel_cpu(cpu_boot_reset | cpu_reset_request), .enable(1'b1),
         .in_valid(backend_valid), .in_command_valid(backend_command_valid),
         .in_owner(backend_owner), .in_write(backend_write),
         .in_refresh(backend_refresh), .in_code_fetch(backend_code_fetch),
@@ -887,6 +898,45 @@ module spk286_at_bios_first_fetch_tb;
         cpu_boot_reset=0;
         for(cycles=0;cycles<max_cpu_cycles;cycles=cycles+1) begin
             @(negedge clk);
+            if (phoenix_pm87) begin
+                if (dut.u_cpu.cpu.debug_protected_msw[0])
+                    phoenix_pm87_saw_pe = 1'b1;
+                if (cpu_shutdown) begin
+                    phoenix_pm87_saw_shutdown = 1'b1;
+                    phoenix_pm87_shutdown_cycles = phoenix_pm87_shutdown_cycles + 1;
+                end else begin
+                    phoenix_pm87_shutdown_cycles = 0;
+                end
+                if (phoenix_pm87_shutdown_cycles > 8)
+                    $fatal(1,"PHOENIX_PM87_SHUTDOWN_NOT_RESET csip=%h:%h msw=%h",
+                           debug_cs,debug_ip,dut.u_cpu.cpu.debug_protected_msw);
+                if (dut.spk_control_error || dut.spk_unsupported_opcode ||
+                    dut.spk_microcode_fault || dut.spk_operand_blocked ||
+                    dut.debug_bridge_error || memory_port_protocol_error ||
+                    sdram_owner_protocol_error || loader_error)
+                    $fatal(1,"PHOENIX_PM87_UNEXPECTED_FAULT csip=%h:%h op=%h",
+                           debug_cs,debug_ip,debug_opcode);
+                if (dut.at_ready && dut.at_io && dut.at_write &&
+                    dut.at_address[15:0] == 16'h0080) begin
+                    if (dut.at_data_out[7:0] == 8'he7)
+                        $fatal(1,"PHOENIX_PM87_COPY_MISMATCH source=%h destination=%h",
+                               pins.mem[16'h1000],pins.mem[16'h1800]);
+                    if (dut.at_data_out[7:0] == 8'ha7) begin
+                        if (!phoenix_pm87_saw_pe || !phoenix_pm87_saw_shutdown ||
+                            reset_vector_fetches < 2 ||
+                            dut.u_cpu.cpu.debug_protected_msw[0] || a20_enable ||
+                            pins.mem[16'h1800] !== 16'ha55a)
+                            $fatal(1,"PHOENIX_PM87_INCOMPLETE pe=%b shutdown=%b resets=%0d msw=%h a20=%b destination=%h",
+                                   phoenix_pm87_saw_pe,phoenix_pm87_saw_shutdown,
+                                   reset_vector_fetches,
+                                   dut.u_cpu.cpu.debug_protected_msw,a20_enable,
+                                   pins.mem[16'h1800]);
+                        $display("PHOENIX_PM87_PASS resets=%0d destination=%h PE_reset=1 A20_closed=1 cycles=%0d",
+                                 reset_vector_fetches,pins.mem[16'h1800],cycles);
+                        $finish;
+                    end
+                end
+            end
             if($test$plusargs("PHOENIX_FDC")) begin
                 if(dut.at_ready && dut.at_io &&
                    ((dut.at_address>=24'h3f0 && dut.at_address<=24'h3f7 && dut.at_address!=24'h3f4) ||
@@ -1128,7 +1178,10 @@ module spk286_at_bios_first_fetch_tb;
                     end
                 end
             end
-            if((landmark_case==0 && (cpu_fault || protocol_error)) || memory_port_protocol_error || sdram_owner_protocol_error || loader_error || cpu_shutdown)
+            if((landmark_case==0 && !phoenix_pm87 &&
+                (cpu_fault || protocol_error)) ||
+               memory_port_protocol_error || sdram_owner_protocol_error ||
+               loader_error || (cpu_shutdown && !phoenix_pm87))
                 $fatal(1,"first fetch fault cycle=%0d csip=%h:%h op=%h",cycles,debug_cs,debug_ip,debug_opcode);
             if(landmark_case==0 && !$test$plusargs("FULL_BOOT") &&
                fetch_returns>=32 && cpu_fetch_returns>=16 && saw_opcode &&

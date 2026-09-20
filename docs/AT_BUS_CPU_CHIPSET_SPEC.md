@@ -284,7 +284,7 @@ signals are normative at the CPU side:
 | `bus_lock` | output | CPU atomic ownership interval |
 | `hlda` | output | CPU has granted external bus ownership |
 | `halted` | output | Architectural HLT state; not a failed request |
-| `shutdown` | output | CPU shutdown indication; must remain observable |
+| `shutdown` | output | CPU shutdown indication; the AT wrapper observes it and generates a CPU-local warm reset |
 
 Debug outputs MAY be captured by the overlay and trace recorder. Debug inputs
 that can alter architectural state MUST be tied to documented safe values in a
@@ -293,6 +293,12 @@ production wrapper.
 The normalized interface is intentionally not a direct claim about the
 electrical 80286 pin cycle. The bridge is responsible for producing the
 machine-side phases and strobes.
+
+On an IBM AT, an 80286 `SHUTDOWN` cycle is not treated as a permanent machine
+halt. The motherboard converts it into a CPU-local reset. RAM, CMOS and AT
+devices remain active so the BIOS can inspect CMOS shutdown byte 0Fh and resume
+the interrupted protected-mode service. The assertion remains observable at
+the CPU boundary for the cycle that requests this warm reset.
 
 ## 7. Request, retention and completion rules
 

@@ -480,10 +480,12 @@ module spk286_at_machine (
     logic        sound_io_candidate;
     logic        warm_boot_marker_event;
 
-    // The 8042 reset is a CPU-local warm reset.  It must flush the CPU and
-    // its retained bus transaction, but must not reset CMOS or the other AT
-    // devices because the BIOS uses CMOS shutdown codes to resume POST.
-    wire       cpu_core_reset = reset | cpu_reset | devices_cpu_reset_request;
+    // Both the 8042 reset output and an 80286 SHUTDOWN cycle cause a
+    // CPU-local warm reset on an IBM AT. They must flush the CPU and its
+    // retained bus transaction, but must not reset CMOS or the other AT
+    // devices because the BIOS uses CMOS shutdown codes to resume execution.
+    wire       cpu_core_reset = reset | cpu_reset |
+                                devices_cpu_reset_request | spk_shutdown;
 
     // IBM AT BIOSes announce a warm reboot by storing 1234h at physical
     // address 0040:0072. Keep this as a one-cycle event so AT286CTL can drop
@@ -990,7 +992,9 @@ module spk286_at_machine (
     assign dma_memory_byte_enable = dma_transfer_byte_enable;
     assign dma_memory_data_out = dma_transfer_data_out;
 
-    assign cpu_reset_request = devices_cpu_reset_request;
+    // Export the complete CPU-local reset event so the external serialized
+    // memory path can cancel any request owned by the pre-reset CPU context.
+    assign cpu_reset_request = devices_cpu_reset_request | spk_shutdown;
 
     // Minimal IBM AT PC speaker path.  The speaker only produces a waveform
     // when both port 61h's speaker-enable and GATE2 are asserted; PIT channel

@@ -26,9 +26,10 @@ possible before the displayed boot, and OSD/8042 resets use the same boundary.
 ## Interface change
 
 `spk286_at_mister_memory_port.cancel_cpu` is driven by the actual AT CPU reset:
-`at_machine_reset | at_cpu_reset_request`. The standalone machine regression
-ties it low where only global reset is exercised; the BIOS first-fetch test
-uses its CPU boot-reset input.
+`at_machine_reset | at_cpu_reset_request`. `at_cpu_reset_request` covers both
+the 8042 reset output and the AT motherboard response to an 80286 `SHUTDOWN`
+cycle. The standalone machine and BIOS first-fetch regressions use the same
+combined CPU-local reset event.
 
 When `cancel_cpu` is high:
 

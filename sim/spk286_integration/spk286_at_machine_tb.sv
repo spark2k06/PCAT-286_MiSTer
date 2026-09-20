@@ -419,7 +419,7 @@ module spk286_at_machine_tb;
     // that the future MiSTer SDRAM/HPS owner will use.
     spk286_at_mister_memory_port memory_port (
         .clk(clk), .reset(reset),
-        .cancel_cpu(1'b0),
+        .cancel_cpu(cpu_reset_request),
         .cpu_valid(memory_request_valid),
         .cpu_command_valid(memory_command_valid),
         .cpu_write(memory_write),
@@ -561,6 +561,21 @@ module spk286_at_machine_tb;
 
         repeat (8) @(posedge clk);
         reset = 1'b0;
+
+        // The AT motherboard converts the 80286 SHUTDOWN indication into a
+        // CPU-local reset and exports the same pulse to cancel a retained
+        // transaction at the serialized memory boundary.
+        force dut.spk_shutdown = 1'b1;
+        #1;
+        if (!dut.cpu_core_reset || !cpu_reset_request)
+            $fatal(1, "SHUTDOWN_WARM_RESET_PATH_FAILURE core=%b external=%b",
+                   dut.cpu_core_reset,cpu_reset_request);
+        release dut.spk_shutdown;
+        @(posedge clk);
+        #1;
+        if (dut.cpu_core_reset || cpu_reset_request)
+            $fatal(1, "SHUTDOWN_WARM_RESET_PATH_STUCK core=%b external=%b",
+                   dut.cpu_core_reset,cpu_reset_request);
 
         // The IBM AT 8042 starts with A20 disabled; BIOS POST opens it
         // explicitly through the output-port protocol.

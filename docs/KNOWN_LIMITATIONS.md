@@ -19,10 +19,13 @@ all row bits on ACTIVE. The corrected pin model now includes this wiring;
 both it and dedicated DQM are tested. Original-ROM five-pattern RAM cases pass,
 including original header and distinct DS/ES.
 The user now confirms both 16K CRITICAL and MEMORY REFRESH PASS in AT hardware.
-The next stop is PROTECTED MODE CPU: SKIP_PM V1 missed the early A3B3 path.
-V2 skips both unsupported PM paths with an explicit SKIPPED status and repairs
-both interleaved ROM checksums. CPU simulation verifies both continuations and
-both original checksum routines; physical V2 confirmation remains pending.
+The next Supersoft stop is PROTECTED MODE CPU: SKIP_PM V1 missed the early
+A3B3 path. V2 skips both broad, still-uncertified PM diagnostic paths with an
+explicit SKIPPED status and repairs both interleaved ROM checksums. CPU
+simulation verifies both continuations and both original checksum routines;
+physical V2 confirmation remains pending. Separately, the narrower protected
+mode path used by Phoenix `INT 15h/AH=87h` is now covered end-to-end, including
+the AT warm reset generated from the 80286 SHUTDOWN condition.
 The STA summary archived before the DQM fix had FPGA_CLK2_50 setup -7.563 ns; timing
 closure is still pending. The previous -4.338 ns CPU-to-CX path was another fit.
 Protected-mode tests are excluded only by the new V2 ROM patch; the old V1
@@ -30,8 +33,10 @@ patch did not exclude the early CPU test. V2 checksums are checked independently
 The timer backend is not yet a fully validated 8254. AT count/status read-back
 is now implemented, simulator-tested and hardware-confirmed: Phoenix detects
 both 1.44 MB drives as type 4, clears CMOS0E and completes the diagnostic
-R/D/1 reads. See `AT_PHOENIX_PIT_READBACK_HANDOFF.md`. DOS still stops during
-the later common initialization path from both floppy and HDD.
+R/D/1 reads. See `AT_PHOENIX_PIT_READBACK_HANDOFF.md`. The later DOS stop from
+both floppy and HDD was reduced to the missing AT response to 80286 SHUTDOWN;
+the correction and passing Phoenix service regression are documented in
+`AT_286_SHUTDOWN_WARM_RESET.md`. Physical boot confirmation is pending.
 RTC periodic-rate division and speaker audio are incomplete;
 calendar/date rollover and MiSTer `F4xx` host-time import are now implemented.
 See `AT_LANDMARK_SKIP_PM_V2.md` for the current ROM and next hardware test.

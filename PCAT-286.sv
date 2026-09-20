@@ -60,7 +60,7 @@ module emu_at
     localparam CONF_STR_EMS = (`ENABLE_EMS ?
         "P3OB,2MB EMS D000-DFFF,Enabled,Disabled;P3-;" : "");
     localparam CONF_STR_UMB = (`ENABLE_UMB ?
-        "P3OC,UMB C400-CFFF,Enabled,Disabled;P3-;" : "");
+        "P3OC,UMB E000-EFFF,Enabled,Disabled;P3-;" : "");
     // Keep the source profile's MIDI/MT32-pi page and status-bit placement.
     // MPU-401 is the AT card at 330h; USER I/O selects the physical MIDI
     // cable or the COM2 pins, while the h3P4 entries configure the external
@@ -89,7 +89,7 @@ module emu_at
         "P1-;",
         "P1O7,Boot Splash Screen,Yes,No;",
         "P1FC0,ROM,PCAT BIOS:;",
-        "P1FC2,ROM,EC00 BIOS:;",
+        "P1FC2,ROM,C800 BIOS:;",
         "P1FC3,ROM,EGA BIOS:;",
         "P1-;",
         // An empty packed Verilog string is an 8-bit NUL, not zero bytes.

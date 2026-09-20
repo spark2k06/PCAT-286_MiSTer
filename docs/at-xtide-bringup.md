@@ -69,12 +69,12 @@ The banner alone does not establish that the CPU is polling IDE status.
 A directed test now executes the actual SPK286, AT chipset, Sergey IVT
 initialization and INT 13h handler, and the r631 AT option ROM instructions.
 The original Sergey POST installs only IVT entries 00h–1Fh. INT 40h remains
-0000:0000. In `ide_at.bin`, code at EC00:0525 tests whether INT 13h already
+0000:0000. In `ide_at.bin`, code at C800:0525 tests whether INT 13h already
 supports hard disks by calling AH=08h through INT 13h and INT 40h. Sergey's
-INT 13h succeeds, so EC00:0534 executes `INT 40h` and jumps to 0000:0000
-before drive detection at EC00:0807.
+INT 13h succeeds, so C800:0534 executes `INT 40h` and jumps to 0000:0000
+before drive detection at C800:0807.
 
-The old `ide_xtl.rom` uses a different check at EC00:0C32: it checks the
+The old `ide_xtl.rom` uses a different check at C800:0C32: it checks the
 segment of INT 40h and copies the old INT 13h vector when INT 40h is absent.
 It therefore handles this XT BIOS omission, explaining why the old image
 could continue while the AT image fails before printing drive information.
@@ -105,13 +105,13 @@ change. Primary AT ports/native word data and the removal of `300h` remain.
 
 With the actual r631 AT ROM and the INT40-patched Sergey BIOS, the expanded
 CPU/chipset probe reproduces a second failure **after** both primary IDENTIFY
-transfers and both secondary timeouts. It reaches EC00:094F (construct the
-fixed-disk parameter tables), calls EC00:069E and stops at EC00:06A1:
+transfers and both secondary timeouts. It reaches C800:094F (construct the
+fixed-disk parameter tables), calls C800:069E and stops at C800:06A1:
 
 ```text
-EC00:069E  F6 05 20  test byte [di],20h
-EC00:06A1  D6        salc
-EC00:06A2  75 02     jnz 06A6h
+C800:069E  F6 05 20  test byte [di],20h
+C800:06A1  D6        salc
+C800:06A2  75 02     jnz 06A6h
 ```
 
 `SALC` sets AL to FFh when CF=1 and 00h when CF=0, preserving AH and FLAGS.

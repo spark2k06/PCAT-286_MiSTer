@@ -81,15 +81,15 @@ module spk286_at_memory_decode (
                                  (address >= 24'h0D0000) &&
                                  (address <= 24'h0DFFFF);
 
-        // C4000-CFFFF is the source core's 48 KiB UMB. C0000-C3FFF
-        // remains the EGA/option-ROM area, and D0000-DFFFF belongs to EMS.
+        // C4000-CFFFF is reserved for option ROMs, including XTIDE at
+        // C8000. Keep the optional UMB contiguous at E0000-EFFFF instead.
         umb_region_select      = valid_memory_class && umb_enabled &&
-                                 (address >= 24'h0C4000) &&
-                                 (address <= 24'h0CFFFF);
+                                 (address >= 24'h0E0000) &&
+                                 (address <= 24'h0EFFFF);
 
-        // D0000-DFFFF is normally an option-ROM region.  When EMS is
-        // enabled and the corresponding 16 KiB window is mapped, it becomes
-        // writable expanded memory instead of the option-region sink.
+        // C0000-EFFFF is normally the option-ROM region. D0000-DFFFF is
+        // replaced by the EMS page frame when EMS is enabled; E0000-EFFFF
+        // is replaced by the optional UMB when that OSD feature is enabled.
         option_region_select    = valid_memory_class &&
                                    (address >= 24'h0C0000) &&
                                    (address <= 24'h0EFFFF) &&

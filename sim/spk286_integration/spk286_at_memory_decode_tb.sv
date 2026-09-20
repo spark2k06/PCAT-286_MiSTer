@@ -113,17 +113,30 @@ module spk286_at_memory_decode_tb;
 
         umb_enabled = 1'b1;
         classify(24'h0C4000, 4'h6, 1'b1);
+        check(memory_cycle && option_region_select && !umb_region_select &&
+              word_capable && !write_allowed && rom_write_blocked,
+              "C400 option-ROM space was incorrectly exposed as UMB");
+        classify(24'h0C8000, 4'h5, 1'b0);
+        check(memory_cycle && option_region_select && !umb_region_select,
+              "XTIDE C800 window was not decoded as option ROM");
+        classify(24'h0CFFFF, 4'h5, 1'b0);
+        check(memory_cycle && option_region_select && !umb_region_select,
+              "CC000-CFFFF option-ROM space was not decoded");
+        classify(24'h0E0000, 4'h6, 1'b1);
         check(memory_cycle && umb_region_select && !option_region_select &&
               word_capable && write_allowed && !rom_write_blocked,
-              "UMB C400 window was not writable RAM");
-        classify(24'h0CFFFF, 4'h5, 1'b0);
+              "UMB E000 window was not writable RAM");
+        classify(24'h0EFFFF, 4'h5, 1'b0);
         check(memory_cycle && umb_region_select && !option_region_select,
-              "UMB C400-CFFF limit was not decoded");
+              "UMB E000-EFFF limit was not decoded");
         classify(24'h0C0000, 4'h6, 1'b1);
         check(option_region_select && !umb_region_select &&
               !write_allowed && rom_write_blocked,
               "EGA BIOS C000-C3FFF was incorrectly exposed as UMB");
         umb_enabled = 1'b0;
+        classify(24'h0E0000, 4'h5, 1'b0);
+        check(memory_cycle && option_region_select && !umb_region_select,
+              "E000 option-ROM region disappeared with UMB disabled");
 
         classify(24'h0F0000, 4'h9, 1'b0);
         check(!word_capable && !memory_cycle && unmapped_request && !system_bios_select,

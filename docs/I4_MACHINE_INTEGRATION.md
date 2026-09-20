@@ -20,6 +20,10 @@ CPU, AT integration, EGA, SDRAM, PIC/PIT support and the common floppy/IDE/
 debug blocks used by the profile.
 
 ROM images are loaded through the AT HPS ROM loader. The main PCAT BIOS is
-mapped at `F0000h`, the EGA BIOS at `C0000h` and the XTIDE image at `EC000h`.
+mapped at `F0000h`, the EGA BIOS at `C0000h` and the 8 KiB XTIDE image at
+`C8000h`, matching 86Box's AT XTIDE placement. `D0000h-DFFFFh` remains the EMS
+page frame when enabled; the optional 64 KiB UMB is relocated to
+`E0000h-EFFFFh`. No RTC option ROM is installed: the AT BIOS already supplies
+the standard RTC services.
 The canonical AT timing file is `SYSTEM.sdc`; the common MiSTer constraints
 remain in `sys/sys_top.sdc`.

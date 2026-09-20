@@ -63,8 +63,12 @@ configuration after their images have loaded.
 | `B0000h–B7FFFh` | 32 KiB | Selectable EGA monochrome aperture | Reserved for video |
 | `B8000h–BFFFFh` | 32 KiB | Selectable EGA colour/text aperture | Reserved for video |
 | `C0000h–C3FFFh` | 16 KiB | EGA option ROM | Reserved for EGA BIOS |
-| `C4000h–EBFFFh` | 160 KiB | AT option/expansion region | Device- or ROM-dependent |
-| `EC000h–EFFFFh` | 16 KiB | XTIDE option ROM | Reserved when an XTIDE ROM is loaded |
+| `C4000h–C7FFFh` | 16 KiB | Option-ROM expansion space | Available for a future ROM |
+| `C8000h–C9FFFh` | 8 KiB | AT XTIDE option ROM | Reserved for the AT XTIDE image |
+| `CA000h–CBFFFh` | 8 KiB | Option-ROM expansion space | Available for a future ROM |
+| `CC000h–CFFFFh` | 16 KiB | Option-ROM expansion space | Available for a future ROM |
+| `D0000h–DFFFFh` | 64 KiB | EMS page frame, or option-ROM region | EMS-dependent |
+| `E0000h–EFFFFh` | 64 KiB | Optional UMB, or option-ROM region | OSD-selectable |
 | `F0000h–FFFFFh` | 64 KiB | Main system BIOS | Reserved for system BIOS |
 | `100000h–15FFFFh` | 384 KiB | Extended SDRAM | Extended memory |
 
@@ -369,9 +373,9 @@ new port.
 
 ## ROM Instructions
 
-ROMs are loaded from the **System & BIOS** section of the OSD. It provides slots
-for the PCAT main/diagnostic ROM, an optional XTIDE ROM at `EC00h`, and the EGA BIOS,
-which is required — see [EGA BIOS — required](#ega-bios--required) below.
+ROMs are loaded from the **System & BIOS** section of the OSD. In the AT profile,
+it provides slots for the PCAT main/diagnostic ROM, an optional 8 KiB XTIDE ROM
+at `C800h`, and the EGA BIOS, which is required — see [EGA BIOS — required](#ega-bios--required) below.
 Once loaded, a ROM remains available on subsequent boots until it is replaced.
 Original and copyrighted system ROMs can be prepared with the Python scripts in
 `SW/ROMs/`:
@@ -379,8 +383,9 @@ Original and copyrighted system ROMs can be prepared with the Python scripts in
 * `SW/ROMs/make_rom_with_ibm5160.py`: creates `pcxt.rom` from the original IBM 5160 ROM. It requires an XTIDE BIOS at `EC00h` to use hard-disk images.
 * `SW/ROMs/make_rom_with_jukost.py`: creates `pcxt.rom` from the Juko ST ROM with the XTIDE BIOS embedded at `F000h`.
 
-The same OSD section accepts an XTIDE ROM of up to 16 KiB at `EC00h`; one is
-included in this repository.
+The AT profile's HPS loader accepts an XTIDE image of up to 8 KiB at `C800h`;
+the `ide_at.bin` test image is configured for this slot. The separate legacy
+XT-ROM construction script above still embeds its XTIDE BIOS at `EC00h`.
 
 Other Open Source ROMs are available in the same folder:
 

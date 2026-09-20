@@ -9,8 +9,8 @@ detection in agreement.
 
 The supplied configuration expects these core options:
 
-- **Hardware → UMB C400-CFFF: Enabled** exposes 48 KiB at
-  `C4000h-CFFFFh`.
+- **Hardware → UMB E000-EFFF: Enabled** exposes 64 KiB at
+  `E0000h-EFFFFh`.
 - **Hardware → 2MB EMS D000-DFFF: Enabled** exposes the four 16 KiB EMS
   page-frame banks at `D0000h-DFFFFh`. The backing store is up to 2 MiB and
   the Lo-tech-compatible page registers are at port `260h`.
@@ -34,9 +34,9 @@ of this AT profile. C/MS, OPL2 and Tandy are core hardware and require no DOS
 driver or environment variable. MPU-401 UART mode is the MIDI transport; the
 MT32-pi itself remains external hardware connected through USER I/O.
 
-The core also decodes SDRAM at `E0000h-EBFFFh`, but that region is deliberately
-not registered as a DOS UMB. The EMS frame lies between the C400h and E000h
-regions, so treating `C400h-EC00h` as one contiguous UMB would overlap EMS.
+The core reserves `C8000h-C9FFFh` for the AT XTIDE option ROM. The rest of
+`C4000h-CFFFFh` is option-ROM space, while `D0000h-DFFFFh` belongs to the EMS
+page frame when enabled. `E0000h-EFFFFh` is the separate, optional UMB window.
 
 ## CONFIG.SYS
 
@@ -46,15 +46,15 @@ The checked-in [`hdd/CONFIG.SYS`](../hdd/CONFIG.SYS) is:
 FILES=40
 BUFFERS = 30
 DOS = HIGH, UMB
-DEVICE=C:\UTIL\USE!UMBS.SYS C400-D000
+DEVICE=C:\UTIL\USE!UMBS.SYS E000-F000
 DEVICE=C:\UTIL\DOSMAX\DOSMAX.EXE /R+ /N+ /P-
 DEVICEHIGH=C:\UTIL\LTEMM.EXE /p:D000 /x /n
 SHELL=C:\UTIL\DOSMAX\SHELLMAX.COM C:\COMMAND.COM C:\ /E:256 /P
 ```
 
-`USE!UMBS.SYS` uses an end-exclusive upper segment: `C400-D000` therefore
-registers exactly `C4000h-CFFFFh`, stopping before the EMS page frame. It is
-the driver notation for the same window the OSD calls `C400-CFFF`.
+`USE!UMBS.SYS` uses an end-exclusive upper segment: `E000-F000` registers
+exactly `E0000h-EFFFFh`. This is independent of the EMS page frame at
+`D0000h-DFFFFh`.
 
 `DOSMAX.EXE` and `SHELLMAX.COM` move DOS data and the command interpreter's
 overhead into that UMB. `LTEMM.EXE /p:D000` registers the core's fixed EMS

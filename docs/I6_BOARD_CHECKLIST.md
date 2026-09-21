@@ -28,12 +28,10 @@ Verify the RBF and diagnostic ROM against the hashes in
 5. Load the EGA ROM into **EGA BIOS** (slot 3). The machine deliberately
    remains in reset while either required ROM is absent.
 6. Leave **XT Bus Pace** at 4.77 MHz for the first run, enable **SPK286
-   Debug**, select the **CPU** page, then select **Reset & apply settings**.
-   Photograph two CPU-page states with different `SNAP` values.
-7. Visit the **Registers**, **Bus** and **Trace** pages without resetting and
-   photograph each page. The overlay is observational and does not pause the
-   machine.
-8. Repeat at 7.16 MHz, 9.54 MHz and Max. These choices pace the XT bus and do
+   Debug**, then select **Reset & apply settings**. Photograph two states with
+   different `SNAP` values. The overlay is observational and does not pause
+   the machine.
+7. Repeat at 7.16 MHz, 9.54 MHz and Max. These choices pace the XT bus and do
    not select historical SPK286 CPU timing profiles.
 
 ## Expected observation
@@ -41,9 +39,9 @@ Verify the RBF and diagnostic ROM against the hashes in
 `SNAP` must change between captures; otherwise the remaining values may be a
 stale observation. `RASTER:N` means the overlay is using normal video timing,
 while `RASTER:F` records that the splash-off fallback active window was needed.
-The CPU page must then show changing `CS:IP`, opcode, microcode PC and non-zero
-CPU/XT completion counters. The trace page retains the four most recently
-accepted XT transactions and the latest port-80 value. The ROM emits `70h,
+The page must then show changing `CS:IP`, opcode and microcode PC. `LAST`
+retains the most recently accepted AT transaction and `POST` the latest
+port-80 value. The ROM emits `70h,
 72h, 71h, 86h` to port `80h`; the passive diagnostic monitor then asserts the
 disk LED. Any write to diagnostic port `81h`, or a CPU/bridge protocol fault,
 asserts the user LED. Neither the overlay nor the LED monitor supplies READY
@@ -61,11 +59,9 @@ Record for each pace setting:
 | Disk LED reaches PASS | Pending |
 | User LED remains clear | Pending |
 | SNAP changes; RASTER N/F recorded | Pending |
-| CPU page: final CS:IP/opcode/uPC/BIU state | Pending |
-| CPU/XT completion counters | Pending |
-| Registers page photograph | Pending |
-| Bus page photograph | Pending |
-| Trace page: four rows and latest POST value | Pending |
+| Final CS:IP/opcode/uPC/BIU state | Pending |
+| Current and latest completed AT transaction | Pending |
+| Latest POST value and error flags | Pending |
 | Display/OSD remains usable | Pending |
 | Repeated cold and warm resets | Pending |
 

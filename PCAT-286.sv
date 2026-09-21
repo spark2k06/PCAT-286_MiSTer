@@ -33,8 +33,8 @@ module emu_at
 );
 
     // Keep the AT profile's System & BIOS page local to the PCAT-286 top.
-    // These indices are part of the HPS/OSD contract: bit 7 is splash,
-    // bit 71 enables the diagnostic overlay and bits 73:72 select its page.
+    // These indices are part of the HPS/OSD contract: bit 7 is splash and
+    // bit 71 enables the compact diagnostic overlay.
     // The ROM marker is required for MiSTer to expose a real file selector.
     localparam CONF_STR_HALT_AT = {
         "h4-,HALTED: no PCAT ROM selected;",
@@ -42,10 +42,8 @@ module emu_at
     };
 
 `ifndef SPK286_AT_NO_DEBUG
-    localparam CONF_STR_AT_DEBUG = {
-        "P1O[71],SPK286 Debug,Off,On;",
-        "P1O[73:72],Debug Page,CPU,Registers,Bus,Trace;"
-    };
+    localparam CONF_STR_AT_DEBUG =
+        "P1O[71],SPK286 Debug,Off,On;";
 `endif
 
     // Keep the source profile's audio menu and status-bit placement.  The
@@ -171,7 +169,6 @@ module emu_at
     wire [127:0] hps_status;
     wire [15:0]  hps_status_menumask;
     wire         at_debug_enable = hps_status[71];
-    wire [1:0]   at_debug_page = hps_status[73:72];
     wire         at_vga_mode13_native_osd = ~hps_status[10];
     wire [3:0]   at_crt_h_osd = hps_status[49:46];
     wire [2:0]   at_crt_v_osd = hps_status[52:50];
@@ -519,38 +516,16 @@ module emu_at
     wire        at_debug_unsupported_opcode;
     wire        at_debug_microcode_fault;
     wire        at_debug_operand_blocked;
-    wire        at_debug_event_completed;
-    wire [7:0]  at_debug_event_vector;
-    wire [2:0]  at_debug_event_kind;
     wire [7:0]  at_debug_opcode;
     wire [15:0] at_debug_cs;
-    wire [23:0] at_debug_cs_base;
     wire [15:0] at_debug_ip;
     wire [15:0] at_debug_flags;
-    wire [127:0] at_debug_gpr;
-    wire [63:0] at_debug_segment_selectors;
     wire        at_debug_fetch_blocked;
-    wire [16:0] at_debug_fetch_cursor;
     wire [11:0] at_debug_micro_pc;
-    wire [11:0] at_debug_micro_entry;
-    wire [7:0]  at_debug_micro_instruction;
-    wire        at_debug_micro_active;
-    wire [3:0]  at_debug_prefetch_count;
     wire [3:0]  at_debug_bus_state;
     wire [7:0]  at_debug_biu_detail;
     wire [7:0]  at_debug_last_post;
-    wire [15:0] at_debug_cpu_cycle_count;
-    wire [15:0] at_debug_at_cycle_count;
     wire [31:0] at_debug_trace0;
-    wire [31:0] at_debug_trace1;
-    wire [31:0] at_debug_trace2;
-    wire [31:0] at_debug_trace3;
-    wire [7:0]  at_debug_keyboard_keycode;
-    wire        at_debug_keyboard_irq;
-    wire [7:0]  at_debug_keyboard_port_b;
-    wire        at_debug_keyboard_pic_int;
-    wire [3:0]  at_debug_dma_request;
-    wire [3:0]  at_debug_dma_acknowledge_n;
     wire [19:0] at_debug_address;
     wire [7:0]  at_debug_data_out;
     wire [7:0]  at_debug_data_in;
@@ -558,11 +533,6 @@ module emu_at
     wire        at_debug_valid;
     wire        at_debug_write;
     wire        at_debug_io;
-    wire        at_debug_inta;
-    wire        at_debug_code;
-    wire        at_debug_byte_high;
-    wire        at_debug_memory_projection;
-    wire        at_debug_cycle_active;
     wire        at_debug_ready;
     wire        at_debug_hold_request;
     wire        at_debug_bridge_idle;
@@ -998,38 +968,38 @@ module emu_at
         .debug_unsupported_opcode(at_debug_unsupported_opcode),
         .debug_microcode_fault  (at_debug_microcode_fault),
         .debug_operand_blocked  (at_debug_operand_blocked),
-        .debug_event_completed  (at_debug_event_completed),
-        .debug_event_vector     (at_debug_event_vector),
-        .debug_event_kind       (at_debug_event_kind),
+        .debug_event_completed  (),
+        .debug_event_vector     (),
+        .debug_event_kind       (),
         .debug_opcode           (at_debug_opcode),
         .debug_cs               (at_debug_cs),
-        .debug_cs_base          (at_debug_cs_base),
+        .debug_cs_base          (),
         .debug_ip               (at_debug_ip),
         .debug_flags            (at_debug_flags),
-        .debug_gpr              (at_debug_gpr),
-        .debug_segment_selectors(at_debug_segment_selectors),
+        .debug_gpr              (),
+        .debug_segment_selectors(),
         .debug_fetch_blocked    (at_debug_fetch_blocked),
-        .debug_fetch_cursor     (at_debug_fetch_cursor),
+        .debug_fetch_cursor     (),
         .debug_micro_pc         (at_debug_micro_pc),
-        .debug_micro_entry      (at_debug_micro_entry),
-        .debug_micro_instruction(at_debug_micro_instruction),
-        .debug_micro_active     (at_debug_micro_active),
-        .debug_prefetch_count   (at_debug_prefetch_count),
+        .debug_micro_entry      (),
+        .debug_micro_instruction(),
+        .debug_micro_active     (),
+        .debug_prefetch_count   (),
         .debug_bus_state        (at_debug_bus_state),
         .debug_biu_detail       (at_debug_biu_detail),
         .debug_last_post        (at_debug_last_post),
-        .debug_cpu_cycle_count  (at_debug_cpu_cycle_count),
-        .debug_at_cycle_count   (at_debug_at_cycle_count),
+        .debug_cpu_cycle_count  (),
+        .debug_at_cycle_count   (),
         .debug_trace0           (at_debug_trace0),
-        .debug_trace1           (at_debug_trace1),
-        .debug_trace2           (at_debug_trace2),
-        .debug_trace3           (at_debug_trace3),
-        .debug_keyboard_keycode (at_debug_keyboard_keycode),
-        .debug_keyboard_irq     (at_debug_keyboard_irq),
-        .debug_keyboard_port_b  (at_debug_keyboard_port_b),
-        .debug_keyboard_pic_int (at_debug_keyboard_pic_int),
-        .debug_dma_request      (at_debug_dma_request),
-        .debug_dma_acknowledge_n(at_debug_dma_acknowledge_n),
+        .debug_trace1           (),
+        .debug_trace2           (),
+        .debug_trace3           (),
+        .debug_keyboard_keycode (),
+        .debug_keyboard_irq     (),
+        .debug_keyboard_port_b  (),
+        .debug_keyboard_pic_int (),
+        .debug_dma_request      (),
+        .debug_dma_acknowledge_n(),
         .debug_at_address       (at_debug_address),
         .debug_at_data_out      (at_debug_data_out),
         .debug_at_data_in       (at_debug_data_in),
@@ -1037,11 +1007,11 @@ module emu_at
         .debug_at_valid         (at_debug_valid),
         .debug_at_write         (at_debug_write),
         .debug_at_io            (at_debug_io),
-        .debug_at_inta          (at_debug_inta),
-        .debug_at_code          (at_debug_code),
-        .debug_at_byte_high     (at_debug_byte_high),
-        .debug_at_memory_projection(at_debug_memory_projection),
-        .debug_at_cycle_active  (at_debug_cycle_active),
+        .debug_at_inta          (),
+        .debug_at_code          (),
+        .debug_at_byte_high     (),
+        .debug_at_memory_projection(),
+        .debug_at_cycle_active  (),
         .debug_at_ready         (at_debug_ready),
         .cpu_hold_request       (at_debug_hold_request),
         .bridge_idle            (at_debug_bridge_idle),
@@ -1193,95 +1163,56 @@ module emu_at
     wire [23:0] at_debug_rgb_out;
 
 `ifndef SPK286_AT_NO_DEBUG
-    // The overlay is intentionally limited to live CPU, register, bus and
-    // rolling transaction views. It is passive and never drives the machine.
-    spk286_debug_overlay #(
-        .COLW   (8),
-        .AT_MODE(1'b1)
+    // The single-page overlay is passive and never drives the machine.
+    spk286_debug_min_overlay #(
+        .COLW(8)
     ) u_at_debug_overlay (
-        .rst                     (at_video_pipe_reset_57_ps),
-        // The source observer must remain alive during the CPU reset so it can
-        // publish the real RST=1 state instead of leaving a stale snapshot.
-        .src_rst                 (at_boot_reset),
-        .src_clk                 (CLK_50M),
-        .clk                     (at_video_clk_57_ps),
-        .pxl_cen                 (at_video_ce_out_q),
-        .HS                      (at_video_hs_out_q),
-        .VS                      (at_video_vs_out_q),
-        .HB                      (at_video_hb_out_q),
-        .VB                      (at_video_vb_out_q),
-        .rgb_in                  ({at_video_r_out_q,
-                                   at_video_g_out_q,
-                                   at_video_b_out_q}),
-        .page                    (at_debug_page),
-        .cpu_reset               (at_machine_reset | at_cpu_reset_request),
-        .cpu_halted              (at_cpu_halted),
-        .cpu_shutdown            (at_cpu_shutdown),
-        .cpu_control_error       (at_debug_control_error),
-        .cpu_unsupported_opcode  (at_debug_unsupported_opcode),
-        .cpu_microcode_fault     (at_debug_microcode_fault),
-        .cpu_operand_blocked     (at_debug_operand_blocked),
-        .cpu_event_completed     (at_debug_event_completed),
-        .cpu_event_vector        (at_debug_event_vector),
-        .cpu_event_kind          (at_debug_event_kind),
-        .cpu_opcode              (at_debug_opcode),
-        .cpu_cs                  (at_debug_cs),
-        .cpu_cs_base             (at_debug_cs_base),
-        .cpu_ip                  (at_debug_ip),
-        .cpu_flags               (at_debug_flags),
-        .cpu_gpr                 (at_debug_gpr),
-        .cpu_segments            (at_debug_segment_selectors),
-        .cpu_fetch_blocked       (at_debug_fetch_blocked),
-        .cpu_fetch_cursor        (at_debug_fetch_cursor),
-        .cpu_micro_pc            (at_debug_micro_pc),
-        .cpu_micro_entry         (at_debug_micro_entry),
-        .cpu_micro_instruction   (at_debug_micro_instruction),
-        .cpu_micro_active        (at_debug_micro_active),
-        .cpu_prefetch_count      (at_debug_prefetch_count),
-        .cpu_biu_state           (at_debug_bus_state),
-        .cpu_address             (at_cpu_address),
-        .cpu_data_out            (at_cpu_data_out),
-        .cpu_data_in             (at_cpu_data_in),
-        .cpu_bus_status          (at_cpu_bus_status),
-        .cpu_bus_valid           (at_cpu_bus_valid),
-        .cpu_bus_write           (at_cpu_bus_write),
-        .cpu_bhe_n               (at_cpu_bus_bhe_n),
-        .cpu_bus_lock            (at_cpu_bus_lock),
-        .cpu_hlda                (at_cpu_hlda),
-        .cpu_ready               (at_cpu_ready),
-        .xt_address              (at_debug_address),
-        .xt_data_out             (at_debug_data_out),
-        .xt_data_in              (at_debug_data_in),
-        .xt_status               (at_debug_status),
-        .xt_valid                (at_debug_valid),
-        .xt_write                (at_debug_write),
-        .xt_io                   (at_debug_io),
-        .xt_inta                 (at_debug_inta),
-        .xt_code                 (at_debug_code),
-        .xt_byte_high            (at_debug_byte_high),
-        .xt_memory_projection    (at_debug_memory_projection),
-        .xt_cycle_active         (at_debug_cycle_active),
-        .xt_ready                (at_debug_ready),
-        .bridge_idle             (at_debug_bridge_idle),
-        .bridge_error            (at_debug_bridge_error | keyboard_event_overflow),
-        .hold_request            (at_debug_hold_request),
-        .biu_detail              (at_debug_biu_detail),
-        .last_post               (at_debug_last_post),
-        .cpu_cycle_count         (at_debug_cpu_cycle_count),
-        .xt_cycle_count          (at_debug_at_cycle_count),
-        .trace0                  (at_debug_trace0),
-        .trace1                  (at_debug_trace1),
-        .trace2                  (at_debug_trace2),
-        .trace3                  (at_debug_trace3),
-        .keyboard_keycode        (at_debug_keyboard_keycode),
-        .keyboard_irq            (at_debug_keyboard_irq),
-        .keyboard_port_b         (at_debug_keyboard_port_b),
-        .keyboard_pic_int        (at_debug_keyboard_pic_int),
-        .dma_request             (at_debug_dma_request),
-        .dma_acknowledge_n       (at_debug_dma_acknowledge_n),
-        .HB_out                  (at_debug_hb_out),
-        .VB_out                  (at_debug_vb_out),
-        .rgb_out                 (at_debug_rgb_out)
+        .rst                    (at_video_pipe_reset_57_ps),
+        .src_rst                (at_boot_reset),
+        .src_clk                (CLK_50M),
+        .clk                    (at_video_clk_57_ps),
+        .pxl_cen                (at_video_ce_out_q),
+        .HS                     (at_video_hs_out_q),
+        .VS                     (at_video_vs_out_q),
+        .HB                     (at_video_hb_out_q),
+        .VB                     (at_video_vb_out_q),
+        .rgb_in                 ({at_video_r_out_q,
+                                  at_video_g_out_q,
+                                  at_video_b_out_q}),
+        .cpu_reset              (at_machine_reset | at_cpu_reset_request),
+        .cpu_halted             (at_cpu_halted),
+        .cpu_shutdown           (at_cpu_shutdown),
+        .cpu_control_error      (at_debug_control_error),
+        .cpu_unsupported_opcode (at_debug_unsupported_opcode),
+        .cpu_microcode_fault    (at_debug_microcode_fault),
+        .cpu_operand_blocked    (at_debug_operand_blocked),
+        .bridge_error           (at_debug_bridge_error |
+                                 keyboard_event_overflow),
+        .cpu_opcode             (at_debug_opcode),
+        .cpu_cs                 (at_debug_cs),
+        .cpu_ip                 (at_debug_ip),
+        .cpu_flags              (at_debug_flags),
+        .cpu_micro_pc           (at_debug_micro_pc),
+        .cpu_biu_state          (at_debug_bus_state),
+        .cpu_fetch_blocked      (at_debug_fetch_blocked),
+        .cpu_ready              (at_cpu_ready),
+        .cpu_bus_valid          (at_cpu_bus_valid),
+        .last_post              (at_debug_last_post),
+        .trace0                 (at_debug_trace0),
+        .at_address             (at_debug_address),
+        .at_data_out            (at_debug_data_out),
+        .at_data_in             (at_debug_data_in),
+        .at_status              (at_debug_status),
+        .at_valid               (at_debug_valid),
+        .at_write               (at_debug_write),
+        .at_io                  (at_debug_io),
+        .at_ready               (at_debug_ready),
+        .bridge_idle            (at_debug_bridge_idle),
+        .hold_request           (at_debug_hold_request),
+        .biu_detail             (at_debug_biu_detail),
+        .HB_out                 (at_debug_hb_out),
+        .VB_out                 (at_debug_vb_out),
+        .rgb_out                (at_debug_rgb_out)
     );
 `endif
 

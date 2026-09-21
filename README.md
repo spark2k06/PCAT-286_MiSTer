@@ -35,9 +35,9 @@ For an architectural overview and possible future improvements, see the
 * Six-byte prefetch queue and native 24-bit CPU address generation
 * Native AT bus bridge with READY, LOCK, HOLD/HLDA and dual-byte handling
 * Cascaded PIC, DMA/refresh arbitration, PIT, 8042 keyboard and RTC/CMOS
-* Passive four-page SPK286 debug overlay for CPU state, architectural
-  registers, live bus signals and accepted AT transactions;
-  it includes a live snapshot counter and a splash-off blank-raster fallback
+* Optional compact SPK286 debug overlay with CPU/BIU state, POST value,
+  fault flags and the latest accepted AT transaction; it includes a live
+  snapshot counter and a splash-off blank-raster fallback
 * **EGA video**: sequencer, graphics controller, attribute controller and a four-plane VRAM, around the UM6845R CRTC
 * Dual EGA dot clock, 14.318181 MHz and 16.257 MHz, selected per mode as on real hardware
 * CGA-compatible text and graphics behaviour, provided by the EGA rather than a separate adapter

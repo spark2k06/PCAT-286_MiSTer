@@ -198,6 +198,7 @@ module spk286_at_device_router (
     logic       rtc_read_data_valid;
     logic       rtc_protocol_error;
     logic [15:0] rtc_side_effect_count;
+    logic [15:0] rtc_mgmt_readdata;
 
     logic       storage_request_accept;
     logic       storage_request_ready;
@@ -205,6 +206,7 @@ module spk286_at_device_router (
     logic       storage_read_data_valid;
     logic       storage_protocol_error;
     logic [15:0] storage_side_effect_count;
+    logic [15:0] storage_mgmt_readdata;
     logic        gameport_request_accept;
     logic        gameport_request_ready;
     logic [15:0] gameport_read_data;
@@ -511,7 +513,7 @@ module spk286_at_device_router (
         .request_read_data(rtc_read_data),
         .request_read_data_valid(rtc_read_data_valid),
         .mgmt_address(mgmt_address), .mgmt_writedata(mgmt_writedata),
-        .mgmt_write(mgmt_write),
+        .mgmt_write(mgmt_write), .mgmt_readdata(rtc_mgmt_readdata),
         .periodic_tick(periodic_tick), .second_tick(second_tick),
         .irq8(irq8), .nmi_mask(nmi_mask),
         .side_effect_count(rtc_side_effect_count),
@@ -574,7 +576,7 @@ module spk286_at_device_router (
         .dma_request(dma_request),
         .mgmt_address(mgmt_address), .mgmt_writedata(mgmt_writedata),
         .mgmt_write(mgmt_write), .mgmt_read(mgmt_read),
-        .mgmt_readdata(mgmt_readdata),
+        .mgmt_readdata(storage_mgmt_readdata),
         .floppy_write_protect(floppy_write_protect),
         .floppy_present(floppy_present), .floppy_request(floppy_request),
         .ata_irq14(irq14), .floppy_irq6(irq6),
@@ -597,6 +599,15 @@ module spk286_at_device_router (
         .ata_command_count(), .floppy_command_count(),
         .protocol_error(storage_protocol_error)
     );
+
+    // F400-F47F is the byte-addressed RTC/CMOS snapshot window used by Main.
+    // Other management ranges retain the existing IDE/FDC routing.
+    always_comb begin
+        if ((mgmt_address[15:8] == 8'hF4) && !mgmt_address[7])
+            mgmt_readdata = rtc_mgmt_readdata;
+        else
+            mgmt_readdata = storage_mgmt_readdata;
+    end
 
     always_comb begin
         request_accept = 1'b0;

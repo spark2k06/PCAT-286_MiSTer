@@ -146,8 +146,8 @@ module emu_at
 
     // Use the same MiSTer management transport and request bit layout as the
     // XT profile. Requests 7:6 are floppy A/B and 2:0 belong to XT-IDE.
-    // RTC/CMOS updates are host-pushed writes in the F4xx window and therefore
-    // need no request bit.
+    // RTC/CMOS uses host-pushed writes and host-initiated snapshot reads in
+    // the F400-F47F window, so it needs no request bit.
     hps_ext hps_ext_at (
         .clk_sys     (CLK_50M),
         .EXT_BUS     (EXT_BUS),

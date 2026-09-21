@@ -32,6 +32,7 @@ module spk286_at_rtc_cmos (
     input  logic [15:0] mgmt_address,
     input  logic [15:0] mgmt_writedata,
     input  logic        mgmt_write,
+    output logic [15:0] mgmt_readdata,
 
     input  logic        periodic_tick,
     input  logic        second_tick,
@@ -253,6 +254,24 @@ module spk286_at_rtc_cmos (
         alarm_field_matches(cmos_q[7'h03], next_minute_clock) &&
         alarm_field_matches(cmos_q[7'h05], next_hour_clock);
 
+    function automatic logic [7:0] read_cmos_byte(input logic [6:0] address);
+        begin
+            case (address)
+                7'h0A: read_cmos_byte = {1'b0, cmos_q[7'h0A][6:0]};
+                7'h0C: read_cmos_byte = {irq8_q,
+                                         status_c_periodic_q,
+                                         status_c_alarm_q,
+                                         status_c_update_q,
+                                         4'b0000};
+                7'h0D: read_cmos_byte = 8'h80;
+                7'h2E: read_cmos_byte = checksum_q[15:8];
+                7'h2F: read_cmos_byte = checksum_q[7:0];
+                7'h37: read_cmos_byte = cmos_q[7'h32];
+                default: read_cmos_byte = cmos_q[address];
+            endcase
+        end
+    endfunction
+
     always_comb begin
         port_selected = request_valid && request_command_valid && request_io &&
                         ((request_address[15:0] == 16'h0070) ||
@@ -270,26 +289,18 @@ module spk286_at_rtc_cmos (
                          (mgmt_address[15:8] == 8'hF4) &&
                          !mgmt_address[7];
 
+        // hps_ext samples ext_din before asserting its read pulse, so expose
+        // management data directly from the address. This snapshot path is
+        // deliberately side-effect free: reading register C here must not
+        // acknowledge RTC interrupts as a CPU read from port 71h would.
+        mgmt_readdata = 16'h0000;
+        if ((mgmt_address[15:8] == 8'hF4) && !mgmt_address[7])
+            mgmt_readdata = {8'h00, read_cmos_byte(mgmt_address[6:0])};
+
         if (request_address[15:0] == 16'h0070)
             current_read_data = {nmi_mask_q, index_q};
-        else begin
-            case (index_q)
-                7'h0A: current_read_data = {1'b0, cmos_q[7'h0A][6:0]};
-                7'h0C: current_read_data = {irq8_q,
-                                            status_c_periodic_q,
-                                            status_c_alarm_q,
-                                            status_c_update_q,
-                                            4'b0000};
-                7'h0D: current_read_data = 8'h80;
-                7'h15, 7'h16, 7'h17, 7'h18,
-                7'h30, 7'h31, 7'h34, 7'h35:
-                    current_read_data = cmos_q[index_q];
-                7'h2E: current_read_data = checksum_q[15:8];
-                7'h2F: current_read_data = checksum_q[7:0];
-                7'h37: current_read_data = cmos_q[7'h32];
-                default: current_read_data = cmos_q[index_q];
-            endcase
-        end
+        else
+            current_read_data = read_cmos_byte(index_q);
     end
 
     assign request_accept = !reset && (io_state_q == IO_IDLE) && port_selected &&

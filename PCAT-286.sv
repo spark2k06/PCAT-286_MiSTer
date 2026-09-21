@@ -33,8 +33,8 @@ module emu_at
 );
 
     // Keep the AT profile's System & BIOS page local to the PCAT-286 top.
-    // These indices are part of the HPS/OSD contract: bit 7 is splash and
-    // bit 71 enables the compact diagnostic overlay.
+    // These indices are part of the HPS/OSD contract: bit 7 is splash when
+    // enabled in config.tcl, and bit 71 enables the compact diagnostic overlay.
     // The ROM marker is required for MiSTer to expose a real file selector.
     localparam CONF_STR_HALT_AT = {
         "h4-,HALTED: no PCAT ROM selected;",
@@ -85,7 +85,9 @@ module emu_at
         "-;",
         "P1,System & BIOS;",
         "P1-;",
+`ifdef SPK286_AT_BOOT_SPLASH
         "P1O7,Boot Splash Screen,Yes,No;",
+`endif
         "P1FC0,ROM,PCAT BIOS:;",
         "P1FC2,ROM,C800 BIOS:;",
         "P1FC3,ROM,EGA BIOS:;",
@@ -808,6 +810,10 @@ module emu_at
     // Reuse the XT reset controls without clearing the loaded ROM flags.
     wire at_boot_reset = RESET | hps_status[0] | hps_buttons[1] |
                          !main_rom_loaded | !at_video_pll_locked;
+    // The XT splash lifetime survives OSD reset and Reset & apply settings.
+    // Only re-arm it when the core itself restarts or its boot prerequisites
+    // disappear; the host reset controls belong to the machine reset below.
+    wire at_splash_reset = RESET | !main_rom_loaded | !at_video_pll_locked;
 
     spk286_at_keyboard u_at_keyboard (
         .clk                    (CLK_50M),
@@ -837,14 +843,19 @@ module emu_at
     // behind it.
     wire at_splashscreen;
     wire at_splash_boot_hold;
+`ifdef SPK286_AT_BOOT_SPLASH
     spk286_at_splash_control u_at_splash_control (
         .clk         (CLK_50M),
-        .reset       (at_boot_reset),
+        .reset       (at_splash_reset),
         .option_off  (hps_status[7]),
         .second_tick (second_tick),
         .splash_active(at_splashscreen),
         .boot_hold   (at_splash_boot_hold)
     );
+`else
+    assign at_splashscreen   = 1'b0;
+    assign at_splash_boot_hold = 1'b0;
+`endif
 
     // The splash is a real boot hold, not only a video overlay.  This keeps
     // CPU/BIU state frozen from boot settling until the image is removed.

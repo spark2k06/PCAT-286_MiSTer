@@ -27,7 +27,7 @@ module spk286_at_sdram_read_buffer #(
     input  logic        in_refresh,
     input  logic        in_code_fetch,
     input  logic [3:0]  in_cycle_class,
-    input  logic [23:0] in_address,
+    input  logic [24:0] in_address,
     input  logic [1:0]  in_byte_enable,
     input  logic [15:0] in_data_out,
     output logic        in_accept,
@@ -43,7 +43,7 @@ module spk286_at_sdram_read_buffer #(
     output logic        out_code_fetch,
     output logic        out_burst,
     output logic [3:0]  out_cycle_class,
-    output logic [23:0] out_address,
+    output logic [24:0] out_address,
     output logic [1:0]  out_byte_enable,
     output logic [15:0] out_data_out,
     input  logic        out_accept,
@@ -70,7 +70,7 @@ module spk286_at_sdram_read_buffer #(
     logic        physical_inflight_q;
     logic [1:0]  fill_index_q;
     logic        line_valid_q;
-    logic [23:0] line_tag_q;
+    logic [24:0] line_tag_q;
     logic [15:0] line_data_q [0:3];
 
     logic [1:0]  request_owner_q;
@@ -78,64 +78,64 @@ module spk286_at_sdram_read_buffer #(
     logic        request_refresh_q;
     logic        request_code_fetch_q;
     logic [3:0]  request_cycle_class_q;
-    logic [23:0] request_address_q;
+    logic [24:0] request_address_q;
     logic [1:0]  request_byte_enable_q;
     logic [15:0] request_data_out_q;
-    logic [23:0] request_line_base_q;
+    logic [24:0] request_line_base_q;
     logic        request_cancelled_q;
 
     assign debug_state = {state_q, physical_inflight_q,
                           request_cancelled_q, line_valid_q};
 
-    function automatic logic [23:0] canonical_address(input logic [23:0] address);
+    function automatic logic [24:0] canonical_address(input logic [24:0] address);
         begin
             // The reset-vector alias is the same physical BIOS window used
             // by the SDRAM owner.  Canonical tags make FFFFF0h and 0FFFF0h
             // share one line without changing the CPU-visible address.
-            if ((address >= 24'hFFF000) && (address <= 24'hFFFFFF))
-                canonical_address = address - 24'hF00000;
+            if ((address >= 25'h0FFF000) && (address <= 25'h0FFFFFF))
+                canonical_address = address - 25'h0F00000;
             else
                 canonical_address = address;
         end
     endfunction
 
-    function automatic logic [23:0] line_base(input logic [23:0] address);
-        logic [23:0] canonical;
+    function automatic logic [24:0] line_base(input logic [24:0] address);
+        logic [24:0] canonical;
         begin
             canonical = canonical_address(address);
-            line_base = {canonical[23:3], 3'b000};
+            line_base = {canonical[24:3], 3'b000};
         end
     endfunction
 
-    function automatic logic cacheable_code_line(input logic [23:0] base);
+    function automatic logic cacheable_code_line(input logic [24:0] base);
         begin
             // Four full words must be legal.  The aligned upper bound is
             // therefore eight bytes below each inclusive region limit.
             cacheable_code_line =
-                (base <= 24'h09FFF8) ||
-                ((base >= 24'h0F0000) && (base <= 24'h0FFFF8)) ||
-                ((base >= 24'h100000) && (base <= 24'h15FFF8));
+                (base <= 25'h009FFF8) ||
+                ((base >= 25'h00F0000) && (base <= 25'h00FFFF8)) ||
+                ((base >= 25'h0100000) && (base <= 25'h11FEFF8));
         end
     endfunction
 
     function automatic logic write_touches_line(
-        input logic [23:0] address,
+        input logic [24:0] address,
         input logic [1:0]  byte_enable,
-        input logic [23:0] tag
+        input logic [24:0] tag
     );
-        logic [23:0] first_byte;
-        logic [23:0] second_byte;
+        logic [24:0] first_byte;
+        logic [24:0] second_byte;
         begin
             first_byte  = canonical_address(address);
-            second_byte = canonical_address(address + 24'd1);
+            second_byte = canonical_address(address + 25'd1);
             write_touches_line =
                 (byte_enable[0] && (line_base(first_byte) == tag)) ||
                 (byte_enable[1] && (line_base(second_byte) == tag));
         end
     endfunction
 
-    wire [23:0] input_line_base = line_base(in_address);
-    wire [23:0] input_canonical_address = canonical_address(in_address);
+    wire [24:0] input_line_base = line_base(in_address);
+    wire [24:0] input_canonical_address = canonical_address(in_address);
     wire [1:0] input_word_index = input_canonical_address[2:1];
 
     wire cache_candidate = ENABLE && enable &&
@@ -284,16 +284,16 @@ module spk286_at_sdram_read_buffer #(
             physical_inflight_q     <= 1'b0;
             fill_index_q            <= 2'd0;
             line_valid_q            <= 1'b0;
-            line_tag_q              <= 24'h000000;
+            line_tag_q              <= 25'h0000000;
             request_owner_q         <= OWNER_CPU;
             request_write_q         <= 1'b0;
             request_refresh_q       <= 1'b0;
             request_code_fetch_q    <= 1'b0;
             request_cycle_class_q  <= 4'h0;
-            request_address_q       <= 24'h000000;
+            request_address_q       <= 25'h0000000;
             request_byte_enable_q   <= 2'b00;
             request_data_out_q      <= 16'h0000;
-            request_line_base_q     <= 24'h000000;
+            request_line_base_q     <= 25'h0000000;
             request_cancelled_q     <= 1'b0;
             debug_hit_count         <= 32'd0;
             debug_miss_count        <= 32'd0;

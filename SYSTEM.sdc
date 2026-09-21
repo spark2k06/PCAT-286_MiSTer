@@ -40,9 +40,11 @@ proc at_mailbox {label source_clock patterns budget} {
 # cycle remain fully timed.
 set at_no_debug 0
 set at_debug_cpu_div2 0
+set at_boot_splash_enabled 0
 foreach_in_collection a [get_all_global_assignments -name VERILOG_MACRO] {
     if {[lindex $a 2] eq "SPK286_AT_NO_DEBUG"} { set at_no_debug 1 }
     if {[lindex $a 2] eq "SPK286_AT_DEBUG_CPU_DIV2"} { set at_debug_cpu_div2 1 }
+    if {[lindex $a 2] eq "SPK286_AT_BOOT_SPLASH"} { set at_boot_splash_enabled 1 }
 }
 if {$at_no_debug && $at_debug_cpu_div2} {
     error "SPK286_AT_DEBUG_CPU_DIV2 requires the debug observer"
@@ -143,10 +145,11 @@ if {[get_collection_size $debug_snapshot_source] &&
                              -to $debug_snapshot_capture
 }
 
-# Only an explicitly labelled reanalysis may lack the newly added stages.
-# A normal candidate compile must fail if either synchronizer is absent.
+# The boot splash is optional at build time. When compiled in, a normal
+# candidate build must still fail if its synchronizer is absent. An explicitly
+# labelled reanalysis may lack this newly added stage.
 set at_require_new [expr {![info exists ::env(P05_REFERENCE_FIT)] || $::env(P05_REFERENCE_FIT) ne "1"}]
-at_sync splash $AT_CPU {*u_video|splash_video_sync1_q} $at_require_new
+at_sync splash $AT_CPU {*u_video|splash_video_sync1_q} [expr {$at_boot_splash_enabled && $at_require_new}]
 
 # These registers asynchronously assert reset, then release on their local
 # clock. Cut only the async control pin, not their synchronous D paths.

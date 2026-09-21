@@ -5,7 +5,7 @@ set_global_assignment -name VERILOG_MACRO "SPK286_AT_CDC"
 set_global_assignment -name VERILOG_MACRO "SPK286_P05_PARALLEL_LIMIT_CHECK"
 # Keep this assignment to build the boot splash and expose its OSD toggle.
 # Remove or comment it out to omit the splash and its OSD option entirely.
-set_global_assignment -name VERILOG_MACRO "SPK286_AT_BOOT_SPLASH"
+# set_global_assignment -name VERILOG_MACRO "SPK286_AT_BOOT_SPLASH"
 # The release build remains observer-free. Comment NO_DEBUG to build the
 # compact single-page hardware observer used for fault diagnosis.
 set_global_assignment -name VERILOG_MACRO "SPK286_AT_NO_DEBUG"

@@ -8,9 +8,9 @@
 // battery-backed state: initialize it at FPGA configuration, retain it across
 // machine resets, and accept host writes even while CPU I/O is held in reset.
 //
-// The first AT memory profile contains exactly 1 MiB of RAM: 640 KiB at
-// 000000h-09FFFFh plus 384 KiB at 100000h-15FFFFh. The corresponding CMOS
-// fields are fixed here and included in the standard 10h-2Dh checksum.
+// The baseline AT memory profile contains 1 MiB of RAM: 640 KiB at
+// 000000h-09FFFFh plus 384 KiB at 100000h-15FFFFh. The Hardware OSD can select
+// larger profiles; their extended-memory CMOS fields follow the applied map.
 `timescale 1ns/1ps
 
 module spk286_at_rtc_cmos (
@@ -22,6 +22,7 @@ module spk286_at_rtc_cmos (
     input  logic        request_write,
     input  logic        request_io,
     input  logic [23:0] request_address,
+    input  logic [2:0]  installed_ram_size,
     input  logic [1:0]  request_byte_enable,
     input  logic [15:0] request_data_out,
     output logic        request_accept,
@@ -62,6 +63,7 @@ module spk286_at_rtc_cmos (
     logic       status_c_alarm_q;
     logic       status_c_update_q;
     logic [15:0] checksum_q;
+    logic [2:0]  memory_size_applied_q = 3'd0;
     logic [7:0] cmos_q [0:127];
     logic [7:0] request_byte;
     logic [7:0] current_read_data;
@@ -70,6 +72,40 @@ module spk286_at_rtc_cmos (
     logic       cpu_data_write;
     logic       mgmt_rtc_write;
     integer i;
+
+    function automatic logic [2:0] normalize_ram_size(input logic [2:0] size);
+        begin
+            case (size)
+                3'd0, 3'd1, 3'd2, 3'd3, 3'd4: normalize_ram_size = size;
+                default: normalize_ram_size = 3'd0;
+            endcase
+        end
+    endfunction
+
+    function automatic logic [15:0] extended_memory_kib(
+        input logic [2:0] size
+    );
+        begin
+            // Total installed-RAM selections subtract the fixed 640 KiB
+            // conventional base. The 16 MiB class is bounded by the 286's
+            // 24-bit range and the high reset-vector BIOS alias.
+            case (size)
+                3'd1:    extended_memory_kib = 16'd1408;
+                3'd2:    extended_memory_kib = 16'd3456;
+                3'd3:    extended_memory_kib = 16'd7552;
+                3'd4:    extended_memory_kib = 16'd15356;
+                default: extended_memory_kib = 16'd384;
+            endcase
+        end
+    endfunction
+
+    wire [2:0] normalized_ram_size = normalize_ram_size(installed_ram_size);
+    wire [15:0] selected_extended_memory_kib =
+        extended_memory_kib(normalized_ram_size);
+    wire [7:0] selected_extended_memory_low =
+        selected_extended_memory_kib[7:0];
+    wire [7:0] selected_extended_memory_high =
+        selected_extended_memory_kib[15:8];
 
     initial begin
         checksum_q = CMOS_INITIAL_SUM;
@@ -317,8 +353,21 @@ module spk286_at_rtc_cmos (
         // The host initializes CMOS before releasing reset. Keep these writes
         // outside the CPU-interface reset branch; a later reset must not erase
         // date/time, drive configuration, shutdown codes or the BIOS checksum.
-        // Management takes priority over a simultaneous CPU data write.
-        if (mgmt_rtc_write) begin
+        // Apply the memory-size fields on Reset & apply settings. Preserve
+        // CPU-writable CMOS semantics between profile changes, and adjust the
+        // standard checksum for the changed 17h/18h bytes.
+        if ((normalized_ram_size != memory_size_applied_q) &&
+            !mgmt_rtc_write && !cpu_data_write) begin
+            cmos_q[7'h17] <= selected_extended_memory_low;
+            cmos_q[7'h18] <= selected_extended_memory_high;
+            cmos_q[7'h30] <= selected_extended_memory_low;
+            cmos_q[7'h31] <= selected_extended_memory_high;
+            checksum_q <= checksum_q - {8'h00, cmos_q[7'h17]} -
+                          {8'h00, cmos_q[7'h18]} +
+                          {8'h00, selected_extended_memory_low} +
+                          {8'h00, selected_extended_memory_high};
+            memory_size_applied_q <= normalized_ram_size;
+        end else if (mgmt_rtc_write) begin
             if ((mgmt_address[6:0] != 7'h0C) &&
                 (mgmt_address[6:0] != 7'h0D) &&
                 (mgmt_address[6:0] != 7'h2E) &&

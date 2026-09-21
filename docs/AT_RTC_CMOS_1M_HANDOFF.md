@@ -1,5 +1,9 @@
 # AT RTC/CMOS and 1 MiB memory profile
 
+> Historical baseline: this document records the original fixed 1 MiB
+> implementation. The current selectable 1/2/4/8/16 MiB profiles are described
+> in [AT_MEMORY_SIZE_CONFIGURATION.md](AT_MEMORY_SIZE_CONFIGURATION.md).
+
 ## Cause found
 
 The AT RTC previously had no connection to MiSTer's management transport.

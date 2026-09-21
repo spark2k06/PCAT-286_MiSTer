@@ -34,7 +34,8 @@ module emu_at
 
     // Keep the AT profile's System & BIOS page local to the PCAT-286 top.
     // These indices are part of the HPS/OSD contract: bit 7 is splash when
-    // enabled in config.tcl, and bit 71 enables the compact diagnostic overlay.
+    // enabled in config.tcl, bits 74:72 select installed RAM, and bit 71
+    // enables the compact diagnostic overlay.
     // The ROM marker is required for MiSTer to expose a real file selector.
     localparam CONF_STR_HALT_AT = {
         "h4-,HALTED: no PCAT ROM selected;",
@@ -115,6 +116,7 @@ module emu_at
         "P2-;",
         "P3,Hardware;",
         "P3-;",
+        "P3O[74:72],Installed RAM,1MB,2MB,4MB,8MB,16MB;",
         CONF_STR_EMS,
         CONF_STR_UMB,
         "P3ONO,Joystick 1, Analog, Digital, Disabled;",
@@ -185,6 +187,7 @@ module emu_at
     wire         at_a220_cms_osd = `ENABLE_CMS ? ~hps_status[29] : 1'b0;
     wire         at_ems_osd = `ENABLE_EMS ? ~hps_status[11] : 1'b0;
     wire         at_umb_osd = `ENABLE_UMB ? ~hps_status[12] : 1'b0;
+    wire [2:0]   at_installed_ram_size_osd = hps_status[74:72];
 
     wire [7:0] at286ctl_cpu;
     wire [7:0] at286ctl_exp;
@@ -492,7 +495,7 @@ module emu_at
     wire        cpu_memory_write;
     wire        cpu_memory_code_fetch;
     wire [3:0]  cpu_memory_cycle_class;
-    wire [23:0] cpu_memory_address;
+    wire [24:0] cpu_memory_address;
     wire [1:0]  cpu_memory_byte_enable;
     wire [15:0] cpu_memory_data_out;
     wire        cpu_memory_accept;
@@ -558,7 +561,7 @@ module emu_at
     wire        dma_memory_valid;
     wire        dma_memory_write;
     wire        dma_memory_read;
-    wire [23:0] dma_memory_address;
+    wire [24:0] dma_memory_address;
     wire [1:0]  dma_memory_byte_enable;
     wire [15:0] dma_memory_data_out;
     wire        dma_memory_accept;
@@ -577,7 +580,7 @@ module emu_at
     wire        backend_refresh;
     wire        backend_code_fetch;
     wire [3:0]  backend_cycle_class;
-    wire [23:0] backend_address;
+    wire [24:0] backend_address;
     wire [1:0]  backend_byte_enable;
     wire [15:0] backend_data_out;
     wire        backend_accept;
@@ -595,7 +598,7 @@ module emu_at
     wire        p03_out_code_fetch;
     wire        p03_out_burst;
     wire [3:0]  p03_out_cycle_class;
-    wire [23:0] p03_out_address;
+    wire [24:0] p03_out_address;
     wire [1:0]  p03_out_byte_enable;
     wire [15:0] p03_out_data_out;
     wire        p03_in_accept;
@@ -966,6 +969,7 @@ module emu_at
         .at286ctl_eff_mpu401   (at286ctl_eff_mpu401),
         .at286ctl_eff_ems      (at286ctl_eff_ems),
         .at286ctl_eff_umb      (at286ctl_eff_umb),
+        .installed_ram_size_osd(at_installed_ram_size_osd),
         .midi_baudce           (midi_baudce),
         .uart_baudce           (uart_baudce),
         .midi_rx               (midi_rx),

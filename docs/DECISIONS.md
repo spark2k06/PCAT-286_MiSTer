@@ -182,3 +182,20 @@ semantics, including temporary write/read/restore patterns used by hardware
 diagnostics. The standard checksum over bytes `10h–2Dh` is maintained
 incrementally, while checksum bytes `2Eh/2Fh` also remain directly writable as
 required by the IBM AT programming model.
+
+## D-AT-012 — Selectable 1–16 MiB RAM profiles
+
+**Date:** 2026-09-21
+**Status:** Implemented in the PCAT-286 MiSTer profile
+
+The Hardware OSD selects nominal installed-RAM profiles of 1, 2, 4, 8 or
+16 MiB. The fixed 640 KiB conventional base and the original 384 KiB extended
+profile remain the 1 MiB default. The applied profile extends the physical RAM
+decode up to its selected limit, with the 16 MiB profile bounded by the 286's
+24-bit address space and the top reset-vector BIOS alias. CMOS extended-memory
+fields and their checksum follow the applied profile.
+
+EMS retains its private 2 MiB page backing at SDRAM addresses 2–4 MiB. CPU and
+DMA accesses at physical addresses 2 MiB and above are translated by +2 MiB in
+the SDRAM backend, keeping that EMS store disjoint from expanded RAM without
+changing addresses visible to the CPU.

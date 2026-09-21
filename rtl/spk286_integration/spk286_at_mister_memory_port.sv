@@ -66,6 +66,7 @@ module spk286_at_mister_memory_port (
     input  logic [15:0] backend_read_data,
     input  logic        backend_read_data_valid,
 
+    output logic [4:0]  debug_state,
     output logic        protocol_error
 );
 
@@ -88,6 +89,8 @@ module spk286_at_mister_memory_port (
     logic response_complete;
     logic selected_accept;
     wire cpu_candidate = cpu_valid && !cancel_cpu;
+
+    assign debug_state = {active_q, accepted_q, owner_q, cpu_cancelled_q};
 
     assign selected_accept = active_q && !accepted_q && backend_accept &&
                              backend_command_valid;

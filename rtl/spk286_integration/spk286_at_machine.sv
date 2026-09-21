@@ -26,8 +26,12 @@
 `define ENABLE_UMB 0
 `endif
 
-module spk286_at_machine (
+module spk286_at_machine #(
+    parameter logic CPU_USES_SAMPLE_EDGE = 1'b0
+) (
     input  logic         clk,
+    input  logic         clk_cpu,
+    input  logic         cpu_sample_edge,
     input  logic         reset,
     // CPU-local reset.  The AT splash holds the 286/BIU in reset while the
     // device router and EGA raster remain alive to render the splash itself.
@@ -208,6 +212,7 @@ module spk286_at_machine (
     output logic [23:0]  debug_cs_base,
     output logic [15:0]  debug_flags,
     output logic [127:0] debug_gpr,
+    output logic         debug_instruction_retired,
     output logic [63:0]  debug_segment_selectors,
     output logic         debug_fetch_blocked,
     output logic [16:0]  debug_fetch_cursor,
@@ -243,6 +248,10 @@ module spk286_at_machine (
     output logic         debug_at_memory_projection,
     output logic         debug_at_cycle_active,
     output logic         debug_at_ready,
+    output logic         debug_at_read_data_valid,
+    output logic         debug_dma_bus_request,
+    output logic         debug_refresh_request,
+    output logic [3:0]   debug_bridge_state,
     output logic [15:0]  refresh_count,
     output logic [15:0]  dma_side_effect_count,
     output logic [15:0]  device_side_effect_count,
@@ -487,6 +496,30 @@ module spk286_at_machine (
     wire       cpu_core_reset = reset | cpu_reset |
                                 devices_cpu_reset_request | spk_shutdown;
 
+    // When the optional divided CPU clock is selected, warm-reset pulses
+    // originate in the 50 MHz chipset domain. Assert asynchronously and
+    // release on the slower CPU clock after two complete edges. The ordinary
+    // 50 MHz build preserves the direct reset path.
+    logic cpu_clock_reset;
+    generate
+        if (CPU_USES_SAMPLE_EDGE) begin : g_cpu_reset_sync
+            logic cpu_reset_sync1_q;
+            logic cpu_reset_sync2_q;
+            always_ff @(posedge clk_cpu or posedge cpu_core_reset) begin
+                if (cpu_core_reset) begin
+                    cpu_reset_sync1_q <= 1'b1;
+                    cpu_reset_sync2_q <= 1'b1;
+                end else begin
+                    cpu_reset_sync1_q <= 1'b0;
+                    cpu_reset_sync2_q <= cpu_reset_sync1_q;
+                end
+            end
+            assign cpu_clock_reset = cpu_reset_sync2_q;
+        end else begin : g_cpu_reset_direct
+            assign cpu_clock_reset = cpu_core_reset;
+        end
+    endgenerate
+
     // IBM AT BIOSes announce a warm reboot by storing 1234h at physical
     // address 0040:0072. Keep this as a one-cycle event so AT286CTL can drop
     // only its VGA+ enable while preserving other per-program overrides.
@@ -594,8 +627,8 @@ module spk286_at_machine (
     end
 
     spk286_machine_cpu u_cpu (
-        .clk                    (clk),
-        .reset                  (cpu_core_reset),
+        .clk                    (clk_cpu),
+        .reset                  (cpu_clock_reset),
         .execute_enable         (execute_enable),
         .ready                  (cpu_ready_i),
         .data_in                (cpu_data_in_i),
@@ -624,9 +657,10 @@ module spk286_at_machine (
         .debug_cs               (debug_cs),
         .debug_cs_base          (spk_debug_cs_base),
         .debug_ip                (debug_ip),
-         .debug_flags             (spk_debug_flags),
-         .debug_gpr               (spk_debug_gpr),
-         .debug_segment_selectors (spk_debug_segment_selectors),
+        .debug_flags             (spk_debug_flags),
+        .debug_gpr               (spk_debug_gpr),
+        .debug_instruction_retired(debug_instruction_retired),
+        .debug_segment_selectors (spk_debug_segment_selectors),
          .fetch_blocked           (spk_fetch_blocked),
         .debug_fetch_cursor      (spk_debug_fetch_cursor),
         .debug_micro_pc          (spk_debug_micro_pc),
@@ -670,9 +704,12 @@ module spk286_at_machine (
         .rom_write_blocked      (), .unmapped_request()
     );
 
-    spk286_at_bus_bridge u_bridge (
+    spk286_at_bus_bridge #(
+        .COMPLETE_ON_CPU_SAMPLE(CPU_USES_SAMPLE_EDGE)
+    ) u_bridge (
         .clk                    (clk),
         .reset                  (cpu_core_reset),
+        .cpu_sample_edge        (cpu_sample_edge),
         .cpu_bus_valid          (cpu_bus_valid),
         .cpu_address            (cpu_address),
         .cpu_data_out           (cpu_data_out),
@@ -708,6 +745,7 @@ module spk286_at_machine (
         .at_read_data           (at_read_data),
         .at_read_data_valid     (at_read_data_valid),
         .bridge_idle            (bridge_idle),
+        .debug_state            (debug_bridge_state),
         .protocol_error         (bridge_protocol_error)
     );
 
@@ -1085,6 +1123,9 @@ module spk286_at_machine (
                                         umb_region_select;
     assign debug_at_cycle_active   = at_valid;
     assign debug_at_ready         = at_ready;
+    assign debug_at_read_data_valid = at_read_data_valid;
+    assign debug_dma_bus_request  = dma_bus_request;
+    assign debug_refresh_request  = refresh_request;
 
     always_ff @(posedge clk or posedge reset) begin
         if (reset) begin

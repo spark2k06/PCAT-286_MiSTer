@@ -8,9 +8,14 @@
 // receive two beats; an already odd, single-lane CPU beat is never split again.
 `timescale 1ns/1ps
 
-module spk286_at_bus_bridge (
+module spk286_at_bus_bridge #(
+    parameter logic COMPLETE_ON_CPU_SAMPLE = 1'b0
+) (
     input  logic         clk,
     input  logic         reset,
+    // Pulse in this clock domain on an edge at which the CPU can sample
+    // READY. It is used only when the CPU runs from a related slower clock.
+    input  logic         cpu_sample_edge,
 
     input  logic         cpu_bus_valid,
     input  logic [23:0]  cpu_address,
@@ -63,6 +68,7 @@ module spk286_at_bus_bridge (
     input  logic         at_read_data_valid,
 
     output logic         bridge_idle,
+    output logic [3:0]   debug_state,
     output logic         protocol_error
 );
 `ifdef SPK286_P01_FAST_MEMORY_START
@@ -78,6 +84,7 @@ module spk286_at_bus_bridge (
     localparam logic [3:0] STATE_COMMAND  = 4'd4;
     localparam logic [3:0] STATE_WAIT     = 4'd5;
     localparam logic [3:0] STATE_COMPLETE = 4'd6;
+    localparam logic [3:0] STATE_ALIGN    = 4'd7;
 
     // The owner encoding is shared by future arbitration records.  CPU is
     // the only owner this bridge can emit; DMA, refresh and loader arbitration
@@ -94,6 +101,7 @@ module spk286_at_bus_bridge (
     logic        request_native_word_q;
     logic        beat_high_q;
     logic [7:0]  read_low_byte_q;
+    logic        complete_sampled_q;
 
     logic request_status_valid;
     logic request_lane_valid;
@@ -213,6 +221,7 @@ module spk286_at_bus_bridge (
     assign at_response_valid = (state_q == STATE_COMPLETE);
     assign cpu_ready         = (state_q == STATE_COMPLETE);
     assign bridge_idle       = (state_q == STATE_IDLE);
+    assign debug_state       = state_q;
 
     always_ff @(posedge clk) begin
         if (reset) begin
@@ -226,9 +235,12 @@ module spk286_at_bus_bridge (
             request_native_word_q <= 1'b0;
             beat_high_q        <= 1'b0;
             read_low_byte_q    <= 8'd0;
+            complete_sampled_q <= 1'b0;
             cpu_data_in        <= 16'd0;
             protocol_error     <= 1'b0;
         end else begin
+            if (state_q != STATE_COMPLETE)
+                complete_sampled_q <= 1'b0;
             case (state_q)
                 STATE_IDLE: begin
                     if (cpu_bus_valid) begin
@@ -306,13 +318,34 @@ module spk286_at_bus_bridge (
                             beat_high_q <= 1'b1;
                             state_q <= STATE_ADDRESS;
                         end else begin
-                            state_q <= STATE_COMPLETE;
+                            // Never launch READY on the same parent edge that
+                            // launches the divided CPU clock. Align it to the
+                            // intervening 50 MHz edge so setup is unambiguous.
+                            state_q <= COMPLETE_ON_CPU_SAMPLE && cpu_sample_edge ?
+                                       STATE_ALIGN : STATE_COMPLETE;
                         end
                     end
                 end
 
-                STATE_COMPLETE:
-                    state_q <= STATE_IDLE;
+                STATE_ALIGN:
+                    state_q <= STATE_COMPLETE;
+
+                STATE_COMPLETE: begin
+                    // A debug build may run the CPU from a related /2 clock.
+                    // Keep READY stable through a CPU sampling edge, then
+                    // release it on the following 50 MHz edge. This provides
+                    // half a CPU cycle of hold time and avoids a second READY
+                    // sample. The CPU may chain cycles without dropping valid,
+                    // so bus_valid cannot acknowledge this state.
+                    if (!COMPLETE_ON_CPU_SAMPLE)
+                        state_q <= STATE_IDLE;
+                    else if (!complete_sampled_q && cpu_sample_edge)
+                        complete_sampled_q <= 1'b1;
+                    else if (complete_sampled_q && !cpu_sample_edge) begin
+                        complete_sampled_q <= 1'b0;
+                        state_q <= STATE_IDLE;
+                    end
+                end
 
                 default: begin
                     state_q <= STATE_IDLE;

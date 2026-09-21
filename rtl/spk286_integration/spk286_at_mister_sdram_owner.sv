@@ -40,6 +40,7 @@ module spk286_at_mister_sdram_owner #(
     output logic [15:0] request_read_data,
     output logic        request_read_data_valid,
     output logic        physical_idle,
+    output logic [7:0]  debug_state,
     output logic        protocol_error,
 
     output logic [12:0] sdram_address,
@@ -79,6 +80,10 @@ module spk286_at_mister_sdram_owner #(
     logic        kf_idle;
     logic        kf_dq_io;
     logic [15:0] kf_dq_out;
+
+    assign debug_state = {active_q, write_q, response_pending_q,
+                          response_data_valid_q, kf_idle, kf_write_flag,
+                          kf_read_flag, kf_refresh_mode};
 
     logic        launch_request;
     logic        physical_write;

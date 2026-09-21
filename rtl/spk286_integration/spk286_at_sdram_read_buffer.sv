@@ -55,7 +55,8 @@ module spk286_at_sdram_read_buffer #(
     output logic [31:0] debug_miss_count,
     output logic [31:0] debug_fill_count,
     output logic [31:0] debug_physical_read_count,
-    output logic [31:0] debug_invalidation_count
+    output logic [31:0] debug_invalidation_count,
+    output logic [4:0]  debug_state
 );
 
     localparam logic [1:0] OWNER_CPU = 2'd0;
@@ -82,6 +83,9 @@ module spk286_at_sdram_read_buffer #(
     logic [15:0] request_data_out_q;
     logic [23:0] request_line_base_q;
     logic        request_cancelled_q;
+
+    assign debug_state = {state_q, physical_inflight_q,
+                          request_cancelled_q, line_valid_q};
 
     function automatic logic [23:0] canonical_address(input logic [23:0] address);
         begin

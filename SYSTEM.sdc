@@ -34,7 +34,31 @@ proc at_mailbox {label source_clock patterns budget} {
     set_false_path -hold -from $source_clock -to $r
 }
 
-set AT_CPU [at_clock FPGA_CLK2_50]
+# The optional observer /2 mode uses a real divide-by-two CPU clock. This is deliberately
+# a generated clock rather than a multicycle exception on the complete SPK286
+# hierarchy: BIU and chipset handshake paths which still require one 50 MHz
+# cycle remain fully timed.
+set at_no_debug 0
+set at_debug_cpu_div2 0
+foreach_in_collection a [get_all_global_assignments -name VERILOG_MACRO] {
+    if {[lindex $a 2] eq "SPK286_AT_NO_DEBUG"} { set at_no_debug 1 }
+    if {[lindex $a 2] eq "SPK286_AT_DEBUG_CPU_DIV2"} { set at_debug_cpu_div2 1 }
+}
+if {$at_no_debug && $at_debug_cpu_div2} {
+    error "SPK286_AT_DEBUG_CPU_DIV2 requires the debug observer"
+}
+if {$at_debug_cpu_div2} {
+    set at_debug_cpu_clock_pin [get_pins -nowarn {*|at_debug_cpu_clock_q|q}]
+    if {[get_collection_size $at_debug_cpu_clock_pin] != 1} {
+        error "AT debug CPU clock divider missing/ambiguous"
+    }
+    create_generated_clock -name AT_DEBUG_CPU_CLK -source [get_ports FPGA_CLK2_50] \
+        -divide_by 2 $at_debug_cpu_clock_pin
+    set AT_CPU [at_clock AT_DEBUG_CPU_CLK]
+} else {
+    set AT_CPU [at_clock FPGA_CLK2_50]
+}
+
 set AT_VIDEO [at_clock {emu|u_at_video_pll|pll_system_inst|altera_pll_i|general[0].gpll~PLL_OUTPUT_COUNTER|divclk}]
 set AT_VIDEO_X2 [at_clock {emu|u_at_video_pll|pll_system_inst|altera_pll_i|general[1].gpll~PLL_OUTPUT_COUNTER|divclk}]
 set AT_VIDEO_OUT [at_clock {emu|u_at_video_pll|pll_system_inst|altera_pll_i|general[2].gpll~PLL_OUTPUT_COUNTER|divclk}]

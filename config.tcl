@@ -5,7 +5,10 @@ set_global_assignment -name VERILOG_MACRO "SPK286_AT_CDC"
 set_global_assignment -name VERILOG_MACRO "SPK286_P05_PARALLEL_LIMIT_CHECK"
 # The release build remains observer-free. Comment NO_DEBUG to build the
 # compact single-page hardware observer used for fault diagnosis.
-# set_global_assignment -name VERILOG_MACRO "SPK286_AT_NO_DEBUG"
+set_global_assignment -name VERILOG_MACRO "SPK286_AT_NO_DEBUG"
+# With NO_DEBUG commented, this optional diagnostic mode runs only SPK286 at
+# 25 MHz. Leave it disabled for the normal 50 MHz observer build.
+# set_global_assignment -name VERILOG_MACRO "SPK286_AT_DEBUG_CPU_DIV2"
 
 # Non-Sound-Blaster audio devices carried over from the source XT profile.
 # Sound Blaster remains intentionally absent from this AT build.

@@ -520,6 +520,8 @@ module emu_at
     wire [15:0] at_debug_cs;
     wire [15:0] at_debug_ip;
     wire [15:0] at_debug_flags;
+    wire [127:0] at_debug_gpr;
+    wire        at_debug_instruction_retired;
     wire        at_debug_fetch_blocked;
     wire [11:0] at_debug_micro_pc;
     wire [3:0]  at_debug_bus_state;
@@ -536,6 +538,14 @@ module emu_at
     wire        at_debug_ready;
     wire        at_debug_hold_request;
     wire        at_debug_bridge_idle;
+    wire [3:0]  at_debug_bridge_state;
+    wire        at_debug_read_data_valid;
+    wire        at_debug_dma_bus_request;
+    wire        at_debug_refresh_request;
+    wire        at_debug_dma_grant;
+    wire        at_debug_refresh_grant;
+    wire        at_debug_intr;
+    wire [15:0] at_debug_irq_request;
     wire        at_speaker_active;
     wire        at_speaker_level;
     wire signed [15:0] at_opl2_sound;
@@ -573,6 +583,7 @@ module emu_at
     wire [15:0] backend_read_data;
     wire        backend_read_data_valid;
     wire        memory_port_protocol_error;
+    wire [4:0]  memory_port_debug_state;
 
     wire        p03_out_valid;
     wire        p03_out_command_valid;
@@ -598,6 +609,7 @@ module emu_at
     wire [31:0] p03_fill_count;
     wire [31:0] p03_physical_read_count;
     wire [31:0] p03_invalidation_count;
+    wire [4:0]  p03_debug_state;
 
     // Keep the existing logical-backend debug names pointed at the response
     // seen by the memory port. The physical owner handshake is intentionally
@@ -657,6 +669,7 @@ module emu_at
         .backend_ready          (p03_in_ready),
         .backend_read_data      (p03_in_read_data),
         .backend_read_data_valid(p03_in_read_data_valid),
+        .debug_state            (memory_port_debug_state),
         .protocol_error         (memory_port_protocol_error)
     );
 
@@ -704,10 +717,12 @@ module emu_at
         .debug_miss_count        (p03_miss_count),
         .debug_fill_count        (p03_fill_count),
         .debug_physical_read_count(p03_physical_read_count),
-        .debug_invalidation_count(p03_invalidation_count)
+        .debug_invalidation_count(p03_invalidation_count),
+        .debug_state             (p03_debug_state)
     );
 
     wire        sdram_owner_protocol_error;
+    wire [7:0]  sdram_owner_debug_state;
     spk286_at_mister_sdram_owner u_at_sdram_owner (
         .clk                    (CLK_50M),
         .reset                  (RESET),
@@ -726,6 +741,7 @@ module emu_at
         .request_read_data      (p03_out_read_data),
         .request_read_data_valid(p03_out_read_data_valid),
         .physical_idle          (physical_idle),
+        .debug_state            (sdram_owner_debug_state),
         .protocol_error         (sdram_owner_protocol_error),
         .sdram_address           (sdram_address),
         .sdram_cke               (sdram_cke),
@@ -892,8 +908,39 @@ module emu_at
     // AT286CTL is clocked by the AT bus and its effective video fields are
     // fed to the EGA/VGA adapter through the machine boundary.
 
-    spk286_at_machine u_at_machine (
+`ifndef SPK286_AT_NO_DEBUG
+`ifdef SPK286_AT_DEBUG_CPU_DIV2
+    // Optional diagnostic configuration: run only SPK286 from a related
+    // 25 MHz clock while the chipset, memory pipeline and SDRAM remain at
+    // 50 MHz. The ordinary observer build keeps the CPU at 50 MHz.
+    (* preserve, altera_attribute = "-name GLOBAL_SIGNAL GLOBAL_CLOCK" *)
+    logic at_debug_cpu_clock_q;
+    always_ff @(posedge CLK_50M or posedge RESET) begin
+        if (RESET)
+            at_debug_cpu_clock_q <= 1'b0;
+        else
+            at_debug_cpu_clock_q <= ~at_debug_cpu_clock_q;
+    end
+    wire at_cpu_clock = at_debug_cpu_clock_q;
+    wire at_cpu_sample_edge = ~at_debug_cpu_clock_q;
+    localparam logic AT_CPU_DIV2_ENABLED = 1'b1;
+`else
+    wire at_cpu_clock = CLK_50M;
+    wire at_cpu_sample_edge = 1'b1;
+    localparam logic AT_CPU_DIV2_ENABLED = 1'b0;
+`endif
+`else
+    wire at_cpu_clock = CLK_50M;
+    wire at_cpu_sample_edge = 1'b1;
+    localparam logic AT_CPU_DIV2_ENABLED = 1'b0;
+`endif
+
+    spk286_at_machine #(
+        .CPU_USES_SAMPLE_EDGE(AT_CPU_DIV2_ENABLED)
+    ) u_at_machine (
         .clk                    (CLK_50M),
+        .clk_cpu                (at_cpu_clock),
+        .cpu_sample_edge        (at_cpu_sample_edge),
         // Keep the AT devices and EGA raster alive during the splash.  Only
         // the CPU/BIU reset is extended over the splash interval.
         .reset                  (at_boot_reset),
@@ -963,6 +1010,10 @@ module emu_at
         .cpu_halted             (at_cpu_halted),
         .cpu_shutdown           (at_cpu_shutdown),
 `ifndef SPK286_AT_NO_DEBUG
+        .intr                   (at_debug_intr),
+        .irq_request            (at_debug_irq_request),
+        .dma_grant              (at_debug_dma_grant),
+        .refresh_grant          (at_debug_refresh_grant),
         .debug_bridge_error     (at_debug_bridge_error),
         .debug_control_error    (at_debug_control_error),
         .debug_unsupported_opcode(at_debug_unsupported_opcode),
@@ -976,7 +1027,8 @@ module emu_at
         .debug_cs_base          (),
         .debug_ip               (at_debug_ip),
         .debug_flags            (at_debug_flags),
-        .debug_gpr              (),
+        .debug_gpr              (at_debug_gpr),
+        .debug_instruction_retired(at_debug_instruction_retired),
         .debug_segment_selectors(),
         .debug_fetch_blocked    (at_debug_fetch_blocked),
         .debug_fetch_cursor     (),
@@ -1013,6 +1065,10 @@ module emu_at
         .debug_at_memory_projection(),
         .debug_at_cycle_active  (),
         .debug_at_ready         (at_debug_ready),
+        .debug_at_read_data_valid(at_debug_read_data_valid),
+        .debug_dma_bus_request  (at_debug_dma_bus_request),
+        .debug_refresh_request  (at_debug_refresh_request),
+        .debug_bridge_state     (at_debug_bridge_state),
         .cpu_hold_request       (at_debug_hold_request),
         .bridge_idle            (at_debug_bridge_idle),
 `endif
@@ -1165,7 +1221,8 @@ module emu_at
 `ifndef SPK286_AT_NO_DEBUG
     // The single-page overlay is passive and never drives the machine.
     spk286_debug_min_overlay #(
-        .COLW(8)
+        .COLW(8),
+        .CPU_DIV2(AT_CPU_DIV2_ENABLED)
     ) u_at_debug_overlay (
         .rst                    (at_video_pipe_reset_57_ps),
         .src_rst                (at_boot_reset),
@@ -1192,11 +1249,16 @@ module emu_at
         .cpu_cs                 (at_debug_cs),
         .cpu_ip                 (at_debug_ip),
         .cpu_flags              (at_debug_flags),
+        .cpu_cx                 (at_debug_gpr[31:16]),
         .cpu_micro_pc           (at_debug_micro_pc),
         .cpu_biu_state          (at_debug_bus_state),
         .cpu_fetch_blocked      (at_debug_fetch_blocked),
         .cpu_ready              (at_cpu_ready),
         .cpu_bus_valid          (at_cpu_bus_valid),
+        .cpu_hlda               (at_cpu_hlda),
+        .instruction_retired    (at_debug_instruction_retired),
+        .irq8                   (at_debug_irq_request[8]),
+        .cpu_intr               (at_debug_intr),
         .last_post              (at_debug_last_post),
         .trace0                 (at_debug_trace0),
         .at_address             (at_debug_address),
@@ -1207,8 +1269,17 @@ module emu_at
         .at_write               (at_debug_write),
         .at_io                  (at_debug_io),
         .at_ready               (at_debug_ready),
+        .at_read_data_valid     (at_debug_read_data_valid),
         .bridge_idle            (at_debug_bridge_idle),
+        .bridge_state           (at_debug_bridge_state),
         .hold_request           (at_debug_hold_request),
+        .dma_request            (at_debug_dma_bus_request),
+        .refresh_request        (at_debug_refresh_request),
+        .dma_grant              (at_debug_dma_grant),
+        .refresh_grant          (at_debug_refresh_grant),
+        .memory_port_state      (memory_port_debug_state),
+        .read_buffer_state      (p03_debug_state),
+        .sdram_owner_state      (sdram_owner_debug_state),
         .biu_detail             (at_debug_biu_detail),
         .HB_out                 (at_debug_hb_out),
         .VB_out                 (at_debug_vb_out),

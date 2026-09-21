@@ -7,7 +7,9 @@
 
 module spk286_debug_min_overlay #(
     parameter integer COLW = 8,
-    parameter integer BLANK_WATCHDOG_WIDTH = 18
+    parameter integer BLANK_WATCHDOG_WIDTH = 18,
+    parameter integer SNAPSHOT_TIMER_WIDTH = 20,
+    parameter logic CPU_DIV2 = 1'b0
 ) (
     input  logic              rst,
     input  logic              src_rst,
@@ -32,11 +34,16 @@ module spk286_debug_min_overlay #(
     input  logic [15:0]       cpu_cs,
     input  logic [15:0]       cpu_ip,
     input  logic [15:0]       cpu_flags,
+    input  logic [15:0]       cpu_cx,
     input  logic [11:0]       cpu_micro_pc,
     input  logic [3:0]        cpu_biu_state,
     input  logic              cpu_fetch_blocked,
     input  logic              cpu_ready,
     input  logic              cpu_bus_valid,
+    input  logic              cpu_hlda,
+    input  logic              instruction_retired,
+    input  logic              irq8,
+    input  logic              cpu_intr,
     input  logic [7:0]        last_post,
     input  logic [31:0]       trace0,
     input  logic [19:0]       at_address,
@@ -47,8 +54,17 @@ module spk286_debug_min_overlay #(
     input  logic              at_write,
     input  logic              at_io,
     input  logic              at_ready,
+    input  logic              at_read_data_valid,
     input  logic              bridge_idle,
+    input  logic [3:0]        bridge_state,
     input  logic              hold_request,
+    input  logic              dma_request,
+    input  logic              refresh_request,
+    input  logic              dma_grant,
+    input  logic              refresh_grant,
+    input  logic [4:0]        memory_port_state,
+    input  logic [4:0]        read_buffer_state,
+    input  logic [7:0]        sdram_owner_state,
     input  logic [7:0]        biu_detail,
 
     output logic              HB_out,
@@ -67,11 +83,16 @@ module spk286_debug_min_overlay #(
         logic [15:0] cpu_cs;
         logic [15:0] cpu_ip;
         logic [15:0] cpu_flags;
+        logic [15:0] cpu_cx;
         logic [11:0] cpu_micro_pc;
         logic [3:0]  cpu_biu_state;
         logic        cpu_fetch_blocked;
         logic        cpu_ready;
         logic        cpu_bus_valid;
+        logic        cpu_hlda;
+        logic [15:0] instruction_count;
+        logic        irq8;
+        logic        cpu_intr;
         logic [7:0]  last_post;
         logic [31:0] trace0;
         logic [19:0] at_address;
@@ -82,8 +103,17 @@ module spk286_debug_min_overlay #(
         logic        at_write;
         logic        at_io;
         logic        at_ready;
+        logic        at_read_data_valid;
         logic        bridge_idle;
+        logic [3:0]  bridge_state;
         logic        hold_request;
+        logic        dma_request;
+        logic        refresh_request;
+        logic        dma_grant;
+        logic        refresh_grant;
+        logic [4:0]  memory_port_state;
+        logic [4:0]  read_buffer_state;
+        logic [7:0]  sdram_owner_state;
         logic [7:0]  biu_detail;
     } debug_state_t;
 
@@ -92,6 +122,7 @@ module spk286_debug_min_overlay #(
     debug_state_t video_snapshot = '0;
     logic [7:0] source_sequence = 8'd0;
     logic [7:0] video_sequence = 8'd0;
+    logic [15:0] instruction_count = 16'd0;
 
     always_comb begin
         state_async.cpu_reset         = cpu_reset;
@@ -105,11 +136,16 @@ module spk286_debug_min_overlay #(
         state_async.cpu_cs            = cpu_cs;
         state_async.cpu_ip            = cpu_ip;
         state_async.cpu_flags         = cpu_flags;
+        state_async.cpu_cx            = cpu_cx;
         state_async.cpu_micro_pc      = cpu_micro_pc;
         state_async.cpu_biu_state     = cpu_biu_state;
         state_async.cpu_fetch_blocked = cpu_fetch_blocked;
         state_async.cpu_ready         = cpu_ready;
         state_async.cpu_bus_valid     = cpu_bus_valid;
+        state_async.cpu_hlda          = cpu_hlda;
+        state_async.instruction_count = instruction_count;
+        state_async.irq8              = irq8;
+        state_async.cpu_intr          = cpu_intr;
         state_async.last_post         = last_post;
         state_async.trace0            = trace0;
         state_async.at_address        = at_address;
@@ -120,8 +156,17 @@ module spk286_debug_min_overlay #(
         state_async.at_write          = at_write;
         state_async.at_io             = at_io;
         state_async.at_ready          = at_ready;
+        state_async.at_read_data_valid = at_read_data_valid;
         state_async.bridge_idle       = bridge_idle;
+        state_async.bridge_state      = bridge_state;
         state_async.hold_request      = hold_request;
+        state_async.dma_request       = dma_request;
+        state_async.refresh_request   = refresh_request;
+        state_async.dma_grant         = dma_grant;
+        state_async.refresh_grant     = refresh_grant;
+        state_async.memory_port_state = memory_port_state;
+        state_async.read_buffer_state = read_buffer_state;
+        state_async.sdram_owner_state = sdram_owner_state;
         state_async.biu_detail        = biu_detail;
     end
 
@@ -132,7 +177,7 @@ module spk286_debug_min_overlay #(
     (* ASYNC_REG = "TRUE" *) logic snapshot_request_src2 = 1'b0;
     (* ASYNC_REG = "TRUE" *) logic snapshot_ack_video1 = 1'b0;
     (* ASYNC_REG = "TRUE" *) logic snapshot_ack_video2 = 1'b0;
-    logic previous_snapshot_vb = 1'b0;
+    logic [SNAPSHOT_TIMER_WIDTH-1:0] snapshot_timer = '0;
 
     always_ff @(posedge src_clk) begin
         if (src_rst) begin
@@ -141,7 +186,10 @@ module spk286_debug_min_overlay #(
             snapshot_acknowledge  <= 1'b0;
             source_snapshot       <= '0;
             source_sequence       <= 8'd0;
+            instruction_count     <= 16'd0;
         end else begin
+            if (instruction_retired)
+                instruction_count <= instruction_count + 16'd1;
             snapshot_request_src1 <= snapshot_request;
             snapshot_request_src2 <= snapshot_request_src1;
             if (snapshot_request_src2 != snapshot_acknowledge) begin
@@ -160,14 +208,22 @@ module spk286_debug_min_overlay #(
             snapshot_acknowledge_seen <= 1'b0;
             video_snapshot            <= '0;
             video_sequence            <= 8'd0;
-            previous_snapshot_vb      <= 1'b0;
+            snapshot_timer            <= '0;
         end else begin
             snapshot_ack_video1  <= snapshot_acknowledge;
             snapshot_ack_video2  <= snapshot_ack_video1;
-            previous_snapshot_vb <= VB;
-            if (VB && !previous_snapshot_vb &&
-                (snapshot_ack_video2 == snapshot_request))
-                snapshot_request <= ~snapshot_request;
+            // Keep diagnostic sampling alive even while BIOS video setup
+            // suppresses or corrupts vertical blanking.  A VB-triggered
+            // mailbox can otherwise freeze on an arbitrary bus phase and
+            // make a display failure look like a stopped CPU transaction.
+            if (snapshot_ack_video2 == snapshot_request) begin
+                if (&snapshot_timer) begin
+                    snapshot_request <= ~snapshot_request;
+                    snapshot_timer   <= '0;
+                end else
+                    snapshot_timer <= snapshot_timer + 1'b1;
+            end else
+                snapshot_timer <= '0;
             if (snapshot_ack_video2 != snapshot_acknowledge_seen) begin
                 video_snapshot            <= source_snapshot;
                 video_sequence            <= source_sequence;
@@ -287,7 +343,7 @@ module spk286_debug_min_overlay #(
     wire in_area = (render_hpos >= HOFFSET) &&
                    (render_hpos < HOFFSET + 10'd224) &&
                    (render_vpos >= VOFFSET) &&
-                   (render_vpos < VOFFSET + 10'd104);
+                   (render_vpos < VOFFSET + 10'd128);
 
     logic [6:0] character;
     integer nibble_shift;
@@ -296,7 +352,9 @@ module spk286_debug_min_overlay #(
         character = 7'd32;
         nibble_shift = 0;
         case (row)
-            4'd0: character = text_at("SPK286 MIN DEBUG", 16, col);
+            4'd0: character = CPU_DIV2
+                ? text_at("SPK286 MIN DEBUG /2", 19, col)
+                : text_at("SPK286 MIN DEBUG", 16, col);
             4'd1: begin
                 character = text_at("RASTER:N", 8, col);
                 if (col == 7)
@@ -324,11 +382,14 @@ module spk286_debug_min_overlay #(
                     character = hex_digit(video_snapshot.cpu_biu_state);
             end
             4'd4: begin
-                character = text_at("FLAGS:0000 FB:0", 15, col);
+                character = text_at("FLAGS:0000 CX:0000 FB:0", 23, col);
                 if ((col >= 6) && (col <= 9)) begin
                     nibble_shift = (9 - col) * 4;
                     character = hex_digit(video_snapshot.cpu_flags[nibble_shift +: 4]);
-                end else if (col == 14)
+                end else if ((col >= 14) && (col <= 17)) begin
+                    nibble_shift = (17 - col) * 4;
+                    character = hex_digit(video_snapshot.cpu_cx[nibble_shift +: 4]);
+                end else if (col == 22)
                     character = bit_digit(video_snapshot.cpu_fetch_blocked);
             end
             4'd5: begin
@@ -346,7 +407,7 @@ module spk286_debug_min_overlay #(
                 else if (col == 22) character = bit_digit(video_snapshot.errors[4]);
             end
             4'd7: begin
-                character = text_at("POST:00 RDY:0 VLD:0", 19, col);
+                character = text_at("POST:00 RDY:0 VLD:0 RET:0000", 28, col);
                 if ((col >= 5) && (col <= 6)) begin
                     nibble_shift = (6 - col) * 4;
                     character = hex_digit(video_snapshot.last_post[nibble_shift +: 4]);
@@ -354,6 +415,10 @@ module spk286_debug_min_overlay #(
                     character = bit_digit(video_snapshot.cpu_ready);
                 else if (col == 18)
                     character = bit_digit(video_snapshot.cpu_bus_valid);
+                else if ((col >= 24) && (col <= 27)) begin
+                    nibble_shift = (27 - col) * 4;
+                    character = hex_digit(video_snapshot.instruction_count[nibble_shift +: 4]);
+                end
             end
             4'd8: begin
                 character = text_at("AT A:00000 S:0 V:0", 18, col);
@@ -387,6 +452,30 @@ module spk286_debug_min_overlay #(
                 end
             end
             4'd11: begin
+                character = text_at("IRQ8:0 INT:0 HLDA:0", 19, col);
+                if (col == 5)
+                    character = bit_digit(video_snapshot.irq8);
+                else if (col == 11)
+                    character = bit_digit(video_snapshot.cpu_intr);
+                else if (col == 18)
+                    character = bit_digit(video_snapshot.cpu_hlda);
+            end
+            4'd12: begin
+                character = text_at("DMA:0/0 REF:0/0 BR:0 DV:0", 25, col);
+                if (col == 4)
+                    character = bit_digit(video_snapshot.dma_request);
+                else if (col == 6)
+                    character = bit_digit(video_snapshot.dma_grant);
+                else if (col == 12)
+                    character = bit_digit(video_snapshot.refresh_request);
+                else if (col == 14)
+                    character = bit_digit(video_snapshot.refresh_grant);
+                else if (col == 19)
+                    character = hex_digit(video_snapshot.bridge_state);
+                else if (col == 24)
+                    character = bit_digit(video_snapshot.at_read_data_valid);
+            end
+            4'd13: begin
                 character = text_at("LAST R A:00000 D:00 S:0", 23, col);
                 if (col == 5)
                     character = video_snapshot.trace0[0] ? 7'd87 : 7'd82;
@@ -399,10 +488,37 @@ module spk286_debug_min_overlay #(
                 end else if (col == 22)
                     character = hex_digit({1'b0, video_snapshot.trace0[3:1]});
             end
-            4'd12: begin
-                character = text_at("SNAP:00", 7, col);
-                if ((col >= 5) && (col <= 6)) begin
-                    nibble_shift = (6 - col) * 4;
+            4'd14: begin
+                character = text_at("MP A:0 K:0 O:0 C:0 BF:0/0/0", 27, col);
+                if (col == 5)
+                    character = bit_digit(video_snapshot.memory_port_state[4]);
+                else if (col == 9)
+                    character = bit_digit(video_snapshot.memory_port_state[3]);
+                else if (col == 13)
+                    character = hex_digit({2'b00, video_snapshot.memory_port_state[2:1]});
+                else if (col == 17)
+                    character = bit_digit(video_snapshot.memory_port_state[0]);
+                else if (col == 22)
+                    character = hex_digit({2'b00, video_snapshot.read_buffer_state[4:3]});
+                else if (col == 24)
+                    character = bit_digit(video_snapshot.read_buffer_state[2]);
+                else if (col == 26)
+                    character = bit_digit(video_snapshot.read_buffer_state[1]);
+            end
+            4'd15: begin
+                character = text_at("SD:0/0/0 K:0 F:0 SNAP:00", 24, col);
+                if (col == 3)
+                    character = bit_digit(video_snapshot.sdram_owner_state[7]);
+                else if (col == 5)
+                    character = bit_digit(video_snapshot.sdram_owner_state[6]);
+                else if (col == 7)
+                    character = bit_digit(video_snapshot.sdram_owner_state[5]);
+                else if (col == 11)
+                    character = bit_digit(video_snapshot.sdram_owner_state[3]);
+                else if (col == 15)
+                    character = hex_digit({1'b0, video_snapshot.sdram_owner_state[2:0]});
+                else if ((col >= 22) && (col <= 23)) begin
+                    nibble_shift = (23 - col) * 4;
                     character = hex_digit(video_sequence[nibble_shift +: 4]);
                 end
             end

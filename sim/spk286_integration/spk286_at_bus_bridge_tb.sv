@@ -70,7 +70,7 @@ module spk286_at_bus_bridge_tb;
     end
 
     spk286_at_bus_bridge dut (
-        .clk(clk), .reset(reset),
+        .clk(clk), .reset(reset), .cpu_sample_edge(1'b1),
         .cpu_bus_valid(cpu_bus_valid), .cpu_address(cpu_address),
         .cpu_data_out(cpu_data_out), .cpu_data_oe(cpu_data_oe),
         .cpu_bus_write(cpu_bus_write), .cpu_bus_bhe_n(cpu_bus_bhe_n),

@@ -486,7 +486,7 @@ module spk286_at_machine_tb;
     );
 
     spk286_at_machine dut (
-        .clk(clk), .reset(reset), .cpu_reset(reset), .clk_video(clk_video), .splashscreen(1'b0),
+        .clk(clk), .clk_cpu(clk), .cpu_sample_edge(1'b1), .reset(reset), .cpu_reset(reset), .clk_video(clk_video), .splashscreen(1'b0),
         .at286ctl_eff_mpu401(runtime_mpu_enable),
         .midi_baudce(1'b1), .uart_baudce(1'b1), .midi_rx(runtime_midi_rx),
         .uart2_rx(1'b1), .uart2_cts_n(1'b1), .uart2_dsr_n(1'b1),

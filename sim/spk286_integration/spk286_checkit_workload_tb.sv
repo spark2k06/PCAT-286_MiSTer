@@ -83,7 +83,8 @@ module spk286_checkit_workload_tb;
     );
 
     spk286_at_bus_bridge bridge (
-        .clk(clk), .reset(cpu_reset), .cpu_bus_valid(bus_valid),
+        .clk(clk), .reset(cpu_reset), .cpu_sample_edge(1'b1),
+        .cpu_bus_valid(bus_valid),
         .cpu_address(address), .cpu_data_out(data_out), .cpu_data_oe(data_oe),
         .cpu_bus_write(bus_write), .cpu_bus_bhe_n(bus_bhe_n),
         .cpu_bus_status(bus_status), .cpu_bus_lock(bus_lock),

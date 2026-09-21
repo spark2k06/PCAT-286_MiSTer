@@ -42,7 +42,8 @@ hacer el hardware.
 | `ADh/AEh` | Deshabilitar/habilitar interfaz | Estado privado | Sí | Sí | Estado y bit 4 del byte de mando |
 | `C0h` leer puerto de entrada | Imagen de configuración 5170 | No | Valor fijo `80h` | Modelo de P1 | `A0h`: interfaz no inhibida, EGA/color, jumper ausente, 512 KiB planar |
 | `D0h/D1h` | Leer/escribir puerto de salida | Sólo escritura | Sí | Sí | Lectura y escritura |
-| `E0h` leer T0/T1 | Estado de reloj/datos | No | No usado | Modelo fijo | `03h`, ambas líneas decodificadas en reposo alto |
+| `E0h` leer T0/T1 | Estado de reloj/datos (bit 0 = reloj, bit 1 = datos) | No | No usado | `00h` | `00h`, estado sin fallo compatible con Phoenix; el perfil no expone los pines eléctricos T0/T1 |
+| Escribir `FFh` en `60h` | El teclado devuelve `FAh` (ACK), luego `AAh` (BAT completado) | Ignorado | Dispositivo de teclado AT emulado | Secuencia ACK/BAT | Respuesta virtual `FAh`, seguida de `AAh` |
 | Estado bit 4 | Interruptor físico de inhibición | Confundido con enable interno | Fijo según modelo | Modelo de P1 | Uno: interruptor abierto |
 | Estado bit 3 | Última escritura fue comando/dato | Siempre cero | Sí | Sí | Sí |
 | Estado bit 2 | System flag | Siempre uno | Sí | Sí | Cero al reset; `AAh` o byte de mando lo actualizan |

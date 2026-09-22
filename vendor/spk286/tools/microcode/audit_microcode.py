@@ -69,6 +69,11 @@ STATEMENTS.update({131: 'IO_READ8 TMP1 -> TMP0', 132: 'IO_READ16 TMP1 -> TMP0', 
 STATEMENTS.update({166: 'SYSTEM_ARPL_CHECK', 167: 'SYSTEM_ARPL', 168: 'SYSTEM_CLTS', 169: 'TASK_SWITCH', 170: 'TASK_RETURN'})
 STATEMENTS[171] = 'CARRY_FILL8 TMP0'
 STATEMENTS[172] = 'LOADALL'
+STATEMENTS.update({181: 'FETCH_ALU_DST16_IMM16', 182: 'FETCH_ALU_DST8_IMM8',
+                   183: 'FETCH_ALU_RM16_IMM16', 184: 'FETCH_ALU_RM16_IMM8S',
+                   185: 'FETCH_ALU_RM8_IMM8', 186: 'FETCH_MOV_DST16_IMM16',
+                   187: 'FETCH_MOV_DST8_IMM8', 188: 'FETCH_MOV_RM16_IMM16',
+                   189: 'FETCH_MOV_RM8_IMM8'})
 STATEMENTS.update({151: 'VALIDATE_EVENT_GATE', 152: 'EVENT_GATE_IP -> TMP0',
                    153: 'EVENT_GATE_CS -> TMP1', 154: 'CLEAR_EVENT_FLAGS',
                    155: 'PUSH_EVENT_ERROR', 156: 'VALIDATE_IRET_CS',
@@ -159,6 +164,12 @@ def read_generated_words(package: str, rom: str) -> tuple[int, ...]:
     if dimension('MC_FORMAT_VERSION') >= 21:
         expected['CARRY_FILL8'] = 171
         expected['LOADALL'] = 172
+    if dimension('MC_FORMAT_VERSION') >= 23:
+        expected.update({'FETCH_ALU_DST16_IMM16': 181, 'FETCH_ALU_DST8_IMM8': 182,
+                         'FETCH_ALU_RM16_IMM16': 183, 'FETCH_ALU_RM16_IMM8S': 184,
+                         'FETCH_ALU_RM8_IMM8': 185, 'FETCH_MOV_DST16_IMM16': 186,
+                         'FETCH_MOV_DST8_IMM8': 187, 'FETCH_MOV_RM16_IMM16': 188,
+                         'FETCH_MOV_RM8_IMM8': 189})
     if dimension('MC_FORMAT_VERSION') >= 16:
         expected.update({'BRANCH_REPEAT_EMPTY': 121, 'STEP_STRING_SOURCE': 122, 'STEP_STRING_DEST': 123, 'REPEAT_COUNT': 124, 'READ_STRING_TMP0': 125, 'READ_STRING_TMP1': 126, 'WRITE_STRING_TMP0': 127, 'BRANCH_REPEAT_CONTINUE': 128, 'READ_STRING_ACCUMULATOR': 129, 'WRITE_STRING_ACCUMULATOR': 130})
     if dimension('MC_FORMAT_VERSION') >= 14:
@@ -238,6 +249,8 @@ def canonical_source(words, entries, labels=None, branch_targets=None):
         version = 21
     if any(173 <= w <= 180 for w in words):
         version = 22
+    if any(w > 180 for w in words):
+        version = 23
     lines = [f"microcode_format {version}"]
     for address, word in enumerate(words[:used]):
         if address in by_address:
@@ -311,7 +324,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, default=ROOT / "build/microcode-audit")
     parser.add_argument("--contract", type=Path,
-                        default=ROOT / "tests/fixtures/microcode_register_execution.json")
+                        default=ROOT / "tests/fixtures/microcode_immediate_execution.json")
     args = parser.parse_args()
     audit(args.output, args.contract)
 

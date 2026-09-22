@@ -2042,3 +2042,32 @@ Capture and execution are useful work, not historical timing states. The
 two-clock execution interval excludes opcode dispatch, retirement boundaries
 and instruction-byte starvation. See the downstream integration receipt in
 `docs/optimization/REGISTER_EXECUTION_50MHZ.md` at the PCAT repository root.
+
+## Immediate execution extension — format 23
+
+Controls 181..189 add `FETCH_ALU_DST16_IMM16`, `FETCH_ALU_DST8_IMM8`,
+`FETCH_ALU_RM16_IMM16`, `FETCH_ALU_RM16_IMM8S`, `FETCH_ALU_RM8_IMM8`,
+`FETCH_MOV_DST16_IMM16`, `FETCH_MOV_DST8_IMM8`, `FETCH_MOV_RM16_IMM16`
+and `FETCH_MOV_RM8_IMM8`. They acquire one or two immediate bytes under the
+existing queue handshake. `IMM8S` sign-extends its byte to a word.
+
+For a register destination, the last accepted immediate byte captures the
+source constant and original destination; the following enabled clock commits
+and retires through the shared format-22 execution stage. CMP/TEST suppress
+the GPR write, ALU operations use the existing decoded FLAGS/undefined masks,
+and MOV preserves FLAGS. No following opcode byte is consumed while commit
+is pending. Start, cancel and reset clear both partial and completed capture.
+
+RM controls follow a complete `DECODE_MODRM`. Memory destinations acquire the
+immediate into the same temporary and fall through at the same edge as before;
+they retain the original protection, operand service, result and FLAGS sequence.
+The compiler requires the exact complete width/destination/memory protocol.
+Accumulator/register-immediate entries retain their historical tail in the
+image for stable symbols; their new first control retires before that tail.
+
+Exactly nine words change relative to format 22. All 122 entries, labels,
+branch targets and the 723-word layout remain fixed; address/control widths
+remain ten/eight bits. The frozen format-22 contract remains independently
+executable, and a separate format-23 fixture specifies the literal delta.
+
+See [the immediate execution receipt](../../docs/optimization/IMMEDIATE_EXECUTION_50MHZ.md).

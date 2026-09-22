@@ -1,7 +1,7 @@
-microcode_format 22
+microcode_format 23
 # Explicit byte widths; original word and event programs retain their controls.
 instruction MOV_R8_IMM8:
-    FETCH_IMM8 -> TMP0
+    FETCH_MOV_DST8_IMM8
     TMP0 -> DST8
     END
 instruction MOV_RM8_R8:
@@ -16,12 +16,12 @@ instruction MOV_R8_RM8:
     END
 instruction MOV_RM8_IMM8:
     DECODE_MODRM
-    FETCH_IMM8 -> TMP0
+    FETCH_MOV_RM8_IMM8
     TMP0 -> RM8
     END
 instruction MOV_RM16_IMM16:
     DECODE_MODRM
-    FETCH_IMM16 -> TMP0
+    FETCH_MOV_RM16_IMM16
     TMP0 -> RM16
     END
 instruction ALU_RM8_R8:
@@ -41,7 +41,7 @@ instruction ALU_R8_RM8:
     COMMIT_FLAGS
     END
 instruction ALU_AL_IMM8:
-    READ_DST8 -> TMP0
+    FETCH_ALU_DST8_IMM8
     FETCH_IMM8 -> TMP1
     ALU DECODED TMP0, TMP1 -> TMP2 FLAGS_DECODED
     TMP2 -> DST8 IF_WRITE
@@ -49,7 +49,7 @@ instruction ALU_AL_IMM8:
     END
 instruction ALU_RM8_IMM8:
     DECODE_MODRM
-    FETCH_IMM8 -> TMP1
+    FETCH_ALU_RM8_IMM8
     READ_RM8 -> TMP0
     ALU DECODED TMP0, TMP1 -> TMP2 FLAGS_DECODED
     TMP2 -> RM8 IF_WRITE

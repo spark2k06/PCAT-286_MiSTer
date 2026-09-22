@@ -34,7 +34,8 @@ class RegisterExecutionMicrocodeTests(unittest.TestCase):
             address = baseline['entries'][entry]
             self.assertEqual(expected[address], 4)
             expected[address] = code
-        sources = {p.name: p.read_text() for p in (ROOT / 'microcode/source').glob('*.mc')}
+        sources = {'format22.mc': canonical_source(active['words'], active['entries'],
+                                                  active['labels'], {int(k): v for k, v in active['branch_targets'].items()})}
         program = compile_sources(sources)
         artifacts = generate(program)
         words = read_generated_words(artifacts['spk286_microcode_pkg.sv'],

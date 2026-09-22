@@ -1,8 +1,8 @@
-microcode_format 22
+microcode_format 23
 
 # One shared entry; the decoder supplies the word-register destination.
 instruction MOV_R16_IMM16:
-    FETCH_IMM16 -> TMP0
+    FETCH_MOV_DST16_IMM16
 writeback:
     TMP0 -> DST
     END

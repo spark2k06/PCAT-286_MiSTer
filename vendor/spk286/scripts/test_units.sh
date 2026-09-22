@@ -24,6 +24,7 @@ tests=(spk286_registers spk286_segments spk286_fetch spk286_core spk286_prefetch
 tests+=(spk286_system_0f spk286_system_0f_integration)
 tests+=(spk286_loadall_service spk286_loadall_integration spk286_loadall_protected)
 tests+=(spk286_register_execution)
+tests+=(spk286_immediate_execution spk286_immediate_throughput)
 if [[ "$unit" != all ]]; then tests=("$unit"); fi
 
 for name in "${tests[@]}"; do

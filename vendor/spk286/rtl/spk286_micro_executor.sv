@@ -23,6 +23,7 @@ module spk286_micro_executor (
     input logic [7:0] stack_segment_access,
     /* verilator lint_on UNUSEDSIGNAL */
     input logic operand_register_direct,
+    input logic [2:0] operand_rm_index,
     output logic address_override,
     output logic [15:0] address_offset,
     output logic io_transfer,
@@ -1225,6 +1226,39 @@ module spk286_micro_executor (
     logic [15:0] sequential_gpr_write_data;
     logic sequential_flags_write_en;
     logic [15:0] sequential_flags_write_data, sequential_flags_write_mask;
+    logic immediate_operation, immediate_alu, immediate_byte, immediate_rm;
+    logic immediate_word, immediate_signed, immediate_register, immediate_fetch;
+    logic immediate_last, immediate_capture;
+    logic [15:0] immediate_value;
+    always_comb begin
+        immediate_operation = 1'b1;
+        immediate_alu = 1'b0;
+        immediate_byte = 1'b0;
+        immediate_rm = 1'b0;
+        immediate_word = 1'b1;
+        immediate_signed = 1'b0;
+        case (operation)
+            spk286_microcode_pkg::MC_FETCH_ALU_DST16_IMM16: immediate_alu = 1'b1;
+            spk286_microcode_pkg::MC_FETCH_ALU_DST8_IMM8: begin immediate_alu = 1'b1; immediate_byte = 1'b1; immediate_word = 1'b0; end
+            spk286_microcode_pkg::MC_FETCH_ALU_RM16_IMM16: begin immediate_alu = 1'b1; immediate_rm = 1'b1; end
+            spk286_microcode_pkg::MC_FETCH_ALU_RM16_IMM8S: begin immediate_alu = 1'b1; immediate_rm = 1'b1; immediate_word = 1'b0; immediate_signed = 1'b1; end
+            spk286_microcode_pkg::MC_FETCH_ALU_RM8_IMM8: begin immediate_alu = 1'b1; immediate_rm = 1'b1; immediate_byte = 1'b1; immediate_word = 1'b0; end
+            spk286_microcode_pkg::MC_FETCH_MOV_DST16_IMM16: begin end
+            spk286_microcode_pkg::MC_FETCH_MOV_DST8_IMM8: begin immediate_byte = 1'b1; immediate_word = 1'b0; end
+            spk286_microcode_pkg::MC_FETCH_MOV_RM16_IMM16: immediate_rm = 1'b1;
+            spk286_microcode_pkg::MC_FETCH_MOV_RM8_IMM8: begin immediate_rm = 1'b1; immediate_byte = 1'b1; immediate_word = 1'b0; end
+            default: immediate_operation = 1'b0;
+        endcase
+    end
+    // ModR/M and all displacement bytes have already completed before these
+    // controls. Never consume the next opcode while a register commit is pending.
+    assign immediate_register = !immediate_rm || (decode_modrm_valid && operand_register_direct);
+    assign immediate_fetch = allowed && immediate_operation && !register_pending_q &&
+                             (!immediate_rm || decode_modrm_valid);
+    assign immediate_last = immediate_fetch && byte_valid && (!immediate_word || high_byte_q);
+    assign immediate_capture = immediate_last && immediate_register;
+    assign immediate_value = immediate_word ? {byte_data, (immediate_register || immediate_alu) ? tmp1_q[7:0] : tmp0_q[7:0]} :
+                             {{8{immediate_signed && byte_data[7]}}, byte_data};
     always_comb begin
         register_decode = 1'b1;
         register_alu = 1'b0;
@@ -1241,8 +1275,13 @@ module spk286_micro_executor (
             spk286_microcode_pkg::MC_DECODE_MOV_REG8_RM8: register_byte = 1'b1;
             default: register_decode = 1'b0;
         endcase
+        if (immediate_operation) begin
+            register_alu = immediate_alu;
+            register_byte = immediate_byte;
+        end
     end
-    assign register_a_index = register_destination_rm ? byte_data[2:0] : byte_data[5:3];
+    assign register_a_index = immediate_operation ? (immediate_rm ? operand_rm_index : destination) :
+                             register_destination_rm ? byte_data[2:0] : byte_data[5:3];
     assign register_b_index = register_destination_rm ? byte_data[5:3] : byte_data[2:0];
     assign register_a_value = register_byte ?
         {8'd0, register_state[register_a_index[1:0]*16 + (register_a_index[2] ? 8 : 0) +: 8]} :
@@ -1253,8 +1292,9 @@ module spk286_micro_executor (
     // Only the accepted ModR/M may capture operands, never displacement bytes.
     assign register_capture = allowed && register_decode && !decode_modrm_valid &&
                               decode_byte_ready && byte_valid && byte_data[7:6] == 2'b11;
-    assign register_complete = allowed && register_decode && register_pending_q &&
-                               operand_register_direct && decode_done;
+    assign register_complete = allowed && register_pending_q &&
+                               ((register_decode && operand_register_direct && decode_done) ||
+                                (immediate_operation && immediate_register));
     assign register_write = register_complete && (!register_alu || result_write_allowed);
     assign operation_retire = register_complete;
     assign gpr_write_en = sequential_gpr_write_en || register_write;
@@ -1303,8 +1343,8 @@ module spk286_micro_executor (
     assign read_operand = operand_request && !descriptor_active_q && !operand_check && !operand_write;
     assign compute_alu = allowed && operation == spk286_microcode_pkg::MC_ALU && temporary_valid_q[0] && temporary_valid_q[1] && !flags_valid_q;
     assign commit_flags = allowed && operation == spk286_microcode_pkg::MC_COMMIT_FLAGS && flags_valid_q && result_disposed_q;
-    assign byte_ready = fetch_word || fetch_signed_byte || fetch_byte || fetch_byte_tmp1 || (fetch_port && port_immediate) || decode_byte_ready;
-    assign operation_done = muldiv_complete || write_result_ax || write_result_dx || (fetch_port && (!port_immediate || byte_valid)) || string_empty || string_continue || string_index_write || string_count || string_read_acc || string_write_acc || add_allocation_sp || ((check_push2 || check_pop2) && !range_fault) || frame_read_gpr || frame_write_gpr || save_auxiliary || restore_auxiliary || save_allocation || load_counter ||
+    assign byte_ready = immediate_fetch || fetch_word || fetch_signed_byte || fetch_byte || fetch_byte_tmp1 || (fetch_port && port_immediate) || decode_byte_ready;
+    assign operation_done = register_complete || (immediate_last && !immediate_register) || muldiv_complete || write_result_ax || write_result_dx || (fetch_port && (!port_immediate || byte_valid)) || string_empty || string_continue || string_index_write || string_count || string_read_acc || string_write_acc || add_allocation_sp || ((check_push2 || check_pop2) && !range_fault) || frame_read_gpr || frame_write_gpr || save_auxiliary || restore_auxiliary || save_allocation || load_counter ||
                             carry_fill_byte || decrement_counter || counter_branch || begin_stack_cursor || read_stack_cursor || set_frame_address || decrement_frame_address || allocate_stack || set_ea_plus2 ||
                             ((check_push8 || check_pop8 || check_stack_word || check_rm32 || check_call_frame) && !range_fault) ||
                             (call_stack_validation_operation && (!call_gate_outer_required || call_stack_ready_q || (call_tss_operand_done && call_tss_phase_q == 2'd1))) ||
@@ -1780,9 +1820,19 @@ module spk286_micro_executor (
             if (write_result_dx) begin
                 auxiliary_valid_q <= 1'b0; result_high_pending_q <= 1'b0; result_disposed_q <= 1'b1;
             end
-            if (register_capture) begin
+            if (immediate_fetch && byte_valid) begin
+                if (immediate_word) high_byte_q <= !high_byte_q;
+                if (immediate_register || immediate_alu) begin
+                    tmp1_q <= (immediate_word && !high_byte_q) ? {8'd0, byte_data} : immediate_value;
+                    temporary_valid_q[1] <= immediate_last;
+                end else begin
+                    tmp0_q <= (immediate_word && !high_byte_q) ? {8'd0, byte_data} : immediate_value;
+                    temporary_valid_q[0] <= immediate_last;
+                end
+            end
+            if (register_capture || immediate_capture) begin
                 tmp0_q <= register_a_value;
-                tmp1_q <= register_b_value;
+                tmp1_q <= immediate_capture ? immediate_value : register_b_value;
                 temporary_valid_q[1:0] <= 2'b11;
                 register_destination_q <= register_a_index;
                 register_pending_q <= 1'b1;

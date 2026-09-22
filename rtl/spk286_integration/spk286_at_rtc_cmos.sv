@@ -87,13 +87,13 @@ module spk286_at_rtc_cmos (
     );
         begin
             // Total installed-RAM selections subtract the fixed 640 KiB
-            // conventional base. The 16 MiB class is bounded by the 286's
-            // 24-bit range and the high reset-vector BIOS alias.
+            // conventional base. The 16 MiB class follows the 16-bit-bus AT
+            // map and reserves the top 128 KiB at FE0000h-FFFFFFh.
             case (size)
                 3'd1:    extended_memory_kib = 16'd1408;
                 3'd2:    extended_memory_kib = 16'd3456;
                 3'd3:    extended_memory_kib = 16'd7552;
-                3'd4:    extended_memory_kib = 16'd15356;
+                3'd4:    extended_memory_kib = 16'd15232;
                 default: extended_memory_kib = 16'd384;
             endcase
         end

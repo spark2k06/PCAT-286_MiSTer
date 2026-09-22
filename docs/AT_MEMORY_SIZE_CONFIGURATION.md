@@ -16,19 +16,22 @@ existing 384 KiB offset between the selected total and the high-memory limit.
 | 2 MiB | `100000h–25FFFFh` | 1,408 KiB |
 | 4 MiB | `100000h–45FFFFh` | 3,456 KiB |
 | 8 MiB | `100000h–85FFFFh` | 7,552 KiB |
-| 16 MiB | `100000h–FFEFFFh` | 15,356 KiB |
+| 16 MiB | `100000h–FDFFFFh` | 15,232 KiB |
 
-The 16 MiB profile uses the full 286 physical range while leaving
-`FFF000h–FFFFFFh` mapped to the reset-vector BIOS alias. The low video, option
-ROM and system BIOS windows keep their existing owners. As a result the 16 MiB
-profile reports 15,356 KiB extended plus 640 KiB conventional RAM; the reserved
-address-map holes are not counted as installed memory. CMOS fields `17h/18h`
-and `30h/31h` track that extended size. The standard checksum is adjusted when
-the applied size changes; BIOS CPU writes to CMOS remain possible afterward.
+The 16 MiB selection represents installed memory. Following the 86Box
+16-bit-bus AT map, CPU-visible extended RAM ends at `FDFFFFh`:
+`FE0000h–FEFFFFh` is reserved and `FF0000h–FFFFFFh` maps the 64 KiB system-BIOS
+alias. The low video, option-ROM and system-BIOS windows keep their existing
+owners. The profile therefore reports 15,232 KiB extended plus 640 KiB
+conventional RAM, or 15,872 KiB visible in total. The 384 KiB low-memory hole
+and 128 KiB high reserved area account for the difference from the installed
+16 MiB. CMOS fields `17h/18h` and `30h/31h` track that extended size. The
+standard checksum is adjusted when the applied size changes; BIOS CPU writes
+to CMOS remain possible afterward.
 
 EMS pages keep their existing private SDRAM backing at backend addresses
 `200000h–3FFFFFh`. To prevent expanded CPU-visible RAM from aliasing that store,
-backend accesses at 2 MiB and above (except the reset-vector alias) are shifted
+backend accesses at 2 MiB through `FDFFFFh` are shifted
 up by 2 MiB. This changes only the SDRAM backing address; the CPU still sees
 the selected physical address and contiguous extended RAM.
 

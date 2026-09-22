@@ -11,7 +11,7 @@ module spk286_at_mister_sdram_owner_tb;
     logic        request_write;
     logic        request_code_fetch;
     logic [3:0]  request_cycle_class;
-    logic [23:0] request_address;
+    logic [24:0] request_address;
     logic [1:0]  request_byte_enable;
     logic [15:0] request_data_out;
     wire         request_accept;
@@ -90,6 +90,7 @@ module spk286_at_mister_sdram_owner_tb;
         .request_owner_refresh(request_owner_refresh),
         .request_write(request_write),
         .request_code_fetch(request_code_fetch),
+        .request_burst(1'b0),
         .request_cycle_class(request_cycle_class),
         .request_address(request_address),
         .request_byte_enable(request_byte_enable),
@@ -98,7 +99,7 @@ module spk286_at_mister_sdram_owner_tb;
         .request_ready(request_ready),
         .request_read_data(request_read_data),
         .request_read_data_valid(request_read_data_valid),
-        .physical_idle(physical_idle),
+        .physical_idle(physical_idle), .debug_state(),
         .protocol_error(protocol_error),
         .sdram_address(sdram_address), .sdram_cke(sdram_cke),
         .sdram_cs(sdram_cs), .sdram_ras(sdram_ras),
@@ -129,7 +130,7 @@ module spk286_at_mister_sdram_owner_tb;
         end
     endtask
 
-    task automatic write_word(input logic [23:0] address,
+    task automatic write_word(input logic [24:0] address,
                               input logic [1:0] lanes,
                               input logic [15:0] data);
         integer guard;
@@ -163,7 +164,7 @@ module spk286_at_mister_sdram_owner_tb;
         end
     endtask
 
-    task automatic read_word(input logic [23:0] address,
+    task automatic read_word(input logic [24:0] address,
                              input logic [1:0] lanes,
                              input logic [15:0] expected);
         integer guard;
@@ -260,21 +261,21 @@ module spk286_at_mister_sdram_owner_tb;
         check(sdram_reads >= 3, "physical read command was not issued");
         check(!protocol_error, "unexpected SDRAM owner protocol error");
 
-        // The reset-vector alias must hit the same physical BIOS window as
-        // F0000h.  Inspect the translated address at the command boundary;
+        // The full 64 KiB high alias must start at the same physical BIOS
+        // window as F0000h. Inspect the translated address at the boundary;
         // the SDRAM model uses the same byte-to-word translation as hardware.
         @(negedge clk);
         request_valid = 1'b1;
         request_command_valid = 1'b1;
         request_owner_refresh = 1'b0;
         request_write = 1'b0;
-        request_address = 24'hFFFFF0;
+        request_address = 24'hFF0000;
         request_byte_enable = 2'b11;
         request_data_out = 16'h0000;
         while (!request_accept)
             @(negedge clk);
-        check(dut.kf_address == 24'h07FFF8,
-              "reset-vector alias was not translated to the physical BIOS word");
+        check(dut.kf_address == 24'h078000,
+              "high BIOS alias base was not translated to the physical BIOS word");
         request_valid = 1'b0;
         request_command_valid = 1'b0;
         $display("AT_MISTER_SDRAM_OWNER_PASS writes=%0d reads=%0d", sdram_writes, sdram_reads);

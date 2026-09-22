@@ -314,7 +314,7 @@ module spk286_at_machine #(
     // must clear only address bit 20 while the gate is closed.  Keep the
     // raw bridge address for diagnostics and apply this view to memory
     // decode/transactions (I/O ports are unaffected).  The reset-vector
-    // alias is deliberately exempt: this profile maps FFF000h-FFFFFFh to
+    // alias is deliberately exempt: this profile maps FF0000h-FFFFFFh to
     // the F0000h BIOS window before the memory owner, even while A20 is off.
     logic [23:0] at_memory_address;
     logic [24:0] memory_backend_address;
@@ -393,7 +393,7 @@ module spk286_at_machine #(
             // beyond the 286's 16 MiB address space, so shift high RAM by
             // 2 MiB while preserving the CPU-visible address map.
             else if ((address >= 24'h200000) &&
-                     (address < 24'hFFF000))
+                     (address < 24'hFE0000))
                 map_memory_backend_address = {1'b0, address} + 25'h0200000;
             else
                 map_memory_backend_address = {1'b0, address};
@@ -603,7 +603,7 @@ module spk286_at_machine #(
     always_comb begin
         at_memory_address = at_address;
         if (!at_io && !a20_enable &&
-            !((at_address >= 24'hFFF000) &&
+            !((at_address >= 24'hFF0000) &&
               (at_address <= 24'hFFFFFF)))
             at_memory_address[20] = 1'b0;
     end

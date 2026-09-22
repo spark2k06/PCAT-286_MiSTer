@@ -191,9 +191,12 @@ required by the IBM AT programming model.
 The Hardware OSD selects nominal installed-RAM profiles of 1, 2, 4, 8 or
 16 MiB. The fixed 640 KiB conventional base and the original 384 KiB extended
 profile remain the 1 MiB default. The applied profile extends the physical RAM
-decode up to its selected limit, with the 16 MiB profile bounded by the 286's
-24-bit address space and the top reset-vector BIOS alias. CMOS extended-memory
-fields and their checksum follow the applied profile.
+decode up to its selected limit. Following the 86Box 16-bit-bus AT map, the
+16 MiB selection exposes extended RAM through `FDFFFFh`, reserves
+`FE0000h–FEFFFFh`, and maps `FF0000h–FFFFFFh` to the 64 KiB system-BIOS alias.
+CMOS reports 15,232 KiB of extended RAM (`3B80h`), so the BIOS sees 15,872 KiB
+including conventional memory. CMOS fields and their checksum follow the
+applied profile.
 
 EMS retains its private 2 MiB page backing at SDRAM addresses 2–4 MiB. CPU and
 DMA accesses at physical addresses 2 MiB and above are translated by +2 MiB in

@@ -70,8 +70,8 @@ P03-R03. Los tags usan dirección física canónica de byte. El desplazamiento
 interno de KFSDRAM a palabras ocurre después; no se mezcla byte address con
 word address al comparar o indexar la línea.
 
-P03-R04. Canonicalizar el alias `FFF000–FFFFFF` hacia la copia BIOS
-`0FF000–0FFFFF` de la misma forma que el mapper actual. Las escrituras del
+P03-R04. Canonicalizar el alias `FF0000–FFFFFF` hacia la copia BIOS
+`0F0000–0FFFFF` de la misma forma que el mapper actual. Las escrituras del
 loader sobre esa copia deben invalidar también los hits realizados por el alias.
 
 P03-R05. A20 es una política del chipset. La integración actual expone

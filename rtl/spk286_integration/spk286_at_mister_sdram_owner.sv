@@ -92,12 +92,12 @@ module spk286_at_mister_sdram_owner #(
     logic [8:0]  kf_access_num;
 
     // The 80286 reset vector is fetched from FFFFF0h, while the loaded
-    // system BIOS occupies the AT F0000h-Fffffh window.  Real AT chipsets
-    // expose the top 4 KiB as a reset-vector alias; translate it here so
+    // system BIOS occupies the AT F0000h-FFFFFh window.  The 16-bit-bus AT
+    // map exposes the top 64 KiB as a BIOS alias; translate it here so
     // the physical SDRAM stores only one copy of the BIOS image.
     always_comb begin
         mapped_address = active_q ? address_q : request_address;
-        if ((mapped_address >= 25'h0FFF000) &&
+        if ((mapped_address >= 25'h0FF0000) &&
             (mapped_address <= 25'h0FFFFFF))
             mapped_address = mapped_address - 25'h0F00000;
     end

@@ -82,6 +82,12 @@ module spk286_at_bios_first_fetch_tb #(
     wire warm_reset_test = keyboard_warm_reset_test || forced_warm_reset_test;
     logic trace_irq0_prev = 1'b0;
     integer trace_lines = 0;
+    logic [2:0] installed_ram_size_osd = 3'd0;
+
+    initial begin
+        if ($test$plusargs("RAM16"))
+            installed_ram_size_osd = 3'd4;
+    end
 
     logic execute_enable = 1'b1;
     logic cpu_boot_reset = 1;
@@ -123,7 +129,7 @@ module spk286_at_bios_first_fetch_tb #(
     wire memory_write;
     wire memory_code_fetch;
     wire [3:0] memory_cycle_class;
-    wire [23:0] memory_address;
+    wire [24:0] memory_address;
     wire [1:0] memory_byte_enable;
     wire [15:0] memory_data_out;
     wire memory_accept;
@@ -134,7 +140,7 @@ module spk286_at_bios_first_fetch_tb #(
     wire dma_memory_valid;
     wire dma_memory_write;
     wire dma_memory_read;
-    wire [23:0] dma_memory_address;
+    wire [24:0] dma_memory_address;
     wire [1:0] dma_memory_byte_enable;
     wire [15:0] dma_memory_data_out;
     wire dma_memory_accept;
@@ -153,7 +159,7 @@ module spk286_at_bios_first_fetch_tb #(
     wire        backend_refresh;
     wire        backend_code_fetch;
     wire [3:0]  backend_cycle_class;
-    wire [23:0] backend_address;
+    wire [24:0] backend_address;
     wire [1:0]  backend_byte_enable;
     wire [15:0] backend_data_out;
     wire        backend_accept;
@@ -379,7 +385,8 @@ module spk286_at_bios_first_fetch_tb #(
             if(backend_ready && backend_code_fetch && backend_owner==0 &&
                !cpu_reset_request && !memory_port.cpu_cancelled_q) begin
                 if(!backend_read_data_valid) $fatal(1,"fetch without VLD");
-                if((backend_address>=24'hfff000) || (backend_address>=24'h0f0000 && backend_address<=24'h0fffff)) begin
+                if((backend_address>=25'h0ff0000 && backend_address<=25'h0ffffff) ||
+                   (backend_address>=25'h00f0000 && backend_address<=25'h00fffff)) begin
                     if(backend_byte_enable[0] && backend_read_data[7:0]!==rom[{backend_address[15:1],1'b0}])
                         $fatal(1,"BIOS low lane addr=%h got=%h",backend_address,backend_read_data);
                     if(backend_byte_enable[1] && backend_read_data[15:8]!==rom[{backend_address[15:1],1'b1}])
@@ -405,7 +412,7 @@ module spk286_at_bios_first_fetch_tb #(
             cpu_bus_status == 4'hd) begin
             if(cpu_fetch_returns==0 && cpu_data_in[7:0]!==rom[16'hfff0])
                 $fatal(1,"CPU first opcode data=%h",cpu_data_in);
-            if ((cpu_address>=24'hfff000) ||
+            if ((cpu_address>=24'hff0000) ||
                 (cpu_address>=24'h0f0000 && cpu_address<=24'h0fffff)) begin
                 if(!cpu_address[0] && cpu_data_in[7:0]!==rom[{cpu_address[15:1],1'b0}])
                     $fatal(1,"CPU low byte mismatch addr=%h data=%h",cpu_address,cpu_data_in);
@@ -887,6 +894,7 @@ module spk286_at_bios_first_fetch_tb #(
         .clk(clk), .clk_cpu(clk_cpu),
         .cpu_sample_edge(CPU_DIV2_TEST ? ~clk_cpu_div : 1'b1),
         .reset(reset | machine_boot_reset), .cpu_reset(reset | cpu_boot_reset), .clk_video(clk_video), .splashscreen(1'b0),
+        .installed_ram_size_osd(installed_ram_size_osd),
         .execute_enable(execute_enable),
         .counter_clock(counter_clock), .refresh_enable(refresh_enable),
         .mgmt_address(mgmt_address), .mgmt_writedata(mgmt_writedata),
@@ -950,6 +958,15 @@ module spk286_at_bios_first_fetch_tb #(
         reg [8*512-1:0] wave_path;
         repeat(8) @(negedge clk); reset=0;
         wait(sdram_initialized); download_bios();
+        if (installed_ram_size_osd == 3'd4) begin
+            if (dut.installed_ram_size_q !== 3'd4 ||
+                dut.u_memory_decode.extended_ram_limit !== 24'hFDFFFF)
+                $fatal(1, "RAM16 decoder profile was not applied");
+            if (dut.u_devices.u_rtc.cmos_q[7'h17] !== 8'h80 ||
+                dut.u_devices.u_rtc.cmos_q[7'h18] !== 8'h3B)
+                $fatal(1, "RAM16 CMOS size was not 15232 KiB");
+            $display("AT_RAM16_PROFILE_PASS limit=fdffff reserved=fe0000-feffff cmos=3b80");
+        end
         if(debug_cs!==16'hf000 || debug_ip!==16'hfff0 || cs_base!==24'hff0000)
             $fatal(1,"bad reset %h:%h base=%h",debug_cs,debug_ip,cs_base);
         if($value$plusargs("WAVE=%s",wave_path)) begin

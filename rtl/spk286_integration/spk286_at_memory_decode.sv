@@ -32,7 +32,7 @@ module spk286_at_memory_decode (
 );
     localparam logic [23:0] SYSTEM_BIOS_BASE       = 24'h0F0000;
     localparam logic [23:0] SYSTEM_BIOS_LIMIT      = 24'h0FFFFF;
-    localparam logic [23:0] SYSTEM_BIOS_ALIAS_BASE = 24'hFFF000;
+    localparam logic [23:0] SYSTEM_BIOS_ALIAS_BASE = 24'hFF0000;
     localparam logic [23:0] SYSTEM_BIOS_ALIAS_LIMIT = 24'hFFFFFF;
     localparam logic [23:0] EXTENDED_RAM_BASE      = 24'h100000;
 
@@ -63,14 +63,14 @@ module spk286_at_memory_decode (
                                      (address <= SYSTEM_BIOS_LIMIT)) ||
                                     system_bios_alias_select);
         // The first profile has 640 KiB conventional + 384 KiB extended.
-        // Larger profiles retain that 384 KiB remap offset. The 16 MiB
-        // profile extends RAM through the 286's 24-bit physical range; the
-        // reset-vector alias above remains owned by the system BIOS.
+        // Larger profiles retain that 384 KiB remap offset. Like the 86Box
+        // 16-bit-bus AT model, the 16 MiB profile reserves the top 128 KiB:
+        // FE0000h-FEFFFFh is unmapped and FF0000h-FFFFFFh is the BIOS alias.
         case (installed_ram_size)
             3'd1:    extended_ram_limit = 24'h25FFFF;
             3'd2:    extended_ram_limit = 24'h45FFFF;
             3'd3:    extended_ram_limit = 24'h85FFFF;
-            3'd4:    extended_ram_limit = 24'hFFFFFF;
+            3'd4:    extended_ram_limit = 24'hFDFFFF;
             default: extended_ram_limit = 24'h15FFFF;
         endcase
         extended_ram_select      = valid_memory_class &&

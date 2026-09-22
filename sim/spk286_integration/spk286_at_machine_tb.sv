@@ -68,7 +68,7 @@ module spk286_at_machine_tb;
     wire memory_write;
     wire memory_code_fetch;
     wire [3:0] memory_cycle_class;
-    wire [23:0] memory_address;
+    wire [24:0] memory_address;
     wire [1:0] memory_byte_enable;
     wire [15:0] memory_data_out;
     wire memory_accept;
@@ -79,7 +79,7 @@ module spk286_at_machine_tb;
     wire dma_memory_valid;
     wire dma_memory_write;
     wire dma_memory_read;
-    wire [23:0] dma_memory_address;
+    wire [24:0] dma_memory_address;
     wire [1:0] dma_memory_byte_enable;
     wire [15:0] dma_memory_data_out;
     wire dma_memory_accept;
@@ -98,7 +98,7 @@ module spk286_at_machine_tb;
     wire        backend_refresh;
     wire        backend_code_fetch;
     wire [3:0]  backend_cycle_class;
-    wire [23:0] backend_address;
+    wire [24:0] backend_address;
     wire [1:0]  backend_byte_enable;
     wire [15:0] backend_data_out;
     wire        backend_accept;
@@ -225,10 +225,10 @@ module spk286_at_machine_tb;
     logic saw_native_reset_data = 1'b0;
     logic saw_low_rom_fetch = 1'b0;
 
-    function automatic logic [7:0] memory_read_byte(input logic [23:0] address);
+    function automatic logic [7:0] memory_read_byte(input logic [24:0] address);
         begin
             if (((address >= 24'h0F0000) && (address <= 24'h0FFFFF)) ||
-                ((address >= 24'hFFF000) && (address <= 24'hFFFFFF)))
+                ((address >= 24'hFF0000) && (address <= 24'hFFFFFF)))
                 memory_read_byte = rom[address[15:0]];
             else if (address < 24'h080000)
                 memory_read_byte = base_ram[address[18:0]];
@@ -237,7 +237,7 @@ module spk286_at_machine_tb;
         end
     endfunction
 
-    task automatic write_memory_byte(input logic [23:0] address,
+    task automatic write_memory_byte(input logic [24:0] address,
                                      input logic [7:0] value);
         begin
             if (address < 24'h080000)
@@ -487,6 +487,7 @@ module spk286_at_machine_tb;
 
     spk286_at_machine dut (
         .clk(clk), .clk_cpu(clk), .cpu_sample_edge(1'b1), .reset(reset), .cpu_reset(reset), .clk_video(clk_video), .splashscreen(1'b0),
+        .installed_ram_size_osd(3'd0),
         .at286ctl_eff_mpu401(runtime_mpu_enable),
         .midi_baudce(1'b1), .uart_baudce(1'b1), .midi_rx(runtime_midi_rx),
         .uart2_rx(1'b1), .uart2_cts_n(1'b1), .uart2_dsr_n(1'b1),

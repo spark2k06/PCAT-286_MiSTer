@@ -92,4 +92,10 @@ for rom in "$rom_path" \
   timeout 120s "$build_dir/verilator-obj/first_fetch_vlt" "+ROM=$rom" \
     "+WAVE=$build_dir/$name.fst" | tee "$build_dir/$name.log"
 done
+
+# Keep the selectable 16 MiB map in the integrated regression. This checks
+# the applied decoder limit and CMOS geometry before executing the reset fetch.
+timeout 120s "$build_dir/verilator-obj/first_fetch_vlt" "+ROM=$rom_path" \
+  +RAM16 | tee "$build_dir/ram16-profile.log"
+grep -q AT_RAM16_PROFILE_PASS "$build_dir/ram16-profile.log"
 echo AT_BIOS_FIRST_FETCH_TEST_PASS

@@ -79,7 +79,8 @@ module spk286_checkit_workload_tb;
 
     spk286_at_memory_decode width_decode (
         .request_valid(bus_valid), .request_write(bus_write),
-        .cycle_class(bus_status), .address(address), .word_capable(width_capable)
+        .cycle_class(bus_status), .address(address),
+        .installed_ram_size(3'd0), .word_capable(width_capable)
     );
 
     spk286_at_bus_bridge bridge (

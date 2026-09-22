@@ -18,7 +18,7 @@ module spk286_at_sdram_read_buffer_tb;
     logic        in_refresh = 1'b0;
     logic        in_code_fetch = 1'b0;
     logic [3:0]  in_cycle_class = 4'h5;
-    logic [23:0] in_address = 24'h000000;
+    logic [24:0] in_address = 25'h0000000;
     logic [1:0]  in_byte_enable = 2'b11;
     logic [15:0] in_data_out = 16'h0000;
     wire         in_accept;
@@ -34,7 +34,7 @@ module spk286_at_sdram_read_buffer_tb;
     wire         out_code_fetch;
     wire         out_burst;
     wire [3:0]   out_cycle_class;
-    wire [23:0]  out_address;
+    wire [24:0]  out_address;
     wire [1:0]   out_byte_enable;
     wire [15:0]  out_data_out;
     wire         out_accept;
@@ -116,7 +116,7 @@ module spk286_at_sdram_read_buffer_tb;
         .debug_hit_count(hit_count), .debug_miss_count(miss_count),
         .debug_fill_count(fill_count),
         .debug_physical_read_count(physical_read_count),
-        .debug_invalidation_count(invalidation_count)
+        .debug_invalidation_count(invalidation_count), .debug_state()
     );
 
     task automatic check(input logic condition, input string message);
@@ -154,7 +154,7 @@ module spk286_at_sdram_read_buffer_tb;
 
     task automatic read_request(input logic [1:0] owner,
                                 input logic code_fetch,
-                                input logic [23:0] address,
+                                input logic [24:0] address,
                                 input logic [15:0] expected);
         begin
             @(negedge clk);
@@ -179,7 +179,7 @@ module spk286_at_sdram_read_buffer_tb;
     endtask
 
     task automatic write_request(input logic [1:0] owner,
-                                 input logic [23:0] address,
+                                 input logic [24:0] address,
                                  input logic [1:0] lanes,
                                  input logic [15:0] data);
         begin
@@ -210,6 +210,10 @@ module spk286_at_sdram_read_buffer_tb;
         mem['h0801] = 16'hA002;
         mem['h0802] = 16'hA003;
         mem['h0803] = 16'hA004;
+        mem['h78000] = 16'hC001;
+        mem['h78001] = 16'hC002;
+        mem['h78002] = 16'hC003;
+        mem['h78003] = 16'hC004;
         mem['h7FFF8] = 16'hB001;
         mem['h7FFF9] = 16'hB002;
         mem['h7FFFA] = 16'hB003;
@@ -242,16 +246,25 @@ module spk286_at_sdram_read_buffer_tb;
         read_request(OWNER_CPU, 1'b1, 24'h001000, 16'hA0CC);
         check(physical_read_count == 13, "DMA write did not invalidate the line");
 
-        // Reset-vector alias and normal BIOS address share one canonical tag.
+        // The alias covers the full top 64 KiB, not only the reset-vector
+        // page, and shares canonical tags with the low BIOS window.
+        read_request(OWNER_CPU, 1'b1, 24'hFF0000, 16'hC001);
+        check(physical_read_count == 17, "BIOS alias-base fill was incorrect");
+        read_request(OWNER_CPU, 1'b1, 24'h0F0002, 16'hC002);
+        check(physical_read_count == 17,
+              "BIOS alias base did not hit the canonical low line");
+
+        // The reset vector remains in the same canonical BIOS window.
         read_request(OWNER_CPU, 1'b1, 24'hFFFFF0, 16'hB001);
-        check(physical_read_count == 17, "BIOS alias fill was incorrect");
+        check(physical_read_count == 21, "BIOS reset-vector fill was incorrect");
         read_request(OWNER_CPU, 1'b1, 24'h0FFFF2, 16'hB002);
-        check(physical_read_count == 17, "BIOS alias did not hit canonical line");
+        check(physical_read_count == 21,
+              "BIOS reset-vector alias did not hit canonical line");
 
         // EGA aperture is never eligible for read-ahead.
         read_request(OWNER_CPU, 1'b1, 24'h0A0000, 16'hE001);
         read_request(OWNER_CPU, 1'b1, 24'h0A0000, 16'hE001);
-        check(physical_read_count == 19, "EGA aperture was incorrectly cached");
+        check(physical_read_count == 23, "EGA aperture was incorrectly cached");
 
         // Machine reset also covers the BIOS-loading window.  CPU traffic is
         // cancelled there, but loader writes must still reach SDRAM or the

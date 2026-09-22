@@ -43,7 +43,7 @@ For a 1 MiB IBM AT-style configuration, the implemented geometry is:
 
 This matches the 384 KiB top-memory remap used by the local 86Box IBM AT/286
 machine reference. CPU reads above the installed range return `FFh`; writes are
-completed without modifying SDRAM. The reset-vector alias `FFF000h–FFFFFFh`
+completed without modifying SDRAM. The high BIOS alias `FF0000h–FFFFFFh`
 continues to select the system BIOS.
 
 ## CMOS behavior
@@ -104,7 +104,7 @@ AT_LANDMARK_CMOS_TEST_PASS
 
 The integrated device test confirms that an `F400h` write passes through the
 AT router and becomes visible through ports `70h/71h`. The memory-decoder test
-checks both ends of `100000h–15FFFFh` and rejects `160000h` and `FFEFFFh` as
+checks both ends of `100000h–15FFFFh` and rejects `160000h` and `FEFFFFh` as
 RAM. The full machine boundary still elaborates, lints and executes its BIOS
 fixture.
 

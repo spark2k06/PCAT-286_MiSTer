@@ -92,7 +92,7 @@ module spk286_at_sdram_read_buffer #(
             // The reset-vector alias is the same physical BIOS window used
             // by the SDRAM owner.  Canonical tags make FFFFF0h and 0FFFF0h
             // share one line without changing the CPU-visible address.
-            if ((address >= 25'h0FFF000) && (address <= 25'h0FFFFFF))
+            if ((address >= 25'h0FF0000) && (address <= 25'h0FFFFFF))
                 canonical_address = address - 25'h0F00000;
             else
                 canonical_address = address;
@@ -114,7 +114,7 @@ module spk286_at_sdram_read_buffer #(
             cacheable_code_line =
                 (base <= 25'h009FFF8) ||
                 ((base >= 25'h00F0000) && (base <= 25'h00FFFF8)) ||
-                ((base >= 25'h0100000) && (base <= 25'h11FEFF8));
+                ((base >= 25'h0100000) && (base <= 25'h11DFFF8));
         end
     endfunction
 

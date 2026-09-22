@@ -31,8 +31,17 @@ sources+=(
 # that Quartus consumes. Previously P01/P02 were hard-coded here even when the
 # shipped bitstream omitted them. Optional overrides are explicit A/B controls.
 source "$root/scripts/at_performance_flags.sh"
+buffer_parameters=()
+if [[ -n ${PCAT_CODE_BUFFER_LINES:-} ]]; then
+  buffer_parameters=(-GCODE_BUFFER_LINES="$PCAT_CODE_BUFFER_LINES")
+fi
+sha256sum "${sources[@]}" config.tcl \
+  sim/spk286_integration/spk286_checkit_profile.svh \
+  sim/spk286_integration/spk286_checkit_ideal_owner.svh \
+  scripts/test_checkit_directed.sh scripts/at_performance_flags.sh \
+  tests/firmware/checkit_*.asm > "$build_dir/compiled-sources.sha256"
 verilator --binary --timing -j 4 -Wno-fatal \
-  "${performance_flags[@]}" \
+  "${performance_flags[@]}" "${buffer_parameters[@]}" \
   --top-module spk286_checkit_workload_tb \
   --Mdir "$build_dir/obj" -o checkit_workload "${sources[@]}" \
   >"$build_dir/build.log" 2>&1
@@ -46,6 +55,7 @@ for workload in dhrystone whetstone working_set dhrystone21; do
       | tee "$build_dir/$workload-p03-$p03.log"
   done
 done
+sha256sum --check "$build_dir/compiled-sources.sha256" > "$build_dir/sources-verified.log"
 
 awk '
   /^CHECKIT_DIRECTED_PASS / {

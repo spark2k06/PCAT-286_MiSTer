@@ -1090,6 +1090,14 @@ module spk286_at_bios_first_fetch_tb #(
             if (forced_warm_reset_test && !forced_warm_reset_injected &&
                 cycles >= 10000 &&
                 dut.u_bridge.state_q == forced_warm_reset_state[3:0]) begin
+                if ($test$plusargs("CODE_BUFFER_RESET_STRESS")) begin
+                    if (pins.mem['h08300] == 0 || refresh_count == 0 ||
+                        p03_buffer.debug_hit_count == 0 || p03_buffer.debug_miss_count < 2)
+                        $fatal(1, "CODE_BUFFER_RESET_STRESS missing IRQ/refresh/hit/miss evidence");
+                    $display("CODE_BUFFER_RESET_STRESS irq_handlers=%0d refresh=%0d hits=%0d misses=%0d",
+                             pins.mem['h08300], refresh_count,
+                             p03_buffer.debug_hit_count, p03_buffer.debug_miss_count);
+                end
                 forced_warm_reset_injected = 1'b1;
                 warm_reset_pulses_before = cpu_reset_pulses;
                 warm_reset_fetches_before = reset_vector_fetches;

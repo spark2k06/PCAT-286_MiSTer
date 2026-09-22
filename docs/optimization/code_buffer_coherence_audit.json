@@ -1,0 +1,134 @@
+{
+  "schema_version": 1,
+  "date": "2026-09-22",
+  "baseline_commit": "266f5b49c4c63b25bb5d7e857a77084bcb9511a7",
+  "scope": "Known production coherence/invalidation failures; successful audit means BUG_REPRODUCED, not functional PASS",
+  "production_rtl": {
+    "path": "rtl/spk286_integration/spk286_at_sdram_read_buffer.sv",
+    "bytes": 18947,
+    "sha256": "ffb26bc1b83513edfe8d2a78858d0c1e4438977e69ac35b77e0c5743e6aeb584"
+  },
+  "production_unchanged_vs_head": true,
+  "testbench": {
+    "path": "sim/spk286_integration/spk286_code_buffer_coherence_audit_tb.sv",
+    "bytes": 9891,
+    "sha256": "fce0f451a20f6b50a94b16ef85283894e14e59fc57711ec9fceb14ef637ad52e"
+  },
+  "runner": {
+    "path": "scripts/test_code_buffer_coherence_audit.sh",
+    "bytes": 5277,
+    "sha256": "6d8ba3c71af049713499da12302e346b2fa24363bb5e3ced48d91d0d34b3d1c3"
+  },
+  "simulators": {
+    "iverilog": "Icarus Verilog version 12.0 (stable) ()",
+    "verilator": "Verilator 5.020 2024-01-01 rev (Debian 5.020-1)"
+  },
+  "compile_logs": [
+    {
+      "path": "build/code-buffer-coherence-audit/iverilog-compile.log",
+      "bytes": 408,
+      "sha256": "9c74bcb0a11f272d9c5cfa32aa64637bba7a040130cb67611ae54c785e875ec5"
+    },
+    {
+      "path": "build/code-buffer-coherence-audit/verilator-compile.log",
+      "bytes": 5298,
+      "sha256": "21ca0a3e23cb981c9896db0a9a27db9b1489a78816333b7653b9f5571016fa8a"
+    }
+  ],
+  "results": [
+    {
+      "case": "cpu_odd_upper_last_byte",
+      "plusargs": "+CASE=0",
+      "simulator": "iverilog",
+      "exit_code": 1,
+      "result": "BUG_REPRODUCED",
+      "observation": "AUDIT_ODD_UPPER owner=0 backend_word=cc04 cached_word=a004 line_valid=1 tag=0001000",
+      "expected_assertion": "COHERENCE_AUDIT_ASSERT AUDIT_EXPECTED_FAILURE case=0 stale_code expected=cc04 actual=a004",
+      "log": {
+        "path": "build/code-buffer-coherence-audit/iverilog-case-0.log",
+        "bytes": 323,
+        "sha256": "10ba06fcb028b808f098e786a31ded0a54debe30f4925bf06c02fcc89318388d"
+      }
+    },
+    {
+      "case": "cpu_cancel_idle",
+      "plusargs": "+CASE=1",
+      "simulator": "iverilog",
+      "exit_code": 1,
+      "result": "BUG_REPRODUCED",
+      "observation": "AUDIT_IDLE_CANCEL physical_reads_before=4 after=4 hits=1",
+      "expected_assertion": "COHERENCE_AUDIT_ASSERT AUDIT_EXPECTED_FAILURE case=1 CPU reset in IDLE did not invalidate the line (P03-R15)",
+      "log": {
+        "path": "build/code-buffer-coherence-audit/iverilog-case-1.log",
+        "bytes": 354,
+        "sha256": "b41e3f847aa80a09b9bd79809b334d88e7d30c7036f20a8b8eb151b5bc3255c6"
+      }
+    },
+    {
+      "case": "dma_odd_upper_last_byte",
+      "plusargs": "+CASE=2",
+      "simulator": "iverilog",
+      "exit_code": 1,
+      "result": "BUG_REPRODUCED",
+      "observation": "AUDIT_ODD_UPPER owner=1 backend_word=cc04 cached_word=a004 line_valid=1 tag=0001000",
+      "expected_assertion": "COHERENCE_AUDIT_ASSERT AUDIT_EXPECTED_FAILURE case=2 stale_code expected=cc04 actual=a004",
+      "log": {
+        "path": "build/code-buffer-coherence-audit/iverilog-case-2.log",
+        "bytes": 323,
+        "sha256": "2120fea2a24a388b63d8c36f7665b3d61540bc3c40d21c8357915ccad01e0434"
+      }
+    },
+    {
+      "case": "cpu_odd_upper_last_byte",
+      "plusargs": "+CASE=0",
+      "simulator": "verilator",
+      "exit_code": -6,
+      "result": "BUG_REPRODUCED",
+      "observation": "AUDIT_ODD_UPPER owner=0 backend_word=cc04 cached_word=a004 line_valid=1 tag=0001000",
+      "expected_assertion": "COHERENCE_AUDIT_ASSERT AUDIT_EXPECTED_FAILURE case=0 stale_code expected=cc04 actual=a004",
+      "log": {
+        "path": "build/code-buffer-coherence-audit/verilator-case-0.log",
+        "bytes": 408,
+        "sha256": "0876e66d122ec71ba0ce55a764f420482bed77cfd14982a386ceec755f420132"
+      }
+    },
+    {
+      "case": "cpu_cancel_idle",
+      "plusargs": "+CASE=1",
+      "simulator": "verilator",
+      "exit_code": -6,
+      "result": "BUG_REPRODUCED",
+      "observation": "AUDIT_IDLE_CANCEL physical_reads_before=4 after=4 hits=1",
+      "expected_assertion": "COHERENCE_AUDIT_ASSERT AUDIT_EXPECTED_FAILURE case=1 CPU reset in IDLE did not invalidate the line (P03-R15)",
+      "log": {
+        "path": "build/code-buffer-coherence-audit/verilator-case-1.log",
+        "bytes": 439,
+        "sha256": "06fbc97b3bffc1c8da1b9efd26dce7abf832e27875d981a3efe601e5a35a2385"
+      }
+    },
+    {
+      "case": "dma_odd_upper_last_byte",
+      "plusargs": "+CASE=2",
+      "simulator": "verilator",
+      "exit_code": -6,
+      "result": "BUG_REPRODUCED",
+      "observation": "AUDIT_ODD_UPPER owner=1 backend_word=cc04 cached_word=a004 line_valid=1 tag=0001000",
+      "expected_assertion": "COHERENCE_AUDIT_ASSERT AUDIT_EXPECTED_FAILURE case=2 stale_code expected=cc04 actual=a004",
+      "log": {
+        "path": "build/code-buffer-coherence-audit/verilator-case-2.log",
+        "bytes": 408,
+        "sha256": "3203d153d6b4f6cee3bda9a050ea8054ebe2bf08f1804ca50fcb179a477c47af"
+      }
+    }
+  ],
+  "limitations": [
+    "Registered-command abstract backend, not SDRAM pin simulation.",
+    "IDLE cancellation violates P03-R15; retaining that unchanged data does not demonstrate corruption by itself.",
+    "No causal link to Windows startup, no synthesis or hardware validation."
+  ],
+  "experimental_model_snapshot": {
+    "path": "sim/spk286_integration/spk286_at_multiline_code_buffer_model.sv",
+    "bytes": 22166,
+    "sha256": "ddb739671ac20e9f96db50901eefbddbb36f384b118989f1c1fe47474a220c61"
+  }
+}

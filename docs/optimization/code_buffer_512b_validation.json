@@ -1,0 +1,574 @@
+{
+  "scope": "Production instruction buffer; standalone CPU RTL unchanged",
+  "sources": [
+    {
+      "path": "rtl/spk286_integration/spk286_at_sdram_read_buffer.sv",
+      "sha256": "5e7b3512394c570fab8e82723c0d093f125e5b8d53c867d99ba0ae30570fdfcb"
+    },
+    {
+      "path": "sim/spk286_integration/spk286_at_multiline_code_buffer_tb.sv",
+      "sha256": "4d63d9543fc1e48406492e8ba9360726d6c3153f90f3a36d3cb23935cba81410"
+    },
+    {
+      "path": "sim/spk286_integration/spk286_at_bios_first_fetch_tb.sv",
+      "sha256": "2710bd875b8e408c1be8f12728816d0aa5a22a67c7e34becf7cf525ca2189dd2"
+    },
+    {
+      "path": "sim/spk286_integration/spk286_at_memory_perf_tb.sv",
+      "sha256": "c09a09e6594565a5780fb67e169d1907a61ec37810dc4b1e30c1e021e72df6cf"
+    },
+    {
+      "path": "tests/firmware/code_buffer_reset_stress.asm",
+      "sha256": "cb205a7eb53254ba297b43a4d72a10c70916c1034a02720f08b41bb6bd823e6a"
+    },
+    {
+      "path": "scripts/test_at_code_buffer_production.sh",
+      "sha256": "da439e22e0bbc86e4a75dd41e095d123b3e91366d13937d62e4adb186164d11c"
+    },
+    {
+      "path": "scripts/test_at_code_buffer_integration.sh",
+      "sha256": "777dd07c96f23d65363bcf4bf37bfbb6776e45dfcca59d0ae9a63640cb4df24f"
+    },
+    {
+      "path": "scripts/test_at_code_buffer_warm_reset.sh",
+      "sha256": "59bfe1d989e30c9e830f4b550aecbb5a0026aa047652337ab2c95e1f1b842e39"
+    },
+    {
+      "path": "scripts/record_code_buffer_validation.py",
+      "sha256": "fc2f55ac29f546972dbce9cb9b71b62bdb47c5fd766497a2cb33716bddb14ff5"
+    }
+  ],
+  "scoreboard_runs": [
+    {
+      "simulator": "iv",
+      "result": {
+        "lines": 1,
+        "ways": 1,
+        "extra": 0,
+        "ENABLE": 1,
+        "requests": 231,
+        "checks": 14630,
+        "commands": 172,
+        "read_beats": 462,
+        "writes": 44
+      },
+      "log": {
+        "path": "build/code-buffer-production/iv-l1-e1.log",
+        "sha256": "370cccdd3cfee1254ac083cfe2c5107e79480ae76d82f2c6c8b2e8c2dcb57d54"
+      }
+    },
+    {
+      "simulator": "vlt",
+      "result": {
+        "lines": 1,
+        "ways": 1,
+        "extra": 0,
+        "ENABLE": 1,
+        "requests": 231,
+        "checks": 14630,
+        "commands": 172,
+        "read_beats": 462,
+        "writes": 44
+      },
+      "log": {
+        "path": "build/code-buffer-production/vlt-l1-e1.log",
+        "sha256": "35cd0a242b6f106ac779afc175ae8bef0e989c8a137802a6ad757a2232b1d3b8"
+      }
+    },
+    {
+      "simulator": "iv",
+      "result": {
+        "lines": 1,
+        "ways": 1,
+        "extra": 0,
+        "ENABLE": 0,
+        "requests": 211,
+        "checks": 9109,
+        "commands": 211,
+        "read_beats": 165,
+        "writes": 44
+      },
+      "log": {
+        "path": "build/code-buffer-production/iv-l1-e0.log",
+        "sha256": "dab7178f916e71db0b947bfe337242d8245c739c08c9c57fea804b09343f861e"
+      }
+    },
+    {
+      "simulator": "vlt",
+      "result": {
+        "lines": 1,
+        "ways": 1,
+        "extra": 0,
+        "ENABLE": 0,
+        "requests": 211,
+        "checks": 9109,
+        "commands": 211,
+        "read_beats": 165,
+        "writes": 44
+      },
+      "log": {
+        "path": "build/code-buffer-production/vlt-l1-e0.log",
+        "sha256": "19d9e4961e9795e2436fe4c5cbf52cc6639ec956143ca9d99c768df6e8b098dd"
+      }
+    },
+    {
+      "simulator": "iv",
+      "result": {
+        "lines": 64,
+        "ways": 1,
+        "extra": 0,
+        "ENABLE": 1,
+        "requests": 422,
+        "checks": 28037,
+        "commands": 299,
+        "read_beats": 970,
+        "writes": 44
+      },
+      "log": {
+        "path": "build/code-buffer-production/iv-l64-e1.log",
+        "sha256": "e74c4c1e459db645ca1c1c37fcbbd4bb9881e9a08935974e1ef75be6490a6a9b"
+      }
+    },
+    {
+      "simulator": "vlt",
+      "result": {
+        "lines": 64,
+        "ways": 1,
+        "extra": 0,
+        "ENABLE": 1,
+        "requests": 422,
+        "checks": 28037,
+        "commands": 299,
+        "read_beats": 970,
+        "writes": 44
+      },
+      "log": {
+        "path": "build/code-buffer-production/vlt-l64-e1.log",
+        "sha256": "9150aaedfbc4c4efad5cfe7f34a04cce4406da3069831f0e7f50fea4a13c86d5"
+      }
+    },
+    {
+      "simulator": "iv",
+      "result": {
+        "lines": 64,
+        "ways": 1,
+        "extra": 0,
+        "ENABLE": 0,
+        "requests": 402,
+        "checks": 17131,
+        "commands": 402,
+        "read_beats": 356,
+        "writes": 44
+      },
+      "log": {
+        "path": "build/code-buffer-production/iv-l64-e0.log",
+        "sha256": "e37e940c71dbe5c947829e6150c4691ef2381f3be6842ed8b22688f9069510bd"
+      }
+    },
+    {
+      "simulator": "vlt",
+      "result": {
+        "lines": 64,
+        "ways": 1,
+        "extra": 0,
+        "ENABLE": 0,
+        "requests": 402,
+        "checks": 17131,
+        "commands": 402,
+        "read_beats": 356,
+        "writes": 44
+      },
+      "log": {
+        "path": "build/code-buffer-production/vlt-l64-e0.log",
+        "sha256": "546780886b22df4f9ef1b2e3cbb105809f369735781d43336cb6baf2bc78c4b1"
+      }
+    }
+  ],
+  "totals": {
+    "runs": 8,
+    "requests": 2532,
+    "checks": 137814
+  },
+  "mutation_audit": {
+    "sources": [
+      {
+        "path": "rtl/spk286_integration/spk286_at_sdram_read_buffer.sv",
+        "sha256": "5e7b3512394c570fab8e82723c0d093f125e5b8d53c867d99ba0ae30570fdfcb"
+      },
+      {
+        "path": "sim/spk286_integration/spk286_at_multiline_code_buffer_tb.sv",
+        "sha256": "4d63d9543fc1e48406492e8ba9360726d6c3153f90f3a36d3cb23935cba81410"
+      },
+      {
+        "path": "scripts/audit_code_buffer_model.py",
+        "sha256": "adfe07d2ef71d4a1936054c6821f51558da97c6ea4f2c2e19c0f66aeca7f313c"
+      }
+    ],
+    "simulator": "Icarus Verilog",
+    "production": true,
+    "configuration": {
+      "ENABLE": 1,
+      "CODE_LINES": 64,
+      "CODE_WAYS": 1,
+      "CODE_HIT_EXTRA": 0
+    },
+    "pristine": {
+      "passed": true,
+      "result": "MULTILINE_COHERENCE_PASS lines=64 ways=1 extra=0 ENABLE=1 requests=422 checks=28037 commands=299 read_beats=970 writes=44",
+      "log": {
+        "path": "build/code-buffer-production-mutants/pristine.log",
+        "sha256": "e74c4c1e459db645ca1c1c37fcbbd4bb9881e9a08935974e1ef75be6490a6a9b"
+      },
+      "compile_log": {
+        "path": "build/code-buffer-production-mutants/pristine.compile.log",
+        "sha256": "4674b3c3f06f36709bc7589daf9a59b4160d6f0a5545cc316675c7f601d613b4"
+      }
+    },
+    "mutants": [
+      {
+        "mutant": "odd_upper_write_keeps_line",
+        "rejected": true,
+        "old": "wire input_write_hit = in_write && (|in_byte_enable) && input_tag_hit;\n    wire request_write_hit = request_write_q && (|request_byte_enable_q) && request_tag_hit;",
+        "new": "wire input_write_hit = in_write && (|in_byte_enable) && input_tag_hit &&\n        !(in_address[2:0] == 3'b111 && in_byte_enable == 2'b10);\n    wire request_write_hit = request_write_q && (|request_byte_enable_q) && request_tag_hit &&\n        !(request_address_q[2:0] == 3'b111 && request_byte_enable_q == 2'b10);",
+        "expected_assertion": "fetch hit/miss mismatch at 0003006 expected_hit=0",
+        "observed_failure": "MULTILINE_FAIL lines=64 ways=1 extra=0 ENABLE=1 request=245 cycle=3226 fetch hit/miss mismatch at 0003006 expected_hit=0",
+        "source": {
+          "path": "build/code-buffer-production-mutants/odd_upper_write_keeps_line.sv",
+          "sha256": "6a647dedc09f025fd1f0a68dd9e7783688d707a2fcd066aa72fffc8cb882cd2a"
+        },
+        "log": {
+          "path": "build/code-buffer-production-mutants/odd_upper_write_keeps_line.log",
+          "sha256": "2b436e52543f60437f8e6ffa2f1399cde2f50963d7d8c6897878116630efea33"
+        },
+        "compile_log": {
+          "path": "build/code-buffer-production-mutants/odd_upper_write_keeps_line.compile.log",
+          "sha256": "5db49529fcf03b57d5ff8d608e8d58fc3fc5150f7b62812fcada22feedf0713a"
+        }
+      },
+      {
+        "mutant": "cancel_idle_keeps_lines",
+        "rejected": true,
+        "old": "if (cancel_cpu) begin",
+        "new": "if (cancel_cpu && state_q != STATE_IDLE) begin",
+        "expected_assertion": "fetch hit/miss mismatch at 0010004 expected_hit=0",
+        "observed_failure": "MULTILINE_FAIL lines=64 ways=1 extra=0 ENABLE=1 request=151 cycle=1680 fetch hit/miss mismatch at 0010004 expected_hit=0",
+        "source": {
+          "path": "build/code-buffer-production-mutants/cancel_idle_keeps_lines.sv",
+          "sha256": "471fcf304f69eb9e5c9e52df806f0d0f8656d36b142a1d4e67682b9c45f267a1"
+        },
+        "log": {
+          "path": "build/code-buffer-production-mutants/cancel_idle_keeps_lines.log",
+          "sha256": "0718387c111f1b5212384205f77cea134e83049ca5de157fff35a880698be5b4"
+        },
+        "compile_log": {
+          "path": "build/code-buffer-production-mutants/cancel_idle_keeps_lines.compile.log",
+          "sha256": "bfb99178f05933c92eb9ad65c1c7e71f9aa62cbc4af77c6ed02ffeaaecf16b5f"
+        }
+      },
+      {
+        "mutant": "live_word_index",
+        "rejected": true,
+        "old": "request_word_index = request_address_q[2:1];",
+        "new": "request_word_index = in_address[2:1];",
+        "expected_assertion": "logical data mismatch got=b0b1 expected=b6b7",
+        "observed_failure": "MULTILINE_FAIL lines=64 ways=1 extra=0 ENABLE=1 request=1 cycle=20 logical data mismatch got=b0b1 expected=b6b7",
+        "source": {
+          "path": "build/code-buffer-production-mutants/live_word_index.sv",
+          "sha256": "3010be6949b6c0a02f9eb8689a64f3d7bdcd9ae27b8440596db0916ac759962f"
+        },
+        "log": {
+          "path": "build/code-buffer-production-mutants/live_word_index.log",
+          "sha256": "bb1be9cf20740965ee080893d50bffe50afaebcd8503556c38b1c313afb2944b"
+        },
+        "compile_log": {
+          "path": "build/code-buffer-production-mutants/live_word_index.compile.log",
+          "sha256": "3c09f8ccaf8b993a2850adf45ca16c64c123bf64b85f03716e59fbbc5b51bff0"
+        }
+      },
+      {
+        "mutant": "bram_hit_wrong_word",
+        "rejected": true,
+        "old": "DATA_ADDRESS_BITS'({input_index, in_address[2:1]})",
+        "new": "DATA_ADDRESS_BITS'({input_index, 2'b00})",
+        "expected_assertion": "logical data mismatch got=b6b7 expected=b4b5",
+        "observed_failure": "MULTILINE_FAIL lines=64 ways=1 extra=0 ENABLE=1 request=2 cycle=24 logical data mismatch got=b6b7 expected=b4b5",
+        "source": {
+          "path": "build/code-buffer-production-mutants/bram_hit_wrong_word.sv",
+          "sha256": "51b6fdd994ba927545b6802607dbc2d6d0e63cefb29c97c5a699a632f99aa040"
+        },
+        "log": {
+          "path": "build/code-buffer-production-mutants/bram_hit_wrong_word.log",
+          "sha256": "9a9d82763cae3666d178080f63815553defe6bfc76cc3e726b8d0094c261bcde"
+        },
+        "compile_log": {
+          "path": "build/code-buffer-production-mutants/bram_hit_wrong_word.compile.log",
+          "sha256": "b5982091f050c1c3607e5f1d7da483fa2240a98d6b3bedaddd15c7afd86aa290"
+        }
+      },
+      {
+        "mutant": "tag_drops_physical_bit24",
+        "rejected": true,
+        "old": "line_tag_q[input_index] == in_address[24:TAG_LOW]",
+        "new": "line_tag_q[input_index][23:TAG_LOW] == in_address[23:TAG_LOW]",
+        "expected_assertion": "logical data mismatch got=a6a7 expected=a7a6",
+        "observed_failure": "MULTILINE_FAIL lines=64 ways=1 extra=0 ENABLE=1 request=377 cycle=4907 logical data mismatch got=a6a7 expected=a7a6",
+        "source": {
+          "path": "build/code-buffer-production-mutants/tag_drops_physical_bit24.sv",
+          "sha256": "95cd4951d68b4d017ec5ec3de801beefed0c8b8d37c652091643dc23fa22d05c"
+        },
+        "log": {
+          "path": "build/code-buffer-production-mutants/tag_drops_physical_bit24.log",
+          "sha256": "ca5854e88c50095894498b52432212bfd3f43270910e8142f7ff72fe74ef0aed"
+        },
+        "compile_log": {
+          "path": "build/code-buffer-production-mutants/tag_drops_physical_bit24.compile.log",
+          "sha256": "2be4a898eb7932c8460f71c71442d4cb4f016498b05986f8e320d969ae98ac7a"
+        }
+      },
+      {
+        "mutant": "cancel_drops_accepted_beats",
+        "rejected": true,
+        "old": "(out_ready && out_read_data_valid)",
+        "new": "(out_read_data_valid)",
+        "expected_assertion": "physical owner released before completion",
+        "observed_failure": "MULTILINE_FAIL lines=64 ways=1 extra=0 ENABLE=1 request=401 cycle=5166 physical owner released before completion",
+        "source": {
+          "path": "build/code-buffer-production-mutants/cancel_drops_accepted_beats.sv",
+          "sha256": "b2f7bb9e724a06be86224db924d9b3b1b778a833d456e3644ef6593278e31f9e"
+        },
+        "log": {
+          "path": "build/code-buffer-production-mutants/cancel_drops_accepted_beats.log",
+          "sha256": "efb1ea0dce7ee104a6f54eaad538bc157cb9f1bb64fc42c42d2fdc8346a01339"
+        },
+        "compile_log": {
+          "path": "build/code-buffer-production-mutants/cancel_drops_accepted_beats.compile.log",
+          "sha256": "e82c5ecdeabf881c9aec770d68b9bf8c4afe46f2b5c8f3c193d8bf723fbf7345"
+        }
+      }
+    ]
+  },
+  "coherence_regression": {
+    "schema_version": 1,
+    "date": "2026-09-22",
+    "baseline_commit": "266f5b49c4c63b25bb5d7e857a77084bcb9511a7",
+    "scope": "Positive production regression of the three historical coherence/invalidation failures",
+    "production_rtl": {
+      "path": "rtl/spk286_integration/spk286_at_sdram_read_buffer.sv",
+      "bytes": 21361,
+      "sha256": "5e7b3512394c570fab8e82723c0d093f125e5b8d53c867d99ba0ae30570fdfcb"
+    },
+    "production_unchanged_vs_head": false,
+    "testbench": {
+      "path": "sim/spk286_integration/spk286_code_buffer_coherence_audit_tb.sv",
+      "bytes": 9673,
+      "sha256": "0f7d8d7adddb452de26feeb7b23ab8d7db8a3698d631a14c0e4b21ce075ce4f4"
+    },
+    "runner": {
+      "path": "scripts/test_code_buffer_coherence_audit.sh",
+      "bytes": 4674,
+      "sha256": "3889b4e319cf056efa9b09b1b5997d8e1f30f3900579b822560419af3d1f0031"
+    },
+    "simulators": {
+      "iverilog": "Icarus Verilog version 12.0 (stable) ()",
+      "verilator": "Verilator 5.020 2024-01-01 rev (Debian 5.020-1)"
+    },
+    "compile_logs": [
+      {
+        "path": "build/code-buffer-coherence-fixed/iverilog-compile.log",
+        "bytes": 408,
+        "sha256": "1aa802d95d4589aa64f81c1a57ed96a8e0985fb6ab63796ccf45d2032c6dcc06"
+      },
+      {
+        "path": "build/code-buffer-coherence-fixed/verilator-compile.log",
+        "bytes": 5298,
+        "sha256": "edfc576ca9b962aa7be4cd62a1dacfddad159ee7f774022a7f006deb9ff72f99"
+      }
+    ],
+    "results": [
+      {
+        "case": "cpu_odd_upper_last_byte",
+        "plusargs": "+CASE=0",
+        "simulator": "iverilog",
+        "exit_code": 0,
+        "result": "PASS",
+        "observation": "AUDIT_ODD_UPPER owner=0 backend_word=cc04",
+        "log": {
+          "path": "build/code-buffer-coherence-fixed/iverilog-case-0.log",
+          "bytes": 171,
+          "sha256": "e82ccdfe0fe504a96c55a82b33df892b8d2bb59411f27d0dc797ee4114a6a8de"
+        }
+      },
+      {
+        "case": "cpu_cancel_idle",
+        "plusargs": "+CASE=1",
+        "simulator": "iverilog",
+        "exit_code": 0,
+        "result": "PASS",
+        "observation": "AUDIT_IDLE_CANCEL physical_reads_before=4 after=8 hits=0",
+        "log": {
+          "path": "build/code-buffer-coherence-fixed/iverilog-case-1.log",
+          "bytes": 288,
+          "sha256": "3fea55f0f4199d68f46190038a16d8c96bd9943980fff423181a508a1fbd46f3"
+        }
+      },
+      {
+        "case": "dma_odd_upper_last_byte",
+        "plusargs": "+CASE=2",
+        "simulator": "iverilog",
+        "exit_code": 0,
+        "result": "PASS",
+        "observation": "AUDIT_ODD_UPPER owner=1 backend_word=cc04",
+        "log": {
+          "path": "build/code-buffer-coherence-fixed/iverilog-case-2.log",
+          "bytes": 171,
+          "sha256": "f62823b96ead9daec64aaf280f5a9a4529c67f8da176288b04d26551399fd090"
+        }
+      },
+      {
+        "case": "cpu_odd_upper_last_byte",
+        "plusargs": "+CASE=0",
+        "simulator": "verilator",
+        "exit_code": 0,
+        "result": "PASS",
+        "observation": "AUDIT_ODD_UPPER owner=0 backend_word=cc04",
+        "log": {
+          "path": "build/code-buffer-coherence-fixed/verilator-case-0.log",
+          "bytes": 158,
+          "sha256": "bd8d7b7e6dda854b5a35c5c7f3a1e043c15ba7b369c33f16bbf2e503525ff278"
+        }
+      },
+      {
+        "case": "cpu_cancel_idle",
+        "plusargs": "+CASE=1",
+        "simulator": "verilator",
+        "exit_code": 0,
+        "result": "PASS",
+        "observation": "AUDIT_IDLE_CANCEL physical_reads_before=4 after=8 hits=0",
+        "log": {
+          "path": "build/code-buffer-coherence-fixed/verilator-case-1.log",
+          "bytes": 275,
+          "sha256": "9f27518a3b4f48d00e25c0206baad6efa35bfe6f1b2fb6a93dc8210414fc861e"
+        }
+      },
+      {
+        "case": "dma_odd_upper_last_byte",
+        "plusargs": "+CASE=2",
+        "simulator": "verilator",
+        "exit_code": 0,
+        "result": "PASS",
+        "observation": "AUDIT_ODD_UPPER owner=1 backend_word=cc04",
+        "log": {
+          "path": "build/code-buffer-coherence-fixed/verilator-case-2.log",
+          "bytes": 158,
+          "sha256": "c362cb32962c06ab4cf926feb4880ed9f0ab26b7371fc671e4021ce2353047fa"
+        }
+      }
+    ],
+    "limitations": [
+      "Registered-command abstract backend, not SDRAM pin simulation.",
+      "IDLE cancellation violates P03-R15; retaining that unchanged data does not demonstrate corruption by itself.",
+      "No causal link to Windows startup, no synthesis or hardware validation."
+    ],
+    "experimental_model_snapshot": {
+      "path": "sim/spk286_integration/spk286_at_multiline_code_buffer_model.sv",
+      "bytes": 22166,
+      "sha256": "ddb739671ac20e9f96db50901eefbddbb36f384b118989f1c1fe47474a220c61"
+    }
+  },
+  "integration": [
+    {
+      "test": "test_at_mister_memory_port",
+      "log": {
+        "path": "build/code-buffer-integration/test_at_mister_memory_port.log",
+        "sha256": "f7f56f9e29b21ad20742e2b18ae80ae652e2e3a3b05fd7aada5f7b704f61ce65"
+      }
+    },
+    {
+      "test": "test_at_mister_sdram_owner",
+      "log": {
+        "path": "build/code-buffer-integration/test_at_mister_sdram_owner.log",
+        "sha256": "d8c531fe1e1b01e057739b8c897d07232f3a4d0bfc5d255047825807fb861c54"
+      }
+    },
+    {
+      "test": "test_at_hps_rom_loader",
+      "log": {
+        "path": "build/code-buffer-integration/test_at_hps_rom_loader.log",
+        "sha256": "91916ec80af49d7799e83d4a2a0df94afc7b0e6b37fe47e3baea0c6b85c8f8d5"
+      }
+    },
+    {
+      "test": "test_at_cdc",
+      "log": {
+        "path": "build/code-buffer-integration/test_at_cdc.log",
+        "sha256": "9c219d17fd5e859fc0f954b9eb39c6f2791d1ba5c444a02251de2bbf22fc99ce"
+      }
+    },
+    {
+      "test": "test_at_machine_boundary",
+      "log": {
+        "path": "build/code-buffer-integration/test_at_machine_boundary.log",
+        "sha256": "b8711206e9ebd29dd5bb87e41b79cd3606367fbe4ab4383e55e6cf97777037d3"
+      }
+    },
+    {
+      "test": "test_at_loadall_xms",
+      "log": {
+        "path": "build/code-buffer-integration/test_at_loadall_xms.log",
+        "sha256": "feb6ae2e1f1e360d7ea163e688c4a24e42c5cf258c1cf5aee3b62388d2c0ad81"
+      }
+    },
+    {
+      "test": "test_at_memory_perf",
+      "log": {
+        "path": "build/code-buffer-integration/test_at_memory_perf.log",
+        "sha256": "c7f32858caec8c2b13550831539b3644f68765c25ff6ee7bc4d1c0bd1b490e2d"
+      }
+    },
+    {
+      "test": "test_at_code_buffer_warm_reset",
+      "log": {
+        "path": "build/code-buffer-integration/test_at_code_buffer_warm_reset.log",
+        "sha256": "510cdf953f5d244e379955b71cf22e465881fbccbc214fd1cc8d074cb8df9595"
+      }
+    }
+  ],
+  "integration_driver": {
+    "path": "build/code-buffer-integration-final.log",
+    "sha256": "9cc99082b03a20a4e4e1ce96c4562663655bcac29446c37f1252cd3e216b890a"
+  },
+  "warm_resets": [
+    {
+      "state": 0,
+      "log": {
+        "path": "build/code-buffer-warm-reset/state-0.log",
+        "sha256": "145dd19ad050acc934d6ec939207462e3637882fb912073a0c27f565d02f0514"
+      }
+    },
+    {
+      "state": 4,
+      "log": {
+        "path": "build/code-buffer-warm-reset/state-4.log",
+        "sha256": "c4bd23e53424b77f33ec3591fe94fce9808c09f906599fc4b2b95aab2124ecd9"
+      }
+    },
+    {
+      "state": 5,
+      "log": {
+        "path": "build/code-buffer-warm-reset/state-5.log",
+        "sha256": "c230c830cef5a38a3d2157512efe4f5bf1c2e52d9897a672eb84fff1fc2927ec"
+      }
+    },
+    {
+      "state": 6,
+      "log": {
+        "path": "build/code-buffer-warm-reset/state-6.log",
+        "sha256": "3cbbbe25ccee9a15789e0f8bd9c44fabf04cecd5bbf0241b599a2a2ef1a7d484"
+      }
+    }
+  ],
+  "performance_comparison": {
+    "path": "build/code-buffer-512b-performance-final/production-comparison.json",
+    "sha256": "62f17cb7ccc10bd279c62ae6cf50f642b4ba62a1edd726feccbba1615bce3250"
+  }
+}

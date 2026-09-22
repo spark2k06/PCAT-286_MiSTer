@@ -8,7 +8,9 @@
 // and no-NPU Whetstone pages.  The production CPU, AT bridge, memory port,
 // SDRAM owner and pin model remain in the path.  P03 can be toggled for an
 // A/B comparison without changing the architectural workload.
-module spk286_checkit_workload_tb;
+module spk286_checkit_workload_tb #(
+    parameter integer CODE_BUFFER_LINES = 64
+);
     logic clk = 1'b0;
     logic reset = 1'b1;
     logic cpu_reset = 1'b1;
@@ -133,7 +135,11 @@ module spk286_checkit_workload_tb;
         .protocol_error(port_error)
     );
 
-    spk286_at_sdram_read_buffer #(.ENABLE(1'b1)) p03_buffer (
+`ifdef PCAT_CODE_BUFFER_EXPERIMENT
+    spk286_at_multiline_code_buffer_model #(.ENABLE(1'b1)) p03_buffer (
+`else
+    spk286_at_sdram_read_buffer #(.ENABLE(1'b1), .LINE_COUNT(CODE_BUFFER_LINES)) p03_buffer (
+`endif
         .clk(clk), .reset(reset), .cancel_cpu(cpu_reset),
         .enable(p03_enable != 0),
         .in_valid(backend_valid), .in_command_valid(backend_command),

@@ -1,0 +1,1827 @@
+{
+  "schema_version": 1,
+  "purpose": "Simulation-only multiline instruction-buffer model validation; no production RTL modification or hardware timing claim.",
+  "sources": [
+    {
+      "path": "sim/spk286_integration/spk286_at_multiline_code_buffer_model.sv",
+      "sha256": "ddb739671ac20e9f96db50901eefbddbb36f384b118989f1c1fe47474a220c61"
+    },
+    {
+      "path": "sim/spk286_integration/spk286_at_multiline_code_buffer_tb.sv",
+      "sha256": "f2bc205624f6ec9acf07d7b4896539c4fcf1ea373199abb190575e32a8504a40"
+    },
+    {
+      "path": "scripts/audit_code_buffer_model.py",
+      "sha256": "617dae7b1ef540e46c1dcf9a38031858f8d09df60331b43377c77eb624c74212"
+    },
+    {
+      "path": "scripts/test_at_multiline_code_buffer.sh",
+      "sha256": "5145cd07959eaf224985010fa39ad84972293499acde82c8b2c949cca187e93a"
+    }
+  ],
+  "source_hashes_checked_before_and_after": true,
+  "source_manifest": {
+    "path": "build/at-multiline-code-buffer/sources.sha256",
+    "sha256": "11cf58d471558de0db553a530b579efa10e3d2f8c11b02db755069393c679dbf"
+  },
+  "tools": {
+    "iverilog": "Icarus Verilog version 12.0 (stable) ()",
+    "verilator": "Verilator 5.020 2024-01-01 rev (Debian 5.020-1)"
+  },
+  "reproduction": [
+    "bash scripts/test_at_multiline_code_buffer.sh > build/multiline-coherence-driver.log 2>&1",
+    "python3 scripts/audit_code_buffer_model.py"
+  ],
+  "configuration_axes": {
+    "ENABLE": [
+      0,
+      1
+    ],
+    "CODE_LINES": [
+      1,
+      2,
+      4,
+      8,
+      16,
+      32,
+      64,
+      128
+    ],
+    "CODE_WAYS": [
+      1,
+      2
+    ],
+    "CODE_HIT_EXTRA": [
+      0,
+      1
+    ],
+    "constraint": "CODE_WAYS <= CODE_LINES"
+  },
+  "coverage": [
+    "All four words of a fill; low RAM, canonical BIOS and upper RAM boundaries.",
+    "Every cache slot, direct-mapped conflicts and two-way least-recently-used replacement.",
+    "CPU/DMA/loader writes with byte-enable 01/10/11 at offsets 0/1/6/7 using aligned physical lanes.",
+    "Odd word crossing lines as ordered upper-lane and lower-lane transfers; zero lanes and unrelated writes preserve cached lines.",
+    "Distinct canonical BIOS and high RAM addresses; data, non-CPU owners, holes and refresh bypass.",
+    "Dynamic enable and compile-time ENABLE=0; exact one-cycle additional hit latency when configured.",
+    "Delayed backend acceptance and separated data beats; stable metadata until physical READY.",
+    "Input metadata deliberately changed after acceptance; captured word and command remain correct.",
+    "CPU cancellation in IDLE invalidates all slots and refuses new CPU requests while DMA/loader requests proceed.",
+    "CPU cancellation before each of four accepted burst beats fully drains all beats and returns the discarded value.",
+    "Reset during an accepted transaction resets both port ends and invalidates cached lines."
+  ],
+  "totals": {
+    "runs": 120,
+    "requests": 38400,
+    "checks": 2093074,
+    "commands": 32804,
+    "read_beats": 59096,
+    "writes": 5280
+  },
+  "totals_by_simulator": {
+    "iverilog": {
+      "runs": 60,
+      "requests": 19200,
+      "checks": 1046537,
+      "commands": 16402,
+      "read_beats": 29548,
+      "writes": 2640
+    },
+    "verilator": {
+      "runs": 60,
+      "requests": 19200,
+      "checks": 1046537,
+      "commands": 16402,
+      "read_beats": 29548,
+      "writes": 2640
+    }
+  },
+  "dual_simulator_counts_equal": true,
+  "driver_log": {
+    "path": "build/multiline-coherence-driver.log",
+    "sha256": "509b57f17a879b3cd476a1372fe5158568b46e6eed43b860f67ac337d3a2baed"
+  },
+  "dual_simulator_runs": [
+    {
+      "configuration": {
+        "ENABLE": 0,
+        "CODE_LINES": 1,
+        "CODE_WAYS": 1,
+        "CODE_HIT_EXTRA": 0
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-0-1-1-0.log",
+          "sha256": "f829bfa8e1d1d5b9b88127ac2f961d395aa3757ddf22a3f54bef3211c6e47eeb"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-0-1-1-0.log",
+          "sha256": "33a8cbb8bde9b5498922cc32c56f2d283c2685b9e7379efdcd2e47e041fdd33c"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 207,
+        "checks": 8934,
+        "commands": 207,
+        "read_beats": 161,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 0,
+        "CODE_LINES": 1,
+        "CODE_WAYS": 1,
+        "CODE_HIT_EXTRA": 1
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-0-1-1-1.log",
+          "sha256": "f48d7af92884f425ea17a853da8ea2f3a3dc6a3918dceed33c7c9f92cc746a82"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-0-1-1-1.log",
+          "sha256": "77ee9fe20bdf187433ffd30c3561d957a6cc41ef42c41d34d44f9c7aece7edd3"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 207,
+        "checks": 8934,
+        "commands": 207,
+        "read_beats": 161,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 0,
+        "CODE_LINES": 2,
+        "CODE_WAYS": 1,
+        "CODE_HIT_EXTRA": 0
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-0-2-1-0.log",
+          "sha256": "17e7c371e82e05900e7795485f6791fb9f838a1496f3079dc8b5bd1ba317f966"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-0-2-1-0.log",
+          "sha256": "e6750dbfea21343481603eeb24e53d160a234d83efdc67049d3424c94858953f"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 212,
+        "checks": 9144,
+        "commands": 212,
+        "read_beats": 166,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 0,
+        "CODE_LINES": 2,
+        "CODE_WAYS": 1,
+        "CODE_HIT_EXTRA": 1
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-0-2-1-1.log",
+          "sha256": "62c6d06e5fc418c1f21ebb26fba947a6a8288c8d7b4cb48c2313d57f41274597"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-0-2-1-1.log",
+          "sha256": "19347f72692201650a4a7bcaef822d7e81d893a77b67a8f727666bb38c1861e1"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 212,
+        "checks": 9144,
+        "commands": 212,
+        "read_beats": 166,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 0,
+        "CODE_LINES": 2,
+        "CODE_WAYS": 2,
+        "CODE_HIT_EXTRA": 0
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-0-2-2-0.log",
+          "sha256": "e811e7d35cbf25a67c303308203516c1f565344edb75dd5b05da88ff5475c22d"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-0-2-2-0.log",
+          "sha256": "e46420ae22ce2e62fbdea083ac9c21f10fece2468e9e99eb130fe8ecdb26d794"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 217,
+        "checks": 9354,
+        "commands": 217,
+        "read_beats": 171,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 0,
+        "CODE_LINES": 2,
+        "CODE_WAYS": 2,
+        "CODE_HIT_EXTRA": 1
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-0-2-2-1.log",
+          "sha256": "83e88f97c29ba9106206c7c3dff903bc7cf0f8d8f4fae333fba12aae6f292280"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-0-2-2-1.log",
+          "sha256": "bdedb4f78bab196ff188a3ea9e7ad95073739a5776439ce5abcd04c30336e6e3"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 217,
+        "checks": 9354,
+        "commands": 217,
+        "read_beats": 171,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 0,
+        "CODE_LINES": 4,
+        "CODE_WAYS": 1,
+        "CODE_HIT_EXTRA": 0
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-0-4-1-0.log",
+          "sha256": "f3da2a754033884ba843d1720457b9351c695ec76fa4621ee05baaebac7fcd5f"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-0-4-1-0.log",
+          "sha256": "4ac08cb5343a6bb8107ef29ee5b0b4aa96a317fababb1ac98662bcf84eac7dbe"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 218,
+        "checks": 9396,
+        "commands": 218,
+        "read_beats": 172,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 0,
+        "CODE_LINES": 4,
+        "CODE_WAYS": 1,
+        "CODE_HIT_EXTRA": 1
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-0-4-1-1.log",
+          "sha256": "f9d4ae5aa68905f5066571dfdb0919ec1ccd3ac1856f2229249c2ea18be5e364"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-0-4-1-1.log",
+          "sha256": "82a08333974ed54f4d802174500d6acdcf8792cc1644e610c387b01037b9b5d8"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 218,
+        "checks": 9396,
+        "commands": 218,
+        "read_beats": 172,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 0,
+        "CODE_LINES": 4,
+        "CODE_WAYS": 2,
+        "CODE_HIT_EXTRA": 0
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-0-4-2-0.log",
+          "sha256": "0cd03fc1f18e6df15ddff3f2b30785a702e57eca0947481c88a364965fbbcc65"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-0-4-2-0.log",
+          "sha256": "02bcb817c479156b132ac48a585bb60d568660a2d54ceb870bde53802d8de3f6"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 223,
+        "checks": 9606,
+        "commands": 223,
+        "read_beats": 177,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 0,
+        "CODE_LINES": 4,
+        "CODE_WAYS": 2,
+        "CODE_HIT_EXTRA": 1
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-0-4-2-1.log",
+          "sha256": "cc884ac4182d3440463cac2847aa3bbddd1a1e8c675b1c1c1d44a0ff7fa8a129"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-0-4-2-1.log",
+          "sha256": "28b0e45cff3df2914cdd1a53e1f63e6e5946620a6ce60100661e8c8ff8299993"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 223,
+        "checks": 9606,
+        "commands": 223,
+        "read_beats": 177,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 0,
+        "CODE_LINES": 8,
+        "CODE_WAYS": 1,
+        "CODE_HIT_EXTRA": 0
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-0-8-1-0.log",
+          "sha256": "4886bad0fc9a0635e0759b2a63655e16690449d921ac01013abebe28e6226fa4"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-0-8-1-0.log",
+          "sha256": "c6728d10fd4cda677dd53b921d626a95479d76cb55832b1ba40bd564a7eca09c"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 230,
+        "checks": 9900,
+        "commands": 230,
+        "read_beats": 184,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 0,
+        "CODE_LINES": 8,
+        "CODE_WAYS": 1,
+        "CODE_HIT_EXTRA": 1
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-0-8-1-1.log",
+          "sha256": "2aba9214045d2a312d1f4f54841b1d0a5ab72fffd6ecdfb22334b15674bc653c"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-0-8-1-1.log",
+          "sha256": "2ed0360bc4d1a4042be46f0bb8e2265fc6c3d0c7d7312d31cb98a9d714771eab"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 230,
+        "checks": 9900,
+        "commands": 230,
+        "read_beats": 184,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 0,
+        "CODE_LINES": 8,
+        "CODE_WAYS": 2,
+        "CODE_HIT_EXTRA": 0
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-0-8-2-0.log",
+          "sha256": "e5fe31d237d0838fdc9502d64c3aec568932f36fc0c2448a38eee75e053cf789"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-0-8-2-0.log",
+          "sha256": "262a1def4692e6fbeef12045471514c29412ba702ba2be2bf2563fd39fa2016c"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 235,
+        "checks": 10110,
+        "commands": 235,
+        "read_beats": 189,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 0,
+        "CODE_LINES": 8,
+        "CODE_WAYS": 2,
+        "CODE_HIT_EXTRA": 1
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-0-8-2-1.log",
+          "sha256": "6e79b0b3d368979e9e36878c8852ffd7f075761dbbb6cf102e0da7023224b9da"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-0-8-2-1.log",
+          "sha256": "04bed02fd06ee3e517749ce378867d5ae0108e2b9ad4f0c5b92f38ebe8dd0018"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 235,
+        "checks": 10110,
+        "commands": 235,
+        "read_beats": 189,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 0,
+        "CODE_LINES": 16,
+        "CODE_WAYS": 1,
+        "CODE_HIT_EXTRA": 0
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-0-16-1-0.log",
+          "sha256": "22b75850eab295081063fff8f854de79abacdb0fe9928befe0153d13294305a1"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-0-16-1-0.log",
+          "sha256": "43ef42d99b29d59647e47326f449ddf38f3e5a0d4425ead8e43a27224b4cbd9b"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 254,
+        "checks": 10908,
+        "commands": 254,
+        "read_beats": 208,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 0,
+        "CODE_LINES": 16,
+        "CODE_WAYS": 1,
+        "CODE_HIT_EXTRA": 1
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-0-16-1-1.log",
+          "sha256": "ea629852f79e2d2c6159f89d4501b9094b4117d3156e42bf600dbd8683baba65"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-0-16-1-1.log",
+          "sha256": "e9d40f0ff282d15571a6be9d2116122572bb09a5b28dad7782b13ca83108046d"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 254,
+        "checks": 10908,
+        "commands": 254,
+        "read_beats": 208,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 0,
+        "CODE_LINES": 16,
+        "CODE_WAYS": 2,
+        "CODE_HIT_EXTRA": 0
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-0-16-2-0.log",
+          "sha256": "267edca8e8d6bb40c0c7d38534703f7058e29b7653c32291e5a56bce8aafcc5e"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-0-16-2-0.log",
+          "sha256": "dc428afdcc4472ecdf5dba215dedc9214035ced9d44d4e638ef29556f1578d08"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 259,
+        "checks": 11118,
+        "commands": 259,
+        "read_beats": 213,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 0,
+        "CODE_LINES": 16,
+        "CODE_WAYS": 2,
+        "CODE_HIT_EXTRA": 1
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-0-16-2-1.log",
+          "sha256": "6286db98d0cde2aee4a46c1b111c3ea6a09b391d4050604b087c07cfd2d5233d"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-0-16-2-1.log",
+          "sha256": "c3df8aefd115e6b189c83c7687e97a22ed754c1beca0e975ea54d70eb73b5760"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 259,
+        "checks": 11118,
+        "commands": 259,
+        "read_beats": 213,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 0,
+        "CODE_LINES": 32,
+        "CODE_WAYS": 1,
+        "CODE_HIT_EXTRA": 0
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-0-32-1-0.log",
+          "sha256": "1f4f18f0d0a189c8bc52e6fc1ebb1620617a6d7b9632d8a91504fefb4f3426f4"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-0-32-1-0.log",
+          "sha256": "378cbed3849ad783e0a9a0275384e7cc7879e63c00cf4614484b86c086d606c1"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 302,
+        "checks": 12924,
+        "commands": 302,
+        "read_beats": 256,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 0,
+        "CODE_LINES": 32,
+        "CODE_WAYS": 1,
+        "CODE_HIT_EXTRA": 1
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-0-32-1-1.log",
+          "sha256": "67254ebaec2dafb3e89cb1dda98a7f66bce7585cb83b186b297633fb646f73b9"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-0-32-1-1.log",
+          "sha256": "288ed0c96e1677795155720b2fefcc7ca9e15f9b00e75f4d2c7adf7800ad5ba9"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 302,
+        "checks": 12924,
+        "commands": 302,
+        "read_beats": 256,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 0,
+        "CODE_LINES": 32,
+        "CODE_WAYS": 2,
+        "CODE_HIT_EXTRA": 0
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-0-32-2-0.log",
+          "sha256": "463c5ec2f8d5422caf2f3957f4827236d928e66fd988177a92e130d399228472"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-0-32-2-0.log",
+          "sha256": "6859bd172fb3ace85efdf3591c6da776cd210b1be8c8d3315585c154e83f2c59"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 307,
+        "checks": 13134,
+        "commands": 307,
+        "read_beats": 261,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 0,
+        "CODE_LINES": 32,
+        "CODE_WAYS": 2,
+        "CODE_HIT_EXTRA": 1
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-0-32-2-1.log",
+          "sha256": "370d657b9809af4484259f47c0aec0747455d0d469ee117a67232dee8a7ed93e"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-0-32-2-1.log",
+          "sha256": "44ed9851f8cba821f54acbc3a005df07579ae9e89b5d737d85032f683667e479"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 307,
+        "checks": 13134,
+        "commands": 307,
+        "read_beats": 261,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 0,
+        "CODE_LINES": 64,
+        "CODE_WAYS": 1,
+        "CODE_HIT_EXTRA": 0
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-0-64-1-0.log",
+          "sha256": "66cb9a3145bf82445f81f06b34ca638e5781b9ef7d1b0228cbddde8d16e2e2e0"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-0-64-1-0.log",
+          "sha256": "b31d0e802fae35a90cfe79a247e1cb2d161176991fcb6a8e2bf8e74e31502262"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 398,
+        "checks": 16956,
+        "commands": 398,
+        "read_beats": 352,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 0,
+        "CODE_LINES": 64,
+        "CODE_WAYS": 1,
+        "CODE_HIT_EXTRA": 1
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-0-64-1-1.log",
+          "sha256": "fbab4eee6450b1d3d53a2520a8965ab8a0ca45acb6d0e94d5b1f1e20ae029e48"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-0-64-1-1.log",
+          "sha256": "ae4c9cc84f914959e27712e89e2d28d993575c051f0029cb63282eec1030c389"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 398,
+        "checks": 16956,
+        "commands": 398,
+        "read_beats": 352,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 0,
+        "CODE_LINES": 64,
+        "CODE_WAYS": 2,
+        "CODE_HIT_EXTRA": 0
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-0-64-2-0.log",
+          "sha256": "041881125e1fc2e50f10f0559e73b12fa6c27b7f5e423afadb1061e2b039695a"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-0-64-2-0.log",
+          "sha256": "1eae0f3bed74920e247c4e45d9de917a1e25c727a02ebe08d4c077e1ae29600f"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 403,
+        "checks": 17166,
+        "commands": 403,
+        "read_beats": 357,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 0,
+        "CODE_LINES": 64,
+        "CODE_WAYS": 2,
+        "CODE_HIT_EXTRA": 1
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-0-64-2-1.log",
+          "sha256": "ab2098cfa70f7314a4471a8552dd50281c8a5252fdb00c32020b64c340f54702"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-0-64-2-1.log",
+          "sha256": "b63cd98b77612e43db53c9ed87b134d548d77ad426d04c84404c31f8b8fc9045"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 403,
+        "checks": 17166,
+        "commands": 403,
+        "read_beats": 357,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 0,
+        "CODE_LINES": 128,
+        "CODE_WAYS": 1,
+        "CODE_HIT_EXTRA": 0
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-0-128-1-0.log",
+          "sha256": "c7ba1a8c048550e45b25dbd24d4c362a26388771d7d3f942a4c38a1877b8b8aa"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-0-128-1-0.log",
+          "sha256": "dfb87ebff8843d29d6efd4e635ee537ca7287f75bceb197ff388ea8deccbcd56"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 590,
+        "checks": 25020,
+        "commands": 590,
+        "read_beats": 544,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 0,
+        "CODE_LINES": 128,
+        "CODE_WAYS": 1,
+        "CODE_HIT_EXTRA": 1
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-0-128-1-1.log",
+          "sha256": "5e153416ca090882c5e243c42b932bf740afee40e9bfa705a63b5463f346ff76"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-0-128-1-1.log",
+          "sha256": "b313bfa747889196a0d29bc76adf6d13457b15406fb588d907f3f788c3228fda"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 590,
+        "checks": 25020,
+        "commands": 590,
+        "read_beats": 544,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 0,
+        "CODE_LINES": 128,
+        "CODE_WAYS": 2,
+        "CODE_HIT_EXTRA": 0
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-0-128-2-0.log",
+          "sha256": "cb22e91d1696c26b081a7637ac44ff5db0612eeb8cef93c3556dbab109a47b04"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-0-128-2-0.log",
+          "sha256": "daae8451040e0bd7e7b042c1ac8cc21e3e0b669a086b11db344b462c11205b62"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 595,
+        "checks": 25230,
+        "commands": 595,
+        "read_beats": 549,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 0,
+        "CODE_LINES": 128,
+        "CODE_WAYS": 2,
+        "CODE_HIT_EXTRA": 1
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-0-128-2-1.log",
+          "sha256": "49721d5d2e8a3fd6d126fe0353b323b92c65d3c24217799e5084ff47278b8228"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-0-128-2-1.log",
+          "sha256": "fdcaba8d514b31ba2123310b7aea6cb766a85b39fddbda700488ec7000f1e007"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 595,
+        "checks": 25230,
+        "commands": 595,
+        "read_beats": 549,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 1,
+        "CODE_LINES": 1,
+        "CODE_WAYS": 1,
+        "CODE_HIT_EXTRA": 0
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-1-1-1-0.log",
+          "sha256": "aef79ca48be3b9a2cf233d5989078521f933e4722f8ca46a3bc814ff12c93c9f"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-1-1-1-0.log",
+          "sha256": "6df18dac96afe548e4ff4f57ed507633dff7443ab372e1aaada7cc46ea9e43c5"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 227,
+        "checks": 14315,
+        "commands": 169,
+        "read_beats": 450,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 1,
+        "CODE_LINES": 1,
+        "CODE_WAYS": 1,
+        "CODE_HIT_EXTRA": 1
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-1-1-1-1.log",
+          "sha256": "10341a0a7737641b2b47f0c17a4ce919db71c8c7101821d5bb39e36aab48b86e"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-1-1-1-1.log",
+          "sha256": "fae2de1bee9354108dd5eab4986c1483cb99a03822b0b5f561b64edf5f0fdb6a"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 227,
+        "checks": 14489,
+        "commands": 169,
+        "read_beats": 450,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 1,
+        "CODE_LINES": 2,
+        "CODE_WAYS": 1,
+        "CODE_HIT_EXTRA": 0
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-1-2-1-0.log",
+          "sha256": "a0f3619f3ffeb2f9497ef61ced7bf345b8991be1430fa172a39905fa20aaecc1"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-1-2-1-0.log",
+          "sha256": "09128f05204b6acbf679dae31ecd5291e9c696ca170414a53c01ef536d6404e6"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 232,
+        "checks": 14640,
+        "commands": 172,
+        "read_beats": 462,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 1,
+        "CODE_LINES": 2,
+        "CODE_WAYS": 1,
+        "CODE_HIT_EXTRA": 1
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-1-2-1-1.log",
+          "sha256": "7d02e5530f692bb03d0edbb4497210e173c6ed1fa24a4cd475944cdaa79594dc"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-1-2-1-1.log",
+          "sha256": "699bebf548329c996db4ef9463586b57256269aad5addd0c70effc9001405ce8"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 232,
+        "checks": 14820,
+        "commands": 172,
+        "read_beats": 462,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 1,
+        "CODE_LINES": 2,
+        "CODE_WAYS": 2,
+        "CODE_HIT_EXTRA": 0
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-1-2-2-0.log",
+          "sha256": "50b89420872bc53e7c306cf098fdfe61ad004f3b9213e1c55f08f79c1fe6fe48"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-1-2-2-0.log",
+          "sha256": "a747876fda46b79d2d762a1f1619146ea7fcd6bf3581aacdad4e306cef0caad3"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 237,
+        "checks": 14885,
+        "commands": 174,
+        "read_beats": 470,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 1,
+        "CODE_LINES": 2,
+        "CODE_WAYS": 2,
+        "CODE_HIT_EXTRA": 1
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-1-2-2-1.log",
+          "sha256": "c20c17f167b9b5b2fb3b4d7ebb1b4fe3c4c62808104a8b6631df550992eaeea6"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-1-2-2-1.log",
+          "sha256": "59406ab374c9a28ae1a2dcffebedd570753d8422dc23e0bf161a165d399fb7d9"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 237,
+        "checks": 15074,
+        "commands": 174,
+        "read_beats": 470,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 1,
+        "CODE_LINES": 4,
+        "CODE_WAYS": 1,
+        "CODE_HIT_EXTRA": 0
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-1-4-1-0.log",
+          "sha256": "535c65637dadfe6df79de23e5d19228798a6e1863b7c08f0c13334d1835862ff"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-1-4-1-0.log",
+          "sha256": "7de3dc7d249502f6144676650cb3a039c9d89ffde7e567204d7c12bb5d97ef26"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 238,
+        "checks": 15062,
+        "commands": 176,
+        "read_beats": 478,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 1,
+        "CODE_LINES": 4,
+        "CODE_WAYS": 1,
+        "CODE_HIT_EXTRA": 1
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-1-4-1-1.log",
+          "sha256": "2e2db073ea30d95aed851ba287c3dc912f10ce0518668c14cc2ba5c07f8c2c13"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-1-4-1-1.log",
+          "sha256": "146e8f5a1978f298ecaba0a2281c99a4f1380b8425c2922000427ba76fb10757"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 238,
+        "checks": 15248,
+        "commands": 176,
+        "read_beats": 478,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 1,
+        "CODE_LINES": 4,
+        "CODE_WAYS": 2,
+        "CODE_HIT_EXTRA": 0
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-1-4-2-0.log",
+          "sha256": "7b0b8f60f994fcfb9eb4e94cf8a82ae3aadddb14038024505176fd93e78cd8a1"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-1-4-2-0.log",
+          "sha256": "24653003b38e3bc96a677a2011c45fc65a79b03ca0982cbf27ff3b4aa8bacf76"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 243,
+        "checks": 15307,
+        "commands": 178,
+        "read_beats": 486,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 1,
+        "CODE_LINES": 4,
+        "CODE_WAYS": 2,
+        "CODE_HIT_EXTRA": 1
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-1-4-2-1.log",
+          "sha256": "6f572cc9d5c52b45987f3e507b7633ed9834f7762847441f8dec36831211a564"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-1-4-2-1.log",
+          "sha256": "d2c515edccb0bda55c6aa55037a8042e07e5b667efd93529a20af89cf656859a"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 243,
+        "checks": 15502,
+        "commands": 178,
+        "read_beats": 486,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 1,
+        "CODE_LINES": 8,
+        "CODE_WAYS": 1,
+        "CODE_HIT_EXTRA": 0
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-1-8-1-0.log",
+          "sha256": "96f2c31bcbe043139e9e6f6c959efd2aa5303ffe8db91e4ea55109b569d18112"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-1-8-1-0.log",
+          "sha256": "4b4a3fd3622b15580f55739d07a4161b73807b936fcee71a029d318bd70e4404"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 250,
+        "checks": 15906,
+        "commands": 184,
+        "read_beats": 510,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 1,
+        "CODE_LINES": 8,
+        "CODE_WAYS": 1,
+        "CODE_HIT_EXTRA": 1
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-1-8-1-1.log",
+          "sha256": "1fe838a5b5379e6d5e540a63653444b2a40ce4204c64df8eb21e5f9770063545"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-1-8-1-1.log",
+          "sha256": "9edc4d3a7c330bcc5edb49c1cc327cd5f2f63d97e21ed3ef949a1364a4c3dad1"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 250,
+        "checks": 16104,
+        "commands": 184,
+        "read_beats": 510,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 1,
+        "CODE_LINES": 8,
+        "CODE_WAYS": 2,
+        "CODE_HIT_EXTRA": 0
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-1-8-2-0.log",
+          "sha256": "ffcc63d71fdcc5e392fc0e34cda1bd37f5ad9cfd74d16c4020593a9f51e0d3eb"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-1-8-2-0.log",
+          "sha256": "e7e2d8646547f9bed63a95afe6be0e80314151cdad1502fa0d50fb81511e3a63"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 255,
+        "checks": 16151,
+        "commands": 186,
+        "read_beats": 518,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 1,
+        "CODE_LINES": 8,
+        "CODE_WAYS": 2,
+        "CODE_HIT_EXTRA": 1
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-1-8-2-1.log",
+          "sha256": "0f89f9e46521184a1bd4d303ec1f8f547193c823bda478a6074320374fe07a7f"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-1-8-2-1.log",
+          "sha256": "9946e3741856019a118c0e0eb0d44b3e586498ffe9ac1709c7158e27bef48525"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 255,
+        "checks": 16358,
+        "commands": 186,
+        "read_beats": 518,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 1,
+        "CODE_LINES": 16,
+        "CODE_WAYS": 1,
+        "CODE_HIT_EXTRA": 0
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-1-16-1-0.log",
+          "sha256": "9049e9e9e75c99e00abf115d967cce0521a7345146bfc508363326022537df1d"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-1-16-1-0.log",
+          "sha256": "d1ab87b8c5472dabb38e4599d669bc858c67c6ec306939462729e1c94a509075"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 274,
+        "checks": 17594,
+        "commands": 200,
+        "read_beats": 574,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 1,
+        "CODE_LINES": 16,
+        "CODE_WAYS": 1,
+        "CODE_HIT_EXTRA": 1
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-1-16-1-1.log",
+          "sha256": "1a3f3123418f2d0fbbd3906721ced3191c40d8e9dffa7ce99f2acfe48495ff14"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-1-16-1-1.log",
+          "sha256": "8a2cdcb3c7249b59f60c83d59739565061553dafa33e10c0b4b30b5ecc0bbe57"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 274,
+        "checks": 17816,
+        "commands": 200,
+        "read_beats": 574,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 1,
+        "CODE_LINES": 16,
+        "CODE_WAYS": 2,
+        "CODE_HIT_EXTRA": 0
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-1-16-2-0.log",
+          "sha256": "30b8dbd32217ad9c319ec747980869c20a2ffd8457ef02e58fca208deb34c2c9"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-1-16-2-0.log",
+          "sha256": "9f29ec09fc53769cd5297a064c636d8b89a013894c0786ad126004ba40142024"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 279,
+        "checks": 17839,
+        "commands": 202,
+        "read_beats": 582,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 1,
+        "CODE_LINES": 16,
+        "CODE_WAYS": 2,
+        "CODE_HIT_EXTRA": 1
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-1-16-2-1.log",
+          "sha256": "0aae67f54d4a1a44e7b5dffe1e21c4ecb46fbb630be89005bf723afb7f8ec425"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-1-16-2-1.log",
+          "sha256": "fccfec10e707b5002ff0900168e9bcd885377dd98f4e2245898d5579dabed741"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 279,
+        "checks": 18070,
+        "commands": 202,
+        "read_beats": 582,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 1,
+        "CODE_LINES": 32,
+        "CODE_WAYS": 1,
+        "CODE_HIT_EXTRA": 0
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-1-32-1-0.log",
+          "sha256": "8bcbad9b1096ed0c97ed78c5cf6b4909b9f51c7eb23de046ba40ee5691806706"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-1-32-1-0.log",
+          "sha256": "2f6c3892653c1f390d5ac74225df7ebfc3f221b54d5c7bc9ebe3569d2504533f"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 322,
+        "checks": 20970,
+        "commands": 232,
+        "read_beats": 702,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 1,
+        "CODE_LINES": 32,
+        "CODE_WAYS": 1,
+        "CODE_HIT_EXTRA": 1
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-1-32-1-1.log",
+          "sha256": "112a62b68112148627b2a50b2516705c5d8355eebef1242453dbf231a2694286"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-1-32-1-1.log",
+          "sha256": "419830331de16ab6c795ada5bc5f63912047023dec6f0df59e7a3dd9e8785381"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 322,
+        "checks": 21240,
+        "commands": 232,
+        "read_beats": 702,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 1,
+        "CODE_LINES": 32,
+        "CODE_WAYS": 2,
+        "CODE_HIT_EXTRA": 0
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-1-32-2-0.log",
+          "sha256": "10748ad089b00b58176ce4de1c3b15331170479a8b405f5fdcb13ac31ec901ab"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-1-32-2-0.log",
+          "sha256": "9cfe682b85c72f6db2ddd350513942c7718799cc4f7c8f7dadd922e06000defd"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 327,
+        "checks": 21215,
+        "commands": 234,
+        "read_beats": 710,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 1,
+        "CODE_LINES": 32,
+        "CODE_WAYS": 2,
+        "CODE_HIT_EXTRA": 1
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-1-32-2-1.log",
+          "sha256": "53cbf5a7d9ac3ca41b83ec6d538ed16c6909e47e0702ad5852e3d3d654a47fc9"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-1-32-2-1.log",
+          "sha256": "cf94874e31d91a7101cc7c175ee05894483c1509e884069beda82b0ab3501f71"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 327,
+        "checks": 21494,
+        "commands": 234,
+        "read_beats": 710,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 1,
+        "CODE_LINES": 64,
+        "CODE_WAYS": 1,
+        "CODE_HIT_EXTRA": 0
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-1-64-1-0.log",
+          "sha256": "c24776e105aee5265aebd5d508777ac704dcb3eee6f3e7d2a4aec2422d5b96ca"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-1-64-1-0.log",
+          "sha256": "1bd774be72cab2f9245f2a2994096a93292cafb3c22bcda553c010e4b9124dee"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 418,
+        "checks": 27722,
+        "commands": 296,
+        "read_beats": 958,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 1,
+        "CODE_LINES": 64,
+        "CODE_WAYS": 1,
+        "CODE_HIT_EXTRA": 1
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-1-64-1-1.log",
+          "sha256": "4322491bcc431a65757094ba237113f9df9e0fb43025387eda1bf6f754a11d2e"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-1-64-1-1.log",
+          "sha256": "d13c1ea66fc91c5b3196e8cb7fd144a629541f15a13f351048fee80c9f72d4e4"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 418,
+        "checks": 28088,
+        "commands": 296,
+        "read_beats": 958,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 1,
+        "CODE_LINES": 64,
+        "CODE_WAYS": 2,
+        "CODE_HIT_EXTRA": 0
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-1-64-2-0.log",
+          "sha256": "fbdf6bb024cb76a28c48b4119a596bf7c1cfb80b52ced38dfc7651028aa861c2"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-1-64-2-0.log",
+          "sha256": "3cfe071bc825f9516b6dd5602ba5903b84938d9033c5910feb1da973e63f21a9"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 423,
+        "checks": 27967,
+        "commands": 298,
+        "read_beats": 966,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 1,
+        "CODE_LINES": 64,
+        "CODE_WAYS": 2,
+        "CODE_HIT_EXTRA": 1
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-1-64-2-1.log",
+          "sha256": "f4e77b27728503eaaf4a0b4489999da460fda4eae1af968310bac141cd8f0071"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-1-64-2-1.log",
+          "sha256": "924d24c73a2623415ba9a435092fbf5400cabc768c3a8e1bd729525a4af6537e"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 423,
+        "checks": 28342,
+        "commands": 298,
+        "read_beats": 966,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 1,
+        "CODE_LINES": 128,
+        "CODE_WAYS": 1,
+        "CODE_HIT_EXTRA": 0
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-1-128-1-0.log",
+          "sha256": "ea171d5b5fd8d18c2967b17708053c1ad6436c96200ac579d10d0e7eb65e36bc"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-1-128-1-0.log",
+          "sha256": "af8485b1c241db28b6f05943a4f1e12ff5ce9188d30c64de9ca4f760d7b72eb1"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 610,
+        "checks": 41226,
+        "commands": 424,
+        "read_beats": 1470,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 1,
+        "CODE_LINES": 128,
+        "CODE_WAYS": 1,
+        "CODE_HIT_EXTRA": 1
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-1-128-1-1.log",
+          "sha256": "a4ae4924c86c65f5ac9e6ff72615f4beb0ccb4517966bc6c17e3ed9a2dff2f1f"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-1-128-1-1.log",
+          "sha256": "1b8ec677d6d6256d19b4c35f7c33263453826a2b587d0039fd2e5b87cb6c9e58"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 610,
+        "checks": 41784,
+        "commands": 424,
+        "read_beats": 1470,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 1,
+        "CODE_LINES": 128,
+        "CODE_WAYS": 2,
+        "CODE_HIT_EXTRA": 0
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-1-128-2-0.log",
+          "sha256": "c76c137851ccfeca038898a9c90b7cb8d8c3b85df035d714f2ff51bb39d8bf7f"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-1-128-2-0.log",
+          "sha256": "b79d44a035bfb1584663e530411879143bc4638d96bdd1ead7a07c180cd152a2"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 615,
+        "checks": 41471,
+        "commands": 426,
+        "read_beats": 1478,
+        "writes": 44
+      }
+    },
+    {
+      "configuration": {
+        "ENABLE": 1,
+        "CODE_LINES": 128,
+        "CODE_WAYS": 2,
+        "CODE_HIT_EXTRA": 1
+      },
+      "passed": true,
+      "logs": {
+        "iverilog": {
+          "path": "build/at-multiline-code-buffer/iverilog-1-128-2-1.log",
+          "sha256": "b20e249d7b22115f4e45b1c7be3603cf9868a1d0de0f3ebdc391f45f7808c105"
+        },
+        "verilator": {
+          "path": "build/at-multiline-code-buffer/verilator-1-128-2-1.log",
+          "sha256": "fda79be30e019cb6e5d51135d9af81fc173c36145f743e4efd2b2852f462ad8d"
+        }
+      },
+      "counts_per_simulator": {
+        "requests": 615,
+        "checks": 42038,
+        "commands": 426,
+        "read_beats": 1478,
+        "writes": 44
+      }
+    }
+  ],
+  "mutation_audit": {
+    "sources": [
+      {
+        "path": "sim/spk286_integration/spk286_at_multiline_code_buffer_model.sv",
+        "sha256": "ddb739671ac20e9f96db50901eefbddbb36f384b118989f1c1fe47474a220c61"
+      },
+      {
+        "path": "sim/spk286_integration/spk286_at_multiline_code_buffer_tb.sv",
+        "sha256": "f2bc205624f6ec9acf07d7b4896539c4fcf1ea373199abb190575e32a8504a40"
+      },
+      {
+        "path": "scripts/audit_code_buffer_model.py",
+        "sha256": "617dae7b1ef540e46c1dcf9a38031858f8d09df60331b43377c77eb624c74212"
+      }
+    ],
+    "simulator": "Icarus Verilog",
+    "configuration": {
+      "ENABLE": 1,
+      "CODE_LINES": 4,
+      "CODE_WAYS": 2,
+      "CODE_HIT_EXTRA": 1
+    },
+    "pristine": {
+      "passed": true,
+      "result": "MULTILINE_COHERENCE_PASS lines=4 ways=2 extra=1 ENABLE=1 requests=243 checks=15502 commands=178 read_beats=486 writes=44",
+      "log": {
+        "path": "build/at-multiline-code-buffer/mutants/pristine.log",
+        "sha256": "6f572cc9d5c52b45987f3e507b7633ed9834f7762847441f8dec36831211a564"
+      },
+      "compile_log": {
+        "path": "build/at-multiline-code-buffer/mutants/pristine.compile.log",
+        "sha256": "150b3c0122f2e61253787d14e18b8bd91eba6a57c12f08d507d1392e464bc621"
+      }
+    },
+    "mutants": [
+      {
+        "mutant": "unaligned_upper_lane",
+        "rejected": true,
+        "old": "second_byte = {address[24:1], 1'b1};",
+        "new": "second_byte = address + 25'd1;",
+        "expected_assertion": "fetch hit/miss mismatch at 0003006 expected_hit=0",
+        "observed_failure": "MULTILINE_FAIL lines=4 ways=2 extra=1 ENABLE=1 request=70 cycle=899 fetch hit/miss mismatch at 0003006 expected_hit=0",
+        "source": {
+          "path": "build/at-multiline-code-buffer/mutants/unaligned_upper_lane.sv",
+          "sha256": "1ac6f5cf979e6e8c7db82f83a59ca7d3ba99de4a6856318893bd6555fc95f1ce"
+        },
+        "log": {
+          "path": "build/at-multiline-code-buffer/mutants/unaligned_upper_lane.log",
+          "sha256": "28e46f830a8d1fd63fbb879923ad3e3c319629b50545937c0d72c56d6115499d"
+        },
+        "compile_log": {
+          "path": "build/at-multiline-code-buffer/mutants/unaligned_upper_lane.compile.log",
+          "sha256": "3582b51026ef9be410859ba46a43aab18cfb93f12687ab63d64ab08c7ff1a6d1"
+        }
+      },
+      {
+        "mutant": "cancel_idle_keeps_lines",
+        "rejected": true,
+        "old": "if (cancel_cpu) begin",
+        "new": "if (cancel_cpu && state_q != STATE_IDLE) begin",
+        "expected_assertion": "fetch hit/miss mismatch at 0010004 expected_hit=0",
+        "observed_failure": "MULTILINE_FAIL lines=4 ways=2 extra=1 ENABLE=1 request=36 cycle=426 fetch hit/miss mismatch at 0010004 expected_hit=0",
+        "source": {
+          "path": "build/at-multiline-code-buffer/mutants/cancel_idle_keeps_lines.sv",
+          "sha256": "cfe763e68473a9201cb2e325fc01e6ee3dfb5e2abd08cf3e5f20b64d1db5aa75"
+        },
+        "log": {
+          "path": "build/at-multiline-code-buffer/mutants/cancel_idle_keeps_lines.log",
+          "sha256": "517b5ded4cdb785c38c4487e72c39f4e77e20b3b9a1afd87edef7a728ec9ebdb"
+        },
+        "compile_log": {
+          "path": "build/at-multiline-code-buffer/mutants/cancel_idle_keeps_lines.compile.log",
+          "sha256": "7b58365eb363e0946f46eb257d2bfb6e5e158025672a86a76913d7976c4fbec9"
+        }
+      },
+      {
+        "mutant": "live_word_index",
+        "rejected": true,
+        "old": "request_word_index = request_address_q[2:1];",
+        "new": "request_word_index = in_address[2:1];",
+        "expected_assertion": "logical data mismatch got=b0b1 expected=b6b7",
+        "observed_failure": "MULTILINE_FAIL lines=4 ways=2 extra=1 ENABLE=1 request=1 cycle=20 logical data mismatch got=b0b1 expected=b6b7",
+        "source": {
+          "path": "build/at-multiline-code-buffer/mutants/live_word_index.sv",
+          "sha256": "d4201c7a1751d7f7d148af206477b26cafc186cf6845f60b59d5a499670d4411"
+        },
+        "log": {
+          "path": "build/at-multiline-code-buffer/mutants/live_word_index.log",
+          "sha256": "2069e9fabf211154800ff8fde682567dc092cc4a872184d71e48b1d59ea0f524"
+        },
+        "compile_log": {
+          "path": "build/at-multiline-code-buffer/mutants/live_word_index.compile.log",
+          "sha256": "85ea1f8dd0e0c5b3ea5f38ebd08674b498d3cdba78d5cf1656e773294fbc8a94"
+        }
+      },
+      {
+        "mutant": "missing_hit_penalty",
+        "rejected": true,
+        "old": "hit_wait_q <= (code_hit_extra != 0);",
+        "new": "hit_wait_q <= 1'b0;",
+        "expected_assertion": "hit latency differs from configured lookup penalty",
+        "observed_failure": "MULTILINE_FAIL lines=4 ways=2 extra=1 ENABLE=1 request=2 cycle=25 hit latency differs from configured lookup penalty",
+        "source": {
+          "path": "build/at-multiline-code-buffer/mutants/missing_hit_penalty.sv",
+          "sha256": "86966fa5fcaf4bcc3ab911d40a41de3c8a0913b7759ad7c518052cbf1cf6ae5e"
+        },
+        "log": {
+          "path": "build/at-multiline-code-buffer/mutants/missing_hit_penalty.log",
+          "sha256": "9443f4cdf6c109da85c4f2598a99d3e2d0668b4e35990bd7800abcc5a33dfafa"
+        },
+        "compile_log": {
+          "path": "build/at-multiline-code-buffer/mutants/missing_hit_penalty.compile.log",
+          "sha256": "a7d5afb71c80904555de5b06f75a52ddc78e09b721f76587f3dbc03e10300bfb"
+        }
+      },
+      {
+        "mutant": "wrong_lru_hit_update",
+        "rejected": true,
+        "old": "lru_way_q[input_set] <= (hit_slot == input_first_slot);",
+        "new": "lru_way_q[input_set] <= (hit_slot != input_first_slot);",
+        "expected_assertion": "fetch hit/miss mismatch at 0002002 expected_hit=1",
+        "observed_failure": "MULTILINE_FAIL lines=4 ways=2 extra=1 ENABLE=1 request=21 cycle=254 fetch hit/miss mismatch at 0002002 expected_hit=1",
+        "source": {
+          "path": "build/at-multiline-code-buffer/mutants/wrong_lru_hit_update.sv",
+          "sha256": "33932fc7bc09c06badee990c2f19ed708d8001939be50ca8c3aa3b3b415eee66"
+        },
+        "log": {
+          "path": "build/at-multiline-code-buffer/mutants/wrong_lru_hit_update.log",
+          "sha256": "c949eedc37bfb8312a70fc59d7d59578caafa5a1003cf2e34180111534478595"
+        },
+        "compile_log": {
+          "path": "build/at-multiline-code-buffer/mutants/wrong_lru_hit_update.compile.log",
+          "sha256": "76cf8339b9975983c93497e5661c023fb72c23ac4a5b3360a3d9c56105ff6ae7"
+        }
+      },
+      {
+        "mutant": "cancel_drops_accepted_beats",
+        "rejected": true,
+        "old": "(out_ready && out_read_data_valid)",
+        "new": "(out_read_data_valid)",
+        "expected_assertion": "physical owner released before completion",
+        "observed_failure": "MULTILINE_FAIL lines=4 ways=2 extra=1 ENABLE=1 request=222 cycle=2813 physical owner released before completion",
+        "source": {
+          "path": "build/at-multiline-code-buffer/mutants/cancel_drops_accepted_beats.sv",
+          "sha256": "8b0da7cbbab43d16ccfbcd59c4fa7a128616775c16254a30ffa24cd6216f231b"
+        },
+        "log": {
+          "path": "build/at-multiline-code-buffer/mutants/cancel_drops_accepted_beats.log",
+          "sha256": "68c6c0ddce9d82aa96586d0341b38860e046fa6909b8a894e31bb619029c59b1"
+        },
+        "compile_log": {
+          "path": "build/at-multiline-code-buffer/mutants/cancel_drops_accepted_beats.compile.log",
+          "sha256": "f03911784d805754aa6777c0db5d32fd3424e53a83d0f3a92c83af8e7c9dd39d"
+        }
+      }
+    ]
+  },
+  "mutation_receipt": {
+    "path": "build/at-multiline-code-buffer/mutants/results.json",
+    "sha256": "01a957d756be3d664645259a06c3d9d1ad80675e5c9878324fcb718de0c6b6f1"
+  }
+}

@@ -3,6 +3,10 @@
 # Quartus project revision in the repository.
 set_global_assignment -name VERILOG_MACRO "SPK286_AT_CDC"
 set_global_assignment -name VERILOG_MACRO "SPK286_P05_PARALLEL_LIMIT_CHECK"
+# Functional access optimizations shared with the simulation profile.
+set_global_assignment -name VERILOG_MACRO "SPK286_P01_FAST_MEMORY_START"
+set_global_assignment -name VERILOG_MACRO "SPK286_P02_FETCH_CHAIN"
+set_global_assignment -name VERILOG_MACRO "SPK286_P06_EARLY_MEMORY_ADDRESS"
 # Keep this assignment to build the boot splash and expose its OSD toggle.
 # Remove or comment it out to omit the splash and its OSD option entirely.
 # set_global_assignment -name VERILOG_MACRO "SPK286_AT_BOOT_SPLASH"

@@ -27,9 +27,12 @@ sources+=(
   sim/spk286_integration/spk286_checkit_workload_tb.sv
 )
 
+# Read implementation-performance switches from the same project configuration
+# that Quartus consumes. Previously P01/P02 were hard-coded here even when the
+# shipped bitstream omitted them. Optional overrides are explicit A/B controls.
+source "$root/scripts/at_performance_flags.sh"
 verilator --binary --timing -j 4 -Wno-fatal \
-  -DSPK286_P01_FAST_MEMORY_START -DSPK286_P02_FETCH_CHAIN \
-  -DSPK286_P05_PARALLEL_LIMIT_CHECK \
+  "${performance_flags[@]}" \
   --top-module spk286_checkit_workload_tb \
   --Mdir "$build_dir/obj" -o checkit_workload "${sources[@]}" \
   >"$build_dir/build.log" 2>&1
@@ -39,6 +42,7 @@ for workload in dhrystone whetstone working_set dhrystone21; do
     "$build_dir/obj/checkit_workload" \
       "+ROM=$build_dir/checkit-$workload.rom" \
       "+NAME=$workload" "+NATIVE=1" "+P03=$p03" \
+      "+PROFILE=${PCAT_PROFILE:-0}" \
       | tee "$build_dir/$workload-p03-$p03.log"
   done
 done

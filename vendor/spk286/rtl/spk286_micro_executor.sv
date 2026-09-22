@@ -8,7 +8,7 @@ module spk286_micro_executor (
     input  logic start,
     input  logic operation_valid,
     input  logic [spk286_microcode_pkg::MC_WORD_WIDTH-1:0] operation,
-    output logic operation_done, dispatch_request,
+    output logic operation_done, operation_retire, dispatch_request,
     input  logic byte_valid,
     input  logic [7:0] byte_data,
     output logic byte_ready,
@@ -31,6 +31,7 @@ module spk286_micro_executor (
     input logic [15:0] port_register,
     output logic decode_operand,
     input  logic decode_done,
+    input  logic decode_modrm_valid,
     input  logic decode_byte_ready,
     output logic operand_request, operand_write, operand_select_rm, operand_check, operand_byte,
     output logic stack_request,
@@ -1213,6 +1214,58 @@ module spk286_micro_executor (
         .result_write(adjust_write), .arithmetic_fault(adjust_fault)
     );
 
+    // Capture both register operands before the execution stage. Memory forms
+    // still use the original operand service and explicit microcode fallback.
+    logic register_decode, register_alu, register_byte, register_destination_rm;
+    logic register_capture, register_pending_q, register_complete, register_write;
+    logic [2:0] register_destination_q, register_a_index, register_b_index;
+    logic [15:0] register_a_value, register_b_value;
+    logic sequential_gpr_write_en, sequential_gpr_write_byte;
+    logic [2:0] sequential_gpr_write_index;
+    logic [15:0] sequential_gpr_write_data;
+    logic sequential_flags_write_en;
+    logic [15:0] sequential_flags_write_data, sequential_flags_write_mask;
+    always_comb begin
+        register_decode = 1'b1;
+        register_alu = 1'b0;
+        register_byte = 1'b0;
+        register_destination_rm = 1'b0;
+        case (operation)
+            spk286_microcode_pkg::MC_DECODE_ALU_RM16_REG16: begin register_alu = 1'b1; register_destination_rm = 1'b1; end
+            spk286_microcode_pkg::MC_DECODE_ALU_REG16_RM16: register_alu = 1'b1;
+            spk286_microcode_pkg::MC_DECODE_ALU_RM8_REG8: begin register_alu = 1'b1; register_byte = 1'b1; register_destination_rm = 1'b1; end
+            spk286_microcode_pkg::MC_DECODE_ALU_REG8_RM8: begin register_alu = 1'b1; register_byte = 1'b1; end
+            spk286_microcode_pkg::MC_DECODE_MOV_RM16_REG16: register_destination_rm = 1'b1;
+            spk286_microcode_pkg::MC_DECODE_MOV_REG16_RM16: begin end
+            spk286_microcode_pkg::MC_DECODE_MOV_RM8_REG8: begin register_byte = 1'b1; register_destination_rm = 1'b1; end
+            spk286_microcode_pkg::MC_DECODE_MOV_REG8_RM8: register_byte = 1'b1;
+            default: register_decode = 1'b0;
+        endcase
+    end
+    assign register_a_index = register_destination_rm ? byte_data[2:0] : byte_data[5:3];
+    assign register_b_index = register_destination_rm ? byte_data[5:3] : byte_data[2:0];
+    assign register_a_value = register_byte ?
+        {8'd0, register_state[register_a_index[1:0]*16 + (register_a_index[2] ? 8 : 0) +: 8]} :
+        register_state[register_a_index*16 +: 16];
+    assign register_b_value = register_byte ?
+        {8'd0, register_state[register_b_index[1:0]*16 + (register_b_index[2] ? 8 : 0) +: 8]} :
+        register_state[register_b_index*16 +: 16];
+    // Only the accepted ModR/M may capture operands, never displacement bytes.
+    assign register_capture = allowed && register_decode && !decode_modrm_valid &&
+                              decode_byte_ready && byte_valid && byte_data[7:6] == 2'b11;
+    assign register_complete = allowed && register_decode && register_pending_q &&
+                               operand_register_direct && decode_done;
+    assign register_write = register_complete && (!register_alu || result_write_allowed);
+    assign operation_retire = register_complete;
+    assign gpr_write_en = sequential_gpr_write_en || register_write;
+    assign gpr_write_byte = register_write ? register_byte : sequential_gpr_write_byte;
+    assign gpr_write_index = register_write ? register_destination_q : sequential_gpr_write_index;
+    assign gpr_write_data = register_write ? (register_alu ? alu_result : tmp1_q) : sequential_gpr_write_data;
+    assign flags_write_en = sequential_flags_write_en || (register_complete && register_alu);
+    assign flags_write_data = register_complete && register_alu ? alu_flags : sequential_flags_write_data;
+    assign flags_write_mask = register_complete && register_alu ?
+                              decoded_flags_mask & ~decoded_undefined_mask : sequential_flags_write_mask;
+
     spk286_alu alu (.operation(alu_operation), .operand_a(reverse_operands ? tmp1_q : tmp0_q), .operand_b(reverse_operands ? tmp0_q : tmp1_q),
                    .carry_in(carry_in), .operand_byte(alu_byte), .result(alu_result), .candidate_flags(alu_flags));
     assign allowed = operation_valid && !reset && !cancel && !start &&
@@ -1222,7 +1275,7 @@ module spk286_micro_executor (
     assign fetch_signed_byte = allowed && (operation == spk286_microcode_pkg::MC_FETCH_IMM8S_TMP1 || operation == spk286_microcode_pkg::MC_FETCH_IMM8S_TMP0);
     assign move_word = allowed && (operation == spk286_microcode_pkg::MC_MOVE || operation == spk286_microcode_pkg::MC_MOVE8) && temporary_valid_q[0];
     assign read_destination = allowed && (operation == spk286_microcode_pkg::MC_READ_DST16 || operation == spk286_microcode_pkg::MC_READ_DST8);
-    assign decode_operand = allowed && operation == spk286_microcode_pkg::MC_DECODE_MODRM;
+    assign decode_operand = allowed && (operation == spk286_microcode_pkg::MC_DECODE_MODRM || register_decode);
     assign read_tmp1 = string_read1 || operation == spk286_microcode_pkg::MC_READ_REG16_TMP1 || operation == spk286_microcode_pkg::MC_READ_RM16_TMP1 || operation == spk286_microcode_pkg::MC_READ_REG8_TMP1 || operation == spk286_microcode_pkg::MC_READ_RM8_TMP1;
     assign result_operation = operation == spk286_microcode_pkg::MC_WRITE_RESULT_REG8 || operation == spk286_microcode_pkg::MC_WRITE_RESULT_RM8 || operation == spk286_microcode_pkg::MC_WRITE_RESULT_REG16 || operation == spk286_microcode_pkg::MC_WRITE_RESULT_RM16 ||
                               (operation == spk286_microcode_pkg::MC_WRITE_RESULT_DST || operation == spk286_microcode_pkg::MC_WRITE_RESULT_DST8);
@@ -1275,28 +1328,30 @@ module spk286_micro_executor (
                             (operation == spk286_microcode_pkg::MC_ADD_ALLOCATION_SP && iret_outer_required) ||
                             ((operand_request && operand_done) && !system_operand_request && !descriptor_active_q && !event_gate_active_q &&
                              !iret_outer_frame_operation && !call_tss_active_q && !call_gate_stack_write && !copy_call_parameters);
-    assign gpr_write_en = task_commit_gpr_write || iret_outer_sp_commit || retf_outer_sp_commit || call_gate_sp_commit || descriptor_result_write || fixed_result_write || string_index_write || string_count_write || string_write_acc || add_allocation_sp || frame_write_gpr || allocate_stack || move_source || stack_arch_write || (count_operation && decrement_count) || move_word || result_to_dst || (operand_gpr_write_en && !system_msw_load);
-    assign gpr_write_byte = (task_commit_gpr_write || iret_outer_sp_commit || retf_outer_sp_commit || call_gate_sp_commit) ? 1'b0 :
+    assign sequential_gpr_write_en = task_commit_gpr_write || iret_outer_sp_commit || retf_outer_sp_commit || call_gate_sp_commit || descriptor_result_write || fixed_result_write || string_index_write || string_count_write || string_write_acc || add_allocation_sp || frame_write_gpr || allocate_stack || move_source || stack_arch_write || (count_operation && decrement_count) || move_word || result_to_dst || (operand_gpr_write_en && !system_msw_load);
+    assign sequential_gpr_write_byte = (task_commit_gpr_write || iret_outer_sp_commit || retf_outer_sp_commit || call_gate_sp_commit) ? 1'b0 :
                             ((string_write_acc && string_byte) ||
                              (!descriptor_result_write && !fixed_result_write && !string_index_write && !string_count_write && !string_write_acc &&
                               (!add_allocation_sp && !frame_write_gpr && !allocate_stack && !stack_arch_write && !count_operation &&
                                ((move_word && operation == spk286_microcode_pkg::MC_MOVE8) ||
                                 (result_to_dst && operation == spk286_microcode_pkg::MC_WRITE_RESULT_DST8) || operand_gpr_write_byte))));
-    assign gpr_write_index = task_commit_gpr_write ? task_commit_phase_q[2:0] : (iret_outer_sp_commit || retf_outer_sp_commit || call_gate_sp_commit) ? 3'd4 : descriptor_result_write ? shift_kind : fixed_result_write ? (write_result_dx ? 3'd2 : 3'd0) : string_index_write ? (string_step_source ? 3'd6 : 3'd7) : string_count_write ? 3'd1 : string_write_acc ? 3'd0 : add_allocation_sp ? 3'd4 : frame_write_gpr ? frame_write_index : allocate_stack ? 3'd4 : move_source ? source_index : stack_arch_write ? 3'd4 : (count_operation ? 3'd1 : (move_word || result_to_dst ? destination : operand_gpr_write_index));
-    assign gpr_write_data = task_commit_gpr_write ? task_loaded_gpr[task_commit_phase_q[2:0] * 16 +: 16] : iret_outer_sp_commit ? iret_outer_sp_q : retf_outer_sp_commit ? iret_outer_sp_q + allocation_q : call_gate_sp_commit ? stack_cursor_q : descriptor_result_write ? descriptor_result_data : fixed_result_write ? (write_result_dx ? auxiliary_q : tmp2_q) : string_index_write ? (architectural_flags[10] ? string_index-string_delta : string_index+string_delta) : string_count_write ? count_value-16'd1 : string_write_acc ? tmp0_q : add_allocation_sp ? stack_pointer+allocation_q : frame_write_gpr ? tmp0_q : allocate_stack ? stack_cursor_q - allocation_q : move_source ? tmp1_q : stack_arch_write ? stack_next_sp : (count_operation ? count_value - 16'd1 : (result_to_dst ? tmp2_q : (move_word ? tmp0_q : operand_gpr_write_data)));
-    assign flags_write_en = !reset && (task_commit_flags_write || arpl_commit || direct_flags || descriptor_verify_flags_write || descriptor_inspect_flags_write || commit_flags || restore_flags || set_if || clear_if_tf || clear_event_flags || iret_commit);
+    assign sequential_gpr_write_index = task_commit_gpr_write ? task_commit_phase_q[2:0] : (iret_outer_sp_commit || retf_outer_sp_commit || call_gate_sp_commit) ? 3'd4 : descriptor_result_write ? shift_kind : fixed_result_write ? (write_result_dx ? 3'd2 : 3'd0) : string_index_write ? (string_step_source ? 3'd6 : 3'd7) : string_count_write ? 3'd1 : string_write_acc ? 3'd0 : add_allocation_sp ? 3'd4 : frame_write_gpr ? frame_write_index : allocate_stack ? 3'd4 : move_source ? source_index : stack_arch_write ? 3'd4 : (count_operation ? 3'd1 : (move_word || result_to_dst ? destination : operand_gpr_write_index));
+    assign sequential_gpr_write_data = task_commit_gpr_write ? task_loaded_gpr[task_commit_phase_q[2:0] * 16 +: 16] : iret_outer_sp_commit ? iret_outer_sp_q : retf_outer_sp_commit ? iret_outer_sp_q + allocation_q : call_gate_sp_commit ? stack_cursor_q : descriptor_result_write ? descriptor_result_data : fixed_result_write ? (write_result_dx ? auxiliary_q : tmp2_q) : string_index_write ? (architectural_flags[10] ? string_index-string_delta : string_index+string_delta) : string_count_write ? count_value-16'd1 : string_write_acc ? tmp0_q : add_allocation_sp ? stack_pointer+allocation_q : frame_write_gpr ? tmp0_q : allocate_stack ? stack_cursor_q - allocation_q : move_source ? tmp1_q : stack_arch_write ? stack_next_sp : (count_operation ? count_value - 16'd1 : (result_to_dst ? tmp2_q : (move_word ? tmp0_q : operand_gpr_write_data)));
+    assign sequential_flags_write_en = !reset && (task_commit_flags_write || arpl_commit || direct_flags || descriptor_verify_flags_write || descriptor_inspect_flags_write || commit_flags || restore_flags || set_if || clear_if_tf || clear_event_flags || iret_commit);
     assign task_flags_write_en = !reset && task_commit_flags_write;
-    assign flags_write_data = task_commit_flags_write ? task_loaded_flags : arpl_commit ? (arpl_adjust ? 16'h0040 : 16'h0000) : direct_flags ? direct_flags_data : descriptor_verify_flags_write ? (descriptor_verify_success_live ? 16'h0040 : 16'h0000) : descriptor_inspect_flags_write ? (descriptor_inspect_success_live ? 16'h0040 : 16'h0000) : restore_flags ? tmp0_q : (iret_commit ? tmp2_q : (set_if ? {6'd0, if_value, 9'd0} : ((clear_if_tf || clear_event_flags) ? 16'd0 : flags_q)));
+    assign sequential_flags_write_data = task_commit_flags_write ? task_loaded_flags : arpl_commit ? (arpl_adjust ? 16'h0040 : 16'h0000) : direct_flags ? direct_flags_data : descriptor_verify_flags_write ? (descriptor_verify_success_live ? 16'h0040 : 16'h0000) : descriptor_inspect_flags_write ? (descriptor_inspect_success_live ? 16'h0040 : 16'h0000) : restore_flags ? tmp0_q : (iret_commit ? tmp2_q : (set_if ? {6'd0, if_value, 9'd0} : ((clear_if_tf || clear_event_flags) ? 16'd0 : flags_q)));
     // Real-mode POPF keeps NT and IOPL unchanged.  In protected mode POPF
     // restores NT; IOPL is writable only at CPL0.  The register block still
     // filters reserved bits, so this mask only expresses the instruction's
     // mode/privilege policy before the architectural write.
-    assign flags_write_mask = task_commit_flags_write ? 16'hFFFF : arpl_commit ? 16'h0040 : direct_flags ? direct_flags_mask : descriptor_verify_flags_write ? 16'h0040 : descriptor_inspect_flags_write ? 16'h0040 : restore_flags ?
+    assign sequential_flags_write_mask = task_commit_flags_write ? 16'hFFFF : arpl_commit ? 16'h0040 : direct_flags ? direct_flags_mask : descriptor_verify_flags_write ? 16'h0040 : descriptor_inspect_flags_write ? 16'h0040 : restore_flags ?
                               (!protected_msw[0] ? 16'h0FD5 : (protected_cpl == 2'd0 ? 16'h7FD5 : 16'h4FD5)) :
                               iret_commit ? 16'h0FD5 : (set_if ? 16'h0200 : (clear_if_tf ? 16'h0300 : (clear_event_flags ? ((!protected_msw[0] || event_gate_class_q == spk286_protected_pkg::DESC_INT_GATE) ? 16'h0300 : 16'h0100) : flags_mask_q)));
 
     always_ff @(posedge clk) begin
         if (reset || cancel || start) begin
+            register_pending_q <= 1'b0;
+            register_destination_q <= 3'd0;
             string_destination <= 1'b0;
             stack_cursor_q <= 16'd0; stack_cursor_valid_q <= 1'b0;
             auxiliary_q <= 16'd0; allocation_q <= 16'd0; frame_address_q <= 16'd0; counter_q <= 5'd0;
@@ -1725,6 +1780,14 @@ module spk286_micro_executor (
             if (write_result_dx) begin
                 auxiliary_valid_q <= 1'b0; result_high_pending_q <= 1'b0; result_disposed_q <= 1'b1;
             end
+            if (register_capture) begin
+                tmp0_q <= register_a_value;
+                tmp1_q <= register_b_value;
+                temporary_valid_q[1:0] <= 2'b11;
+                register_destination_q <= register_a_index;
+                register_pending_q <= 1'b1;
+            end
+            if (register_complete) register_pending_q <= 1'b0;
             if (compute_alu || shift_complete || adjust_complete) begin
                 arithmetic_fault_q <= adjust_complete && adjust_fault;
                 result_suppress_q <= adjust_complete ? !adjust_write : shift_complete && !shift_write;

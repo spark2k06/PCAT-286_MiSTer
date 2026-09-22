@@ -1,23 +1,23 @@
-SPK286 microcode compiler 21.1; format 21; encoding 21
+SPK286 microcode compiler 22.0; format 22; encoding 22
 0000  MOV_R16_IMM16:
 0000  1  FETCH_IMM16 -> TMP0  # data_move.mc:5
 0001  MOV_R16_IMM16.writeback:
 0001  2  TMP0 -> DST  # data_move.mc:7
 0002  3  END  # data_move.mc:8
 0003  MOV_RM16_R16:
-0003  4  DECODE_MODRM  # data_move.mc:11
+0003  B1  DECODE_MOV_RM16_REG16  # data_move.mc:11
 0004  5  READ_REG16 -> TMP0  # data_move.mc:12
 0005  MOV_RM16_R16.writeback:
 0005  8  TMP0 -> RM16  # data_move.mc:14
 0006  3  END  # data_move.mc:15
 0007  MOV_R16_RM16:
-0007  4  DECODE_MODRM  # data_move.mc:18
+0007  B2  DECODE_MOV_REG16_RM16  # data_move.mc:18
 0008  6  READ_RM16 -> TMP0  # data_move.mc:19
 0009  MOV_R16_RM16.writeback:
 0009  7  TMP0 -> REG16  # data_move.mc:21
 000A  3  END  # data_move.mc:22
 000B  ALU_RM16_R16:
-000B  4  DECODE_MODRM  # word_alu.mc:7
+000B  AD  DECODE_ALU_RM16_REG16  # word_alu.mc:7
 000C  6  READ_RM16 -> TMP0  # word_alu.mc:8
 000D  9  READ_REG16 -> TMP1  # word_alu.mc:9
 000E  E  ALU DECODED TMP0, TMP1 -> TMP2 FLAGS_DECODED  # word_alu.mc:10
@@ -26,7 +26,7 @@ SPK286 microcode compiler 21.1; format 21; encoding 21
 0010  12  COMMIT_FLAGS  # word_alu.mc:13
 0011  3  END  # word_alu.mc:14
 0012  ALU_R16_RM16:
-0012  4  DECODE_MODRM  # word_alu.mc:17
+0012  AE  DECODE_ALU_REG16_RM16  # word_alu.mc:17
 0013  5  READ_REG16 -> TMP0  # word_alu.mc:18
 0014  A  READ_RM16 -> TMP1  # word_alu.mc:19
 0015  E  ALU DECODED TMP0, TMP1 -> TMP2 FLAGS_DECODED  # word_alu.mc:20
@@ -200,12 +200,12 @@ SPK286 microcode compiler 21.1; format 21; encoding 21
 00A0  36  TMP0 -> DST8  # zz_byte_scalar.mc:5
 00A1  3  END  # zz_byte_scalar.mc:6
 00A2  MOV_RM8_R8:
-00A2  4  DECODE_MODRM  # zz_byte_scalar.mc:8
+00A2  B3  DECODE_MOV_RM8_REG8  # zz_byte_scalar.mc:8
 00A3  2E  READ_REG8 -> TMP0  # zz_byte_scalar.mc:9
 00A4  31  TMP0 -> RM8  # zz_byte_scalar.mc:10
 00A5  3  END  # zz_byte_scalar.mc:11
 00A6  MOV_R8_RM8:
-00A6  4  DECODE_MODRM  # zz_byte_scalar.mc:13
+00A6  B4  DECODE_MOV_REG8_RM8  # zz_byte_scalar.mc:13
 00A7  2F  READ_RM8 -> TMP0  # zz_byte_scalar.mc:14
 00A8  30  TMP0 -> REG8  # zz_byte_scalar.mc:15
 00A9  3  END  # zz_byte_scalar.mc:16
@@ -220,7 +220,7 @@ SPK286 microcode compiler 21.1; format 21; encoding 21
 00B0  8  TMP0 -> RM16  # zz_byte_scalar.mc:25
 00B1  3  END  # zz_byte_scalar.mc:26
 00B2  ALU_RM8_R8:
-00B2  4  DECODE_MODRM  # zz_byte_scalar.mc:28
+00B2  AF  DECODE_ALU_RM8_REG8  # zz_byte_scalar.mc:28
 00B3  2F  READ_RM8 -> TMP0  # zz_byte_scalar.mc:29
 00B4  33  READ_REG8 -> TMP1  # zz_byte_scalar.mc:30
 00B5  E  ALU DECODED TMP0, TMP1 -> TMP2 FLAGS_DECODED  # zz_byte_scalar.mc:31
@@ -228,7 +228,7 @@ SPK286 microcode compiler 21.1; format 21; encoding 21
 00B7  12  COMMIT_FLAGS  # zz_byte_scalar.mc:33
 00B8  3  END  # zz_byte_scalar.mc:34
 00B9  ALU_R8_RM8:
-00B9  4  DECODE_MODRM  # zz_byte_scalar.mc:36
+00B9  B0  DECODE_ALU_REG8_RM8  # zz_byte_scalar.mc:36
 00BA  2E  READ_REG8 -> TMP0  # zz_byte_scalar.mc:37
 00BB  34  READ_RM8 -> TMP1  # zz_byte_scalar.mc:38
 00BC  E  ALU DECODED TMP0, TMP1 -> TMP2 FLAGS_DECODED  # zz_byte_scalar.mc:39

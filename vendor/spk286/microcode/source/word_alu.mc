@@ -1,10 +1,10 @@
-microcode_format 3
+microcode_format 22
 
 # Decode supplies the functional operation, FLAGS mask and IF_WRITE permission.
 # Complete instruction-byte acquisition before any immediate-form data access.
 # TMP0 is always the original destination; TMP1 is always the source.
 instruction ALU_RM16_R16:
-    DECODE_MODRM
+    DECODE_ALU_RM16_REG16
     READ_RM16 -> TMP0
     READ_REG16 -> TMP1
     ALU DECODED TMP0, TMP1 -> TMP2 FLAGS_DECODED
@@ -14,7 +14,7 @@ writeback:
     END
 
 instruction ALU_R16_RM16:
-    DECODE_MODRM
+    DECODE_ALU_REG16_RM16
     READ_REG16 -> TMP0
     READ_RM16 -> TMP1
     ALU DECODED TMP0, TMP1 -> TMP2 FLAGS_DECODED

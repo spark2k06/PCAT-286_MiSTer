@@ -3,7 +3,7 @@
 The authoritative source is `source/*.mc`, compiled by
 `tools/microcode/compile_microcode.py` using Python's standard library.
 `SPK286_MICROCODE_FORMAT.md` defines the architecture; this file documents the
-preserved Phase 2.75/3/4 formats and the incremental extensions below; format 14 is current.
+preserved Phase 2.75/3/4 formats and the incremental extensions below; format 22 is current.
 
 ```text
 make microcode        # regenerate all five committed artifacts

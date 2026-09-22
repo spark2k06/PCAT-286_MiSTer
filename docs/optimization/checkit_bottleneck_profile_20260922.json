@@ -1,0 +1,1057 @@
+{
+  "date": "2026-09-22",
+  "clock_mhz": 50,
+  "configuration_correction": "These historical simulations hard-coded P01/P02/P05. The shipped RBF enabled only P05. P03=1 alone did not establish whole-profile equivalence. See the subsequent bus-latency comparison against the actual configuration.",
+  "note": "Synthetic directed firmware, not DOS CheckIt. Ideal owner is a counterfactual, not production RTL.",
+  "production_inputs_unchanged": 342,
+  "profile_source_sha256": {
+    "sim/spk286_integration/spk286_checkit_workload_tb.sv": "c2929c7abeef7875d047b70904d54121356366fdda4b1ba0316595b808263148",
+    "sim/spk286_integration/spk286_checkit_profile.svh": "a48da6278ca34a3a14cead64ad4cf39c9580151299ad9ae4dbb04ec8ae1815d6",
+    "sim/spk286_integration/spk286_checkit_ideal_owner.svh": "e9c6a29a5138d159cc548de2381951ce9b808f517557571cb747007ba9c8d1fc",
+    "scripts/test_checkit_directed.sh": "8fe1bb5905171ead3a051f1343c3c275569c3189dcf423b467a57c184f2e44da",
+    "scripts/test_checkit_profile.sh": "e91859e9158157253b15f1523ccc92185b1eed5e3724700829df100785b581a1",
+    "scripts/report_checkit_profile.py": "747d2af071e723bd4b5eb6edf8b4151eb1705e7c6d7261d6d2632c46b0d78fad"
+  },
+  "full_report": "build/checkit-profile-final/profile.json",
+  "full_report_sha256": "39ff821d1bbcaf0d96be8ee078906dbc922b4a61b48b8a7ffda0b7c741437c5c",
+  "reference_build": "build/register-opt-import/checkit-after",
+  "validated_runs": 32,
+  "rows": [
+    {
+      "workload": "dhrystone",
+      "cycles": 1215988,
+      "retired": 38656,
+      "cpu": {
+        "opcode_starved": {
+          "cycles": 94977,
+          "bus_wait_overlap": 75708
+        },
+        "instruction_byte_starved": {
+          "cycles": 19472,
+          "bus_wait_overlap": 12602
+        },
+        "operand_service": {
+          "cycles": 705293,
+          "bus_wait_overlap": 588037
+        },
+        "internal_microcode": {
+          "cycles": 317906,
+          "bus_wait_overlap": 131243
+        },
+        "dispatch_or_prefix": {
+          "cycles": 39684,
+          "bus_wait_overlap": 24729
+        },
+        "retirement_boundary": {
+          "cycles": 38656,
+          "bus_wait_overlap": 27809
+        },
+        "other": {
+          "cycles": 0,
+          "bus_wait_overlap": 0
+        }
+      },
+      "cpu_percent": {
+        "opcode_starved": 7.810685631766103,
+        "instruction_byte_starved": 1.6013315920880797,
+        "operand_service": 58.001641463567076,
+        "internal_microcode": 26.143843524771626,
+        "dispatch_or_prefix": 3.263519047885341,
+        "retirement_boundary": 3.1789787399217757,
+        "other": 0.0
+      },
+      "latency": {
+        "code_hit": {
+          "count": 34873,
+          "total": 139492,
+          "front": 69746,
+          "backend": 34873,
+          "return": 34873,
+          "max": 4,
+          "mean_wait_clocks": 4.0
+        },
+        "code_miss": {
+          "count": 16526,
+          "total": 202719,
+          "front": 37459,
+          "backend": 148734,
+          "return": 16526,
+          "max": 17,
+          "mean_wait_clocks": 12.266670700714027
+        },
+        "code_bypass": {
+          "count": 0,
+          "total": 0,
+          "front": 0,
+          "backend": 0,
+          "return": 0,
+          "max": 0,
+          "mean_wait_clocks": null
+        },
+        "data_read": {
+          "count": 37616,
+          "total": 342929,
+          "front": 79617,
+          "backend": 225696,
+          "return": 37616,
+          "max": 14,
+          "mean_wait_clocks": 9.11657273500638
+        },
+        "data_write": {
+          "count": 21124,
+          "total": 174987,
+          "front": 48243,
+          "backend": 105620,
+          "return": 21124,
+          "max": 14,
+          "mean_wait_clocks": 8.283800416587768
+        }
+      },
+      "misc": {
+        "queue_empty_not_demanded": 39879,
+        "data_wait_for_code": 85580,
+        "code_wait_for_data": 0,
+        "data_admission": 58516,
+        "data_response": 646777,
+        "code_transfers": 51399,
+        "code_bytes": 100369,
+        "consumed_bytes": 73521,
+        "flushed_bytes": 16093,
+        "redirects": 5375,
+        "cancelled_code": 4350,
+        "fast_register_ops": 1538,
+        "owner_refresh": 68544
+      },
+      "optimized_register_instruction_percent": 3.9786837748344372,
+      "counterfactuals": {
+        "1": {
+          "cycles": 858928,
+          "speedup": 1.4157042266639346
+        },
+        "2": {
+          "cycles": 1142194,
+          "speedup": 1.0646072383500527
+        },
+        "3": {
+          "cycles": 934395,
+          "speedup": 1.3013639841822784
+        },
+        "4": {
+          "cycles": 1024269,
+          "speedup": 1.1871764155705191
+        },
+        "5": {
+          "cycles": 1129180,
+          "speedup": 1.0768770258063374
+        },
+        "6": {
+          "cycles": 1027115,
+          "speedup": 1.183886906529454
+        }
+      },
+      "data_cache_1k": {
+        "words": "512",
+        "hits": "36960",
+        "misses": "656",
+        "write_updates": "19161"
+      },
+      "top_internal_microcode": [
+        {
+          "pc": "556",
+          "internal": "13312",
+          "operation": "MULDIV16 DECODED TMP0",
+          "source": "zzzzzzzzzzz_muldiv.mc:14"
+        },
+        {
+          "pc": "0",
+          "internal": "8756",
+          "operation": "FETCH_IMM16 -> TMP0",
+          "source": "data_move.mc:5"
+        },
+        {
+          "pc": "577",
+          "internal": "8448",
+          "operation": "STEP_STRING_SOURCE",
+          "source": "zzzzzzzzzzzz_strings.mc:8"
+        },
+        {
+          "pc": "578",
+          "internal": "8448",
+          "operation": "REPEAT_COUNT",
+          "source": "zzzzzzzzzzzz_strings.mc:9"
+        },
+        {
+          "pc": "579",
+          "internal": "8448",
+          "operation": "READ_STRING_TMP0",
+          "source": "zzzzzzzzzzzz_strings.mc:10"
+        },
+        {
+          "pc": "580",
+          "internal": "8448",
+          "operation": "STEP_STRING_DEST",
+          "source": "zzzzzzzzzzzz_strings.mc:11"
+        },
+        {
+          "pc": "581",
+          "internal": "8448",
+          "operation": "WRITE_STRING_TMP0",
+          "source": "zzzzzzzzzzzz_strings.mc:12"
+        },
+        {
+          "pc": "582",
+          "internal": "8448",
+          "operation": "BRANCH_REPEAT_CONTINUE loop",
+          "source": "zzzzzzzzzzzz_strings.mc:13"
+        },
+        {
+          "pc": "585",
+          "internal": "8192",
+          "operation": "STEP_STRING_DEST",
+          "source": "zzzzzzzzzzzz_strings.mc:20"
+        },
+        {
+          "pc": "586",
+          "internal": "8192",
+          "operation": "READ_STRING_TMP1",
+          "source": "zzzzzzzzzzzz_strings.mc:21"
+        }
+      ],
+      "top_active_opcodes": [
+        {
+          "opcode": "a7",
+          "retired": "512",
+          "active": "261804"
+        },
+        {
+          "opcode": "a5",
+          "retired": "513",
+          "active": "238011"
+        },
+        {
+          "opcode": "8b",
+          "retired": "1792",
+          "active": "42548"
+        },
+        {
+          "opcode": "89",
+          "retired": "1664",
+          "active": "39196"
+        },
+        {
+          "opcode": "e8",
+          "retired": "1536",
+          "active": "37884"
+        },
+        {
+          "opcode": "ab",
+          "retired": "642",
+          "active": "27594"
+        },
+        {
+          "opcode": "c3",
+          "retired": "1536",
+          "active": "26624"
+        },
+        {
+          "opcode": "50",
+          "retired": "1536",
+          "active": "23040"
+        },
+        {
+          "opcode": "58",
+          "retired": "1536",
+          "active": "22410"
+        },
+        {
+          "opcode": "57",
+          "retired": "1024",
+          "active": "21848"
+        }
+      ],
+      "signature": {
+        "gpr": "4800560000007c00000700000000600d",
+        "flags": "0016",
+        "memory": "3d5537bf66334dce",
+        "ideal_owner": "0"
+      }
+    },
+    {
+      "workload": "whetstone",
+      "cycles": 1018477,
+      "retired": 44486,
+      "cpu": {
+        "opcode_starved": {
+          "cycles": 129993,
+          "bus_wait_overlap": 105119
+        },
+        "instruction_byte_starved": {
+          "cycles": 42720,
+          "bus_wait_overlap": 28511
+        },
+        "operand_service": {
+          "cycles": 483747,
+          "bus_wait_overlap": 412571
+        },
+        "internal_microcode": {
+          "cycles": 273043,
+          "bus_wait_overlap": 189880
+        },
+        "dispatch_or_prefix": {
+          "cycles": 44488,
+          "bus_wait_overlap": 28905
+        },
+        "retirement_boundary": {
+          "cycles": 44486,
+          "bus_wait_overlap": 35821
+        },
+        "other": {
+          "cycles": 0,
+          "bus_wait_overlap": 0
+        }
+      },
+      "cpu_percent": {
+        "opcode_starved": 12.763469376333486,
+        "instruction_byte_starved": 4.194498255728897,
+        "operand_service": 47.497096154355965,
+        "internal_microcode": 26.808951012148533,
+        "dispatch_or_prefix": 4.368090786537153,
+        "retirement_boundary": 4.367894414895967,
+        "other": 0.0
+      },
+      "latency": {
+        "code_hit": {
+          "count": 48285,
+          "total": 193140,
+          "front": 96570,
+          "backend": 48285,
+          "return": 48285,
+          "max": 4,
+          "mean_wait_clocks": 4.0
+        },
+        "code_miss": {
+          "count": 24073,
+          "total": 293907,
+          "front": 53177,
+          "backend": 216657,
+          "return": 24073,
+          "max": 18,
+          "mean_wait_clocks": 12.208989324139077
+        },
+        "code_bypass": {
+          "count": 0,
+          "total": 0,
+          "front": 0,
+          "backend": 0,
+          "return": 0,
+          "max": 0,
+          "mean_wait_clocks": null
+        },
+        "data_read": {
+          "count": 19072,
+          "total": 179013,
+          "front": 45509,
+          "backend": 114432,
+          "return": 19072,
+          "max": 15,
+          "mean_wait_clocks": 9.386168204697986
+        },
+        "data_write": {
+          "count": 16516,
+          "total": 134746,
+          "front": 35650,
+          "backend": 82580,
+          "return": 16516,
+          "max": 14,
+          "mean_wait_clocks": 8.158512957132478
+        }
+      },
+      "misc": {
+        "queue_empty_not_demanded": 53429,
+        "data_wait_for_code": 123397,
+        "code_wait_for_data": 0,
+        "data_admission": 35588,
+        "data_response": 448159,
+        "code_transfers": 72358,
+        "code_bytes": 140800,
+        "consumed_bytes": 97461,
+        "flushed_bytes": 26952,
+        "redirects": 8191,
+        "cancelled_code": 6783,
+        "fast_register_ops": 2306,
+        "owner_refresh": 57726
+      },
+      "optimized_register_instruction_percent": 5.183653284179292,
+      "counterfactuals": {
+        "1": {
+          "cycles": 735468,
+          "speedup": 1.384801242202244
+        },
+        "2": {
+          "cycles": 904188,
+          "speedup": 1.126399598313625
+        },
+        "3": {
+          "cycles": 852886,
+          "speedup": 1.1941537321517763
+        },
+        "4": {
+          "cycles": 925191,
+          "speedup": 1.1008289099223836
+        },
+        "5": {
+          "cycles": 945386,
+          "speedup": 1.0773133936825805
+        },
+        "6": {
+          "cycles": 926284,
+          "speedup": 1.099529949777822
+        }
+      },
+      "data_cache_1k": {
+        "words": "512",
+        "hits": "18808",
+        "misses": "264",
+        "write_updates": "14972"
+      },
+      "top_internal_microcode": [
+        {
+          "pc": "556",
+          "internal": "35584",
+          "operation": "MULDIV16 DECODED TMP0",
+          "source": "zzzzzzzzzzz_muldiv.mc:14"
+        },
+        {
+          "pc": "7",
+          "internal": "12288",
+          "operation": "DECODE_MOV_REG16_RM16",
+          "source": "data_move.mc:18"
+        },
+        {
+          "pc": "18",
+          "internal": "8704",
+          "operation": "DECODE_ALU_REG16_RM16",
+          "source": "word_alu.mc:17"
+        },
+        {
+          "pc": "45",
+          "internal": "6912",
+          "operation": "READ_DST16 -> TMP0",
+          "source": "word_stack_control.mc:5"
+        },
+        {
+          "pc": "46",
+          "internal": "6912",
+          "operation": "PUSH16 DECODED TMP0",
+          "source": "word_stack_control.mc:6"
+        },
+        {
+          "pc": "47",
+          "internal": "6912",
+          "operation": "END",
+          "source": "word_stack_control.mc:7"
+        },
+        {
+          "pc": "48",
+          "internal": "6912",
+          "operation": "POP16 -> TMP0",
+          "source": "word_stack_control.mc:10"
+        },
+        {
+          "pc": "49",
+          "internal": "6912",
+          "operation": "TMP0 -> DST",
+          "source": "word_stack_control.mc:11"
+        },
+        {
+          "pc": "50",
+          "internal": "6912",
+          "operation": "END",
+          "source": "word_stack_control.mc:12"
+        },
+        {
+          "pc": "292",
+          "internal": "6656",
+          "operation": "FETCH_IMM16 -> TMP1",
+          "source": "zzzzz_data.mc:35"
+        }
+      ],
+      "top_active_opcodes": [
+        {
+          "opcode": "a1",
+          "retired": "3328",
+          "active": "87027"
+        },
+        {
+          "opcode": "8b",
+          "retired": "3072",
+          "active": "74295"
+        },
+        {
+          "opcode": "e8",
+          "retired": "2816",
+          "active": "68344"
+        },
+        {
+          "opcode": "a3",
+          "retired": "3200",
+          "active": "60040"
+        },
+        {
+          "opcode": "58",
+          "retired": "2816",
+          "active": "52755"
+        },
+        {
+          "opcode": "c3",
+          "retired": "2816",
+          "active": "51204"
+        },
+        {
+          "opcode": "f7",
+          "retired": "1489",
+          "active": "51114"
+        },
+        {
+          "opcode": "50",
+          "retired": "2816",
+          "active": "48913"
+        },
+        {
+          "opcode": "5b",
+          "retired": "2816",
+          "active": "43002"
+        },
+        {
+          "opcode": "53",
+          "retired": "2816",
+          "active": "37243"
+        }
+      ],
+      "signature": {
+        "gpr": "4800630000007c000031fffe0000600d",
+        "flags": "0016",
+        "memory": "3bee53bc61d7964a",
+        "ideal_owner": "0"
+      }
+    },
+    {
+      "workload": "working_set",
+      "cycles": 1140571,
+      "retired": 56886,
+      "cpu": {
+        "opcode_starved": {
+          "cycles": 157777,
+          "bus_wait_overlap": 124082
+        },
+        "instruction_byte_starved": {
+          "cycles": 40645,
+          "bus_wait_overlap": 27484
+        },
+        "operand_service": {
+          "cycles": 496482,
+          "bus_wait_overlap": 418094
+        },
+        "internal_microcode": {
+          "cycles": 331893,
+          "bus_wait_overlap": 250010
+        },
+        "dispatch_or_prefix": {
+          "cycles": 56888,
+          "bus_wait_overlap": 39662
+        },
+        "retirement_boundary": {
+          "cycles": 56886,
+          "bus_wait_overlap": 46599
+        },
+        "other": {
+          "cycles": 0,
+          "bus_wait_overlap": 0
+        }
+      },
+      "cpu_percent": {
+        "opcode_starved": 13.833159005445518,
+        "instruction_byte_starved": 3.5635659682737857,
+        "operand_service": 43.52924982311492,
+        "internal_microcode": 29.09884610427584,
+        "dispatch_or_prefix": 4.987677224828617,
+        "retirement_boundary": 4.9875018740613255,
+        "other": 0.0
+      },
+      "latency": {
+        "code_hit": {
+          "count": 59129,
+          "total": 236516,
+          "front": 118258,
+          "backend": 59129,
+          "return": 59129,
+          "max": 4,
+          "mean_wait_clocks": 4.0
+        },
+        "code_miss": {
+          "count": 26553,
+          "total": 326367,
+          "front": 60837,
+          "backend": 238977,
+          "return": 26553,
+          "max": 18,
+          "mean_wait_clocks": 12.291153541972658
+        },
+        "code_bypass": {
+          "count": 0,
+          "total": 0,
+          "front": 0,
+          "backend": 0,
+          "return": 0,
+          "max": 0,
+          "mean_wait_clocks": null
+        },
+        "data_read": {
+          "count": 19403,
+          "total": 179357,
+          "front": 43536,
+          "backend": 116418,
+          "return": 19403,
+          "max": 15,
+          "mean_wait_clocks": 9.243776735556358
+        },
+        "data_write": {
+          "count": 19791,
+          "total": 163690,
+          "front": 44944,
+          "backend": 98955,
+          "return": 19791,
+          "max": 14,
+          "mean_wait_clocks": 8.270931231367793
+        }
+      },
+      "misc": {
+        "queue_empty_not_demanded": 53368,
+        "data_wait_for_code": 97940,
+        "code_wait_for_data": 0,
+        "data_admission": 39194,
+        "data_response": 457288,
+        "code_transfers": 85682,
+        "code_bytes": 168748,
+        "consumed_bytes": 117454,
+        "flushed_bytes": 32641,
+        "redirects": 9324,
+        "cancelled_code": 8556,
+        "fast_register_ops": 4354,
+        "owner_refresh": 64362
+      },
+      "optimized_register_instruction_percent": 7.653904299827726,
+      "counterfactuals": {
+        "1": {
+          "cycles": 837736,
+          "speedup": 1.3614921645960063
+        },
+        "2": {
+          "cycles": 1023146,
+          "speedup": 1.114768566753914
+        },
+        "3": {
+          "cycles": 954320,
+          "speedup": 1.1951661916338334
+        },
+        "4": {
+          "cycles": 1039386,
+          "speedup": 1.0973507436120942
+        },
+        "5": {
+          "cycles": 1055223,
+          "speedup": 1.080881481923726
+        },
+        "6": {
+          "cycles": 1040115,
+          "speedup": 1.0965816279930585
+        }
+      },
+      "data_cache_1k": {
+        "words": "512",
+        "hits": "19011",
+        "misses": "392",
+        "write_updates": "18247"
+      },
+      "top_internal_microcode": [
+        {
+          "pc": "556",
+          "internal": "40192",
+          "operation": "MULDIV16 DECODED TMP0",
+          "source": "zzzzzzzzzzz_muldiv.mc:14"
+        },
+        {
+          "pc": "11",
+          "internal": "10244",
+          "operation": "DECODE_ALU_RM16_REG16",
+          "source": "word_alu.mc:7"
+        },
+        {
+          "pc": "45",
+          "internal": "9216",
+          "operation": "READ_DST16 -> TMP0",
+          "source": "word_stack_control.mc:5"
+        },
+        {
+          "pc": "46",
+          "internal": "9216",
+          "operation": "PUSH16 DECODED TMP0",
+          "source": "word_stack_control.mc:6"
+        },
+        {
+          "pc": "47",
+          "internal": "9216",
+          "operation": "END",
+          "source": "word_stack_control.mc:7"
+        },
+        {
+          "pc": "48",
+          "internal": "9216",
+          "operation": "POP16 -> TMP0",
+          "source": "word_stack_control.mc:10"
+        },
+        {
+          "pc": "49",
+          "internal": "9216",
+          "operation": "TMP0 -> DST",
+          "source": "word_stack_control.mc:11"
+        },
+        {
+          "pc": "50",
+          "internal": "9216",
+          "operation": "END",
+          "source": "word_stack_control.mc:12"
+        },
+        {
+          "pc": "302",
+          "internal": "8192",
+          "operation": "FETCH_IMM16 -> TMP1",
+          "source": "zzzzz_data.mc:47"
+        },
+        {
+          "pc": "7",
+          "internal": "6656",
+          "operation": "DECODE_MOV_REG16_RM16",
+          "source": "data_move.mc:18"
+        }
+      ],
+      "top_active_opcodes": [
+        {
+          "opcode": "a3",
+          "retired": "4096",
+          "active": "81126"
+        },
+        {
+          "opcode": "e8",
+          "retired": "3072",
+          "active": "80894"
+        },
+        {
+          "opcode": "a1",
+          "retired": "3072",
+          "active": "69543"
+        },
+        {
+          "opcode": "f7",
+          "retired": "2214",
+          "active": "62972"
+        },
+        {
+          "opcode": "59",
+          "retired": "3072",
+          "active": "52657"
+        },
+        {
+          "opcode": "5b",
+          "retired": "3072",
+          "active": "52411"
+        },
+        {
+          "opcode": "c3",
+          "retired": "3072",
+          "active": "49262"
+        },
+        {
+          "opcode": "50",
+          "retired": "3072",
+          "active": "46947"
+        },
+        {
+          "opcode": "58",
+          "retired": "3072",
+          "active": "43778"
+        },
+        {
+          "opcode": "53",
+          "retired": "3072",
+          "active": "40844"
+        }
+      ],
+      "signature": {
+        "gpr": "4800740000007c00000b00020000600d",
+        "flags": "0016",
+        "memory": "59258436c35aa1ce",
+        "ideal_owner": "0"
+      }
+    },
+    {
+      "workload": "dhrystone21",
+      "cycles": 1347223,
+      "retired": 59249,
+      "cpu": {
+        "opcode_starved": {
+          "cycles": 214127,
+          "bus_wait_overlap": 176212
+        },
+        "instruction_byte_starved": {
+          "cycles": 86833,
+          "bus_wait_overlap": 49859
+        },
+        "operand_service": {
+          "cycles": 526937,
+          "bus_wait_overlap": 445831
+        },
+        "internal_microcode": {
+          "cycles": 400567,
+          "bus_wait_overlap": 282576
+        },
+        "dispatch_or_prefix": {
+          "cycles": 59510,
+          "bus_wait_overlap": 46876
+        },
+        "retirement_boundary": {
+          "cycles": 59249,
+          "bus_wait_overlap": 49436
+        },
+        "other": {
+          "cycles": 0,
+          "bus_wait_overlap": 0
+        }
+      },
+      "cpu_percent": {
+        "opcode_starved": 15.893953710707136,
+        "instruction_byte_starved": 6.445332361457606,
+        "operand_service": 39.11282690393498,
+        "internal_microcode": 29.732791082099993,
+        "dispatch_or_prefix": 4.4172345632460255,
+        "retirement_boundary": 4.397861378554255,
+        "other": 0.0
+      },
+      "latency": {
+        "code_hit": {
+          "count": 72771,
+          "total": 291084,
+          "front": 145542,
+          "backend": 72771,
+          "return": 72771,
+          "max": 4,
+          "mean_wait_clocks": 4.0
+        },
+        "code_miss": {
+          "count": 33126,
+          "total": 403665,
+          "front": 72405,
+          "backend": 298134,
+          "return": 33126,
+          "max": 18,
+          "mean_wait_clocks": 12.185745335989857
+        },
+        "code_bypass": {
+          "count": 0,
+          "total": 0,
+          "front": 0,
+          "backend": 0,
+          "return": 0,
+          "max": 0,
+          "mean_wait_clocks": null
+        },
+        "data_read": {
+          "count": 20428,
+          "total": 190563,
+          "front": 47567,
+          "backend": 122568,
+          "return": 20428,
+          "max": 15,
+          "mean_wait_clocks": 9.328519678872135
+        },
+        "data_write": {
+          "count": 20125,
+          "total": 165477,
+          "front": 44727,
+          "backend": 100625,
+          "return": 20125,
+          "max": 14,
+          "mean_wait_clocks": 8.222459627329192
+        }
+      },
+      "misc": {
+        "queue_empty_not_demanded": 108869,
+        "data_wait_for_code": 111368,
+        "code_wait_for_data": 0,
+        "data_admission": 40553,
+        "data_response": 486384,
+        "code_transfers": 105897,
+        "code_bytes": 202066,
+        "consumed_bytes": 140184,
+        "flushed_bytes": 38123,
+        "redirects": 11877,
+        "cancelled_code": 7267,
+        "fast_register_ops": 1346,
+        "owner_refresh": 75534
+      },
+      "optimized_register_instruction_percent": 2.2717682998869178,
+      "counterfactuals": {
+        "1": {
+          "cycles": 1008886,
+          "speedup": 1.3353570175421208
+        },
+        "2": {
+          "cycles": 1200510,
+          "speedup": 1.1222088945531483
+        },
+        "3": {
+          "cycles": 1154257,
+          "speedup": 1.167177673603019
+        },
+        "4": {
+          "cycles": 1239522,
+          "speedup": 1.0868891395231388
+        },
+        "5": {
+          "cycles": 1263473,
+          "speedup": 1.0662855478510422
+        },
+        "6": {
+          "cycles": 1240394,
+          "speedup": 1.0861250538135463
+        }
+      },
+      "data_cache_1k": {
+        "words": "512",
+        "hits": "20052",
+        "misses": "376",
+        "write_updates": "9680"
+      },
+      "top_internal_microcode": [
+        {
+          "pc": "38",
+          "internal": "26880",
+          "operation": "DECODE_MODRM",
+          "source": "word_alu.mc:46"
+        },
+        {
+          "pc": "18",
+          "internal": "19716",
+          "operation": "DECODE_ALU_REG16_RM16",
+          "source": "word_alu.mc:17"
+        },
+        {
+          "pc": "39",
+          "internal": "13440",
+          "operation": "FETCH_IMM8S -> TMP1",
+          "source": "word_alu.mc:47"
+        },
+        {
+          "pc": "40",
+          "internal": "13440",
+          "operation": "READ_RM16 -> TMP0",
+          "source": "word_alu.mc:48"
+        },
+        {
+          "pc": "41",
+          "internal": "13440",
+          "operation": "ALU DECODED TMP0, TMP1 -> TMP2 FLAGS_DECODED",
+          "source": "word_alu.mc:49"
+        },
+        {
+          "pc": "42",
+          "internal": "13440",
+          "operation": "TMP2 -> RM16 IF_WRITE",
+          "source": "word_alu.mc:51"
+        },
+        {
+          "pc": "43",
+          "internal": "13440",
+          "operation": "COMMIT_FLAGS",
+          "source": "word_alu.mc:52"
+        },
+        {
+          "pc": "44",
+          "internal": "13440",
+          "operation": "END",
+          "source": "word_alu.mc:53"
+        },
+        {
+          "pc": "3",
+          "internal": "11264",
+          "operation": "DECODE_MOV_RM16_REG16",
+          "source": "data_move.mc:11"
+        },
+        {
+          "pc": "81",
+          "internal": "9344",
+          "operation": "FETCH_IMM8S -> TMP1",
+          "source": "word_stack_control.mc:60"
+        }
+      ],
+      "top_active_opcodes": [
+        {
+          "opcode": "83",
+          "retired": "13440",
+          "active": "144640"
+        },
+        {
+          "opcode": "33",
+          "retired": "4608",
+          "active": "136583"
+        },
+        {
+          "opcode": "89",
+          "retired": "5056",
+          "active": "110912"
+        },
+        {
+          "opcode": "ab",
+          "retired": "4609",
+          "active": "94328"
+        },
+        {
+          "opcode": "a7",
+          "retired": "129",
+          "active": "64585"
+        },
+        {
+          "opcode": "a5",
+          "retired": "130",
+          "active": "58491"
+        },
+        {
+          "opcode": "8b",
+          "retired": "2240",
+          "active": "50848"
+        },
+        {
+          "opcode": "e2",
+          "retired": "9344",
+          "active": "47680"
+        },
+        {
+          "opcode": "e8",
+          "retired": "1346",
+          "active": "34928"
+        },
+        {
+          "opcode": "c3",
+          "retired": "1346",
+          "active": "21534"
+        }
+      ],
+      "signature": {
+        "gpr": "4800512000007c00000500000000600d",
+        "flags": "0016",
+        "memory": "ef78ab197813f369",
+        "ideal_owner": "0"
+      }
+    }
+  ]
+}

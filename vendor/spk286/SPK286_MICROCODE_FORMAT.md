@@ -2022,3 +2022,23 @@ and independent review remain pending; no new waiver or Phase 8 work is claimed.
 See PHASE7_REP_EVENT_EVIDENCE.md and PHASE7_IO_CAPTURE_REVIEW.md for evidence
 limitations. Complete Phase 7 remains incomplete; this directory is not a
 verified Git delivery.
+
+## PCAT register execution extension — format 22 (2026-09-22)
+
+Controls 173..180 add the byte/word and both-direction variants of
+`DECODE_ALU_*` and `DECODE_MOV_*`. Register-direct ModR/M captures both
+operands together, then executes and retires with an atomic architectural
+commit. Memory operands continue through the original microcode body. The
+compiler requires that body to match the optimized direction and width.
+
+This downstream image preserves `CARRY_FILL8=171` and `LOADALL=172`; their
+upstream numbering differs. Always regenerate package and ROM together with
+this compiler. Exactly eight existing ROM words change; all 122 entries,
+labels, branch targets and the 723-word layout remain fixed. The independent
+contract is `tests/fixtures/microcode_register_execution.json`.
+
+The sequencer accepts `operation_retire` only alongside `operation_done`.
+Capture and execution are useful work, not historical timing states. The
+two-clock execution interval excludes opcode dispatch, retirement boundaries
+and instruction-byte starvation. See the downstream integration receipt in
+`docs/optimization/REGISTER_EXECUTION_50MHZ.md` at the PCAT repository root.

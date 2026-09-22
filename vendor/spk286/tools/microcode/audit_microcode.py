@@ -1,4 +1,4 @@
-"""Audit encodings 1 through 21 using emitted RTL and canonical DSL reconstruction.
+"""Audit encodings 1 through 22 using emitted RTL and canonical DSL reconstruction.
 
 This is an offline checker for the existing generated case-ROM template, not a
 general Verilog parser or a new production ROM format. Entry/label sidecars are
@@ -79,6 +79,9 @@ STATEMENTS.update({151: 'VALIDATE_EVENT_GATE', 152: 'EVENT_GATE_IP -> TMP0',
                    165: 'COPY_CALL_PARAMETERS'})
 
 
+STATEMENTS.update({173: 'DECODE_ALU_RM16_REG16', 174: 'DECODE_ALU_REG16_RM16', 175: 'DECODE_ALU_RM8_REG8', 176: 'DECODE_ALU_REG8_RM8', 177: 'DECODE_MOV_RM16_REG16', 178: 'DECODE_MOV_REG16_RM16', 179: 'DECODE_MOV_RM8_REG8', 180: 'DECODE_MOV_REG8_RM8'})
+
+
 def read_generated_words(package: str, rom: str) -> tuple[int, ...]:
     def dimension(name):
         matches = re.findall(rf"localparam integer {name} = ([0-9]+);", package)
@@ -151,6 +154,8 @@ def read_generated_words(package: str, rom: str) -> tuple[int, ...]:
                          'COPY_CALL_PARAMETERS': 165})
     if dimension('MC_FORMAT_VERSION') >= 20:
         expected.update({'SYSTEM_ARPL_CHECK': 166, 'SYSTEM_ARPL': 167, 'SYSTEM_CLTS': 168, 'TASK_SWITCH': 169, 'TASK_RETURN': 170})
+    if dimension('MC_FORMAT_VERSION') >= 22:
+        expected.update({'DECODE_ALU_RM16_REG16': 173, 'DECODE_ALU_REG16_RM16': 174, 'DECODE_ALU_RM8_REG8': 175, 'DECODE_ALU_REG8_RM8': 176, 'DECODE_MOV_RM16_REG16': 177, 'DECODE_MOV_REG16_RM16': 178, 'DECODE_MOV_RM8_REG8': 179, 'DECODE_MOV_REG8_RM8': 180})
     if dimension('MC_FORMAT_VERSION') >= 21:
         expected['CARRY_FILL8'] = 171
         expected['LOADALL'] = 172
@@ -231,6 +236,8 @@ def canonical_source(words, entries, labels=None, branch_targets=None):
     version = 20 if any(w > 164 for w in words) else 19 if any(w > 160 for w in words) else 18 if any(w > 150 for w in words) else 17 if any(w > 130 for w in words) else 16 if any(w > 120 for w in words) else 15 if any(w > 115 for w in words) else 14 if any(w > 112 for w in words) else 13 if any(w > 77 for w in words) else 12 if any(w > 75 for w in words) else 11 if any(w > 73 for w in words) else 10 if any(w > 70 for w in words) or unary else 9 if any(w > 63 for w in words) else 8 if any(w > 61 for w in words) else 7 if any(w > 57 for w in words) or any(tuple(words[i:i+2]) == (30, 54) for i in range(len(words)-1)) else 6 if any(w > 45 for w in words) else 5 if any(w > 28 for w in words) else (4 if any(w > 18 for w in words) else (3 if any(w > 8 for w in words) else (2 if any(w > 3 for w in words) else 1)))
     if 171 in words or 172 in words:
         version = 21
+    if any(173 <= w <= 180 for w in words):
+        version = 22
     lines = [f"microcode_format {version}"]
     for address, word in enumerate(words[:used]):
         if address in by_address:
@@ -304,7 +311,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, default=ROOT / "build/microcode-audit")
     parser.add_argument("--contract", type=Path,
-                        default=ROOT / "tests/fixtures/microcode_phase9_loadall.json")
+                        default=ROOT / "tests/fixtures/microcode_register_execution.json")
     args = parser.parse_args()
     audit(args.output, args.contract)
 

@@ -1,5 +1,16 @@
 # Known limitations and pending evidence
 
+## HIMEM LOADALL integration (2026-09-22)
+
+The reported HIMEM extended-memory-test stop has `OP=05` and `ERR U=1`:
+the vendored CPU recognized `0F 05` (LOADALL) but did not execute it. The
+upstream functional LOADALL implementation is now integrated, with directed
+AT/SDRAM coverage for repeated LOADALL, extended-memory copying and A20 at
+normal and divided CPU clocks. See [AT_HIMEM_LOADALL.md](AT_HIMEM_LOADALL.md)
+for the failing baseline, passing fixture and validation limits. Actual
+HIMEM completion and Windows 3.1 protected-mode startup remain unverified
+on hardware.
+
 ## Latest AT hardware evidence (2026-09-20)
 
 The user confirms BIOS execution and visible Supersoft POST on MiSTer (`6f07770`),

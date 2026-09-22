@@ -4,6 +4,12 @@ This repository is an integration work tree. It retains the selected PCXT
 machine source hierarchy and vendors a complete, pinned SPK286 indexed tree.
 Normal builds do not read either source checkout.
 
+The snapshot sections below describe the original import. Subsequent CPU
+updates include the [2026-09-22 LOADALL integration](AT_HIMEM_LOADALL.md),
+selectively imported from SPK286 `aa922e53a579db17c67aeba37962a3683353813c`.
+The original `spk286-9d3a69eb.sha256` manifest is historical and is not a hash
+manifest of the updated CPU; it has not been silently regenerated.
+
 ## PCXT machine baseline
 
 - Source directory at import time: `D:/GitHub/PCXT-EGA_MiSTer_devel`.

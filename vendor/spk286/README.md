@@ -8,6 +8,11 @@ This vendored PCAT copy includes the downstream
 AT XTIDE Universal BIOS after disk detection. Historical phase manifests
 below retain their original scope.
 
+The downstream copy also integrates the upstream 80286 `0F 05` LOADALL
+functional slice, including atomic register/cache loading and tests. See the
+[HIMEM integration record](../../docs/AT_HIMEM_LOADALL.md) for provenance,
+microcode numbering and the remaining hardware-validation boundary.
+
 SPK286 is a **CPU-only project**. Its scope ends at the processor boundary:
 architectural execution, microcode, prefetch, segmentation/protection,
 exceptions, the Bus Interface Unit (BIU), timing policy, and the native external

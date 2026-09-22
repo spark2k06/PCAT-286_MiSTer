@@ -1079,6 +1079,33 @@ module spk286_at_bios_first_fetch_tb #(
                     end
                 end
             end
+            if ($test$plusargs("LOADALL_XMS")) begin
+                if (cpu_fault || protocol_error || memory_port_protocol_error ||
+                    sdram_owner_protocol_error || loader_error || cpu_shutdown)
+                    $fatal(1,"AT_LOADALL_XMS_FAULT csip=%h:%h op=%h unsupported=%b",
+                           debug_cs,debug_ip,debug_opcode,dut.spk_unsupported_opcode);
+                if (dut.at_ready && dut.at_io && dut.at_write &&
+                    dut.at_address[15:0] == 16'h0080) begin
+                    if (dut.at_data_out[7:0] == 8'he5)
+                        $fatal(1,"AT_LOADALL_XMS_DATA_MISMATCH csip=%h:%h",debug_cs,debug_ip);
+                    if (dut.at_data_out[7:0] == 8'ha5) begin
+                        // Physical SDRAM contents independently check the CPU's
+                        // comparisons, extended addressing and both byte lanes.
+                        if (a20_enable || dut.u_cpu.cpu.debug_protected_msw[0] ||
+                            pins.mem[20'h80100] !== 16'h125a ||
+                            pins.mem[20'h80101] !== 16'ha534 ||
+                            pins.mem[20'h8010f] !== 16'ha55a ||
+                            pins.mem[20'h01800] !== 16'h125a ||
+                            pins.mem[20'h01801] !== 16'ha534 ||
+                            pins.mem[20'h0180f] !== 16'ha55a ||
+                            pins.mem[20'h00100] !== 16'h5aa5)
+                            $fatal(1,"AT_LOADALL_XMS_PHYSICAL_MISMATCH a20=%b extended=%h copied=%h alias=%h",
+                                   a20_enable,pins.mem[20'h80100],pins.mem[20'h01800],pins.mem[20'h00100]);
+                        $display("AT_LOADALL_XMS_PASS repeated_LOADALL=3 extended_copy_bytes=32 A20_alias=1 byte_lanes=1 cycles=%0d",cycles);
+                        $finish;
+                    end
+                end
+            end
             if($test$plusargs("PHOENIX_FDC")) begin
                 if(dut.at_ready && dut.at_io &&
                    ((dut.at_address>=24'h3f0 && dut.at_address<=24'h3f7 && dut.at_address!=24'h3f4) ||

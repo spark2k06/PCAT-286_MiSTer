@@ -17,7 +17,7 @@ import re
 import sys
 from typing import Mapping
 
-COMPILER_VERSION = "21.0"
+COMPILER_VERSION = "21.1"
 FORMAT_VERSION = 21
 MAX_ADDRESS_WIDTH = 12  # Current numeric CPU debug interface.
 OPERATIONS = {"INVALID": 0, "FETCH_IMM16": 1, "MOVE": 2, "END": 3,
@@ -72,6 +72,7 @@ ROOT = Path(__file__).resolve().parents[2]
 
 OPERATIONS.update({'MULDIV8': 116, 'MULDIV16': 117, 'IMUL_IMM16': 118, 'WRITE_RESULT_AX16': 119, 'WRITE_RESULT_DX16': 120})
 OPERATIONS['CARRY_FILL8'] = 171
+OPERATIONS['LOADALL'] = 172
 
 
 @dataclass(frozen=True)
@@ -255,6 +256,8 @@ def parse_statement(text: str, location: Location, format_version: int = 1) -> S
         return Statement(location, op, args, text)
     if format_version >= 21 and normalized == 'CARRY_FILL8 TMP0':
         return Statement(location, 'CARRY_FILL8', ('TMP0',), text)
+    if format_version >= 21 and normalized == 'LOADALL':
+        return Statement(location, 'LOADALL', (), text)
     scalar_extensions = {
         'FLAGS DECODED': ('FLAGS_DECODED', ()),
         'SIGN_EXTEND8 TMP0': ('SIGN_EXTEND8', ('TMP0',)),
@@ -438,6 +441,8 @@ def validate_far(block: Block) -> None:
         raise CompileError(block.location,'invalid far pointer acquisition, precheck, stack or context commit protocol')
     if 'VALIDATE_CS' in actual and block.format_version < 17:
         raise CompileError(block.location,'protected far context validation requires microcode format 17')
+    if block.format_version >= 20 and 'VALIDATE_CS' in actual and 'TASK_SWITCH' not in actual:
+        raise CompileError(block.location,'protected far context requires task-switch disposition')
     if 'VALIDATE_CS' not in actual and block.format_version >= 17 and actual != legacy_sequences[0]:
         raise CompileError(block.location,'invalid far pointer acquisition, precheck, stack or context commit protocol')
 
@@ -478,6 +483,10 @@ def validate_muldiv(block: Block) -> None:
 
 
 def validate_block(block: Block) -> None:
+    if block.location.entry == 'LOADALL' or any(s.operation == 'LOADALL' for s in block.statements):
+        if block.format_version < 21 or tuple(s.operation for s in block.statements) != ('LOADALL', 'END'):
+            raise CompileError(block.location, 'LOADALL requires the atomic LOADALL; END protocol')
+        return
     if block.location.entry == 'LOAD_CARRY_BYTE' or any(s.operation == 'CARRY_FILL8' for s in block.statements):
         if block.format_version < 21:
             raise CompileError(block.location, 'carry fill requires microcode_format 21')
@@ -738,6 +747,8 @@ def validate_event_block(block: Block) -> None:
     ops = tuple(s.operation for s in block.statements)
     if ops not in sequences:
         raise CompileError(block.location, 'invalid event service ordering, temporary lifetime or completion')
+    if block.format_version >= 20 and 'VALIDATE_CALL_GATE' in ops and 'TASK_SWITCH' not in ops:
+        raise CompileError(block.location, 'protected call gate requires task-switch disposition')
     for s in block.statements:
         if s.operation == 'PUSH16' and s.operands != ('DECODED', 'TMP0'):
             raise CompileError(s.location, 'invalid frame push source')
@@ -924,7 +935,7 @@ def generate(program: Program) -> dict[str, str]:
     width = program.address_width
     word_width = program.word_width
     operations = {name: value for name, value in OPERATIONS.items()
-                if value < {1: 4, 2: 9, 3: 19, 4: 29, 5: 46, 6: 58, 7: 62, 8: 64, 9: 71, 10: 74, 11: 76, 12: 78, 13: 113, 14: 116, 15: 121, 16: 131, 17: 151, 18: 161, 19: 165, 20: 171, 21: 172}[program.format_version]}
+                if value < {1: 4, 2: 9, 3: 19, 4: 29, 5: 46, 6: 58, 7: 62, 8: 64, 9: 71, 10: 74, 11: 76, 12: 78, 13: 113, 14: 116, 15: 121, 16: 131, 17: 151, 18: 161, 19: 165, 20: 171, 21: 173}[program.format_version]}
     package = banner + ("`timescale 1ns/1ps\n"
                         "// Public constants: standalone consumers use only a subset.\n"
                         "/* verilator lint_off UNUSEDPARAM */\n"

@@ -87,23 +87,11 @@ module spk286_at_sdram_read_buffer #(
     assign debug_state = {state_q, physical_inflight_q,
                           request_cancelled_q, line_valid_q};
 
-    function automatic logic [24:0] canonical_address(input logic [24:0] address);
-        begin
-            // The reset-vector alias is the same physical BIOS window used
-            // by the SDRAM owner.  Canonical tags make FFFFF0h and 0FFFF0h
-            // share one line without changing the CPU-visible address.
-            if ((address >= 25'h0FF0000) && (address <= 25'h0FFFFFF))
-                canonical_address = address - 25'h0F00000;
-            else
-                canonical_address = address;
-        end
-    endfunction
-
+    // Addresses are already canonical backend byte addresses. Reapplying
+    // CPU BIOS aliases here would turn shifted high RAM into BIOS hits.
     function automatic logic [24:0] line_base(input logic [24:0] address);
-        logic [24:0] canonical;
         begin
-            canonical = canonical_address(address);
-            line_base = {canonical[24:3], 3'b000};
+            line_base = {address[24:3], 3'b000};
         end
     endfunction
 
@@ -126,8 +114,8 @@ module spk286_at_sdram_read_buffer #(
         logic [24:0] first_byte;
         logic [24:0] second_byte;
         begin
-            first_byte  = canonical_address(address);
-            second_byte = canonical_address(address + 25'd1);
+            first_byte  = address;
+            second_byte = address + 25'd1;
             write_touches_line =
                 (byte_enable[0] && (line_base(first_byte) == tag)) ||
                 (byte_enable[1] && (line_base(second_byte) == tag));
@@ -135,8 +123,7 @@ module spk286_at_sdram_read_buffer #(
     endfunction
 
     wire [24:0] input_line_base = line_base(in_address);
-    wire [24:0] input_canonical_address = canonical_address(in_address);
-    wire [1:0] input_word_index = input_canonical_address[2:1];
+    wire [1:0] input_word_index = in_address[2:1];
 
     wire cache_candidate = ENABLE && enable &&
                            (in_owner == OWNER_CPU) &&

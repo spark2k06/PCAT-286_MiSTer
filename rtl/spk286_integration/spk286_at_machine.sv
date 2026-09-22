@@ -383,9 +383,14 @@ module spk286_at_machine #(
                 2'b11: selected_page = ems_map[3];
                 default: selected_page = 7'h00;
             endcase
+            // Resolve the CPU BIOS alias before entering backend address
+            // space. Backend FF0000h-FFFFFFh also backs shifted RAM at
+            // CPU DF0000h-DFFFFFh and must not be translated again.
+            if (address >= 24'hFF0000)
+                map_memory_backend_address = {9'h00F, address[15:0]};
             // Preserve the source core's physical EMS layout:
             // {1'b1, page[6:0], offset[13:0]} = 0x200000..0x3FFFFF.
-            if (ems_page_selected(address))
+            else if (ems_page_selected(address))
                 map_memory_backend_address = {1'b0, 2'b00, 1'b1,
                                                selected_page, address[13:0]};
             // Keep the EMS card's private 2-4 MiB page store separate from

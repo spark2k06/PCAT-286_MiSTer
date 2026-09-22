@@ -48,7 +48,7 @@ module spk286_at_sdram_read_buffer_tb;
     wire [31:0] physical_read_count;
     wire [31:0] invalidation_count;
 
-    localparam integer MEM_WORDS = 1048576;
+    localparam integer MEM_WORDS = 16777216;
     logic [15:0] mem [0:MEM_WORDS-1];
     logic        backend_active_q = 1'b0;
     logic        backend_burst_q = 1'b0;
@@ -58,7 +58,7 @@ module spk286_at_sdram_read_buffer_tb;
     integer backend_writes = 0;
 
     assign out_accept = out_valid && out_command_valid && !backend_active_q;
-    assign out_read_data = mem[out_address[20:1] + backend_beat_q];
+    assign out_read_data = mem[out_address[24:1] + backend_beat_q];
     assign out_read_data_valid = backend_active_q && !backend_write_q;
     assign out_ready = backend_active_q &&
                        (backend_write_q || !backend_burst_q ||
@@ -82,9 +82,9 @@ module spk286_at_sdram_read_buffer_tb;
                 backend_beat_q   <= 2'd0;
                 if (out_write) begin
                     if (out_byte_enable[0])
-                        mem[out_address[20:1]][7:0] <= out_data_out[7:0];
+                        mem[out_address[24:1]][7:0] <= out_data_out[7:0];
                     if (out_byte_enable[1])
-                        mem[out_address[20:1]][15:8] <= out_data_out[15:8];
+                        mem[out_address[24:1]][15:8] <= out_data_out[15:8];
                     backend_writes <= backend_writes + 1;
                 end else begin
                     backend_reads <= backend_reads + 1;
@@ -246,16 +246,16 @@ module spk286_at_sdram_read_buffer_tb;
         read_request(OWNER_CPU, 1'b1, 24'h001000, 16'hA0CC);
         check(physical_read_count == 13, "DMA write did not invalidate the line");
 
-        // The alias covers the full top 64 KiB, not only the reset-vector
-        // page, and shares canonical tags with the low BIOS window.
-        read_request(OWNER_CPU, 1'b1, 24'hFF0000, 16'hC001);
+        // The machine resolves both CPU BIOS windows to the low backend
+        // address before they reach the buffer.
+        read_request(OWNER_CPU, 1'b1, 24'h0F0000, 16'hC001);
         check(physical_read_count == 17, "BIOS alias-base fill was incorrect");
         read_request(OWNER_CPU, 1'b1, 24'h0F0002, 16'hC002);
         check(physical_read_count == 17,
               "BIOS alias base did not hit the canonical low line");
 
         // The reset vector remains in the same canonical BIOS window.
-        read_request(OWNER_CPU, 1'b1, 24'hFFFFF0, 16'hB001);
+        read_request(OWNER_CPU, 1'b1, 24'h0FFFF0, 16'hB001);
         check(physical_read_count == 21, "BIOS reset-vector fill was incorrect");
         read_request(OWNER_CPU, 1'b1, 24'h0FFFF2, 16'hB002);
         check(physical_read_count == 21,
@@ -265,6 +265,32 @@ module spk286_at_sdram_read_buffer_tb;
         read_request(OWNER_CPU, 1'b1, 24'h0A0000, 16'hE001);
         read_request(OWNER_CPU, 1'b1, 24'h0A0000, 16'hE001);
         check(physical_read_count == 23, "EGA aperture was incorrectly cached");
+
+        // Backend FF0000h is shifted RAM, not a second BIOS alias. A
+        // cached BIOS line must neither hit for RAM nor be invalidated by
+        // writes to that RAM. Then exercise a real fill from the RAM line.
+        read_request(OWNER_CPU, 1'b1, 25'h00F0000, 16'hC001);
+        write_request(OWNER_CPU, 25'h0FF0000, 2'b11, 16'hD001);
+        write_request(OWNER_DMA, 25'h0FF0002, 2'b11, 16'hD002);
+        begin : high_ram_isolation
+            integer reads_before;
+            reads_before = physical_read_count;
+            read_request(OWNER_CPU, 1'b1, 25'h00F0000, 16'hC001);
+            check(physical_read_count == reads_before,
+                  "high RAM write invalidated the BIOS line");
+            read_request(OWNER_CPU, 1'b1, 25'h0FF0000, 16'hD001);
+            check(physical_read_count == reads_before + 4,
+                  "high RAM fetch hit the BIOS line");
+            read_request(OWNER_CPU, 1'b1, 25'h0FF0002, 16'hD002);
+            check(physical_read_count == reads_before + 4,
+                  "high RAM line was not cached");
+        end
+        read_request(OWNER_CPU, 1'b0, 25'h00F0000, 16'hC001);
+        write_request(OWNER_CPU, 25'h0FFFFF0, 2'b11, 16'hD003);
+        read_request(OWNER_CPU, 1'b1, 25'h0FFFFF0, 16'hD003);
+        read_request(OWNER_CPU, 1'b1, 25'h00FFFF0, 16'hB001);
+        write_request(OWNER_CPU, 25'h11DFFFE, 2'b11, 16'hD004);
+        read_request(OWNER_CPU, 1'b1, 25'h11DFFFE, 16'hD004);
 
         // Machine reset also covers the BIOS-loading window.  CPU traffic is
         // cancelled there, but loader writes must still reach SDRAM or the

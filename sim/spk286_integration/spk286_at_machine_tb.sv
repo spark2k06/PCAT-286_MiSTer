@@ -227,8 +227,7 @@ module spk286_at_machine_tb;
 
     function automatic logic [7:0] memory_read_byte(input logic [24:0] address);
         begin
-            if (((address >= 24'h0F0000) && (address <= 24'h0FFFFF)) ||
-                ((address >= 24'hFF0000) && (address <= 24'hFFFFFF)))
+            if ((address >= 25'h00F0000) && (address <= 25'h00FFFFF))
                 memory_read_byte = rom[address[15:0]];
             else if (address < 24'h080000)
                 memory_read_byte = base_ram[address[18:0]];
@@ -313,7 +312,8 @@ module spk286_at_machine_tb;
         end else begin
             if (backend_accept && (backend_owner == 2'd0)) begin
                 accepted_memory_beats <= accepted_memory_beats + 1;
-                if (backend_address == 24'hFFFFF0)
+                if (backend_address == 25'h00FFFF0 &&
+                    dut.at_memory_address == 24'hFFFFF0)
                     saw_native_reset_fetch <= 1'b1;
                 if ((backend_address >= 24'h0F0000) &&
                     (backend_address <= 24'h0FFFFF))
@@ -330,7 +330,8 @@ module spk286_at_machine_tb;
                              backend_address, backend_byte_enable,
                              backend_read_data, backend_read_data_valid);
                 first_bios_read_count <= first_bios_read_count + 1;
-                if (backend_address == 24'hFFFFF0) begin
+                if (backend_address == 25'h00FFFF0 &&
+                    dut.at_memory_address == 24'hFFFFF0) begin
                     saw_native_reset_response <= 1'b1;
                     if (backend_read_data_valid &&
                         (((backend_byte_enable == 2'b01) &&
@@ -596,7 +597,7 @@ module spk286_at_machine_tb;
         force dut.at_address = 24'hFF_FFF0;
         #1;
         if (dut.at_memory_address !== 24'hFF_FFF0 ||
-            memory_address !== 24'hFF_FFF0)
+            memory_address !== 25'h00F_FFF0)
             $fatal(1, "A20_RESET_ALIAS_FAILURE gated=%06h output=%06h",
                    dut.at_memory_address, memory_address);
         force dut.at_address = 24'h10_1234;

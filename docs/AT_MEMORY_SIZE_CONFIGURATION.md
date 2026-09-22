@@ -35,5 +35,21 @@ backend accesses at 2 MiB through `FDFFFFh` are shifted
 up by 2 MiB. This changes only the SDRAM backing address; the CPU still sees
 the selected physical address and contiguous extended RAM.
 
+The machine resolves the CPU BIOS alias `FF0000h–FFFFFFh` to
+`0F0000h–0FFFFFh` before handing addresses to the backend. The read buffer and
+SDRAM owner must use those backend addresses unchanged: backend
+`FF0000h–FFFFFFh` stores CPU RAM at `DF0000h–DFFFFFh` after the 2 MiB shift.
+Applying the CPU alias again in either backend component makes that RAM
+collide with the BIOS. This explains the reported POST stop at 13,888 KiB:
+`DF0000h / 1024 - 384 = 13,888`, accounting for the low-memory hole.
+
+Regression coverage includes independent high-RAM/BIOS reads and writes in
+the SDRAM owner and read buffer, plus `+RAM16` in the BIOS first-fetch test.
+That integrated test writes and reads one word per 64 KiB extended-RAM block
+through the production mapper, memory port, buffer and SDRAM pins, checks
+the collision boundaries and final RAM word, verifies all 64 KiB of BIOS
+remain intact, and then executes the reset fetch. The user also confirmed
+correct operation on MiSTer after this fix. This is not an exhaustive RAM test.
+
 The previous fixed 1 MiB baseline and its original verification record are
 documented in [AT_RTC_CMOS_1M_HANDOFF.md](AT_RTC_CMOS_1M_HANDOFF.md).

@@ -91,16 +91,9 @@ module spk286_at_mister_sdram_owner #(
     logic [24:0] mapped_address;
     logic [8:0]  kf_access_num;
 
-    // The 80286 reset vector is fetched from FFFFF0h, while the loaded
-    // system BIOS occupies the AT F0000h-FFFFFh window.  The 16-bit-bus AT
-    // map exposes the top 64 KiB as a BIOS alias; translate it here so
-    // the physical SDRAM stores only one copy of the BIOS image.
-    always_comb begin
-        mapped_address = active_q ? address_q : request_address;
-        if ((mapped_address >= 25'h0FF0000) &&
-            (mapped_address <= 25'h0FFFFFF))
-            mapped_address = mapped_address - 25'h0F00000;
-    end
+    // The machine has already resolved CPU aliases and the EMS RAM shift.
+    // Backend FF0000h-FFFFFFh is RAM, not the CPU's high BIOS alias.
+    assign mapped_address = active_q ? address_q : request_address;
 
     assign physical_idle = kf_idle && !active_q;
     assign launch_request = !active_q && request_valid &&

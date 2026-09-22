@@ -70,9 +70,12 @@ P03-R03. Los tags usan dirección física canónica de byte. El desplazamiento
 interno de KFSDRAM a palabras ocurre después; no se mezcla byte address con
 word address al comparar o indexar la línea.
 
-P03-R04. Canonicalizar el alias `FF0000–FFFFFF` hacia la copia BIOS
-`0F0000–0FFFFF` de la misma forma que el mapper actual. Las escrituras del
-loader sobre esa copia deben invalidar también los hits realizados por el alias.
+P03-R04. El mapper de la máquina resuelve el alias CPU `FF0000–FFFFFF` hacia
+la copia BIOS `0F0000–0FFFFF` antes de entrar al buffer. El buffer usa la
+dirección de backend recibida sin repetir esa traducción: `FF0000–FFFFFF`
+en el backend contiene RAM desplazada desde `DF0000–DFFFFF`. Las escrituras
+del loader sobre la copia BIOS deben invalidar también los hits realizados
+por el alias CPU, que ya llega con la misma dirección de backend.
 
 P03-R05. A20 es una política del chipset. La integración actual expone
 `a20_enable`, pero no debe presuponerse que ya exista un enmascaramiento completo

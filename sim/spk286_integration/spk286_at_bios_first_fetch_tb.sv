@@ -173,7 +173,7 @@ module spk286_at_bios_first_fetch_tb #(
     wire [1:0]  p03_out_owner;
     wire        p03_out_write, p03_out_refresh, p03_out_code_fetch, p03_out_burst;
     wire [3:0]  p03_out_cycle_class;
-    wire [23:0] p03_out_address;
+    wire [24:0] p03_out_address;
     wire [1:0]  p03_out_byte_enable;
     wire [15:0] p03_out_data_out;
     wire        p03_in_accept, p03_in_ready;
@@ -269,7 +269,7 @@ module spk286_at_bios_first_fetch_tb #(
         if (reset) sdram_initialized <= 0;
         else if (physical_idle) sdram_initialized <= 1;
     end
-    spk286_sdram_pin_model #(.MEM_WORDS(1<<20)) pins (
+    spk286_sdram_pin_model #(.MEM_WORDS(1<<24)) pins (
         .clk(clk), .reset(reset), .address(sdram_address), .cke(sdram_cke),
         .cs_n(sdram_cs), .ras_n(sdram_ras), .cas_n(sdram_cas), .we_n(sdram_we),
         .ba(sdram_ba), .dq_from_controller(sdram_dq_out),
@@ -385,8 +385,7 @@ module spk286_at_bios_first_fetch_tb #(
             if(backend_ready && backend_code_fetch && backend_owner==0 &&
                !cpu_reset_request && !memory_port.cpu_cancelled_q) begin
                 if(!backend_read_data_valid) $fatal(1,"fetch without VLD");
-                if((backend_address>=25'h0ff0000 && backend_address<=25'h0ffffff) ||
-                   (backend_address>=25'h00f0000 && backend_address<=25'h00fffff)) begin
+                if(backend_address>=25'h00f0000 && backend_address<=25'h00fffff) begin
                     if(backend_byte_enable[0] && backend_read_data[7:0]!==rom[{backend_address[15:1],1'b0}])
                         $fatal(1,"BIOS low lane addr=%h got=%h",backend_address,backend_read_data);
                     if(backend_byte_enable[1] && backend_read_data[15:8]!==rom[{backend_address[15:1],1'b1}])
@@ -449,9 +448,10 @@ module spk286_at_bios_first_fetch_tb #(
                 end
                 trace_irq0_prev <= dut.irq0;
             end
-            if (backend_accept && (backend_owner == 2'd0)) begin
+            if (!profile_probe && backend_accept && (backend_owner == 2'd0)) begin
                 accepted_memory_beats <= accepted_memory_beats + 1;
-                if (backend_address == 24'hFFFFF0) begin
+                if (backend_address == 25'h00FFFF0 &&
+                    dut.at_memory_address == 24'hFFFFF0) begin
                     saw_native_reset_fetch <= 1'b1;
                     if (backend_code_fetch)
                         reset_vector_fetches <= reset_vector_fetches + 1;
@@ -464,7 +464,7 @@ module spk286_at_bios_first_fetch_tb #(
             // Capture the first returned CPU reads, not only accepted
             // commands.  This makes the test fail if the SDRAM address is
             // right but the returned word/lane/valid timing is wrong.
-            if (backend_ready && (backend_owner == 2'd0) && !backend_write &&
+            if (!profile_probe && backend_ready && (backend_owner == 2'd0) && !backend_write &&
                 !cpu_reset_request && !memory_port.cpu_cancelled_q &&
                 (first_bios_read_count < 32)) begin
                 if (first_bios_read_count == 0)
@@ -472,7 +472,8 @@ module spk286_at_bios_first_fetch_tb #(
                              backend_address, backend_byte_enable,
                              backend_read_data, backend_read_data_valid);
                 first_bios_read_count <= first_bios_read_count + 1;
-                if (backend_address == 24'hFFFFF0) begin
+                if (backend_address == 25'h00FFFF0 &&
+                    dut.at_memory_address == 24'hFFFFF0) begin
                     saw_native_reset_response <= 1'b1;
                     if (backend_read_data_valid &&
                         (((backend_byte_enable == 2'b01) &&
@@ -787,19 +788,53 @@ module spk286_at_bios_first_fetch_tb #(
             port80_sequence[index] = 8'h00;
     end
 
+    // Directed RAM16 accesses use the production mapper and the complete
+    // memory-port/buffer/SDRAM path while the CPU is held in boot reset.
+    logic profile_probe = 0, profile_valid = 0, profile_write = 0;
+    logic [23:0] profile_address = 0;
+    logic [15:0] profile_data = 0;
+    wire [24:0] profile_backend_address =
+        dut.map_memory_backend_address(profile_address);
+    wire memory_cpu_cancel = (cpu_boot_reset && !profile_probe) | cpu_reset_request;
+
+    task automatic profile_access(input logic write_access,
+                                  input logic [23:0] address,
+                                  input logic [15:0] data);
+        integer guard;
+        begin
+            @(negedge clk);
+            profile_address = address;
+            profile_write = write_access;
+            profile_data = data;
+            profile_valid = 1;
+            guard = 0;
+            do begin
+                @(negedge clk);
+                guard = guard + 1;
+                if (guard > 1000) $fatal(1, "RAM16 access timed out at %h", address);
+            end while (!memory_ready);
+            if (!write_access && (!memory_read_data_valid || memory_read_data !== data))
+                $fatal(1, "RAM16 read %h expected=%h actual=%h", address, data, memory_read_data);
+            @(negedge clk);
+            profile_valid = 0;
+            // Allow the serialized port and physical burst to drain.
+            repeat (16) @(negedge clk);
+        end
+    endtask
+
     // Exercise the real machine through the same serialized memory boundary
     // that the future MiSTer SDRAM/HPS owner will use.
     spk286_at_mister_memory_port memory_port (
         .clk(clk), .reset(reset),
-        .cancel_cpu(cpu_boot_reset | cpu_reset_request),
-        .cpu_valid(memory_request_valid),
-        .cpu_command_valid(memory_command_valid),
-        .cpu_write(memory_write),
-        .cpu_code_fetch(memory_code_fetch),
+        .cancel_cpu(memory_cpu_cancel),
+        .cpu_valid(profile_probe ? profile_valid : memory_request_valid),
+        .cpu_command_valid(profile_probe ? profile_valid : memory_command_valid),
+        .cpu_write(profile_probe ? profile_write : memory_write),
+        .cpu_code_fetch(profile_probe ? !profile_write : memory_code_fetch),
         .cpu_cycle_class(memory_cycle_class),
-        .cpu_address(memory_address),
-        .cpu_byte_enable(memory_byte_enable),
-        .cpu_data_out(memory_data_out),
+        .cpu_address(profile_probe ? profile_backend_address : memory_address),
+        .cpu_byte_enable(profile_probe ? 2'b11 : memory_byte_enable),
+        .cpu_data_out(profile_probe ? profile_data : memory_data_out),
         .cpu_accept(memory_accept), .cpu_ready(memory_ready),
         .cpu_read_data(memory_read_data),
         .cpu_read_data_valid(memory_read_data_valid),
@@ -834,7 +869,7 @@ module spk286_at_bios_first_fetch_tb #(
 
     spk286_at_sdram_read_buffer #(.ENABLE(1'b1)) p03_buffer (
         .clk(clk), .reset(reset),
-        .cancel_cpu(cpu_boot_reset | cpu_reset_request), .enable(1'b1),
+        .cancel_cpu(memory_cpu_cancel), .enable(1'b1),
         .in_valid(backend_valid), .in_command_valid(backend_command_valid),
         .in_owner(backend_owner), .in_write(backend_write),
         .in_refresh(backend_refresh), .in_code_fetch(backend_code_fetch),
@@ -966,6 +1001,29 @@ module spk286_at_bios_first_fetch_tb #(
                 dut.u_devices.u_rtc.cmos_q[7'h18] !== 8'h3B)
                 $fatal(1, "RAM16 CMOS size was not 15232 KiB");
             $display("AT_RAM16_PROFILE_PASS limit=fdffff reserved=fe0000-feffff cmos=3b80");
+            profile_probe = 1;
+            // Write first, then read: a folded high address cannot pass by
+            // immediately reading its own corruption of an earlier block.
+            for (integer block = 'h10; block < 'hFE; block = block + 1)
+                profile_access(1, 24'(block << 16), 16'hA500 ^ 16'(block));
+            for (integer block = 'h10; block < 'hFE; block = block + 1)
+                profile_access(0, 24'(block << 16), 16'hA500 ^ 16'(block));
+            profile_access(1, 24'hDEFFFE, 16'h1234);
+            profile_access(1, 24'hDFFFFE, 16'h5678);
+            profile_access(1, 24'hFDFFFE, 16'h9ABC);
+            profile_access(0, 24'hDEFFFE, 16'h1234);
+            profile_access(0, 24'hDFFFFE, 16'h5678);
+            profile_access(0, 24'hFDFFFE, 16'h9ABC);
+            // Check the complete loaded BIOS, plus reads through both CPU
+            // aliases, before allowing its reset vector to execute.
+            for (integer offset = 0; offset < 65536; offset = offset + 2)
+                if (pins.mem[('hF0000 + offset) >> 1] !== {rom[offset+1], rom[offset]})
+                    $fatal(1, "RAM16 corrupted BIOS offset=%h", offset);
+            profile_access(0, 24'hFF0000, {rom[1], rom[0]});
+            profile_access(0, 24'h0F0000, {rom[1], rom[0]});
+            profile_access(0, 24'hFFFFF0, {rom['hFFF1], rom['hFFF0]});
+            profile_probe = 0;
+            $display("AT_RAM16_BACKEND_ISOLATION_PASS blocks=238 bios_bytes=65536");
         end
         if(debug_cs!==16'hf000 || debug_ip!==16'hfff0 || cs_base!==24'hff0000)
             $fatal(1,"bad reset %h:%h base=%h",debug_cs,debug_ip,cs_base);

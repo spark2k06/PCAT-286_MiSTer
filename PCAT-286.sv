@@ -117,7 +117,11 @@ module emu_at
         "P2oIK,CRT V offset,0,1,2,3,4,5,6,7;",
         "P2O[66:64],VSync Width,Auto,1,2,3,4,5,6,7;",
         "P2O[69:67],HSync Width,Auto,1,2,3,4,5,6,7;",
+        "P2O12,Scandoubler Fx,None,HQ2x,CRT 25%,CRT 50%;",
+        "P2O89,Aspect ratio,Original,Full Screen,[ARC1],[ARC2];",
+        "P2OEG,Display,Full Color,Green,Amber,B&W,Red,Blue,Fuchsia,Purple;",
         "P2OA,VGA 13h+ CRT,Native 70Hz,TV 60Hz;",
+        "P2o23,350-line CRT,Native,480i 15 kHz,240p 15 kHz;",
         "P2-;",
         "P3,Hardware;",
         "P3-;",
@@ -140,7 +144,8 @@ module emu_at
 
     wire [35:0] EXT_BUS;
     wire [21:0] gamma_bus;
-    assign gamma_bus[21] = 1'b0;
+    wire [21:0] gamma_bus_video;
+    assign gamma_bus = gamma_bus_video;
 
     wire [15:0] at_mgmt_din;
     wire [15:0] at_mgmt_dout;
@@ -954,6 +959,20 @@ module emu_at
     wire [11:0] at_video_active_dots_raw;
     wire [9:0]  at_video_active_lines_raw;
 
+    // Video effects keep the PCXT-EGA status-bit assignments so existing
+    // settings and saved core configurations remain compatible.
+    logic [1:0] at_video_scale_q;
+    logic [2:0] at_video_display_q;
+    logic [12:0] at_video_arx_q;
+    logic [12:0] at_video_ary_q;
+    always_ff @(posedge at_video_clk_57) begin
+        at_video_scale_q   <= hps_status[2:1];
+        at_video_display_q <= hps_status[16:14];
+        at_video_arx_q     <= (hps_status[9:8] == 2'd0) ? 13'd4 :
+                              ({11'd0, hps_status[9:8]} - 13'd1);
+        at_video_ary_q     <= (hps_status[9:8] == 2'd0) ? 13'd3 : 13'd0;
+    end
+
     // AT286CTL is clocked by the AT bus and its effective video fields are
     // fed to the EGA/VGA adapter through the machine boundary.
 
@@ -1241,6 +1260,248 @@ module emu_at
         end
     end
 
+    // Apply the selected monitor phosphor in the pixel domain. Sync and
+    // blanking pass through the same converter so their edges stay aligned
+    // with the tinted RGB values.
+    wire [7:0] at_video_mono_r;
+    wire [7:0] at_video_mono_g;
+    wire [7:0] at_video_mono_b;
+    wire       at_video_mono_hs;
+    wire       at_video_mono_hb;
+    wire       at_video_mono_vs;
+    wire       at_video_mono_vb;
+
+    video_monochrome_converter u_at_video_display (
+        .clk_vid    (at_video_clk_57),
+        .ce_pix     (at_video_ce_pipe_q),
+        .gfx_mode   (at_video_display_q),
+        .R          (at_video_r_pipe_q),
+        .G          (at_video_g_pipe_q),
+        .B          (at_video_b_pipe_q),
+        .HSync      (at_video_hs_pipe_q),
+        .VSync      (at_video_vs_pipe_q),
+        .HBlank     (at_video_hb_pipe_q),
+        .VBlank     (at_video_vb_pipe_q),
+        .R_OUT      (at_video_mono_r),
+        .G_OUT      (at_video_mono_g),
+        .B_OUT      (at_video_mono_b),
+        .HSync_OUT  (at_video_mono_hs),
+        .VSync_OUT  (at_video_mono_vs),
+        .HBlank_OUT (at_video_mono_hb),
+        .VBlank_OUT (at_video_mono_vb)
+    );
+
+    logic       at_video_mode350_s1_q;
+    logic       at_video_mode350_s2_q;
+    logic [11:0] at_video_active_dots_s1_q;
+    logic [11:0] at_video_active_dots_s2_q;
+    logic [9:0]  at_video_active_lines_s1_q;
+    logic [9:0]  at_video_active_lines_s2_q;
+    always_ff @(posedge at_video_clk_57) begin
+        if (at_video_pipe_reset_57) begin
+            at_video_mode350_s1_q <= 1'b0;
+            at_video_mode350_s2_q <= 1'b0;
+            at_video_active_dots_s1_q <= 12'd0;
+            at_video_active_dots_s2_q <= 12'd0;
+            at_video_active_lines_s1_q <= 10'd0;
+            at_video_active_lines_s2_q <= 10'd0;
+        end else begin
+            at_video_mode350_s1_q <= at_video_mode350_raw;
+            at_video_mode350_s2_q <= at_video_mode350_s1_q;
+            at_video_active_dots_s1_q <= at_video_active_dots_raw;
+            at_video_active_dots_s2_q <= at_video_active_dots_s1_q;
+            at_video_active_lines_s1_q <= at_video_active_lines_raw;
+            at_video_active_lines_s2_q <= at_video_active_lines_s1_q;
+        end
+    end
+
+    // 0 keeps the native EGA raster, 1 converts the captured frame to 480i,
+    // and 2 converts it to 240p. The framebuffer is used only when the EGA
+    // CRTC is actually producing a 350-line mode.
+    wire [1:0] at_video_crt350_mode = hps_status[35:34];
+    wire       at_video_crt350_enable = at_video_mode350_s2_q &
+                                         (|at_video_crt350_mode);
+    wire       at_video_crt350_progressive = at_video_crt350_mode[1];
+
+    wire [7:0]  at_fb_cap_burstcnt;
+    wire [28:0] at_fb_cap_addr;
+    wire [63:0] at_fb_cap_din;
+    wire        at_fb_cap_we;
+    wire        at_fb_cap_busy;
+    wire [1:0]  at_fb_frame_buffer;
+    wire [11:0] at_fb_frame_width;
+    wire [9:0]  at_fb_frame_height;
+    wire [13:0] at_fb_frame_stride;
+    wire        at_fb_frame_valid;
+    wire [1:0]  at_fb_reading_buffer;
+
+    ega_fb_capture u_at_ega_fb_capture (
+        .clk            (at_video_clk_57),
+        .reset          (at_video_pipe_reset_57),
+        .enable         (at_video_crt350_enable),
+        .ce_pix         (at_video_ce_pipe_q),
+        .r              (at_video_mono_r),
+        .g              (at_video_mono_g),
+        .b              (at_video_mono_b),
+        .de             (~at_video_mono_hb & ~at_video_mono_vb),
+        .vblank         (at_video_mono_vb),
+        .active_dots    (at_video_active_dots_s2_q),
+        .active_lines   (at_video_active_lines_s2_q),
+        .reading_buffer (at_fb_reading_buffer),
+        .ddram_busy     (at_fb_cap_busy),
+        .ddram_burstcnt (at_fb_cap_burstcnt),
+        .ddram_addr     (at_fb_cap_addr),
+        .ddram_din      (at_fb_cap_din),
+        .ddram_be       (),
+        .ddram_we       (at_fb_cap_we),
+        .frame_buffer   (at_fb_frame_buffer),
+        .frame_width    (at_fb_frame_width),
+        .frame_height   (at_fb_frame_height),
+        .frame_stride   (at_fb_frame_stride),
+        .frame_seq      (),
+        .frame_valid    (at_fb_frame_valid),
+        .overrun        ()
+    );
+
+    wire        at_fb_rd_req;
+    wire [28:0] at_fb_rd_addr;
+    wire [7:0]  at_fb_rd_burstcnt;
+    wire        at_fb_rd_grant;
+    wire [63:0] at_fb_rd_data;
+    wire        at_fb_rd_data_valid;
+    wire [7:0]  at_fb_r;
+    wire [7:0]  at_fb_g;
+    wire [7:0]  at_fb_b;
+    wire        at_fb_hs;
+    wire        at_fb_vs;
+    wire        at_fb_hb;
+    wire        at_fb_vb;
+    wire        at_fb_de;
+    wire        at_fb_field;
+    wire        at_fb_ce_pix;
+
+    ega_fb_readout u_at_ega_fb_readout (
+        .clk            (at_video_clk_57),
+        .reset          (at_video_pipe_reset_57),
+        .enable         (at_video_crt350_enable),
+        .progressive    (at_video_crt350_progressive),
+        .crt_h_offset   (at286ctl_eff_crt_h),
+        .crt_v_offset   (at286ctl_eff_crt_v),
+        .frame_buffer   (at_fb_frame_buffer),
+        .frame_width    (at_fb_frame_width),
+        .frame_height   (at_fb_frame_height),
+        .frame_stride   (at_fb_frame_stride),
+        .frame_valid    (at_fb_frame_valid),
+        .rd_req         (at_fb_rd_req),
+        .rd_addr        (at_fb_rd_addr),
+        .rd_burstcnt    (at_fb_rd_burstcnt),
+        .rd_grant       (at_fb_rd_grant),
+        .rd_data        (at_fb_rd_data),
+        .rd_data_valid  (at_fb_rd_data_valid),
+        .r              (at_fb_r),
+        .g              (at_fb_g),
+        .b              (at_fb_b),
+        .hsync          (at_fb_hs),
+        .vsync          (at_fb_vs),
+        .hblank         (at_fb_hb),
+        .vblank         (at_fb_vb),
+        .de             (at_fb_de),
+        .field          (at_fb_field),
+        .ce_pix         (at_fb_ce_pix),
+        .reading_buffer (at_fb_reading_buffer)
+    );
+
+    assign DDRAM_CLK = at_video_clk_57;
+    ega_ddr_arbiter u_at_ega_ddr_arbiter (
+        .clk             (at_video_clk_57),
+        .reset           (at_video_pipe_reset_57),
+        .ddram_busy      (DDRAM_BUSY),
+        .ddram_burstcnt  (DDRAM_BURSTCNT),
+        .ddram_addr      (DDRAM_ADDR),
+        .ddram_din       (DDRAM_DIN),
+        .ddram_be        (DDRAM_BE),
+        .ddram_we        (DDRAM_WE),
+        .ddram_rd        (DDRAM_RD),
+        .ddram_dout      (DDRAM_DOUT),
+        .ddram_dout_ready(DDRAM_DOUT_READY),
+        .rd_req          (at_fb_rd_req),
+        .rd_addr         (at_fb_rd_addr),
+        .rd_burstcnt     (at_fb_rd_burstcnt),
+        .rd_grant        (at_fb_rd_grant),
+        .rd_data         (at_fb_rd_data),
+        .rd_data_valid   (at_fb_rd_data_valid),
+        .wr_req          (at_fb_cap_we),
+        .wr_addr         (at_fb_cap_addr),
+        .wr_burstcnt     (at_fb_cap_burstcnt),
+        .wr_din          (at_fb_cap_din),
+        .wr_busy_out     (at_fb_cap_busy),
+        .wr_grant        ()
+    );
+
+    wire at_video_crt350_active;
+    video_source_switch u_at_video_crt350_switch (
+        .clock         (at_video_clk_57),
+        .reset         (at_video_pipe_reset_57),
+        .select_alt    (at_video_crt350_enable & at_fb_frame_valid),
+        .primary_hsync (at_video_mono_hs),
+        .primary_vblank(at_video_mono_vb),
+        .alt_hsync     (at_fb_hs),
+        .alt_vblank    (at_fb_vb),
+        .alt_active    (at_video_crt350_active)
+    );
+
+    wire [7:0] at_video_mix_r = at_video_crt350_active ? at_fb_r : at_video_mono_r;
+    wire [7:0] at_video_mix_g = at_video_crt350_active ? at_fb_g : at_video_mono_g;
+    wire [7:0] at_video_mix_b = at_video_crt350_active ? at_fb_b : at_video_mono_b;
+    wire       at_video_mix_hs = at_video_crt350_active ? at_fb_hs : at_video_mono_hs;
+    wire       at_video_mix_vs = at_video_crt350_active ? at_fb_vs : at_video_mono_vs;
+    wire       at_video_mix_hb = at_video_crt350_active ? at_fb_hb : at_video_mono_hb;
+    wire       at_video_mix_vb = at_video_crt350_active ? at_fb_vb : at_video_mono_vb;
+    wire       at_video_mix_ce = at_video_crt350_active ? at_fb_ce_pix : at_video_ce_pipe_q;
+    wire       at_video_mixer_ce;
+    wire [7:0] at_video_mixer_r;
+    wire [7:0] at_video_mixer_g;
+    wire [7:0] at_video_mixer_b;
+    wire       at_video_mixer_hs;
+    wire       at_video_mixer_vs;
+    wire       at_video_mixer_de;
+    logic      at_video_vga_f1_ps1;
+    logic      at_video_vga_f1_ps2;
+
+    video_mixer #(.GAMMA(1)) u_at_video_mixer (
+        .CLK_VIDEO  (at_video_clk_57),
+        .CE_PIXEL   (at_video_mixer_ce),
+        .ce_pix     (at_video_mix_ce),
+        .scandoubler(1'b0),
+        .hq2x       (at_video_scale_q == 2'd1),
+        .gamma_bus  (gamma_bus_video),
+        .R          (at_video_mix_r),
+        .G          (at_video_mix_g),
+        .B          (at_video_mix_b),
+        .HSync      (at_video_mix_hs),
+        .VSync      (at_video_mix_vs),
+        .HBlank     (at_video_mix_hb),
+        .VBlank     (at_video_mix_vb),
+        .HDMI_FREEZE(1'b0),
+        .freeze_sync(),
+        .VGA_R      (at_video_mixer_r),
+        .VGA_G      (at_video_mixer_g),
+        .VGA_B      (at_video_mixer_b),
+        .VGA_VS     (at_video_mixer_vs),
+        .VGA_HS     (at_video_mixer_hs),
+        .VGA_DE     (at_video_mixer_de)
+    );
+
+    always_ff @(posedge at_video_clk_57_ps) begin
+        if (at_video_pipe_reset_57_ps) begin
+            at_video_vga_f1_ps1 <= 1'b0;
+            at_video_vga_f1_ps2 <= 1'b0;
+        end else begin
+            at_video_vga_f1_ps1 <= at_video_crt350_active & at_fb_field;
+            at_video_vga_f1_ps2 <= at_video_vga_f1_ps1;
+        end
+    end
+
     always_ff @(posedge at_video_clk_57_ps) begin
         if (at_video_pipe_reset_57_ps) begin
             at_video_r_out_q <= 8'h00;
@@ -1253,15 +1514,15 @@ module emu_at
             at_video_de_out_q <= 1'b0;
             at_video_ce_out_q <= 1'b0;
         end else begin
-            at_video_r_out_q <= at_video_r_pipe_q;
-            at_video_g_out_q <= at_video_g_pipe_q;
-            at_video_b_out_q <= at_video_b_pipe_q;
-            at_video_hs_out_q <= at_video_hs_pipe_q;
-            at_video_hb_out_q <= at_video_hb_pipe_q;
-            at_video_vs_out_q <= at_video_vs_pipe_q;
-            at_video_vb_out_q <= at_video_vb_pipe_q;
-            at_video_de_out_q <= at_video_de_pipe_q;
-            at_video_ce_out_q <= at_video_ce_pipe_q;
+            at_video_r_out_q <= at_video_mixer_r;
+            at_video_g_out_q <= at_video_mixer_g;
+            at_video_b_out_q <= at_video_mixer_b;
+            at_video_hs_out_q <= at_video_mixer_hs;
+            at_video_hb_out_q <= at_video_mix_hb;
+            at_video_vs_out_q <= at_video_mixer_vs;
+            at_video_vb_out_q <= at_video_mix_vb;
+            at_video_de_out_q <= at_video_mixer_de;
+            at_video_ce_out_q <= at_video_mixer_ce;
         end
     end
 
@@ -1375,8 +1636,8 @@ module emu_at
 
     assign CLK_VIDEO    = at_video_clk_57_ps;
     assign CE_PIXEL     = at_video_ce_out_q;
-    assign VIDEO_ARX    = 13'd4;
-    assign VIDEO_ARY    = 13'd3;
+    assign VIDEO_ARX    = at_video_arx_q;
+    assign VIDEO_ARY    = at_video_ary_q;
     assign VGA_R        = at_use_debug_q ? at_debug_rgb_out[23:16] :
                           at_video_r_out_q;
     assign VGA_G        = at_use_debug_q ? at_debug_rgb_out[15:8] :
@@ -1388,8 +1649,9 @@ module emu_at
     assign VGA_DE       = at_use_debug_q ?
                           (~at_debug_hb_out & ~at_debug_vb_out) :
                           at_video_de_out_q;
-    assign VGA_F1       = 1'b0;
-    assign VGA_SL       = 2'b00;
+    assign VGA_F1       = at_video_vga_f1_ps2;
+    assign VGA_SL       = {at_video_scale_q == 2'd3,
+                           at_video_scale_q == 2'd2};
     assign VGA_SCALER   = 1'b0;
     assign VGA_DISABLE  = 1'b0;
     assign HDMI_FREEZE  = 1'b0;
@@ -1520,13 +1782,6 @@ module emu_at
     assign SD_SCK       = 1'bz;
     assign SD_MOSI      = 1'bz;
     assign SD_CS        = 1'bz;
-    assign DDRAM_CLK    = CLK_50M;
-    assign DDRAM_ADDR   = 29'h0;
-    assign DDRAM_BURSTCNT = 8'h0;
-    assign DDRAM_RD     = 1'b0;
-    assign DDRAM_DIN    = 64'h0;
-    assign DDRAM_BE     = 8'h0;
-    assign DDRAM_WE     = 1'b0;
     // The HPS UART becomes the MPU-401 MIDI transport in its MIDI mode;
     // otherwise the selected COM2 path owns the pins. Match the source
     // profile by releasing the HPS modem outputs while MIDI mode is active.

@@ -52,11 +52,12 @@ module emu_at
         "P1O[71],SPK286 Debug,Off,On;";
 `endif
 
-    // Keep the source profile's audio menu and status-bit placement.  The
-    // 220h selector has only the C/MS choices in this build: Sound Blaster is
-    // deliberately not part of the AT profile.
-    localparam CONF_STR_A220 = (`ENABLE_CMS ?
-        "P2OT,C/MS Audio,Enabled,Disabled;" : "");
+    // Match the source profile's mutually exclusive C/MS and Sound Blaster
+    // choices on the shared 220h ports.
+    localparam CONF_STR_A220 = (`ENABLE_CMS && `ENABLE_SB ?
+        "P2OST,Audio 220h,C/MS,Sound Blaster,Disabled;" :
+        (`ENABLE_SB ? "P2OT,Sound Blaster,Enabled,Disabled;" :
+         (`ENABLE_CMS ? "P2OT,C/MS Audio,Enabled,Disabled;" : "")));
     localparam CONF_STR_OPL2 = (`ENABLE_OPL2 ?
         "P2oAB,OPL2,Adlib 388h,SB FM 388h/228h, Disabled;" : "");
     localparam CONF_STR_TANDY = (`ENABLE_TANDY_AUDIO ?
@@ -133,6 +134,7 @@ module emu_at
         "P3OPQ,Joystick 2, Analog, Digital, Disabled;",
         "P3OR,Sync Joy to CPU Speed,No,Yes;",
         "P3oM,Swap Joysticks,No,Yes;",
+        (`ENABLE_SB ? "P3O[70],Sound Blaster IRQ,5,7;" : ""),
         CONF_STR_MIDI,
         "P3-;",
         "-;",
@@ -202,7 +204,11 @@ module emu_at
     wire         at_joy2_disable_osd = hps_status[26];
     wire         at_joy_sync_osd = hps_status[27];
     wire         at_joy_swap_osd = hps_status[54];
-    wire         at_a220_cms_osd = `ENABLE_CMS ? ~hps_status[29] : 1'b0;
+    wire         at_a220_cms_osd = `ENABLE_CMS ?
+        (`ENABLE_SB ? (hps_status[29:28] == 2'b00) : ~hps_status[29]) : 1'b0;
+    wire         at_a220_sb_osd = `ENABLE_SB ?
+        (`ENABLE_CMS ? (hps_status[29:28] == 2'b01) : ~hps_status[29]) : 1'b0;
+    wire [2:0]   at_sb_irq_osd = hps_status[70] ? 3'd7 : 3'd5;
     wire         at_ems_osd = `ENABLE_EMS ? ~hps_status[11] : 1'b0;
     wire         at_umb_osd = `ENABLE_UMB ? ~hps_status[12] : 1'b0;
     wire [2:0]   at_installed_ram_size_osd = hps_status[74:72];
@@ -253,7 +259,8 @@ module emu_at
         .reg_vid(at286ctl_vid), .reg_inp(at286ctl_inp),
         .reg_midi(at286ctl_midi), .reg_exp2(at286ctl_exp2),
         .osd_speed(2'd0), .osd_fake286(1'b0), .osd_opl2(hps_status[43:42]),
-        .osd_cms(at_a220_cms_osd), .osd_sb(1'b0), .osd_sb_irq(3'd5),
+        .osd_cms(at_a220_cms_osd), .osd_sb(at_a220_sb_osd),
+        .osd_sb_irq(at_sb_irq_osd),
         .osd_ems(at_ems_osd), .osd_umb(at_umb_osd),
         .osd_joy1_digital(at_joy1_digital_osd), .osd_joy1_disable(at_joy1_disable_osd),
         .osd_joy2_digital(at_joy2_digital_osd), .osd_joy2_disable(at_joy2_disable_osd),
@@ -263,7 +270,8 @@ module emu_at
         .reg_crt(at286ctl_crt), .reg_sync(at286ctl_sync),
         .osd_crt_h(at_crt_h_osd), .osd_crt_v(at_crt_v_osd),
         .osd_vsync_w(at_vsync_width_osd), .osd_hsync_w(at_hsync_width_osd),
-        .build_sb(1'b0), .build_tandy(`ENABLE_TANDY_AUDIO ? 1'b1 : 1'b0),
+        .build_sb(`ENABLE_SB ? 1'b1 : 1'b0),
+        .build_tandy(`ENABLE_TANDY_AUDIO ? 1'b1 : 1'b0),
         .eff_speed(at286ctl_eff_speed), .eff_fake286(at286ctl_eff_fake286),
         .eff_opl2(at286ctl_eff_opl2), .eff_cms(at286ctl_eff_cms),
         .eff_sb(at286ctl_eff_sb), .eff_sb_irq(at286ctl_eff_sb_irq),
@@ -575,6 +583,8 @@ module emu_at
     wire signed [15:0] at_cms_sound_l;
     wire signed [15:0] at_cms_sound_r;
     wire signed [10:0] at_tandy_sound;
+    wire signed [15:0] at_sb_sound_l;
+    wire signed [15:0] at_sb_sound_r;
 
     wire        dma_memory_valid;
     wire        dma_memory_write;
@@ -1020,6 +1030,8 @@ module emu_at
         .at286ctl_status_osd_match(at286ctl_status_osd_match),
         .at286ctl_eff_opl2     (at286ctl_eff_opl2),
         .at286ctl_eff_cms      (at286ctl_eff_cms),
+        .at286ctl_eff_sb       (at286ctl_eff_sb),
+        .at286ctl_eff_sb_irq   (at286ctl_eff_sb_irq),
         .at286ctl_eff_tandy    (at286ctl_eff_tandy),
         .at286ctl_eff_mpu401   (at286ctl_eff_mpu401),
         .at286ctl_eff_ems      (at286ctl_eff_ems),
@@ -1175,6 +1187,8 @@ module emu_at
         .cms_sound_l            (at_cms_sound_l),
         .cms_sound_r            (at_cms_sound_r),
         .tandy_sound            (at_tandy_sound),
+        .sb_sound_l             (at_sb_sound_l),
+        .sb_sound_r             (at_sb_sound_r),
         .midi_tx               (midi_tx),
         .uart2_tx              (uart2_tx),
         .uart2_rts_n           (uart2_rts_n),
@@ -1698,11 +1712,13 @@ module emu_at
     );
 
     // MiSTer audio mixer. This retains the source profile's volume, boost
-    // and stereo-mix controls while summing only the PC speaker, OPL2, C/MS
-    // and Tandy sources. Sound Blaster is intentionally absent.
+    // and stereo-mix controls while summing the PC speaker, FM, C/MS, Tandy,
+    // Sound Blaster and MT32-pi sources.
     wire signed [16:0] audio_opl2 = {at_opl2_sound[15], at_opl2_sound};
     wire signed [16:0] audio_cms_l = {at_cms_sound_l[15], at_cms_sound_l};
     wire signed [16:0] audio_cms_r = {at_cms_sound_r[15], at_cms_sound_r};
+    wire signed [16:0] audio_sb_l = {at_sb_sound_l[15], at_sb_sound_l};
+    wire signed [16:0] audio_sb_r = {at_sb_sound_r[15], at_sb_sound_r};
     wire [16:0] audio_tandy = `ENABLE_TANDY_AUDIO ?
         {{{2{at_tandy_sound[10]}}, {4{at_tandy_sound[10]}}, at_tandy_sound}
           << hps_status[33:32], 2'b00} : 17'd0;
@@ -1721,10 +1737,10 @@ module emu_at
         {audio_mt32_r_ext[16], audio_mt32_r_ext[16:1]} : 17'sd0;
     wire signed [16:0] audio_sum_l = audio_opl2 + audio_cms_l +
                                       $signed(audio_tandy) + audio_speaker +
-                                      audio_mt32_l;
+                                      audio_sb_l + audio_mt32_l;
     wire signed [16:0] audio_sum_r = audio_opl2 + audio_cms_r +
                                       $signed(audio_tandy) + audio_speaker +
-                                      audio_mt32_r;
+                                      audio_sb_r + audio_mt32_r;
 
     localparam integer COMP_F1 = 4;
     localparam integer COMP_A1 = 2;

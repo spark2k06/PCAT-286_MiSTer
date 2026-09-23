@@ -15,6 +15,7 @@ module spk286_at_video_adapter (
     input  logic        reset,
     input  logic        clk_video,
     input  logic        splashscreen,
+    input  logic [1:0]  ega_monitor_profile,
     input  logic        vga_enabled,
     input  logic        vga_mode13_native,
     input  logic [3:0]  crt_h_offset,
@@ -77,13 +78,21 @@ module spk286_at_video_adapter (
     logic splash_video_sync1_q;
     (* altera_attribute = "-name SYNCHRONIZER_IDENTIFICATION FORCED_IF_ASYNCHRONOUS" *)
     logic splash_video_sync2_q;
+    (* altera_attribute = "-name SYNCHRONIZER_IDENTIFICATION FORCED_IF_ASYNCHRONOUS" *)
+    logic [1:0] ega_monitor_profile_video_sync1_q;
+    (* altera_attribute = "-name SYNCHRONIZER_IDENTIFICATION FORCED_IF_ASYNCHRONOUS" *)
+    logic [1:0] ega_monitor_profile_video_sync2_q;
     always_ff @(posedge clk_video) begin
         if (video_reset) begin
             splash_video_sync1_q <= 1'b0;
             splash_video_sync2_q <= 1'b0;
+            ega_monitor_profile_video_sync1_q <= 2'b00;
+            ega_monitor_profile_video_sync2_q <= 2'b00;
         end else begin
             splash_video_sync1_q <= splashscreen;
             splash_video_sync2_q <= splash_video_sync1_q;
+            ega_monitor_profile_video_sync1_q <= ega_monitor_profile;
+            ega_monitor_profile_video_sync2_q <= ega_monitor_profile_video_sync1_q;
         end
     end
 
@@ -117,7 +126,7 @@ module spk286_at_video_adapter (
     ega_switch_sense_host u_ega_switch_sense_host (
         .clock             (clk),
         .reset             (reset),
-        .monitor_profile   (2'b00),
+        .monitor_profile   (ega_monitor_profile),
         .io_address        (request_address[14:0]),
         .io_data           (request_byte),
         .io_write_n        (!(ega_switch_request && request_write)),
@@ -557,7 +566,7 @@ module spk286_at_video_adapter (
         .thin_font                  (1'b0),
         .scandouble_en              (1'b0),
         .ega_enabled                (1'b1),
-        .ega_monitor_profile        (2'b00),
+        .ega_monitor_profile        (ega_monitor_profile_video_sync2_q),
         .vga_enabled                (vga_enabled),
         .vga_mode13_native          (vga_mode13_native),
         .vga_mode13_set             (1'b0),

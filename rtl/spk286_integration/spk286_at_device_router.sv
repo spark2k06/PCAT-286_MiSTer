@@ -26,6 +26,7 @@ module spk286_at_device_router (
     input  logic        reset,
     input  logic        clk_video,
     input  logic        splashscreen,
+    input  logic [1:0]  ega_monitor_profile,
     input  logic        clear_vga13,
     input  logic [39:0] at286ctl_status_effective,
     input  logic [17:0] at286ctl_status_osd_match,
@@ -552,6 +553,7 @@ module spk286_at_device_router (
     spk286_at_storage_video u_storage_video (
         .clk(clk), .reset(reset),
         .clk_video(clk_video), .splashscreen(splashscreen),
+        .ega_monitor_profile(ega_monitor_profile),
         .vga_enabled(vga_enabled),
         .vga_mode13_native(vga_mode13_native),
         .crt_h_offset(crt_h_offset), .crt_v_offset(crt_v_offset),

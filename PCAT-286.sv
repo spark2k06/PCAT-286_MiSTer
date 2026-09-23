@@ -42,6 +42,11 @@ module emu_at
         "h5-,HALTED: no EGA BIOS selected;"
     };
 
+    localparam CONF_STR_INFO = {
+        "I,Monitor setting pending\n",
+        "Reset to apply;"
+    };
+
 `ifndef SPK286_AT_NO_DEBUG
     localparam CONF_STR_AT_DEBUG =
         "P1O[71],SPK286 Debug,Off,On;";
@@ -117,6 +122,7 @@ module emu_at
         "P3,Hardware;",
         "P3-;",
         "P3O[74:72],Installed RAM,1MB,2MB,4MB,8MB,16MB;",
+        "P3oCD,Monitor,5154/ECD,5153/CGA,5151/MDA;",
         CONF_STR_EMS,
         CONF_STR_UMB,
         "P3ONO,Joystick 1, Analog, Digital, Disabled;",
@@ -128,6 +134,7 @@ module emu_at
         "-;",
         "R0,Reset & apply settings;",
         "J,Fire 1,Fire 2;",
+        CONF_STR_INFO,
         "V,v"
     };
 
@@ -172,6 +179,12 @@ module emu_at
     wire        direct_video;
     wire [127:0] hps_status;
     wire [15:0]  hps_status_menumask;
+    wire [1:0]   at_monitor_profile_osd = hps_status[45:44];
+    wire [1:0]   at_monitor_profile_applied;
+    wire         at_monitor_pending_info_req;
+    wire [7:0]   at_monitor_pending_info;
+    wire         at_monitor_profile_pending =
+        at_monitor_profile_osd != at_monitor_profile_applied;
     wire         at_debug_enable = hps_status[71];
     wire         at_vga_mode13_native_osd = ~hps_status[10];
     wire [3:0]   at_crt_h_osd = hps_status[49:46];
@@ -304,8 +317,8 @@ module emu_at
         .status_menumask      (hps_status_menumask),
         .video_rotated        (1'b0),
         .new_vmode            (1'b0),
-        .info_req             (1'b0),
-        .info                 (8'h00),
+        .info_req             (at_monitor_pending_info_req),
+        .info                 (at_monitor_pending_info),
         .status_in            (128'h0),
         .status_set           (1'b0),
         .uart_mode            (uart_mode),
@@ -865,6 +878,28 @@ module emu_at
     // As in XT, the pending interval is part of the boot hold; otherwise
     // the CPU runs before the first timer tick and is reset a second time.
     wire at_machine_reset = at_boot_reset | at_splash_boot_hold;
+
+    // The OSD choice represents physical EGA monitor switches. Sample it for
+    // the active machine only during reset, then use that applied profile for
+    // both BIOS switch-sense reads and the video connector output.
+    ega_monitor_profile_latch at_monitor_profile_latch (
+        .clock        (CLK_50M),
+        .reset_active (at_machine_reset),
+        .selected     (at_monitor_profile_osd),
+        .applied      (at_monitor_profile_applied)
+    );
+
+    reset_pending_notice #(
+        .INFO_INDEX (8'd1)
+    ) at_monitor_pending_notice (
+        .clock      (CLK_50M),
+        .pending    (at_monitor_profile_pending),
+        .osd_status (OSD_STATUS),
+        .suppress   (1'b0),
+        .info       (at_monitor_pending_info),
+        .info_req   (at_monitor_pending_info_req)
+    );
+
     wire at_cpu_reset_request;
     logic at_video_pipe_reset_57_q1;
     logic at_video_pipe_reset_57_q2;
@@ -961,6 +996,7 @@ module emu_at
         .cpu_reset              (at_machine_reset),
         .clk_video              (at_video_clk_28),
         .splashscreen           (at_splashscreen),
+        .ega_monitor_profile    (at_monitor_profile_applied),
         .at286ctl_status_effective(at286ctl_status_effective),
         .at286ctl_status_osd_match(at286ctl_status_osd_match),
         .at286ctl_eff_opl2     (at286ctl_eff_opl2),

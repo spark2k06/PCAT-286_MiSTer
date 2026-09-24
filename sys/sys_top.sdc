@@ -11,8 +11,9 @@ derive_clock_uncertainty
 
 # Decouple different clock groups (to simplify routing)
 # In the opt-in AT CDC experiment, remove clock-group exclusions between
-# the participating control domains. Keep all unrelated legacy exclusions;
-# do not introduce any new exclusions involving the AT video PLL outputs.
+# the participating control domains. Keep all unrelated legacy exclusions.
+# The f2sdram exception below applies in both profiles because it is
+# limited to paths that pass through the HPS hard block.
 set at_cdc_enabled 0
 foreach_in_collection a [get_all_global_assignments -name VERILOG_MACRO] {
    if {[lindex $a 2] eq "SPK286_AT_CDC"} { set at_cdc_enabled 1 }
@@ -41,6 +42,21 @@ foreach names {
 }
 eval $at_groups
 }
+
+# The Cyclone V f2sdram timing model can attribute an output of one DDR
+# port to the clock of another. The video and audio DDR ports have separate
+# clocks, so timing/hold repair across this hard-block boundary is invalid.
+# Keep direct FPGA logic crossings between these clocks visible to TimeQuest.
+set video_ddr_clock [get_clocks -nowarn {*u_at_video_pll*general[1]*divclk}]
+set audio_ddr_clock [get_clocks -nowarn {pll_audio*general[0]*divclk}]
+set hps_ddr_pins [get_pins -compatibility_mode -nowarn {*|f2sdram|*}]
+if {[get_collection_size $video_ddr_clock] != 1 ||
+    [get_collection_size $audio_ddr_clock] != 1 ||
+    [get_collection_size $hps_ddr_pins] == 0} {
+   error "Expected video/audio DDR clocks and f2sdram pins were not found"
+}
+set_false_path -from $video_ddr_clock -through $hps_ddr_pins -to $audio_ddr_clock
+set_false_path -from $audio_ddr_clock -through $hps_ddr_pins -to $video_ddr_clock
 
 set_false_path -from [get_ports {KEY*}]
 set_false_path -from [get_ports {BTN_*}]

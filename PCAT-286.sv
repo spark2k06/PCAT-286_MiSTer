@@ -1332,7 +1332,28 @@ module emu_at
     // 0 keeps the native EGA raster, 1 converts the captured frame to 480i,
     // and 2 converts it to 240p. The framebuffer is used only when the EGA
     // CRTC is actually producing a 350-line mode.
-    wire [1:0] at_video_crt350_mode = hps_status[35:34];
+    wire [8:0] at_crt350_config_source = {
+        hps_status[35:34], at286ctl_eff_crt_h, at286ctl_eff_crt_v
+    };
+    reg [8:0] at_crt350_config_sent_q = 9'd0;
+    wire at_crt350_config_ready;
+    wire [8:0] at_crt350_config_video;
+    always_ff @(posedge CLK_50M) begin
+        if (at_crt350_config_ready &&
+            at_crt350_config_source != at_crt350_config_sent_q)
+            at_crt350_config_sent_q <= at_crt350_config_source;
+    end
+    at_cdc_snapshot #(.WIDTH(9)) at_crt350_config_cdc (
+        .src_clk   (CLK_50M),
+        .src_send  (at_crt350_config_ready &&
+                    at_crt350_config_source != at_crt350_config_sent_q),
+        .src_data  (at_crt350_config_source),
+        .src_ready (at_crt350_config_ready),
+        .dst_clk   (at_video_clk_57),
+        .dst_data  (at_crt350_config_video),
+        .dst_update()
+    );
+    wire [1:0] at_video_crt350_mode = at_crt350_config_video[8:7];
     wire       at_video_crt350_enable = at_video_mode350_s2_q &
                                          (|at_video_crt350_mode);
     wire       at_video_crt350_progressive = at_video_crt350_mode[1];
@@ -1399,8 +1420,8 @@ module emu_at
         .reset          (at_video_pipe_reset_57),
         .enable         (at_video_crt350_enable),
         .progressive    (at_video_crt350_progressive),
-        .crt_h_offset   (at286ctl_eff_crt_h),
-        .crt_v_offset   (at286ctl_eff_crt_v),
+        .crt_h_offset   (at_crt350_config_video[6:3]),
+        .crt_v_offset   (at_crt350_config_video[2:0]),
         .frame_buffer   (at_fb_frame_buffer),
         .frame_width    (at_fb_frame_width),
         .frame_height   (at_fb_frame_height),

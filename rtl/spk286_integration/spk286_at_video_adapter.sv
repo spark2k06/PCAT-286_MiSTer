@@ -82,19 +82,51 @@ module spk286_at_video_adapter (
     logic [1:0] ega_monitor_profile_video_sync1_q;
     (* altera_attribute = "-name SYNCHRONIZER_IDENTIFICATION FORCED_IF_ASYNCHRONOUS" *)
     logic [1:0] ega_monitor_profile_video_sync2_q;
+    (* altera_attribute = "-name SYNCHRONIZER_IDENTIFICATION FORCED_IF_ASYNCHRONOUS" *)
+    logic vga_mode13_native_video_sync1_q;
+    (* altera_attribute = "-name SYNCHRONIZER_IDENTIFICATION FORCED_IF_ASYNCHRONOUS" *)
+    logic vga_mode13_native_video_sync2_q;
     always_ff @(posedge clk_video) begin
         if (video_reset) begin
             splash_video_sync1_q <= 1'b0;
             splash_video_sync2_q <= 1'b0;
             ega_monitor_profile_video_sync1_q <= 2'b00;
             ega_monitor_profile_video_sync2_q <= 2'b00;
+            vga_mode13_native_video_sync1_q <= 1'b1;
+            vga_mode13_native_video_sync2_q <= 1'b1;
         end else begin
             splash_video_sync1_q <= splashscreen;
             splash_video_sync2_q <= splash_video_sync1_q;
             ega_monitor_profile_video_sync1_q <= ega_monitor_profile;
             ega_monitor_profile_video_sync2_q <= ega_monitor_profile_video_sync1_q;
+            vga_mode13_native_video_sync1_q <= vga_mode13_native;
+            vga_mode13_native_video_sync2_q <= vga_mode13_native_video_sync1_q;
         end
     end
+
+    // CRT geometry is one software-visible configuration. Hold the complete
+    // value while its request crosses to the raster clock, then update all
+    // fields together. A later write supersedes an in-flight value.
+    wire [13:0] video_geometry_source = {
+        vga_enabled, hsync_width_osd, vsync_width_osd,
+        crt_v_offset, crt_h_offset
+    };
+    logic [13:0] video_geometry_sent_q = 14'd0;
+    wire video_geometry_ready;
+    wire [13:0] video_geometry;
+    always_ff @(posedge clk) begin
+        if (video_geometry_ready && video_geometry_source != video_geometry_sent_q)
+            video_geometry_sent_q <= video_geometry_source;
+    end
+    at_cdc_snapshot #(.WIDTH(14)) video_geometry_cdc (
+        .src_clk   (clk),
+        .src_send  (video_geometry_ready && video_geometry_source != video_geometry_sent_q),
+        .src_data  (video_geometry_source),
+        .src_ready (video_geometry_ready),
+        .dst_clk   (clk_video),
+        .dst_data  (video_geometry),
+        .dst_update()
+    );
 
     wire video_io_request = request_valid && request_command_valid &&
                             request_io &&
@@ -567,8 +599,8 @@ module spk286_at_video_adapter (
         .scandouble_en              (1'b0),
         .ega_enabled                (1'b1),
         .ega_monitor_profile        (ega_monitor_profile_video_sync2_q),
-        .vga_enabled                (vga_enabled),
-        .vga_mode13_native          (vga_mode13_native),
+        .vga_enabled                (video_geometry[13]),
+        .vga_mode13_native          (vga_mode13_native_video_sync2_q),
         .vga_mode13_set             (1'b0),
         .vga_mode13_clear           (1'b0),
         .vga_mode13_active_out      (vga_mode13_active_video),
@@ -576,10 +608,10 @@ module spk286_at_video_adapter (
         .vga_mode13_wide_clock_out  (),
         .vga_planar_memory_active_out(vga_planar_memory_active_video),
         .vga_mode13_pixel_toggle_out(),
-        .crt_h_offset               (crt_h_offset),
-        .crt_v_offset               (crt_v_offset),
-        .vsync_width_osd            (vsync_width_osd),
-        .hsync_width_osd            (hsync_width_osd)
+        .crt_h_offset               (video_geometry[3:0]),
+        .crt_v_offset               (video_geometry[6:4]),
+        .vsync_width_osd            (video_geometry[9:7]),
+        .hsync_width_osd            (video_geometry[12:10])
     );
 
 endmodule

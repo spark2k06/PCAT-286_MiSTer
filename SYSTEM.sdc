@@ -177,7 +177,7 @@ if {$at_cdc_enabled && $at_require_new} {
     # Concrete instance endpoints, not domain-wide exemptions. 5 ns is less
     # than one 148.5 MHz destination period. Capture waits for two toggle
     # stages; the payload remains frozen until the acknowledgement returns.
-    proc at_snapshot {instance} {
+    proc at_snapshot {instance {budget 5.0}} {
         set src [at_regs "${instance}_payload" "*${instance}|payload_q\[*\]"]
         set dst [at_regs "${instance}_capture" "*${instance}|dst_data\[*\]"]
         set req [at_regs "${instance}_req" "*${instance}|req_q"]
@@ -186,7 +186,7 @@ if {$at_cdc_enabled && $at_require_new} {
         set ack_meta [at_regs "${instance}_ack_meta" "*${instance}|ack_meta"]
         set_false_path -from $req -to $req_meta
         set_false_path -from $ack -to $ack_meta
-        set_max_delay -from $src -to $dst 5.0
+        set_max_delay -from $src -to $dst $budget
         set_false_path -hold -from $src -to $dst
     }
     foreach instance {
@@ -196,6 +196,12 @@ if {$at_cdc_enabled && $at_require_new} {
     } {
         at_snapshot $instance
     }
+    # The AT CRT configuration is a 14-bit held payload. Its destination
+    # clock is 28.636 MHz; 10 ns leaves ample handshake settling time.
+    at_snapshot video_geometry_cdc 10.0
+    at_snapshot at_crt350_config_cdc 10.0
+    at_snapshot framebuffer_out_config 10.0
+    at_snapshot framebuffer_avl_config 10.0
     at_sync metrics_video_edges $AT_VIDEO_OUT {*video_calc*g_at_edges*vs_meta *video_calc*g_at_edges*hs_meta *video_calc*g_at_edges*de_meta}
     at_sync metrics_hdmi_edge $AT_HDMI {*video_calc*g_at_edges*hdmi_meta}
     at_sync pll_cfg_video $AT_CPU {*pll_hdmi_adj|cfg_video_meta}

@@ -517,6 +517,13 @@ ARCHITECTURE rtl OF ascal IS
 	SIGNAL cdc_output_meta : std_logic_vector(23 DOWNTO 0);
 	SIGNAL cdc_input_data : std_logic_vector(25 DOWNTO 0);
 	SIGNAL cdc_output_data : std_logic_vector(23 DOWNTO 0);
+	SIGNAL cdc_fb_out_data,cdc_fb_out_meta : std_logic_vector(76 DOWNTO 0);
+	SIGNAL cdc_fb_avl_data,cdc_fb_avl_meta : std_logic_vector(32 DOWNTO 0);
+	SIGNAL cdc_o_fb_ena,cdc_avl_fb_ena : std_logic;
+	SIGNAL cdc_o_fb_hsize,cdc_o_fb_vsize : natural RANGE 0 TO 4095;
+	SIGNAL cdc_o_fb_format : unsigned(5 DOWNTO 0);
+	SIGNAL cdc_o_fb_base,cdc_avl_fb_base : unsigned(31 DOWNTO 0);
+	SIGNAL cdc_o_fb_stride : unsigned(13 DOWNTO 0);
 	SIGNAL cdc_hrsize,cdc_vrsize,cdc_ohsize,cdc_ovsize : uint12;
 	SIGNAL cdc_hdown,cdc_vdown : std_logic;
 	SIGNAL o_ihsize_temp, o_ihsize_temp2 : natural RANGE 0 TO 32767;
@@ -1182,6 +1189,35 @@ BEGIN
 				src_data => cdc_output_data,
 				src_ready => OPEN, dst_clk => i_clk,
 				dst_data => cdc_output_meta, dst_update => OPEN);
+		-- Framebuffer controls originate on poly_clk. The raster and Avalon
+		-- clocks consume separate acknowledged copies of one complete setting.
+		cdc_fb_out_data <= o_fb_ena &
+		                   std_logic_vector(to_unsigned(o_fb_hsize,12)) &
+		                   std_logic_vector(to_unsigned(o_fb_vsize,12)) &
+		                   std_logic_vector(o_fb_format) &
+		                   std_logic_vector(o_fb_base) &
+		                   std_logic_vector(o_fb_stride);
+		cdc_fb_avl_data <= o_fb_ena & std_logic_vector(o_fb_base);
+		framebuffer_out_config : ENTITY work.at_cdc_snapshot_vhd
+			GENERIC MAP (WIDTH => 77)
+			PORT MAP (src_clk => poly_clk, src_send => '1',
+				src_data => cdc_fb_out_data,
+				src_ready => OPEN, dst_clk => o_clk,
+				dst_data => cdc_fb_out_meta, dst_update => OPEN);
+		framebuffer_avl_config : ENTITY work.at_cdc_snapshot_vhd
+			GENERIC MAP (WIDTH => 33)
+			PORT MAP (src_clk => poly_clk, src_send => '1',
+				src_data => cdc_fb_avl_data,
+				src_ready => OPEN, dst_clk => avl_clk,
+				dst_data => cdc_fb_avl_meta, dst_update => OPEN);
+		cdc_o_fb_ena <= cdc_fb_out_meta(76);
+		cdc_o_fb_hsize <= to_integer(unsigned(cdc_fb_out_meta(75 DOWNTO 64)));
+		cdc_o_fb_vsize <= to_integer(unsigned(cdc_fb_out_meta(63 DOWNTO 52)));
+		cdc_o_fb_format <= unsigned(cdc_fb_out_meta(51 DOWNTO 46));
+		cdc_o_fb_base <= unsigned(cdc_fb_out_meta(45 DOWNTO 14));
+		cdc_o_fb_stride <= unsigned(cdc_fb_out_meta(13 DOWNTO 0));
+		cdc_avl_fb_ena <= cdc_fb_avl_meta(32);
+		cdc_avl_fb_base <= unsigned(cdc_fb_avl_meta(31 DOWNTO 0));
 		cdc_hrsize <= to_integer(unsigned(cdc_input_meta(25 DOWNTO 14)));
 		cdc_vrsize <= to_integer(unsigned(cdc_input_meta(13 DOWNTO 2)));
 		cdc_hdown <= cdc_input_meta(1);
@@ -1190,6 +1226,14 @@ BEGIN
 		cdc_ovsize <= to_integer(unsigned(cdc_output_meta(11 DOWNTO 0)));
 	END GENERATE;
 	g_legacy_cdc : IF NOT AT_CDC GENERATE
+		cdc_o_fb_ena <= o_fb_ena;
+		cdc_o_fb_hsize <= o_fb_hsize;
+		cdc_o_fb_vsize <= o_fb_vsize;
+		cdc_o_fb_format <= o_fb_format;
+		cdc_o_fb_base <= o_fb_base;
+		cdc_o_fb_stride <= o_fb_stride;
+		cdc_avl_fb_ena <= o_fb_ena;
+		cdc_avl_fb_base <= o_fb_base;
 		cdc_hrsize <= i_hrsize;
 		cdc_vrsize <= i_vrsize;
 		cdc_hdown <= i_hdown;
@@ -1745,7 +1789,7 @@ BEGIN
 			avl_o_vs_sync<=o_vsv(0); -- <ASYNC>
 			avl_o_vs<=avl_o_vs_sync;
 
-			avl_fb_ena<=o_fb_ena; -- <ASYNC>
+			avl_fb_ena<=cdc_avl_fb_ena;
 			IF avl_fb_ena='0' THEN
 				IF HEADER THEN
 					avl_o_offset0<=buf_offset(o_obuf0,RAMBASE,RAMSIZE) + N_BURST;  -- <ASYNC>
@@ -1756,8 +1800,8 @@ BEGIN
 				END IF;
 			ELSIF avl_o_vs_sync='0' AND avl_o_vs='1' THEN
 				-- Copy framebuffer base address at VS falling edge
-				avl_o_offset0<=o_fb_base; -- <ASYNC>
-				avl_o_offset1<=o_fb_base; -- <ASYNC>
+				avl_o_offset0<=cdc_avl_fb_base;
+				avl_o_offset1<=cdc_avl_fb_base;
 			END IF;
 
 			avl_i_offset0<=buf_offset(o_ibuf0,RAMBASE,RAMSIZE);  -- <ASYNC>
@@ -1997,7 +2041,7 @@ BEGIN
 				END IF;
 			END IF;
 
-			IF (swblack = '1' and o_fb_ena = '0' and (o_ihsize /= cdc_hrsize or o_ivsize /= cdc_vrsize)) then
+			IF (swblack = '1' and cdc_o_fb_ena = '0' and (o_ihsize /= cdc_hrsize or o_ivsize /= cdc_vrsize)) then
 				o_newres <= 3;
 			END IF;
 
@@ -2028,10 +2072,10 @@ BEGIN
 			END IF;
 
 			-- Framebuffer mode.
-			IF o_fb_ena='1' THEN
-				o_ihsize<=o_fb_hsize;
-				o_ivsize<=o_fb_vsize;
-				o_format<=o_fb_format;
+			IF cdc_o_fb_ena='1' THEN
+				o_ihsize<=cdc_o_fb_hsize;
+				o_ivsize<=cdc_o_fb_vsize;
+				o_format<=cdc_o_fb_format;
 				o_hdown<='0';
 				o_vdown<='0';
 			END IF;
@@ -2047,8 +2091,8 @@ BEGIN
 			o_ihsize_temp2 <= (o_ihsize_temp + N_BURST - 1);
 			o_hburst <= o_ihsize_temp2 / N_BURST;
 
-			IF o_fb_ena='1' AND o_fb_stride /= 0 THEN
-				o_stride<=o_fb_stride;
+			IF cdc_o_fb_ena='1' AND cdc_o_fb_stride /= 0 THEN
+				o_stride<=cdc_o_fb_stride;
 			ELSE
 				o_stride<=to_unsigned(o_ihsize_temp2,14);
 				o_stride(NB_BURST-1 DOWNTO 0)<=(OTHERS =>'0');
@@ -2169,8 +2213,8 @@ BEGIN
 					prim_v:=to_std_logic(o_hbcpt=0);
 					last_v:=to_std_logic(o_hbcpt=o_hburst-1);
 					bib_v :=o_bibu;
-					off_v :=pixoffset(o_adrs + o_fb_base(NB_LA-1 DOWNTO 0),o_fb_format);
-					IF o_fb_ena='0' THEN
+						off_v :=pixoffset(o_adrs + cdc_o_fb_base(NB_LA-1 DOWNTO 0),cdc_o_fb_format);
+						IF cdc_o_fb_ena='0' THEN
 						off_v:=0;
 					END IF;
 					o_adrsa<='1';

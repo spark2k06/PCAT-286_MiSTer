@@ -1788,13 +1788,29 @@ wire [13:0] fb_stride;
 `endif
 
 `ifdef AT_PROFILE
+// The HPS initialization reset originates on h2f_user0_clk. Assert the AT
+// reset immediately, then release it on FPGA_CLK2_50 before it reaches the
+// CPU, memory port and physical SDRAM owner.
+(* altera_attribute = "-name SYNCHRONIZER_IDENTIFICATION FORCED_IF_ASYNCHRONOUS" *) reg at_reset_sync1_q = 1'b1;
+(* altera_attribute = "-name SYNCHRONIZER_IDENTIFICATION FORCED_IF_ASYNCHRONOUS" *) reg at_reset_sync2_q = 1'b1;
+always @(posedge FPGA_CLK2_50 or posedge reset) begin
+	if (reset) begin
+		at_reset_sync1_q <= 1'b1;
+		at_reset_sync2_q <= 1'b1;
+	end else begin
+		at_reset_sync1_q <= 1'b0;
+		at_reset_sync2_q <= at_reset_sync1_q;
+	end
+end
+wire emu_reset = at_reset_sync2_q;
 emu_at emu
 `else
+wire emu_reset = reset;
 emu emu
 `endif
 (
 	.CLK_50M(FPGA_CLK2_50),
-	.RESET(reset),
+	.RESET(emu_reset),
 	.HPS_BUS({f1, HDMI_TX_VS, 
 				 clk_100m, clk_ihdmi,
 				 ce_hpix, hde_emu, hhs_fix, hvs_fix, 

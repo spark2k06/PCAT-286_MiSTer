@@ -49,14 +49,38 @@ eval $at_groups
 # Keep direct FPGA logic crossings between these clocks visible to TimeQuest.
 set video_ddr_clock [get_clocks -nowarn {*u_at_video_pll*general[1]*divclk}]
 set audio_ddr_clock [get_clocks -nowarn {pll_audio*general[0]*divclk}]
+set hps_user_clock [get_clocks -nowarn {*h2f_user0_clk}]
 set hps_ddr_pins [get_pins -compatibility_mode -nowarn {*|f2sdram|*}]
 if {[get_collection_size $video_ddr_clock] != 1 ||
     [get_collection_size $audio_ddr_clock] != 1 ||
+    [get_collection_size $hps_user_clock] != 1 ||
     [get_collection_size $hps_ddr_pins] == 0} {
-   error "Expected video/audio DDR clocks and f2sdram pins were not found"
+   error "Expected HPS/video/audio DDR clocks and f2sdram pins were not found"
 }
 set_false_path -from $video_ddr_clock -through $hps_ddr_pins -to $audio_ddr_clock
 set_false_path -from $audio_ddr_clock -through $hps_ddr_pins -to $video_ddr_clock
+set_false_path -from $hps_user_clock -through $hps_ddr_pins -to $video_ddr_clock
+set_false_path -from $video_ddr_clock -through $hps_ddr_pins -to $hps_user_clock
+set_false_path -from $hps_user_clock -through $hps_ddr_pins -to $audio_ddr_clock
+set_false_path -from $audio_ddr_clock -through $hps_ddr_pins -to $hps_user_clock
+
+# sysmem reset is synchronized independently in each DDR port clock domain.
+# The input of each first stage may change asynchronously; later stages stay timed.
+foreach reset_port {ram1 ram2 vbuf} {
+   set reset_meta [get_registers -nowarn "*|${reset_port}_reset_0"]
+   if {[get_collection_size $reset_meta] != 1} {
+      error "Expected ${reset_port} DDR reset synchronizer was not found"
+   }
+   set_false_path -to $reset_meta
+}
+
+# The OSD mode switch is sampled by a two-stage register chain in the EGA
+# raster domain. Only the first stage may receive the asynchronous transition.
+set vga_mode13_meta [get_registers -nowarn {*vga_mode13_native_video_sync1_q}]
+if {[get_collection_size $vga_mode13_meta] != 1} {
+   error "Expected EGA mode-13 clock-domain synchronizer was not found"
+}
+set_false_path -to $vga_mode13_meta
 
 set_false_path -from [get_ports {KEY*}]
 set_false_path -from [get_ports {BTN_*}]

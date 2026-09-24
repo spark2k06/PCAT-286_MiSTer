@@ -201,7 +201,43 @@ if {$at_cdc_enabled && $at_require_new} {
     at_snapshot video_geometry_cdc 10.0
     at_snapshot at_crt350_config_cdc 10.0
     at_snapshot framebuffer_out_config 10.0
-    at_snapshot framebuffer_avl_config 10.0
+    at_snapshot capture_bank_config 10.0
+    at_snapshot capture_field_history 5.0
+
+    # Packed/planar selection is registered in the video domain before its
+    # two-stage level synchronizer. Only the asynchronous first stage is cut.
+    at_sync vga_packed_mode $AT_VIDEO {*u_video|vga_packed_memory_sync1_q}
+
+    set AT_AVALON [at_clock {sysmem|fpga_interfaces|clocks_resets|h2f_user0_clk}]
+    # No functional logic observes these first stages. Pulse/edge detection
+    # in the AT scaler uses stage two and a separate remembered value.
+    at_sync scaler_write_request $AT_VIDEO_OUT {*ascal|avl_write_sync}
+    at_sync scaler_read_request $AT_HDMI {*ascal|avl_read_sync}
+    at_sync scaler_read_ack $AT_AVALON {*ascal|o_readack_sync}
+    at_sync scaler_read_data_ack $AT_AVALON {*ascal|o_readdataack_sync}
+    at_sync scaler_input_frame $AT_VIDEO_OUT {*ascal|o_iendframe0 *ascal|o_iendframe1}
+    at_sync scaler_output_frame $AT_HDMI {*ascal|avl_o_vs_sync}
+
+    # Bundled command data, not a bank of independently synchronized bits.
+    # Read address+base remain frozen until the Avalon acceptance ack returns.
+    # Writes are held for >=6 input clocks (104 ns at 57.272 MHz); the 100 MHz
+    # receiver captures after two stages, edge detection and one capture clock
+    # (<50 ns). Use a 10 ns max-delay budget; Quartus 17 also accounts for
+    # clock-network latencies. Audit actual data delay against the settling
+    # window after fitting. Hold has no inter-clock phase requirement here.
+    foreach {label src_patterns dst_patterns} {
+        scaler_read_command
+        {*ascal|o_read_address_q[*] *ascal|o_read_base_q[*]}
+        {*ascal|avl_radrs[*] *ascal|avl_rbase[*]}
+        scaler_write_command
+        {*ascal|i_wadrs[*] *ascal|i_wbase[*] *ascal|i_walt}
+        {*ascal|avl_wadrs[*] *ascal|avl_wbase[*] *ascal|avl_walt}
+    } {
+        set src [at_regs ${label}_source $src_patterns]
+        set dst [at_regs ${label}_capture $dst_patterns]
+        set_max_delay -from $src -to $dst 10.0
+        set_false_path -hold -from $src -to $dst
+    }
     at_sync metrics_video_edges $AT_VIDEO_OUT {*video_calc*g_at_edges*vs_meta *video_calc*g_at_edges*hs_meta *video_calc*g_at_edges*de_meta}
     at_sync metrics_hdmi_edge $AT_HDMI {*video_calc*g_at_edges*hdmi_meta}
     at_sync pll_cfg_video $AT_CPU {*pll_hdmi_adj|cfg_video_meta}

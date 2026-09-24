@@ -322,7 +322,13 @@ module spk286_at_video_adapter (
     // Standard VGA mode 13h uses a packed 64 KiB A0000 framebuffer. Keep its
     // CPU aperture separate from the planar EGA VRAM, whose Chain-4 path is
     // intentionally handled by ega_vram_bram_frontend.
+    // Register the decoded mode before crossing clocks: the planar/packed
+    // decision depends on several graphics registers and must not propagate
+    // combinational decode glitches into the CPU-domain synchronizer.
+    logic vga_packed_memory_video_q;
+    (* altera_attribute = "-name SYNCHRONIZER_IDENTIFICATION FORCED_IF_ASYNCHRONOUS; -name DONT_MERGE_REGISTER ON" *)
     logic vga_packed_memory_sync1_q;
+    (* altera_attribute = "-name SYNCHRONIZER_IDENTIFICATION FORCED_IF_ASYNCHRONOUS; -name DONT_MERGE_REGISTER ON" *)
     logic vga_packed_memory_sync2_q;
     wire  vga_packed_memory_active = vga_packed_memory_sync2_q;
     wire  vga_packed_memory_request = memory_busy_q &&
@@ -334,13 +340,20 @@ module spk286_at_video_adapter (
     assign memory_ready = vga_packed_memory_request ?
                           vga_framebuffer_cpu_ready : vram_cpu_ready;
 
+    always_ff @(posedge clk_video) begin
+        if (video_reset)
+            vga_packed_memory_video_q <= 1'b0;
+        else
+            vga_packed_memory_video_q <= vga_mode13_active_video &&
+                                         !vga_planar_memory_active_video;
+    end
+
     always_ff @(posedge clk or posedge reset) begin
         if (reset) begin
             vga_packed_memory_sync1_q <= 1'b0;
             vga_packed_memory_sync2_q <= 1'b0;
         end else begin
-            vga_packed_memory_sync1_q <= vga_mode13_active_video &&
-                                         !vga_planar_memory_active_video;
+            vga_packed_memory_sync1_q <= vga_packed_memory_video_q;
             vga_packed_memory_sync2_q <= vga_packed_memory_sync1_q;
         end
     end

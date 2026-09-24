@@ -15,10 +15,12 @@ module spk286_at_video_window_tb;
     wire [15:0] data_in;
     wire hblank, vblank, de, dot;
     logic [3:0] h_offset = 0;
+    logic vga_enabled = 0;
+    logic [7:0] last_read;
 
     spk286_at_video_adapter dut (
         .clk(clk), .reset(reset), .clk_video(clk_video), .splashscreen(1'b0),
-        .ega_monitor_profile(2'd0), .vga_enabled(1'b0), .vga_mode13_native(1'b1),
+        .ega_monitor_profile(2'd0), .vga_enabled(vga_enabled), .vga_mode13_native(1'b1),
         .crt_h_offset(h_offset), .crt_v_offset(3'd0),
         .vsync_width_osd(3'd0), .hsync_width_osd(3'd0),
         .request_valid(valid), .request_command_valid(command_valid),
@@ -52,6 +54,7 @@ module spk286_at_video_window_tb;
                 cycles++;
             end
             if (!ready) $fatal(1, "Video request timed out at %06h", addr);
+            last_read = addr[0] ? data_in[15:8] : data_in[7:0];
             @(negedge clk);
             valid = 0;
             repeat (2) @(negedge clk);
@@ -161,6 +164,38 @@ module spk286_at_video_window_tb;
             end
         end
         $display("AT_VIDEO_WINDOW_TEST_PASS text200=640 text350=640 graphics200=640 offsets=0,6");
+
+        // Exercise the mode crossing with actual CPU I/O, immediately followed
+        // by memory transactions. The I/O acknowledgement must leave enough
+        // time for the registered packed/planar selection to reach the CPU.
+        vga_enabled = 1;
+        indexed_write(16'h03C4, 2, 8'h01);
+        indexed_write(16'h03C4, 4, 8'h0E);
+        indexed_write(16'h03CE, 4, 8'h00);
+        indexed_write(16'h03CE, 5, 8'h40);
+        indexed_write(16'h03CE, 6, 8'h05);
+        io_write(16'h03CD, 8'h13);
+        if (!dut.vga_packed_memory_active) $fatal(1, "Packed mode not ready after I/O ack");
+        access_byte(1, 0, 24'h0A0123, 8'hA5);
+        access_byte(0, 0, 24'h0A0123, 0);
+        if (last_read != 8'hA5) $fatal(1, "Packed framebuffer readback failed");
+        indexed_write(16'h03C4, 4, 8'h06);
+        if (dut.vga_packed_memory_active) $fatal(1, "Mode X not ready after I/O ack");
+        access_byte(1, 0, 24'h0A0123, 8'h3C);
+        access_byte(0, 0, 24'h0A0123, 0);
+        if (last_read != 8'h3C) $fatal(1, "Planar framebuffer readback failed: %h", last_read);
+        for (integer k = 0; k < 8; k++) begin
+            // GC06.misc_reg[0] was the reported asynchronous path.
+            indexed_write(16'h03CE, 6, 8'h04);
+            if (!dut.vga_packed_memory_active) $fatal(1, "GC06 packed selection late");
+            access_byte(0, 0, 24'h0A0123, 0);
+            if (last_read != 8'hA5) $fatal(1, "Packed data damaged by planar write");
+            indexed_write(16'h03CE, 6, 8'h05);
+            if (dut.vga_packed_memory_active) $fatal(1, "GC06 planar selection late");
+            access_byte(0, 0, 24'h0A0123, 0);
+            if (last_read != 8'h3C) $fatal(1, "Planar data lost across mode change");
+        end
+        $display("AT_VIDEO_MODE_CDC_PASS packed=A5 planar=3C switches=16");
         $finish;
     end
 

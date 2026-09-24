@@ -50,19 +50,30 @@ if {$mode eq "baseline"} {
         read_data_ack_sync {*ascal|o_readdataack_sync} {*ascal|o_readdataack_sync2}
         input_frame_sync {*ascal|o_iendframe0 *ascal|o_iendframe1} {*ascal|o_iendframe02 *ascal|o_iendframe12}
         output_frame_sync {*ascal|avl_o_vs_sync} {*ascal|avl_o_vs}
+        frame_counter_source {*sync_v|pol* emu|at_video_vs_out_q} {*u_at_frame_counter|vs_video_q}
+        frame_counter_sync {*u_at_frame_counter|vs_meta} {*u_at_frame_counter|vs_sync}
+        frame_counter_logic {*u_at_frame_counter|vs_sync *u_at_frame_counter|vs_seen} {*u_at_frame_counter|frame_cnt[*]}
+        shadowmask_apply {*HDMI_shadowmask*g_at_config*config_mailbox|dst_data[*]} {*HDMI_shadowmask*g_at_config*config_active_q[*]}
+        shadowmask_local {*HDMI_shadowmask*g_at_config*config_active_q[*]} {*HDMI_shadowmask|*}
     } {
         lappend groups $label [list -from [regs ${label}_src $src] -to [regs ${label}_dst $dst]]
     }
     set payload_groups {read_payload write_payload}
-    foreach instance {capture_bank_config capture_field_history framebuffer_out_config} {
-        set src [regs ${instance}_src "*${instance}|payload_q\[*\]"]
-        set dst [regs ${instance}_dst "*${instance}|dst_data\[*\]"]
-        lappend groups $instance [list -from $src -to $dst]
-        lappend payload_groups $instance
+    foreach {label instance} {
+        capture_bank_config capture_bank_config
+        capture_field_history capture_field_history
+        framebuffer_out_config framebuffer_out_config
+        shadowmask_config HDMI_shadowmask*g_at_config*config_mailbox
+    } {
+        # Selectors may contain wildcards; report filenames must work on Windows.
+        set src [regs ${label}_src "*${instance}|payload_q\[*\]"]
+        set dst [regs ${label}_dst "*${instance}|dst_data\[*\]"]
+        lappend groups $label [list -from $src -to $dst]
+        lappend payload_groups $label
         foreach {src_name dst_name} {req_meta req_sync ack_meta ack_sync} {
-            set src [regs ${instance}_${src_name} "*${instance}|${src_name}"]
-            set dst [regs ${instance}_${dst_name} "*${instance}|${dst_name}"]
-            lappend groups ${instance}_${src_name} [list -from $src -to $dst]
+            set src [regs ${label}_${src_name} "*${instance}|${src_name}"]
+            set dst [regs ${label}_${dst_name} "*${instance}|${dst_name}"]
+            lappend groups ${label}_${src_name} [list -from $src -to $dst]
         }
     }
     set old [get_registers -nowarn {*ascal|avl_i_offset0[*] *ascal|avl_i_offset1[*] *ascal|avl_o_offset0[*] *ascal|avl_o_offset1[*]}]

@@ -365,6 +365,9 @@ always@(posedge clk_sys) begin
 
 `ifndef MISTER_DEBUG_NOHDMI
 	shadowmask_wr <= 0;
+	// Keep the transaction envelope aligned with the registered command strobe.
+	// A falling edge commits the complete flags/LUT/dimensions command stream.
+	shadowmask_active <= io_uio && has_cmd && (cmd == 'h3E);
 `endif
 
 	if(~io_uio) begin
@@ -548,6 +551,12 @@ always@(posedge clk_sys) begin
 	if(~vs_d2 & vs_d1) vs_wait <= 0;
 end
 
+`ifdef SPK286_AT_CDC
+wire [7:0] frame_cnt;
+at_frame_counter u_at_frame_counter (
+	.clk_video(clk_vid), .clk_sys(clk_sys), .vs(vs_fix), .frame_cnt(frame_cnt)
+);
+`else
 reg [7:0] frame_cnt;
 always @(posedge clk_sys) begin
 	reg vs_r, vs_old;
@@ -556,6 +565,7 @@ always @(posedge clk_sys) begin
 	if(vs_r == vs_fix) vs_old <= vs_r;
 	if(~vs_old & vs_r) frame_cnt <= frame_cnt + 1'd1;
 end
+`endif
 
 cyclonev_hps_interface_peripheral_uart uart
 (
@@ -1167,14 +1177,22 @@ cyclonev_hps_interface_peripheral_i2c hdmi_i2c
 
 	reg [15:0] shadowmask_data;
 	reg        shadowmask_wr = 0;
+	reg        shadowmask_active = 0;
 
-	shadowmask HDMI_shadowmask
+	shadowmask #(
+`ifdef SPK286_AT_CDC
+		.AT_CDC(1)
+`else
+		.AT_CDC(0)
+`endif
+	) HDMI_shadowmask
 	(
 		.clk(clk_hdmi),
 		.clk_sys(clk_sys),
 
 		.cmd_wr(shadowmask_wr),
 		.cmd_in(shadowmask_data),
+		.cmd_active(shadowmask_active),
 
 		.din(dis_output ? 24'd0 : hdmi_data),
 		.hs_in(hdmi_hs),

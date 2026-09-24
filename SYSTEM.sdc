@@ -203,6 +203,10 @@ if {$at_cdc_enabled && $at_require_new} {
     at_snapshot framebuffer_out_config 10.0
     at_snapshot capture_bank_config 10.0
     at_snapshot capture_field_history 5.0
+    # Completed UIO configuration is held until ack, then applied at HDMI VS.
+    at_snapshot HDMI_shadowmask*g_at_config*config_mailbox 5.0
+    # Source-registered VS level; only the second stage drives edge detection.
+    at_sync frame_counter_vs $AT_VIDEO_OUT {*u_at_frame_counter|vs_meta}
 
     # Packed/planar selection is registered in the video domain before its
     # two-stage level synchronizer. Only the asynchronous first stage is cut.

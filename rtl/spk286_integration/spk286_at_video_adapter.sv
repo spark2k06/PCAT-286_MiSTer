@@ -524,6 +524,15 @@ module spk286_at_video_adapter (
         end
     end
 
+    // Native EGA RGB follows the renderer/attribute pipeline, whose visible
+    // window is later than the CRTC's HBLANK (13 dots in 80-column text).
+    // Match PCXT-EGA's LHBL selection so the HDMI mixer and framebuffer keep
+    // the entire rendered line. Private VGA and scandoubled rasters already
+    // supply their own aligned blanking.
+    wire ega_hblank_raw;
+    assign video_hblank = (video_scandouble_active || vga_mode13_active_video)
+                          ? ega_hblank_raw : ~video_de;
+
     ega_top u_ega (
         .clk                        (clk_video),
         .reset                      (video_reset),
@@ -576,7 +585,7 @@ module spk286_at_video_adapter (
         .ega_blink_counter_out      (),
         .ega_blink_state_out        (),
         .hsync                      (video_hsync),
-        .hblank                     (video_hblank),
+        .hblank                     (ega_hblank_raw),
         .dbl_hsync                  (video_dbl_hsync),
         .vsync                      (video_vsync),
         .vblank                     (video_vblank),

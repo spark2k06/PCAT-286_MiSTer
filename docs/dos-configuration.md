@@ -14,7 +14,11 @@ The supplied configuration expects these core options:
 - **Hardware → 2MB EMS D000-DFFF: Enabled** exposes the four 16 KiB EMS
   page-frame banks at `D0000h-DFFFFh`. The backing store is up to 2 MiB and
   the Lo-tech-compatible page registers are at port `260h`.
-- **Audio & Video → C/MS Audio: Enabled** exposes the C/MS pair at `220h`.
+- **Audio & Video → Audio 220h: C/MS** exposes the C/MS pair at `220h`.
+  Select **Sound Blaster** instead to use the SB Pro DSP and mixer at that
+  address. The two devices share ports and are mutually exclusive.
+- **Hardware → Sound Blaster IRQ: 5** selects IRQ5 (the default); IRQ7 is
+  also available. Sound Blaster uses 8-bit DMA channel 1.
 - **Audio & Video → OPL2: Adlib 388h** exposes the OPL2 at `388h`; the second
   OSD choice also enables its `228h` FM alias.
 - **Audio & Video → Tandy Sound: Enabled** exposes the SN76489 at `0C0h-0CFh`.
@@ -29,9 +33,10 @@ The supplied configuration expects these core options:
 - The MT32-pi page keeps the source choices for MT-32/General MIDI mode,
   ROM, SoundFont, reset and the optional external bridge.
 
-Sound Blaster DSP, DMA, IRQ and its OSD selection are intentionally not part
-of this AT profile. C/MS, OPL2 and Tandy are core hardware and require no DOS
-driver or environment variable. MPU-401 UART mode is the MIDI transport; the
+The AT profile builds Sound Blaster Pro support with `ENABLE_SB=1` in
+`config.tcl`. Select it through Audio 220h before using a Sound Blaster driver.
+C/MS, OPL2 and Tandy require no DOS driver or environment variable.
+MPU-401 UART mode is the MIDI transport; the
 MT32-pi itself remains external hardware connected through USER I/O.
 
 The core reserves `C8000h-C9FFFh` for the AT XTIDE option ROM. The rest of
@@ -76,12 +81,47 @@ C:\UTIL\CTMOUSE\CTMOUSE.EXE
 ```
 
 The built-in devices are selected by their OSD options or by the per-program
-`AT286CTL` overrides; no `BLASTER`, `SOUND` or `MIDI` variable configures them.
+`AT286CTL` overrides. For Sound Blaster programs, add this line to AUTOEXEC.BAT
+when using the default IRQ5:
+
+```bat
+SET BLASTER=A220 I5 D1 T4
+```
+
+Use `I7` if the effective Sound Blaster IRQ is 7. `T4` identifies Sound
+Blaster Pro. The variable tells DOS software where to find the device; it
+does not change the core's OSD or AT286CTL settings.
 
 The final line in the supplied example starts CuteMouse. It probes PS/2 first
 and then the serial ports, so the core's COM1 mouse normally needs no command
 line switches. See [`hdd/CTMOUSE/CTMOUSE.TXT`](../hdd/CTMOUSE/CTMOUSE.TXT)
 for explicit port, IRQ and protocol options.
+
+### Sound Blaster detection check
+
+With **Audio 220h: Sound Blaster** selected, start DOS `DEBUG` and enter
+these commands individually (numbers are hexadecimal):
+
+```text
+o 226 1
+o 226 0
+i 22e
+i 22a
+i 22e
+i 22c
+q
+```
+
+The four reads should return **FF, AA, 7F, 7F**: a pending DSP reset reply,
+the `AA` reply itself, an empty response buffer, and a ready command port.
+This check does not depend on `BLASTER`, IRQ routing or DMA transfers.
+Four `FF` values indicate that the expected DSP response is absent; the
+SB migration originally left its ports out of the machine's I/O decoder.
+
+`bash scripts/test_at_soundblaster.sh` exercises the DSP and DMA adapter,
+then repeats detection through the production CPU bus bridge, machine
+decoder and device router using a simulated CPU bus driver. It also checks
+IRQ5/IRQ7 routing and the mutually exclusive SB/C/MS port selection.
 
 ## Per-program profiles
 

@@ -23,8 +23,11 @@ OPTIONS
             noadlib        no OPL2
             cms  nocms      C/MS at 220h or not
 
-            Sound Blaster is not built in the PCAT-286 profile. Its legacy
-            register fields are reserved for compatibility and have no effect.
+            sb  nosb        Sound Blaster Pro at 220h or not
+            sbirq=auto|5|7  Sound Blaster IRQ (auto follows the OSD)
+
+            C/MS and Sound Blaster share ports; an explicit sb override
+            takes precedence when both are requested.
 
   Memory    ems  noems
             umb  noumb
@@ -68,8 +71,13 @@ AUDIO DEVICES
 
 AdLib/OPL2, C/MS and Tandy are built into the core and need no DOS driver or
 environment variable. Use their OSD entries, or the adlib/cms/tandy overrides,
-to select them for a program. Sound Blaster DSP, DMA and IRQ support are not
-part of this PCAT-286 profile.
+to select them for a program. Sound Blaster Pro is also built into the current
+profile. Select it with Audio 220h in the OSD or the sb override and set:
+
+    SET BLASTER=A220 I5 D1 T4
+
+Change I5 to I7 if the effective IRQ is 7. The BLASTER variable describes the
+hardware to DOS software; it does not enable or reconfigure the core itself.
 
 
 HOW IT BEHAVES

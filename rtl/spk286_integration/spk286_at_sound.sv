@@ -118,8 +118,8 @@ module spk286_at_sound (
                           request_command_valid && request_io &&
                           request_write &&
                           (request_address[15:4] == 12'h00C);
-        // The SB Pro occupies the DSP and mixer registers at 220h-225h and
-        // 22Ah/22Ch/22Eh.  C/MS is excluded by the effective audio selector.
+        // The SB Pro occupies DSP ports 226h/22Ah/22Ch/22Eh and mixer ports
+        // 224h/225h. C/MS is excluded by the effective audio selector.
         sb_candidate = `ENABLE_SB && sb_en && request_valid &&
                        request_command_valid && request_io &&
                        (request_address[15:4] == 12'h022) &&
@@ -251,7 +251,7 @@ module spk286_at_sound (
                 .internal_data_bus (sb_dma_dack &&
                                     dma_transfer_read_from_memory ?
                                     dma_transfer_data_in[7:0] : data_out_q),
-                .io_read_n         (sb_cpu_strobe && !read_q ? 1'b0 :
+                .io_read_n         (sb_cpu_strobe && read_q ? 1'b0 :
                                     sb_dma_io_read_n),
                 .io_write_n        (sb_cpu_strobe && write_q ? 1'b0 :
                                     sb_dma_io_write_n),

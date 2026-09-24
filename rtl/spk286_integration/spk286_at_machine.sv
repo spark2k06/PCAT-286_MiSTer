@@ -640,7 +640,21 @@ module spk286_at_machine #(
                                   (at_address[3:0] == 4'hB))))) ||
                               ((`ENABLE_TANDY_AUDIO) && at286ctl_eff_tandy &&
                                at_write &&
-                               (at_address[15:4] == 12'h00C)));
+                               (at_address[15:4] == 12'h00C)) ||
+                              // Admit SB DSP/mixer accesses before the
+                              // unmapped-I/O sink can consume them. Match
+                              // the device router's direction-aware decode.
+                              ((`ENABLE_SB) && at286ctl_eff_sb &&
+                               (at_address[15:4] == 12'h022) &&
+                               ((at_address[3:0] == 4'h6) ||
+                                (at_address[3:0] == 4'hA) ||
+                                (at_address[3:0] == 4'hC) ||
+                                (at_address[3:0] == 4'hE) ||
+                                (at_write &&
+                                 ((at_address[3:0] == 4'h4) ||
+                                  (at_address[3:0] == 4'h5))) ||
+                                (!at_write &&
+                                 (at_address[3:0] == 4'h5)))));
         // Tandy's C0h-CFh decode takes the first half of the AT secondary-DMA
         // page, just as it does on the source XT profile. Keep D0h-DFh for
         // the DMA controller when Tandy sound is enabled.

@@ -123,7 +123,9 @@ set_false_path -from {vol_att[*] scaler_flt[*] led_overtake[*] led_state[*]}
 set_false_path -from {aflt_* acx* acy* areset* arc*}
 set_false_path -from {arx* ary*}
 set_false_path -from {vs_line*}
+if {!$at_cdc_enabled} {
 set_false_path -from {ColorBurst_Range* PhaseInc* pal_en cvbs yc_en}
+}
 
 if {!$at_cdc_enabled} {
 set_false_path -from {ascal|o_ihsize*}

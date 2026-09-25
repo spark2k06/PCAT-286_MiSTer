@@ -1,4 +1,4 @@
-// HDMI_TX_VS is already registered in the HDMI output domain. Its high/low
+// HDMI_TX_VS is registered in the selected transmitter clock domain. Its high/low
 // intervals must span at least two clk_sys periods (video VS lasts us/ms).
 // Keep receiving while HPS/PLL consumers are idle; only stage two is observed.
 module at_hdmi_vsync (

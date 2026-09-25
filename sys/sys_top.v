@@ -1418,7 +1418,11 @@ always @(posedge clk_vid) begin
 	end
 
 	dv_d1  <= dv_data_osd;
+`ifdef SPK286_AT_CDC
+	dv_hs1 <= at_csync_video ? dv_cs_osd : dv_hs_osd;
+`else
 	dv_hs1 <= csync_en ? dv_cs_osd : dv_hs_osd;
+`endif
 	dv_vs1 <= dv_vs_osd;
 
 	dv_d2  <= dv_d1;
@@ -1433,18 +1437,25 @@ always @(posedge clk_vid) begin
 end
 
 `ifndef MISTER_DISABLE_YC
-	assign {dv_data_osd, dv_hs_osd, dv_vs_osd, dv_cs_osd } = ~yc_en ? {vga_data_osd, vga_hs_osd, vga_vs_osd, vga_cs_osd } : {yc_o, yc_hs, yc_vs, yc_cs };
+	assign {dv_data_osd, dv_hs_osd, dv_vs_osd, dv_cs_osd } = ~yc_video_en ? {vga_data_osd, vga_hs_osd, vga_vs_osd, vga_cs_osd } : {yc_o, yc_hs, yc_vs, yc_cs };
 `else
 	assign {dv_data_osd, dv_hs_osd, dv_vs_osd, dv_cs_osd } = {vga_data_osd, vga_hs_osd, vga_vs_osd, vga_cs_osd };
 `endif
 
 wire hdmi_tx_clk;
-`ifdef AT_PROFILE
-	// The AT source video runs from CLK_50M, but the HDMI pipeline and OSD
-	// still run from the standard HDMI PLL clock. Sampling hdmi_data_osd with
-	// clk_vid would cross from the 148.5 MHz pipeline into 50 MHz and makes
-	// the physical HDMI link unstable.
-	assign hdmi_tx_clk = hdmi_clk_out;
+`ifdef SPK286_AT_CDC
+`ifndef MISTER_DEBUG_NOHDMI
+`define AT_NATIVE_HDMI_OUTPUT
+`endif
+`endif
+`ifdef AT_NATIVE_HDMI_OUTPUT
+	wire at_direct_select;
+	// Native video and scaler each keep their own clock. Select the matching
+	// clock and data only while at_hdmi_output holds the transmitter in reset.
+	cyclonev_clkselect hdmi_clk_sw (
+		.clkselect({1'b1, at_direct_select}),
+		.inclk({clk_vid, hdmi_clk_out, 2'b00}), .outclk(hdmi_tx_clk)
+	);
 `elsif MISTER_DEBUG_NOHDMI
 	assign hdmi_tx_clk = clk_vid;
 `else
@@ -1481,6 +1492,19 @@ hdmiclk_ddr
 	.sset(1'b0)
 );
 
+`ifdef AT_NATIVE_HDMI_OUTPUT
+wire hdmi_out_hs, hdmi_out_vs, hdmi_out_de;
+wire [23:0] hdmi_out_d;
+at_hdmi_output u_at_hdmi_output (
+	.clk_sys(clk_sys), .clk_video(clk_vid), .clk_hdmi(clk_hdmi), .clk_tx(hdmi_tx_clk),
+	.src_idle(~io_uio), .direct_video(direct_video), .vga_fb(vga_fb), .csync(csync_en),
+	.direct_pixel({dv_hs,dv_vs,dv_de,dv_data}),
+	.scaled_pixel({hdmi_hs_osd,hdmi_vs_osd,hdmi_de_osd,hdmi_data_osd}),
+	.scaled_csync(hdmi_cs_osd), .select_direct(at_direct_select),
+	.tx_pixel({hdmi_out_hs,hdmi_out_vs,hdmi_out_de,hdmi_out_d})
+);
+`undef AT_NATIVE_HDMI_OUTPUT
+`else
 reg hdmi_out_hs;
 reg hdmi_out_vs;
 reg hdmi_out_de;
@@ -1515,6 +1539,7 @@ always @(posedge hdmi_tx_clk) begin
 	hdmi_out_de <= de;
 	hdmi_out_d  <= d;
 end
+`endif
 
 assign HDMI_TX_HS = hdmi_out_hs;
 assign HDMI_TX_VS = hdmi_out_vs;
@@ -1620,20 +1645,27 @@ wire vga_cs_osd;
 csync csync_vga(clk_vid, vga_hs_osd, vga_vs_osd, vga_cs_osd);
 
 `ifndef MISTER_DISABLE_YC
-	reg         pal_en;
-	reg         yc_en;
-	reg         cvbs;
-	reg  [16:0] ColorBurst_Range;
+	reg         pal_en = 0;
+	reg         yc_en = 0;
+	reg         cvbs = 0;
+	reg  [16:0] ColorBurst_Range = 0;
 	wire [23:0] yc_o;
 	wire        yc_hs, yc_vs, yc_cs, yc_de;
 
 	yc_out yc_out
 	(
 		.clk(clk_vid),
+`ifdef SPK286_AT_CDC
+		.PAL_EN(at_pal_video),
+		.CVBS(at_cvbs_video),
+		.PHASE_INC(at_phase_video),
+		.COLORBURST_RANGE(at_burst_video),
+`else
 		.PAL_EN(pal_en),
 		.CVBS(cvbs),
 		.PHASE_INC(PhaseInc),
 		.COLORBURST_RANGE(ColorBurst_Range),
+`endif
 		.hsync(vga_hs_osd),
 		.vsync(vga_vs_osd),
 		.csync(vga_cs_osd),
@@ -1647,18 +1679,52 @@ csync csync_vga(clk_vid, vga_hs_osd, vga_vs_osd, vga_cs_osd);
 	);
 `endif
 
-reg  [39:0] PhaseInc;
+reg  [39:0] PhaseInc = 0;
+`ifdef SPK286_AT_CDC
+wire [39:0] at_phase_video;
+wire [16:0] at_burst_video;
+wire at_pal_video, at_cvbs_video, yc_video_en, at_subcarrier_video, at_csync_video;
+at_video_output_config u_at_video_output_config (
+	.clk_sys(clk_sys), .clk_video(clk_vid), .src_idle(~io_uio), .video_vs(vga_vs_osd),
+	.phase_inc(PhaseInc),
+`ifndef MISTER_DISABLE_YC
+	.burst_range(ColorBurst_Range), .pal(pal_en), .cvbs(cvbs), .yc(yc_en),
+`else
+	.burst_range(17'd0), .pal(1'b0), .cvbs(1'b0), .yc(1'b0),
+`endif
+`ifndef MISTER_DUAL_SDRAM
+	.subcarrier_enable(subcarrier & csync_en & ~ypbpr_en & ~forced_scandoubler & ~vgas_en),
+`else
+	.subcarrier_enable(1'b0),
+`endif
+	.csync(csync_en), .phase_video(at_phase_video), .burst_video(at_burst_video),
+	.pal_video(at_pal_video), .cvbs_video(at_cvbs_video), .yc_video(yc_video_en),
+	.subcarrier_video(at_subcarrier_video), .csync_video(at_csync_video)
+);
+`else
+`ifndef MISTER_DISABLE_YC
+wire yc_video_en = yc_en;
+`endif
+`endif
 
 `ifndef MISTER_DUAL_SDRAM
 	// Subcarrier generation for external encoders (independent of YC module)
-	reg         subcarrier;
+	reg         subcarrier = 0;
 
-	reg  [39:0] sub_accum;
+	reg  [39:0] sub_accum = 0;
+`ifdef SPK286_AT_CDC
+	always @(posedge clk_vid) sub_accum <= sub_accum + at_phase_video;
+`else
 	always @(posedge clk_vid) sub_accum <= sub_accum + PhaseInc;
+`endif
 
 	// 1-bit output for positive/negative of wave, no LUT required. Output 1 if disabled for further logic
 	reg subcarrier_out;
+`ifdef SPK286_AT_CDC
+	always @(posedge clk_vid) subcarrier_out <= ~at_subcarrier_video | sub_accum[39];
+`else
 	always @(posedge clk_vid) subcarrier_out <= ~(subcarrier & csync_en & ~ypbpr_en & ~forced_scandoubler & ~vgas_en) | sub_accum[39];
+`endif
 
 
 	wire VGA_DISABLE;
@@ -1703,7 +1769,7 @@ reg  [39:0] PhaseInc;
 	);
 
 	`ifndef MISTER_DISABLE_YC
-		assign {vga_o, vga_hs, vga_vs, vga_cs, vga_de } = ~yc_en ? {vga_o_t, vga_hs_t, vga_vs_t, vga_cs_t, vga_de_t } : {yc_o, yc_hs, yc_vs, yc_cs, yc_de };
+		assign {vga_o, vga_hs, vga_vs, vga_cs, vga_de } = ~yc_video_en ? {vga_o_t, vga_hs_t, vga_vs_t, vga_cs_t, vga_de_t } : {yc_o, yc_hs, yc_vs, yc_cs, yc_de };
 	`else
 		assign {vga_o, vga_hs, vga_vs, vga_cs, vga_de } =  {vga_o_t, vga_hs_t, vga_vs_t, vga_cs_t, vga_de_t } ;
 	`endif

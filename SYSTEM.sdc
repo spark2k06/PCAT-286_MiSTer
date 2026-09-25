@@ -174,6 +174,47 @@ if {[get_collection_size $scaler_reset]} { set_false_path -to $scaler_reset }
 # STA must analyze the real base/X2/+90 degree phase relationships.
 
 if {$at_cdc_enabled && $at_require_new} {
+    # The transmitter uses native video in direct mode and HDMI PLL otherwise.
+    # These are two modes of the SAME clock mux, not asynchronous clock groups
+    # for the rest of the design. Its final I/O data mux uses the same selector.
+    set tx_pin [get_pins -nowarn -compatibility_mode {hdmi_clk_sw|outclk}]
+    set tx_hdmi_pin [get_pins -nowarn -compatibility_mode {hdmi_clk_sw|inclk[2]}]
+    set tx_video_pin [get_pins -nowarn -compatibility_mode {hdmi_clk_sw|inclk[3]}]
+    foreach p [list $tx_pin $tx_hdmi_pin $tx_video_pin] {
+        if {[get_collection_size $p] != 1} { error "AT HDMI clock mux pin missing/ambiguous" }
+    }
+    create_generated_clock -name AT_HDMI_TX_SCALED -source $tx_hdmi_pin \
+        -master_clock $AT_HDMI -divide_by 1 $tx_pin
+    create_generated_clock -name AT_HDMI_TX_DIRECT -source $tx_video_pin \
+        -master_clock $AT_VIDEO_OUT -divide_by 1 -add $tx_pin
+    set AT_TX_SCALED [at_clock AT_HDMI_TX_SCALED]
+    set AT_TX_DIRECT [at_clock AT_HDMI_TX_DIRECT]
+    set AT_TX [get_clocks {AT_HDMI_TX_SCALED AT_HDMI_TX_DIRECT}]
+    set_clock_groups -logically_exclusive -group $AT_TX_SCALED -group $AT_TX_DIRECT
+    set tx_regs [at_regs hdmi_tx_output {*u_at_hdmi_output|tx_pixel[*]}]
+    # Only the unselected data branch is impossible in each clock mode.
+    # The matching VIDEO->DIRECT and HDMI->SCALED transfers remain fully timed.
+    set tx_direct_data [at_regs hdmi_tx_direct {*u_at_hdmi_output|direct_q2[*]}]
+    set tx_scaled_data [at_regs hdmi_tx_scaled {*u_at_hdmi_output|scaled_q[*]}]
+    set_false_path -from $tx_direct_data -to $AT_TX_SCALED
+    set_false_path -from $tx_scaled_data -to $AT_TX_DIRECT
+    # select_direct changes with reset asserted, >=160 ns before switching and
+    # >=640 ns before release (then two TX reset-release stages). It cannot
+    # change while a live output pixel is being sampled. Do not cut other SYS
+    # controls or all paths into the output bank.
+    set tx_select [at_regs hdmi_tx_select {*u_at_hdmi_output|select_direct}]
+    set_max_delay -from $tx_select -to $tx_regs 10.0
+    set_false_path -hold -from $tx_select -to $tx_regs
+    set tx_reset_pins [get_pins -nowarn -compatibility_mode {
+        *u_at_hdmi_output|reset_*|clrn *u_at_hdmi_output|reset_*|prn
+    }]
+    if {![get_collection_size $tx_reset_pins]} { error "AT HDMI reset pins missing" }
+    # Only SYS assertion/release into the reset synchronizer is asynchronous.
+    # reset_sync -> TX I/O reset pins retain recovery/removal analysis.
+    set_false_path -to $tx_reset_pins
+    at_sync hdmi_tx_csync $AT_CPU {*u_at_hdmi_output|csync_meta}
+    derive_clock_uncertainty
+
     # Concrete instance endpoints, not domain-wide exemptions. 5 ns is less
     # than one 148.5 MHz destination period. Capture waits for two toggle
     # stages; the payload remains frozen until the acknowledgement returns.
@@ -216,11 +257,14 @@ if {$at_cdc_enabled && $at_require_new} {
     # Adaptive H/V flags are published after the coefficient write pipeline
     # drains; the receiver applies the held pair at vertical blank.
     at_snapshot ascal*g_at_poly_control*poly_adaptive_config 5.0
+    # Phase increment, colour burst and output controls are held together;
+    # the complete UIO command is applied in the native video domain at VS.
+    at_snapshot u_at_video_output_config*config_mailbox 10.0
     # Source-registered VS level; only the second stage drives edge detection.
     at_sync frame_counter_vs $AT_VIDEO_OUT {*u_at_frame_counter|vs_meta}
     # Registered HDMI output VS -> continuously running sys receiver. Only
     # stage one is asynchronous; edge detection and all consumers remain timed.
-    at_sync hdmi_vsync $AT_HDMI {*u_at_hdmi_vsync|vs_meta}
+    at_sync hdmi_vsync $AT_TX {*u_at_hdmi_vsync|vs_meta}
 
     # Packed/planar selection is registered in the video domain before its
     # two-stage level synchronizer. Only the asynchronous first stage is cut.
@@ -257,7 +301,7 @@ if {$at_cdc_enabled && $at_require_new} {
         set_false_path -hold -from $src -to $dst
     }
     at_sync metrics_video_edges $AT_VIDEO_OUT {*video_calc*g_at_edges*vs_meta *video_calc*g_at_edges*hs_meta *video_calc*g_at_edges*de_meta}
-    at_sync metrics_hdmi_edge $AT_HDMI {*video_calc*g_at_edges*hdmi_meta}
+    at_sync metrics_hdmi_edge $AT_TX {*video_calc*g_at_edges*hdmi_meta}
     at_sync pll_cfg_video $AT_CPU {*pll_hdmi_adj|cfg_video_meta}
     at_sync pll_cfg_mgmt $AT_CPU {*pll_hdmi_adj|cfg_mgmt_meta *pll_hdmi_adj|llena_meta}
     at_sync pll_input_window $AT_VIDEO_OUT {*pll_hdmi_adj|ivss_meta}

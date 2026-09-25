@@ -72,14 +72,46 @@ if {$mode eq "baseline"} {
         adaptive_flags_apply {*ascal*g_at_poly_control*poly_adaptive_config|dst_data[*]} {*ascal|poly_adaptive_local[*]}
         adaptive_flags_commit {*ascal|o_run *ascal|o_vsv[*]} {*ascal|poly_adaptive_local[*]}
         adaptive_flags_local {*ascal|poly_adaptive_local[*]} {*}
+        scaler_luminance_capture {*ascal|o_h_lum_pix* *ascal|o_v_lum_pix*} {*ascal|o_poly_lum_rg[*] *ascal|o_poly_lum_b[*]}
+        scaler_luminance_reduce {*ascal|o_poly_lum_rg[*] *ascal|o_poly_lum_b[*]} {*ascal|o_poly_lum1[*]}
+        scaler_luminance_weights {*ascal|o_poly_lum1[*]} {*ascal|o_poly_lerp_ta[*] *ascal|o_poly_lerp_tb[*]}
         hdmi_vsync_sync {*u_at_hdmi_vsync|vs_meta} {*u_at_hdmi_vsync|vs_sync}
         hdmi_vsync_consumers {*u_at_hdmi_vsync|vs_sync *u_at_hdmi_vsync|vs_seen} {*}
         hdmi_vsync_wait {*u_at_hdmi_vsync|vs_sync *u_at_hdmi_vsync|vs_seen} {vs_wait}
         hdmi_vsync_pll {*u_at_hdmi_vsync|vs_sync *u_at_hdmi_vsync|vs_seen} {cfg_got}
+        analog_config_source {PhaseInc[*] ColorBurst_Range[*] pal_en cvbs yc_en subcarrier} {*u_at_video_output_config*config_mailbox|payload_q[*]}
+        analog_config_apply {*u_at_video_output_config*config_mailbox|dst_data[*]} {*u_at_video_output_config|active_q[*]}
+        analog_config_local {*u_at_video_output_config|active_q[*]} {*}
+        subcarrier_accumulator {sub_accum[*]} {sub_accum[*] subcarrier_out}
+        direct_video_capture {dv_data[*] dv_hs dv_vs dv_de} {*u_at_hdmi_output|direct_q1[*]}
+        direct_video_pipeline {*u_at_hdmi_output|direct_q1[*]} {*u_at_hdmi_output|direct_q2[*]}
+        scaled_video_capture {*hdmi_osd|* *csync_hdmi|*} {*u_at_hdmi_output|scaled_q[*]}
+        tx_csync_sync {*u_at_hdmi_output|csync_meta} {*u_at_hdmi_output|csync_sync}
+        tx_csync_local {*u_at_hdmi_output|csync_sync} {*u_at_hdmi_output|scaled_q[*]}
+        tx_mode_control {*u_at_hdmi_output|state_q* *u_at_hdmi_output|wait_q* *u_at_hdmi_output|target_q} {*u_at_hdmi_output|select_direct *u_at_hdmi_output|switch_reset_q}
     } {
         lappend groups $label [list -from [regs ${label}_src $src] -to [regs ${label}_dst $dst]]
     }
     set payload_groups {read_payload write_payload}
+    foreach {label source clock} {
+        direct_video_output {*u_at_hdmi_output|direct_q2[*]} AT_HDMI_TX_DIRECT
+        scaled_video_output {*u_at_hdmi_output|scaled_q[*]} AT_HDMI_TX_SCALED
+    } {
+        lappend groups $label [list -from [regs ${label}_source $source] \
+            -to [regs ${label}_destination {*u_at_hdmi_output|tx_pixel[*]}] -to_clock [get_clocks $clock]]
+    }
+    foreach clock {AT_HDMI_TX_DIRECT AT_HDMI_TX_SCALED} {
+        lappend groups tx_reset_${clock} [list \
+            -from [regs ${clock}_reset_meta {*u_at_hdmi_output|reset_meta}] \
+            -to [regs ${clock}_reset_sync {*u_at_hdmi_output|reset_sync}] \
+            -from_clock [get_clocks $clock] -to_clock [get_clocks $clock]]
+    }
+    lappend groups tx_mode_stable [list \
+        -from [regs tx_mode_source {*u_at_hdmi_output|select_direct}] \
+        -to [regs tx_mode_destination {*u_at_hdmi_output|tx_pixel[*]}]]
+    lappend payload_groups tx_mode_stable
+    set tx_reset_release [regs tx_reset_release {*u_at_hdmi_output|reset_sync}]
+    set tx_output_regs [regs tx_output_reset {*u_at_hdmi_output|tx_pixel[*]}]
     foreach {label instance} {
         capture_bank_config capture_bank_config
         capture_field_history capture_field_history
@@ -91,6 +123,7 @@ if {$mode eq "baseline"} {
         video_options_config u_at_video_options*config_mailbox
         scanlines_status_config u_at_scanlines_status*config_mailbox
         adaptive_flags_config ascal*g_at_poly_control*poly_adaptive_config
+        analog_output_config u_at_video_output_config*config_mailbox
     } {
         # Selectors may contain wildcards; report filenames must work on Windows.
         set src [regs ${label}_src "*${instance}|payload_q\[*\]"]
@@ -109,6 +142,9 @@ if {$mode eq "baseline"} {
     set old_profile [get_registers -nowarn {*u_video|ega_monitor_profile_video_sync1_q[*] *u_video|ega_monitor_profile_video_sync2_q[*]}]
     puts $inventory "legacy_independent_profile_bits=[get_collection_size $old_profile]"
     if {[get_collection_size $old_profile]} { error "Old independent profile synchronizers still present" }
+    set old_direct [get_registers -nowarn {hdmi_dv_data[*] hdmi_dv_hs hdmi_dv_vs hdmi_dv_de}]
+    puts $inventory "legacy_direct_capture=[get_collection_size $old_direct]"
+    if {[get_collection_size $old_direct]} { error "Old cross-domain direct video capture still present" }
 }
 close $inventory
 set counts [open "$output/path_counts.txt" w]
@@ -138,6 +174,16 @@ foreach condition [get_available_operating_conditions] {
         set result [report_timing -$kind -npaths 20 -detail full_path -file "$dir/global_${kind}.rpt"]
         puts $counts "$corner global $kind $result"
         if {[lindex $result 0] && [lindex $result 1] < 0} { set open_timing 1 }
+        if {$mode ne "baseline"} {
+            foreach clock {AT_HDMI_TX_DIRECT AT_HDMI_TX_SCALED} {
+                set result [report_timing -$kind \
+                    -from $tx_reset_release -to $tx_output_regs \
+                    -from_clock [get_clocks $clock] -to_clock [get_clocks $clock] \
+                    -npaths 20 -detail full_path -file "$dir/tx_${clock}_${kind}.rpt"]
+                puts $counts "$corner tx_${clock} $kind $result"
+                if {[lindex $result 0] == 0 || [lindex $result 1] < 0} { set open_timing 1 }
+            }
+        }
     }
     report_min_pulse_width -nworst 20 -file "$dir/pulse_width.rpt"
 }

@@ -1066,7 +1066,7 @@ ARCHITECTURE rtl OF ascal IS
 	SIGNAL o_poly_phase_b,o_poly_phase_b2,o_poly_phase_b3 : poly_phase_t;
 	SIGNAL o_v_poly_phase, o_v_poly_phase2, o_h_poly_phase, o_poly_phase, o_poly_phase1 : poly_phase_interp_t;
 	SIGNAL o_v_poly_pix, o_h_poly_pix, o_h_lum_pix, o_v_lum_pix : type_pix;
-	SIGNAL o_poly_lum, o_poly_lum1 : unsigned(7 DOWNTO 0);
+	SIGNAL o_poly_lum_rg, o_poly_lum_b, o_poly_lum1 : unsigned(7 DOWNTO 0);
 	SIGNAL o_poly_lerp_ta, o_poly_lerp_tb : signed(9 DOWNTO 0);
 	SIGNAL o_h_poly_t,o_h_poly_t2,o_v_poly_t   : type_poly_t;
 
@@ -1163,33 +1163,13 @@ ARCHITECTURE rtl OF ascal IS
 	END FUNCTION;
 
 
-	FUNCTION poly_lum(p : type_pix) RETURN unsigned IS
-		VARIABLE v : UNSIGNED(7 DOWNTO 0);
+	FUNCTION poly_max(a,b : unsigned(7 DOWNTO 0)) RETURN unsigned IS
 	BEGIN
-		-- 0.375 R + 0.5 G + 0.125 B
-		--v := ("00" & p.r(7 DOWNTO 2)) + ("000" & p.r(7 DOWNTO 3)) + ("0" & p.g(7 DOWNTO 1)) + ("000" & p.b(7 DOWNTO 3));
-
-		-- 0.25 R + 0.5 G + 0.25 B
-		-- v := ( ("00" & p.r(7 DOWNTO 2)) + ("0" & p.g(7 DOWNTO 1)) + ("00" & p.b(7 DOWNTO 2)) );
-
-		-- Just OR them all together
-		--v := (p.r OR p.g OR p.b);
-
-		-- Maximum
-		IF p.r > p.g THEN
-			v := p.r;
+		IF a > b THEN
+			RETURN a;
 		ELSE
-			v := p.g;
+			RETURN b;
 		END IF;
-
-		IF p.b > v THEN
-			v := p.b;
-		END IF;
-
-		-- 100%
-		-- v := "1111111";
-
-		RETURN v;
 	END FUNCTION;
 BEGIN
 	avl_frame_fall <= avl_o_vs_seen AND NOT avl_o_vs WHEN AT_CDC ELSE
@@ -2629,11 +2609,16 @@ BEGIN
 				o_h_poly_phase_a<=poly_nn(hfrac3_v);
 			END IF;
 
+			-- Split max(R,G,B) across the existing C3/C4 registers. Keep B
+			-- aligned with max(R,G), including when neither adaptive axis is
+			-- active: both registers retain the last selected pixel together.
 			IF o_v_poly_use_adaptive='1' THEN
-				o_poly_lum<=poly_lum(o_v_lum_pix);
+				o_poly_lum_rg<=poly_max(o_v_lum_pix.r,o_v_lum_pix.g);
+				o_poly_lum_b<=o_v_lum_pix.b;
 				o_a_poly_addr<=o_v_poly_addr;
 			ELSIF o_h_poly_use_adaptive='1' THEN
-				o_poly_lum<=poly_lum(o_h_lum_pix);
+				o_poly_lum_rg<=poly_max(o_h_lum_pix.r,o_h_lum_pix.g);
+				o_poly_lum_b<=o_h_lum_pix.b;
 				o_a_poly_addr<=to_integer(hfrac3_v);
 			END IF;
 
@@ -2648,7 +2633,8 @@ BEGIN
 
 			o_h_poly_phase_a2<=o_h_poly_phase_a;
 			o_v_poly_phase_a2<=o_v_poly_phase_a;
-			o_poly_lum1<=o_poly_lum;
+			-- Same C4 latency as before; C5 weights and coefficients stay aligned.
+			o_poly_lum1<=poly_max(o_poly_lum_rg,o_poly_lum_b);
 
 			-- C5 / HC5 / VC6
 			o_poly_lerp_ta<=signed(to_unsigned(256,10) - resize(o_poly_lum1,10));

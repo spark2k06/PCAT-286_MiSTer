@@ -32,10 +32,12 @@ machine reset, there is no apply-and-reboot command, and there is no state that
 has to survive a reset. That single rule is what the whole design is arranged
 around, and it is why several otherwise plausible settings are absent.
 
-**Zero means "leave it to the OSD"** for every field except VGA 13h+. Those
-fields encode 1..N as the choices in the same order the menu lists them. VGA
-13h+ is deliberately different: zero is disabled after reset and `VGATSR.COM`
-owns activation. This prevents an OSD timing choice or an unrelated AT286CTL
+**Zero means "leave it to the OSD"** for configurable fields except VGA 13h+.
+Those fields encode 1..N as the choices in the same order the menu lists them.
+The old EMS/UMB override bits in `8982h` are reserved and ignored; both windows
+are fixed on by this machine profile. VGA 13h+ is deliberately different:
+zero is disabled after reset and `VGATSR.COM` owns activation. This prevents
+an OSD timing choice or an unrelated AT286CTL
 profile from removing a live VGA device.
 
 ## Register map
@@ -49,7 +51,7 @@ match the OSD.
 |---|---|---|
 | `8980h` | R | Signature, `45h` (`'E'`) |
 | `8981h` | R/W | CPU — `[2:0]` speed · `[4:3]` Fake 286 FLAGS |
-| `8982h` | R/W | Expansion — `[1:0]` OPL2 · `[3:2]` CMS · `[5:4]` EMS · `[7:6]` UMB |
+| `8982h` | R/W | Expansion — `[1:0]` OPL2 · `[3:2]` CMS · `[7:4]` reserved (legacy EMS/UMB fields ignored) |
 | `8983h` | R/W | Video — `[1:0]` VGA 13h+ |
 | `8984h` | R/W | Input — `[1:0]` joy 1 · `[3:2]` joy 2 · `[5:4]` swap · `[7:6]` joy sync |
 | `8985h` | R/W | MIDI — `[1:0]` MT32-pi mode · `[3:2]` MPU-401 |
@@ -57,7 +59,7 @@ match the OSD.
 | `8987h` | R/W | CRT offset — `[3:0]` H · `[6:4]` V · `[7]` override |
 | `8988h` | R/W | Sync width — `[2:0]` VSync · `[5:3]` HSync (`0` = OSD) |
 | `8989h` | R | Effective CPU/audio — speed `[1:0]` · Fake FLAGS `[3]` · OPL2 `[5:4]` · Audio 220h `[7:6]` |
-| `898Ah` | R | Effective memory/video/input — EMS `[0]` · UMB `[1]` · VGA 13h+ `[2]` · joy 1 `[4:3]` · joy 2 `[6:5]` · swap `[7]` |
+| `898Ah` | R | Effective memory/video/input — EMS `[0]=1` · UMB `[1]=1` · VGA 13h+ `[2]` · joy 1 `[4:3]` · joy 2 `[6:5]` · swap `[7]` |
 | `898Bh` | R | Effective input/MIDI/audio — joy sync `[0]` · MT32-pi `[1]` · MPU-401 `[2]` · Tandy `[4:3]` · SB IRQ7 `[5]`; `[7:6] = 10b` status-extension marker |
 | `898Ch` | R | Effective CRT position — H `[3:0]` · V `[6:4]` |
 | `898Dh` | R | Effective sync widths — VSync `[2:0]` · HSync `[5:3]`; `[7:6]` are OSD-match flags for VSync/HSync |
@@ -71,7 +73,9 @@ match the OSD.
 | Speed | 3 | OSD | 4.77 MHz | 7.16 MHz | 9.54 MHz | Max |
 | Fake 286 FLAGS | 2 | OSD | off | on | — | |
 | OPL2 | 2 | OSD | Adlib 388h | SB FM 388h/228h | disabled | |
-| CMS / EMS / UMB | 2 | OSD | enabled | disabled | — | |
+| CMS | 2 | OSD | enabled | disabled | — | |
+| Legacy EMS override | 2 | ignored | ignored | ignored | ignored | — |
+| Legacy UMB override | 2 | ignored | ignored | ignored | ignored | — |
 | VGA 13h+ | 2 | disabled | legacy disabled | enabled (used by `VGATSR`) | reserved/disabled | |
 | Joystick 1 / 2 | 2 | OSD | analog | digital | disabled | |
 | Swap joysticks | 2 | OSD | normal | swapped | — | |
@@ -95,12 +99,15 @@ bit of its two-bit field. Sound Blaster enable is gated by `ENABLE_SB` in
 `config.tcl`; the current AT profile builds it.
 
 The OSD-match mask is ordered as follows: bit 0 speed, 1 Fake 286 FLAGS, 2
-OPL2, 3 Audio 220h, 4 EMS, 5 UMB, 6 joystick 1, 7 joystick 2, 8 swap, 9 joy
-sync, 10 MT32-pi, 11 MPU-401, 12 Tandy, 13 Sound Blaster IRQ, 14 CRT H, 15
-CRT V, 16 VSync and 17 HSync. The two high bits (16 and 17) are carried in
+OPL2, 3 Audio 220h, 4 EMS (fixed-on), 5 UMB (fixed-on), 6 joystick 1,
+7 joystick 2, 8 swap, 9 joy sync, 10 MT32-pi, 11 MPU-401, 12 Tandy,
+13 Sound Blaster IRQ, 14 CRT H, 15 CRT V, 16 VSync and 17 HSync. The two high
+bits (16 and 17) are carried in
 `898Dh[7:6]`; the other flags are in `898Eh` and `898Fh`. A field is marked as
 matching when its effective value equals the live OSD value, even if an
-explicit AT286CTL override selected that same value.
+explicit AT286CTL override selected that same value. Bits 4 and 5 remain set
+for compatibility and indicate the fixed EMS/UMB configuration; neither has
+an OSD control.
 
 VGA 13h+ controls only *whether* the extension is present, not *which* timing
 profile it uses. It starts disabled after every reset; an IBM-compatible warm
@@ -120,9 +127,9 @@ SN76489 exists at all is still a build-time choice (`ENABLE_TANDY_AUDIO` in
 enforced again at the chip select itself, so a stray write cannot reach a
 device that was never built. That build gate used to be the *only* thing zero
 could defer to, because the menu had no status bit left for it; now that one is
-free, zero defers to the menu the same way EMS or UMB does.
+free, zero defers to the menu the same way other configurable fields do.
 
-MPU-401 works the same way as EMS and UMB: the menu option is the master
+MPU-401 works like the other optional devices: the menu option is the master
 switch — with it off, the card is gone from the bus entirely and `330h`/`331h`
 read back as if nothing were there. The MT32-pi menu page hides itself in that
 case too, the same way it already hides when no mt32-pi is detected, since

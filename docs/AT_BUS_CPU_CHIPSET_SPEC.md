@@ -593,7 +593,9 @@ aliases must be listed as explicit compatibility extensions.
 | --- | --- | --- |
 | `000000h–09FFFFh` | Conventional RAM | Read/write; parity policy explicit |
 | `0A0000h–0BFFFFh` | EGA/VGA video aperture | Device-selected lane and latch semantics |
-| `0C0000h–0EFFFFh` | Option ROMs, adapters and reserved holes | Decode table with ROM write protection |
+| `0C0000h–0C7FFFh` | EGA option ROM | Read-only after image load |
+| `0C8000h–0DFFFFh` | UMB RAM | Always present, read/write |
+| `0E0000h–0EFFFFh` | EMS page frame | Always present; four register-mapped 16 KiB windows |
 | `0F0000h–0FFFFFh` | System BIOS | Read-only after image load |
 | `100000h–FFFFFFh` | Extended RAM and/or mapped devices | Full 24-bit decode; no paging implied |
 

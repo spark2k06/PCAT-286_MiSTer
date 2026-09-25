@@ -21,11 +21,13 @@ existing 384 KiB offset between the selected total and the high-memory limit.
 The 16 MiB selection represents installed memory. Following the 86Box
 16-bit-bus AT map, CPU-visible extended RAM ends at `FDFFFFh`:
 `FE0000h–FEFFFFh` is reserved and `FF0000h–FFFFFFh` maps the 64 KiB system-BIOS
-alias. The low video, option-ROM and system-BIOS windows keep their existing
-owners. The profile therefore reports 15,232 KiB extended plus 640 KiB
-conventional RAM, or 15,872 KiB visible in total. The 384 KiB low-memory hole
-and 128 KiB high reserved area account for the difference from the installed
-16 MiB. CMOS fields `17h/18h` and `30h/31h` track that extended size. The
+alias. The low video, EGA BIOS (`C0000h–C7FFFh`), UMB RAM
+(`C8000h–DFFFFh`) and EMS page frame (`E0000h–EFFFFh`) retain distinct owners.
+UMB and EMS are always enabled in this profile. The profile reports
+15,232 KiB extended plus 640 KiB conventional RAM, or 15,872 KiB visible in
+total. The 384 KiB low-memory hole and 128 KiB high reserved area account for
+the difference from the installed 16 MiB. CMOS fields `17h/18h` and `30h/31h`
+track that extended size. The
 standard checksum is adjusted when the applied size changes; BIOS CPU writes
 to CMOS remain possible afterward.
 

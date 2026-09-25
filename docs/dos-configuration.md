@@ -7,13 +7,12 @@ detection in agreement.
 
 ## Matching OSD settings
 
-The supplied configuration expects these core options:
+The supplied configuration expects these fixed memory windows:
 
-- **Hardware → UMB E000-EFFF: Enabled** exposes 64 KiB at
-  `E0000h-EFFFFh`.
-- **Hardware → 2MB EMS D000-DFFF: Enabled** exposes the four 16 KiB EMS
-  page-frame banks at `D0000h-DFFFFh`. The backing store is up to 2 MiB and
-  the Lo-tech-compatible page registers are at port `260h`.
+- UMB RAM is always mapped at `C8000h-DFFFFh` (96 KiB).
+- The EMS page frame is always present at `E0000h-EFFFFh`, split into four
+  16 KiB windows. The backing store is 2 MiB and the Lo-tech-compatible page
+  registers are at port `260h`.
 - **Audio & Video → Audio 220h: C/MS** exposes the C/MS pair at `220h`.
   Select **Sound Blaster** instead to use the SB Pro DSP and mixer at that
   address. The two devices share ports and are mutually exclusive.
@@ -39,36 +38,34 @@ C/MS, OPL2 and Tandy require no DOS driver or environment variable.
 MPU-401 UART mode is the MIDI transport; the
 MT32-pi itself remains external hardware connected through USER I/O.
 
-The core reserves `C8000h-C9FFFh` for the AT XTIDE option ROM. The rest of
-`C4000h-CFFFFh` is option-ROM space, while `D0000h-DFFFFh` belongs to the EMS
-page frame when enabled. `E0000h-EFFFFh` is the separate, optional UMB window.
+The EGA BIOS remains in `C0000h-C7FFFh`. The AT profile has no XTIDE ROM slot;
+`C8000h-DFFFFh` is always UMB RAM and `E0000h-EFFFFh` is always the EMS page
+frame. The UMB and EMS windows cannot be disabled through the OSD or AT286CTL.
 
-## CONFIG.SYS
+## CONFIG.SYS example with UMB and EMS drivers
 
-The checked-in [`hdd/CONFIG.SYS`](../hdd/CONFIG.SYS) is:
+The checked-in [`hdd/CONFIG.SYS`](../hdd/CONFIG.SYS) stays minimal. For a DOS
+installation with UMB and EMS managers, a suitable configuration is:
 
 ```dos
 FILES=40
 BUFFERS = 30
 DOS = HIGH, UMB
-DEVICE=C:\UTIL\USE!UMBS.SYS E000-F000
+DEVICE=C:\UTIL\USE!UMBS.SYS C800-E000
 DEVICE=C:\UTIL\DOSMAX\DOSMAX.EXE /R+ /N+ /P-
-DEVICEHIGH=C:\UTIL\LTEMM.EXE /p:D000 /x /n
+DEVICEHIGH=C:\UTIL\LTEMM.EXE /p:E000 /x /n
 SHELL=C:\UTIL\DOSMAX\SHELLMAX.COM C:\COMMAND.COM C:\ /E:256 /P
 ```
 
-`USE!UMBS.SYS` uses an end-exclusive upper segment: `E000-F000` registers
-exactly `E0000h-EFFFFh`. This is independent of the EMS page frame at
-`D0000h-DFFFFh`.
+`USE!UMBS.SYS` uses an end-exclusive upper segment: `C800-E000` registers
+exactly `C8000h-DFFFFh`. This is independent of the EMS page frame at
+`E0000h-EFFFFh`.
 
 `DOSMAX.EXE` and `SHELLMAX.COM` move DOS data and the command interpreter's
-overhead into that UMB. `LTEMM.EXE /p:D000` registers the core's fixed EMS
+overhead into that UMB. `LTEMM.EXE /p:E000` registers the core's fixed EMS
 page frame; no `/i:` argument is needed because `260h` is already LTEMM's
-default I/O port.
-
-If UMB or EMS is disabled in the OSD or temporarily with AT286CTL, remove or
-comment the matching driver line for that boot. A DOS driver cannot create a
-memory device that the core has taken off the bus.
+default I/O port. These driver paths are an example and are not part of the
+minimal files under `hdd/`.
 
 ## AUTOEXEC.BAT and built-in audio
 

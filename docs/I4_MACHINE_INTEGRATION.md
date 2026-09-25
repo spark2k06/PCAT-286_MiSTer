@@ -11,7 +11,7 @@ SPK286 CPU/BIU
   -> AT bus bridge and memory decoder
   -> AT machine arbitration
   -> PIC/PIT/DMA/refresh/8042/RTC/CMOS
-  -> FDC/XTIDE/EGA and the MiSTer SDRAM/HPS owners
+  -> FDC/IDE/EGA and the MiSTer SDRAM/HPS owners
 ```
 
 The source closure is described by `files.qip` and
@@ -20,10 +20,9 @@ CPU, AT integration, EGA, SDRAM, PIC/PIT support and the common floppy/IDE/
 debug blocks used by the profile.
 
 ROM images are loaded through the AT HPS ROM loader. The main PCAT BIOS is
-mapped at `F0000h`, the EGA BIOS at `C0000h` and the 8 KiB XTIDE image at
-`C8000h`, matching 86Box's AT XTIDE placement. `D0000h-DFFFFh` remains the EMS
-page frame when enabled; the optional 64 KiB UMB is relocated to
-`E0000h-EFFFFh`. No RTC option ROM is installed: the AT BIOS already supplies
-the standard RTC services.
+mapped at `F0000h` and the EGA BIOS occupies `C0000h-C7FFFh`. The AT profile
+does not load an XTIDE option ROM: `C8000h-DFFFFh` is always-on UMB RAM and
+`E0000h-EFFFFh` is the always-present EMS page frame. No RTC option ROM is
+installed: the AT BIOS already supplies the standard RTC services.
 The canonical AT timing file is `SYSTEM.sdc`; the common MiSTer constraints
 remain in `sys/sys_top.sdc`.

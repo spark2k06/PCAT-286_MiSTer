@@ -29,8 +29,7 @@ OPTIONS
             C/MS and Sound Blaster share ports; an explicit sb override
             takes precedence when both are requested.
 
-  Memory    ems  noems
-            umb  noumb
+  Memory    EMS and UMB are always enabled by the core
 
   Input     joy1=analog | joy1=digital | joy1=off
             joy2=analog | joy2=digital | joy2=off

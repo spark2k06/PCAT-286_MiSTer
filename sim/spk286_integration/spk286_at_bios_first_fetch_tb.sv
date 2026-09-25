@@ -294,7 +294,7 @@ module spk286_at_bios_first_fetch_tb #(
         .loader_data_out(loader_data), .loader_accept(loader_accept),
         .loader_ready(loader_ready), .main_rom_loaded(main_rom_loaded),
         .protocol_error(loader_error), .bios_protect_flag(), .ega_rom_loaded(),
-        .xtide_rom_loaded(), .load_active()
+        .load_active()
     );
     task automatic download_bios;
         integer offset, guard;

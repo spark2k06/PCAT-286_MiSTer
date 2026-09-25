@@ -22,12 +22,6 @@
 `ifndef ENABLE_MIDI
 `define ENABLE_MIDI 0
 `endif
-`ifndef ENABLE_EMS
-`define ENABLE_EMS 0
-`endif
-`ifndef ENABLE_UMB
-`define ENABLE_UMB 0
-`endif
 
 module spk286_at_machine #(
     parameter logic CPU_USES_SAMPLE_EDGE = 1'b0
@@ -348,8 +342,11 @@ module spk286_at_machine #(
             installed_ram_size_q <= normalize_ram_size(installed_ram_size_osd);
     end
 
-    assign ems_runtime_enabled = (`ENABLE_EMS) && at286ctl_eff_ems;
-    assign umb_runtime_enabled = (`ENABLE_UMB) && at286ctl_eff_umb;
+    // The AT profile always decodes its EMS and UMB windows. Keep the legacy
+    // control inputs above for integration compatibility; they no longer gate
+    // the machine memory map.
+    assign ems_runtime_enabled = 1'b1;
+    assign umb_runtime_enabled = 1'b1;
 
     logic        memory_cycle;
     logic        conventional_ram_select;
@@ -364,9 +361,8 @@ module spk286_at_machine #(
     function automatic logic ems_page_selected(input logic [23:0] address);
         begin
             ems_page_selected = 1'b0;
-            if (ems_runtime_enabled &&
-                (address >= 24'h0D0000) &&
-                (address <= 24'h0DFFFF)) begin
+            if ((address >= 24'h0E0000) &&
+                (address <= 24'h0EFFFF)) begin
                 case (address[15:14])
                     2'b00: ems_page_selected = ems_window_enabled[0];
                     2'b01: ems_page_selected = ems_window_enabled[1];

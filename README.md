@@ -46,7 +46,7 @@ For an architectural overview and possible future improvements, see the
   of the single AT profile
 * 640 KiB conventional memory plus the normalized AT extended-memory window
 * EGA BIOS option ROM support (required — the card is initialised by its own ROM, as on real hardware)
-* XTIDE support
+* IDE/VHD storage support
 * Built-in AdLib/OPL2, C/MS and Tandy SN76489 audio, plus the PC speaker
 * EGA graphical boot splash
 
@@ -62,15 +62,18 @@ configuration after their images have loaded.
 | `A0000h–AFFFFh` | 64 KiB | EGA aperture | Reserved for video |
 | `B0000h–B7FFFh` | 32 KiB | Selectable EGA monochrome aperture | Reserved for video |
 | `B8000h–BFFFFh` | 32 KiB | Selectable EGA colour/text aperture | Reserved for video |
-| `C0000h–C3FFFh` | 16 KiB | EGA option ROM | Reserved for EGA BIOS |
-| `C4000h–C7FFFh` | 16 KiB | Option-ROM expansion space | Available for a future ROM |
-| `C8000h–C9FFFh` | 8 KiB | AT XTIDE option ROM | Reserved for the AT XTIDE image |
-| `CA000h–CBFFFh` | 8 KiB | Option-ROM expansion space | Available for a future ROM |
-| `CC000h–CFFFFh` | 16 KiB | Option-ROM expansion space | Available for a future ROM |
-| `D0000h–DFFFFh` | 64 KiB | EMS page frame, or option-ROM region | EMS-dependent |
-| `E0000h–EFFFFh` | 64 KiB | Optional UMB, or option-ROM region | OSD-selectable |
+| `C0000h–C7FFFh` | 32 KiB | EGA option ROM | Reserved for EGA BIOS |
+| `C8000h–DFFFFh` | 96 KiB | UMB RAM | Always enabled |
+| `E0000h–EFFFFh` | 64 KiB | EMS page frame | Always present; pages set through EMS registers |
 | `F0000h–FFFFFh` | 64 KiB | Main system BIOS | Reserved for system BIOS |
-| `100000h–15FFFFh` | 384 KiB | Extended SDRAM | Extended memory |
+| `100000h–límite del perfil` | 384–15,232 KiB | Extended SDRAM | Extended memory |
+| `FE0000h–FEFFFFh` | 64 KiB | Unmapped in the 16 MiB profile | Reserved |
+| `FF0000h–FFFFFFh` | 64 KiB | Alias of the main system BIOS | Reset-vector alias |
+
+The **Installed RAM** OSD setting selects the extended-memory limit. The
+profiles are `15FFFFh` (1 MiB), `25FFFFh` (2 MiB), `45FFFFh` (4 MiB),
+`85FFFFh` (8 MiB) and `FDFFFFh` (16 MiB); see
+[Selectable PC/AT RAM size](docs/AT_MEMORY_SIZE_CONFIGURATION.md).
 
 EGA's graphics-controller map can select `A0000h–BFFFFh`, `A0000h–AFFFFh`,
 `B0000h–B7FFFh` or `B8000h–BFFFFh`; the entire A/B area is therefore reserved
@@ -78,8 +81,8 @@ for video regardless of the active EGA map. VGA 13h+ owns `A0000h–AFFFFh`
 while active: packed mode 13h uses its private packed framebuffer, while its
 supported unchained profiles use the existing four EGA planes.
 
-The expansion area is deliberately decoded by the AT device router and ROM
-loader; there are no legacy UMB/EMS switches in the single project profile.
+The UMB and EMS windows are fixed parts of this profile; neither has an OSD
+enable switch. The EGA BIOS is the only option ROM below the system BIOS.
 
 ## DOS environment (CONFIG.SYS / AUTOEXEC.BAT)
 
@@ -372,8 +375,9 @@ new port.
 ## ROM Instructions
 
 ROMs are loaded from the **System & BIOS** section of the OSD. In the AT profile,
-it provides slots for the PCAT main/diagnostic ROM, an optional 8 KiB XTIDE ROM
-at `C800h`, and the EGA BIOS, which is required — see [EGA BIOS — required](#ega-bios--required) below.
+it provides slots for the PCAT main/diagnostic ROM and the EGA BIOS, which is
+required — see [EGA BIOS — required](#ega-bios--required) below. The AT profile
+does not load an XTIDE option ROM; `C8000h–DFFFFh` is UMB RAM.
 Once loaded, a ROM remains available on subsequent boots until it is replaced.
 Original and copyrighted system ROMs can be prepared with the Python scripts in
 `SW/ROMs/`:
@@ -381,15 +385,10 @@ Original and copyrighted system ROMs can be prepared with the Python scripts in
 * `SW/ROMs/make_rom_with_ibm5160.py`: creates `pcxt.rom` from the original IBM 5160 ROM. It requires an XTIDE BIOS at `EC00h` to use hard-disk images.
 * `SW/ROMs/make_rom_with_jukost.py`: creates `pcxt.rom` from the Juko ST ROM with the XTIDE BIOS embedded at `F000h`.
 
-The AT profile's HPS loader accepts an XTIDE image of up to 8 KiB at `C800h`;
-the `ide_at.bin` test image is configured for this slot. The separate legacy
-XT-ROM construction script above still embeds its XTIDE BIOS at `EC00h`.
-
-Other Open Source ROMs are available in the same folder:
-
-* `pcxt_pcxt31.rom`: includes the XTIDE BIOS at `F000h`. ([source code](https://github.com/virtualxt/pcxtbios))
-* `bios-micro8088-xtide.rom`: Micro8088 BIOS with XTIDE support, built from the [8088 BIOS source code](https://github.com/skiselev/8088_bios).
-* `ide_xtl.rom`: XTIDE BIOS used by some scripts and upgradeable from its [upstream project](https://www.xtideuniversalbios.org/).
+The EGA BIOS image must fit in its `C0000h–C7FFFh` window. The HPS loader
+rejects writes beyond that 32 KiB region so an oversized image cannot overwrite
+the UMB. The ROM builders listed above are retained for preparing legacy XT
+images; their outputs are not loadable through the AT profile's OSD.
 
 ### EGA BIOS — required
 

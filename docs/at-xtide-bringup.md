@@ -1,16 +1,17 @@
-# AT XT-IDE detection regression
+# AT IDE storage-port regression
 
-The AT XTIDE image is a regular ISA16 IDE option ROM.  Its disk channel is not
-the XT2IDE `300h` window: it probes the standard primary channel at
-`1F0h–1F7h` and the alternate-status/device-control port at `3F6h`.
+The AT profile retains its IDE/VHD storage interface, which uses the standard
+primary channel at `1F0h–1F7h` and alternate-status/device-control port `3F6h`.
+The XTIDE option-ROM slot and loader path described in the original bring-up
+were retired when `C8000h–DFFFFh` became fixed UMB RAM. The `300h` XT2IDE window
+remains unmapped.
 
-The AT profile could load the XTIDE option ROM and show a mounted VHD in the
-OSD, but the BIOS could not complete the disk boot through the old XT path.
-The same media worked with the XT-derived profile.
+This regression records the IDE I/O decode and storage bridge behavior; it
+does not imply that the AT OSD still accepts an XTIDE ROM.
 
 ## Cause and fix
 
-`spk286_at_machine.is_a5_io_port()` did not include the XT-IDE window.
+`spk286_at_machine.is_a5_io_port()` did not include the IDE primary channel.
 Consequently the machine's unmapped-I/O sink completed reads with `FFh` and
 discarded writes before they reached `spk286_at_device_router`. The IDE engine
 could still be configured through the independent HPS management interface.

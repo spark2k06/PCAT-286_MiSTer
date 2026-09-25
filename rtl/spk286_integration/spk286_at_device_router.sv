@@ -20,9 +20,6 @@
 `ifndef ENABLE_MIDI
 `define ENABLE_MIDI 0
 `endif
-`ifndef ENABLE_EMS
-`define ENABLE_EMS 0
-`endif
 
 module spk286_at_device_router (
     input  logic        clk,
@@ -184,7 +181,9 @@ module spk286_at_device_router (
     logic        ems_runtime_enabled;
     logic        sound_dma_channel_selected;
 
-    assign ems_runtime_enabled = (`ENABLE_EMS) && at286ctl_eff_ems;
+    // EMS is permanently present in the AT profile. Page windows are still
+    // controlled by their EMS page registers, not a global enable switch.
+    assign ems_runtime_enabled = 1'b1;
 
     logic       device_8042_candidate;
     logic       device_rtc_candidate;

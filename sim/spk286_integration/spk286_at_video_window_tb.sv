@@ -5,8 +5,9 @@
 // sent to the HDMI mixer/capture, including the last text column.
 module spk286_at_video_window_tb;
     logic clk = 0, clk_video = 0, reset = 1;
+    logic run_video = 1;
     always #10 clk = ~clk;
-    always #17.462 clk_video = ~clk_video;
+    always #17.462 if (run_video) clk_video = ~clk_video;
     logic valid = 0, command_valid = 0, write_cycle = 0, io_cycle = 1;
     logic [23:0] address = 0;
     logic [1:0] lanes = 1;
@@ -17,10 +18,17 @@ module spk286_at_video_window_tb;
     logic [3:0] h_offset = 0;
     logic vga_enabled = 0;
     logic [7:0] last_read;
+    logic machine_reset = 1;
+    logic [1:0] selected_profile = 0;
+    wire [1:0] applied_profile;
+    ega_monitor_profile_latch profile_latch (
+        .clock(clk), .reset_active(machine_reset),
+        .selected(selected_profile), .applied(applied_profile)
+    );
 
     spk286_at_video_adapter dut (
         .clk(clk), .reset(reset), .clk_video(clk_video), .splashscreen(1'b0),
-        .ega_monitor_profile(2'd0), .vga_enabled(vga_enabled), .vga_mode13_native(1'b1),
+        .ega_monitor_profile(applied_profile), .vga_enabled(vga_enabled), .vga_mode13_native(1'b1),
         .crt_h_offset(h_offset), .crt_v_offset(3'd0),
         .vsync_width_osd(3'd0), .hsync_width_osd(3'd0),
         .request_valid(valid), .request_command_valid(command_valid),
@@ -148,7 +156,44 @@ module spk286_at_video_window_tb;
         end
     endtask
 
+    task check_profile(input logic [1:0] expected);
+        repeat(60) @(negedge clk);
+        if(dut.u_ega.ega_monitor_profile !== expected)
+            $fatal(1,"Video profile differs: expected=%0d got=%0d",expected,dut.u_ega.ega_monitor_profile);
+        if(dut.u_ega_switch_sense_host.monitor_profile !== expected)
+            $fatal(1,"Host switch profile differs from raster");
+    endtask
+
     initial begin
+        // Profile changes are accepted only while the CPU is held in reset.
+        // The raster/mailbox may keep running during the boot splash.
+        @(negedge clk); selected_profile=1;
+        check_profile(1);
+        reset=0; machine_reset=0; selected_profile=2;
+        check_profile(1); // OSD change remains pending during normal execution.
+        machine_reset=1; h_offset=6;
+        check_profile(2);
+        if(dut.video_geometry[3:0] !== 6) $fatal(1,"Geometry corrupted by profile transfer");
+        // Verify the actual four BIOS switch-sense reads for an MDA monitor.
+        for(integer sw=0;sw<4;sw++) begin
+            io_write(16'h03C2,8'(sw*4));
+            access_byte(0,1,24'h0003C2,0);
+            if(last_read !== ((4'b1011 & (4'b1000 >> sw)) ? 8'h10 : 8'h00))
+                $fatal(1,"MDA BIOS switch read failed at selector %0d",sw);
+        end
+        @(negedge clk_video); run_video=0;
+        @(negedge clk); selected_profile=1;
+        repeat(20) @(negedge clk);
+        selected_profile=2;
+        repeat(20) @(negedge clk);
+        selected_profile=0;
+        repeat(20) @(negedge clk);
+        run_video=1; check_profile(0);
+        // Repeat a warm reset without resetting the live mailbox toggles.
+        reset=1; selected_profile=1; check_profile(1);
+        reset=0; selected_profile=0; check_profile(0);
+        machine_reset=0; h_offset=0;
+        $display("AT_MONITOR_PROFILE_CDC_PASS profiles=0,1,2 pending_until_reset=1 switch_reads=4 stopped_clock=1 warm_reset=1");
         for (mode = 0; mode < 3; mode++) begin
             @(negedge clk);
             reset = 1;

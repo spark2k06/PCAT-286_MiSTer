@@ -1,4 +1,4 @@
-module shadowmask #(parameter AT_CDC = 0)
+module shadowmask #(parameter AT_CDC = 0, parameter AT_VIDEO_ENABLE = 0)
 (
 	input             clk,
 	input             clk_sys,
@@ -54,18 +54,19 @@ generate if (AT_CDC) begin : g_at_config
 			config_committed_q <= {flags_sys, hmax_sys, vmax_sys};
 	end
 
-	// LFB's enable comes from clk_sys too. Transfer it coherently with the
-	// completed configuration; intermediate command fields never reach HDMI.
+	// Legacy AT callers supply enable in clk_sys. The frame-config wrapper
+	// supplies it in HDMI instead; keep that local gate out of the sys mailbox.
 	at_cdc_snapshot #(.WIDTH(11)) config_mailbox (
 		.src_clk(clk_sys), .src_send(!cmd_active),
-		.src_data({config_committed_q[10] & enable, config_committed_q[9:0]}),
+		.src_data({config_committed_q[10] & (AT_VIDEO_ENABLE ? 1'b1 : enable), config_committed_q[9:0]}),
 		.src_ready(), .dst_clk(clk), .dst_data(config_pending), .dst_update()
 	);
 	always @(posedge clk) begin
 		vs_seen <= vs_in;
 		if (vs_seen && !vs_in) config_active_q <= config_pending;
 	end
-	assign {mask_enable, mask_rotate, mask_2x} = config_active_q[10:8];
+	assign mask_enable = config_active_q[10] & (AT_VIDEO_ENABLE ? enable : 1'b1);
+	assign {mask_rotate, mask_2x} = config_active_q[9:8];
 	assign hmax = {1'b0, config_active_q[7:4]};
 	assign vmax = {1'b0, config_active_q[3:0]};
 end else begin : g_legacy_config

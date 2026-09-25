@@ -114,6 +114,8 @@ USE ieee.numeric_std.ALL;
 ENTITY ascal IS
 	GENERIC (
 		AT_CDC       : boolean := false;
+		-- AT wrapper supplies one frame-coherent packet in o_clk and mode in i_clk.
+		AT_LOCAL_CONFIG : boolean := false;
 		MASK         : unsigned(7 DOWNTO 0) :=x"FF";
 		RAMBASE      : unsigned(31 DOWNTO 0);
 		RAMSIZE      : unsigned(31 DOWNTO 0) := x"0080_0000"; -- =8MB
@@ -205,6 +207,9 @@ ENTITY ascal IS
 		run       : IN std_logic :='1'; -- 1=Enable output image. 0=No image
 		freeze    : IN std_logic :='0'; -- 1=Disable framebuffer writes
 		mode      : IN unsigned(4 DOWNTO 0);
+		at_input_mode : IN unsigned(4 DOWNTO 0) := (OTHERS => '0');
+		at_config_update : IN std_logic := '0';
+		at_config_retime : IN std_logic := '0';
  		bob_deint : IN std_logic := '0';
 		-- SYNC  |_________________________/"""""""""\_______|
 		-- DE    |""""""""""""""""""\________________________|
@@ -1214,12 +1219,18 @@ BEGIN
 		                   std_logic_vector(o_fb_format) &
 		                   std_logic_vector(o_fb_base) &
 		                   std_logic_vector(o_fb_stride);
+		g_fb_async : IF NOT AT_LOCAL_CONFIG GENERATE
 		framebuffer_out_config : ENTITY work.at_cdc_snapshot_vhd
 			GENERIC MAP (WIDTH => 77)
 			PORT MAP (src_clk => poly_clk, src_send => '1',
 				src_data => cdc_fb_out_data,
 				src_ready => OPEN, dst_clk => o_clk,
 				dst_data => cdc_fb_out_meta, dst_update => OPEN);
+		END GENERATE;
+		g_fb_local : IF AT_LOCAL_CONFIG GENERATE
+			-- Already captured with geometry/mode at output VS in the AT wrapper.
+			cdc_fb_out_meta <= cdc_fb_out_data;
+		END GENERATE;
 		-- Bank allocation changes at input VS, well before the next frame's
 		-- first write. Transfer the pair coherently back to the capture clock;
 		-- each write then freezes its selected base until the next burst.
@@ -1420,7 +1431,8 @@ BEGIN
 					i_hburst<=(i_hrsize*4 + N_BURST - 1) / N_BURST;
 				END IF;
 				----------------------------------------------------
-				i_mode<=mode; -- <ASYNC>
+				IF AT_LOCAL_CONFIG THEN i_mode<=at_input_mode;
+				ELSE i_mode<=mode; END IF;
 				i_format<=format; -- <ASYNC>
 
 				-- Downscaling : Nearest or bilinear
@@ -2207,7 +2219,8 @@ BEGIN
 			IF AT_CDC THEN
 				o_readdataack<=o_readdataack_sync2 XOR o_readdataack_seen;
 				IF o_readack='1' THEN o_read_pending<='0'; END IF;
-				IF o_vsv(1)='1' AND o_vsv(0)='0' THEN
+				IF (o_vsv(1)='1' AND o_vsv(0)='0') OR
+				   (AT_LOCAL_CONFIG AND at_config_update='1') THEN
 					o_frame_base_q<=cdc_o_fb_base;
 				END IF;
 			ELSE
@@ -3043,6 +3056,23 @@ BEGIN
 			o_vcpt2<=o_vcpt_pre3;
 			o_vrr_sync<=(o_vrr='1' AND (o_sync OR o_sync_max) AND o_vcpt2>=o_vdisp AND o_vcpt2<o_vsstart);
 			o_vrr_sync2<=o_vrr_sync;
+
+			-- A new raster can be taller than the old VS position. Restart in
+			-- its final blank line so the change cannot expose a partial active
+			-- frame. Ordinary aspect/framebuffer changes keep the cadence intact.
+			IF AT_LOCAL_CONFIG AND at_config_retime='1' THEN
+				o_hcpt<=0;
+				IF vtotal>0 THEN
+					o_vcpt_pre3<=vtotal-1; o_vcpt_pre2<=vtotal-1;
+					o_vcpt_pre<=vtotal-1; o_vcpt<=vtotal-1; o_vcpt2<=vtotal-1;
+				ELSE
+					o_vcpt_pre3<=0; o_vcpt_pre2<=0; o_vcpt_pre<=0; o_vcpt<=0; o_vcpt2<=0;
+				END IF;
+				o_dev<=(OTHERS=>'0'); o_pev<=(OTHERS=>'0');
+				o_hsv<=(OTHERS=>'0'); o_vsv<=(OTHERS=>'0'); o_end<=(OTHERS=>'1');
+				o_vcpt_sync<=0; o_sync<=false; o_sync_max<=false;
+				o_vrr_sync<=false; o_vrr_sync2<=false;
+			END IF;
 
 	 END IF;
 	END PROCESS OSWEEP;

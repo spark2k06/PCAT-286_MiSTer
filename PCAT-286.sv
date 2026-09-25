@@ -969,19 +969,20 @@ module emu_at
     wire [11:0] at_video_active_dots_raw;
     wire [9:0]  at_video_active_lines_raw;
 
-    // Video effects keep the PCXT-EGA status-bit assignments so existing
-    // settings and saved core configurations remain compatible.
-    logic [1:0] at_video_scale_q;
-    logic [2:0] at_video_display_q;
-    logic [12:0] at_video_arx_q;
-    logic [12:0] at_video_ary_q;
-    always_ff @(posedge at_video_clk_57) begin
-        at_video_scale_q   <= hps_status[2:1];
-        at_video_display_q <= hps_status[16:14];
-        at_video_arx_q     <= (hps_status[9:8] == 2'd0) ? 13'd4 :
-                              ({11'd0, hps_status[9:8]} - 13'd1);
-        at_video_ary_q     <= (hps_status[9:8] == 2'd0) ? 13'd3 : 13'd0;
-    end
+    // Keep the PCXT-EGA bit assignments, but cross completed HPS options as
+    // one configuration. Apply before the next active native-raster frame.
+    wire [1:0] at_video_scale_q;
+    wire [2:0] at_video_display_q;
+    wire [12:0] at_video_arx_q;
+    wire [12:0] at_video_ary_q;
+    at_video_options_cdc u_at_video_options (
+        .clk_sys(CLK_50M), .src_idle(!HPS_BUS[34]),
+        .options({hps_status[16:14], hps_status[2:1], hps_status[9:8]}),
+        .clk_video(at_video_clk_57), .video_reset(at_video_pipe_reset_57),
+        .vblank(at_video_vb_pipe_q),
+        .scale(at_video_scale_q), .display(at_video_display_q),
+        .arx(at_video_arx_q), .ary(at_video_ary_q)
+    );
 
     // AT286CTL is clocked by the AT bus and its effective video fields are
     // fed to the EGA/VGA adapter through the machine boundary.

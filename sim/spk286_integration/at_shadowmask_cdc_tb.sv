@@ -6,10 +6,12 @@ module at_shadowmask_cdc_tb;
     reg cmd_wr=0, cmd_active=0;
     reg [15:0] cmd_in=0;
     reg enable=1;
+    reg enable_video=1;
     reg [23:0] din=24'hA07040;
     reg hs=0,vs=0,de=0,brd=1;
     integer h=0,v=0,frame_count=0,compared=0;
-    wire [23:0] pixels,legacy_pixels;
+    wire [23:0] pixels,legacy_pixels,local_pixels;
+    wire local_hs,local_vs,local_de;
     wire ho,vo,deo,lho,lvo,ldeo;
     reg compare_pixels=0;
     shadowmask #(.AT_CDC(1)) dut(.clk(clk),.clk_sys(clk_sys),
@@ -20,6 +22,10 @@ module at_shadowmask_cdc_tb;
         .cmd_wr(cmd_wr),.cmd_in(cmd_in),.cmd_active(cmd_active),
         .din(din),.hs_in(hs),.vs_in(vs),.de_in(de),.brd_in(brd),.enable(enable),
         .dout(legacy_pixels),.hs_out(lho),.vs_out(lvo),.de_out(ldeo));
+    shadowmask #(.AT_CDC(1),.AT_VIDEO_ENABLE(1)) local_dut(.clk(clk),.clk_sys(clk_sys),
+        .cmd_wr(cmd_wr),.cmd_in(cmd_in),.cmd_active(cmd_active),
+        .din(din),.hs_in(hs),.vs_in(vs),.de_in(de),.brd_in(brd),.enable(enable_video),
+        .dout(local_pixels),.hs_out(local_hs),.vs_out(local_vs),.de_out(local_de));
 
     always @(negedge clk) begin
         h=(h+1)%80;
@@ -42,9 +48,11 @@ module at_shadowmask_cdc_tb;
             $fatal(1,"Shadowmask configuration changed inside a frame");
         if(compare_pixels) begin
             if({ho,vo,deo} !== {lho,lvo,ldeo}) $fatal(1,"Video latency changed");
+            if({local_hs,local_vs,local_de} !== {lho,lvo,ldeo}) $fatal(1,"Local enable video latency changed");
             if(deo) begin
                 if(^pixels === 1'bx) $fatal(1,"Unknown visible pixel in comparison");
                 if(pixels !== legacy_pixels) $fatal(1,"Mask output differs from legacy: %h != %h",pixels,legacy_pixels);
+                if(local_pixels !== legacy_pixels) $fatal(1,"Local enable output differs from legacy");
                 compared++;
             end
         end
@@ -108,12 +116,19 @@ module at_shadowmask_cdc_tb;
 
         // LFB bypass is coherent with the flags and also applied at VS.
         @(negedge clk_sys); enable=0;
+        @(negedge clk); enable_video=0;
+        @(posedge clk); #0.001;
+        if(local_dut.mask_enable !== 0 || local_dut.g_at_config.config_active_q[10] !== 1)
+            $fatal(1,"HDMI-local bypass incorrectly waits for the sys mailbox");
         compare_stable(3'b011,9,10);
         @(negedge clk_sys); enable=1;
+        @(negedge clk); enable_video=1;
+        @(posedge clk); #0.001;
+        if(local_dut.mask_enable !== 1) $fatal(1,"HDMI-local re-enable failed");
         compare_stable(3'b111,9,10);
         configure(3'b000,0,0,81); compare_stable(3'b000,0,0);
         if(compared<10000) $fatal(1,"Insufficient visible-pixel comparisons");
-        $display("AT_SHADOWMASK_CDC_PASS pixels=%0d modes=4 lut_words=2048 partial_transaction=1 clock_pause=1 lfb=1",compared);
+        $display("AT_SHADOWMASK_CDC_PASS pixels=%0d modes=4 lut_words=2048 partial_transaction=1 clock_pause=1 lfb=1 local_enable=1",compared);
         $finish;
     end
     initial begin #2000000; $fatal(1,"Shadowmask timeout"); end

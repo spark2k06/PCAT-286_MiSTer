@@ -196,11 +196,19 @@ if {$at_cdc_enabled && $at_require_new} {
     } {
         at_snapshot $instance
     }
-    # The AT CRT configuration is a 14-bit held payload. Its destination
-    # clock is 28.636 MHz; 10 ns leaves ample handshake settling time.
+    # Geometry plus the applied EGA monitor profile form a 16-bit held bus.
+    # Its destination is 28.636 MHz; 10 ns leaves ample settling time.
     at_snapshot video_geometry_cdc 10.0
     at_snapshot at_crt350_config_cdc 10.0
-    at_snapshot framebuffer_out_config 10.0
+    # Completed HPS display/scale/aspect fields apply locally in vertical blank.
+    at_snapshot u_at_video_options*config_mailbox 10.0
+    # Applied scanline intensity returns as a coherent pair for HPS readback.
+    at_snapshot u_at_scanlines_status*config_mailbox 10.0
+    # Complete UIO geometry is held through calculation, then frame-committed
+    # in HDMI. Framebuffer base/format travel in that same output packet.
+    at_snapshot u_at_scaler_config*geometry_config 10.0
+    at_snapshot u_at_scaler_config*scaler_frame_config 5.0
+    at_snapshot u_at_scaler_config*aspect_readback 10.0
     at_snapshot capture_bank_config 10.0
     at_snapshot capture_field_history 5.0
     # Completed UIO configuration is held until ack, then applied at HDMI VS.

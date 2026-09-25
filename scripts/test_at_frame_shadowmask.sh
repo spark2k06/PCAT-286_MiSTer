@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 root=$(cd "$(dirname "$0")/.." && pwd)
-build="$root/build/at-frame-shadowmask"
+build="${AT_FRAME_TEST_OUTPUT:-$root/build/at-frame-shadowmask}"
 mkdir -p "$build"
 for tb in at_frame_counter at_shadowmask_cdc; do
   iverilog -g2012 -Wall -Wno-timescale -s "${tb}_tb" -o "$build/$tb.vvp" \

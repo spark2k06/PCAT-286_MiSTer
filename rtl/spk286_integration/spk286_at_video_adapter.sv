@@ -79,10 +79,6 @@ module spk286_at_video_adapter (
     (* altera_attribute = "-name SYNCHRONIZER_IDENTIFICATION FORCED_IF_ASYNCHRONOUS" *)
     logic splash_video_sync2_q;
     (* altera_attribute = "-name SYNCHRONIZER_IDENTIFICATION FORCED_IF_ASYNCHRONOUS" *)
-    logic [1:0] ega_monitor_profile_video_sync1_q;
-    (* altera_attribute = "-name SYNCHRONIZER_IDENTIFICATION FORCED_IF_ASYNCHRONOUS" *)
-    logic [1:0] ega_monitor_profile_video_sync2_q;
-    (* altera_attribute = "-name SYNCHRONIZER_IDENTIFICATION FORCED_IF_ASYNCHRONOUS" *)
     logic vga_mode13_native_video_sync1_q;
     (* altera_attribute = "-name SYNCHRONIZER_IDENTIFICATION FORCED_IF_ASYNCHRONOUS" *)
     logic vga_mode13_native_video_sync2_q;
@@ -90,35 +86,33 @@ module spk286_at_video_adapter (
         if (video_reset) begin
             splash_video_sync1_q <= 1'b0;
             splash_video_sync2_q <= 1'b0;
-            ega_monitor_profile_video_sync1_q <= 2'b00;
-            ega_monitor_profile_video_sync2_q <= 2'b00;
             vga_mode13_native_video_sync1_q <= 1'b1;
             vga_mode13_native_video_sync2_q <= 1'b1;
         end else begin
             splash_video_sync1_q <= splashscreen;
             splash_video_sync2_q <= splash_video_sync1_q;
-            ega_monitor_profile_video_sync1_q <= ega_monitor_profile;
-            ega_monitor_profile_video_sync2_q <= ega_monitor_profile_video_sync1_q;
             vga_mode13_native_video_sync1_q <= vga_mode13_native;
             vga_mode13_native_video_sync2_q <= vga_mode13_native_video_sync1_q;
         end
     end
 
-    // CRT geometry is one software-visible configuration. Hold the complete
-    // value while its request crosses to the raster clock, then update all
-    // fields together. A later write supersedes an in-flight value.
-    wire [13:0] video_geometry_source = {
-        vga_enabled, hsync_width_osd, vsync_width_osd,
+    // Transfer geometry and the applied physical monitor profile coherently.
+    // The profile latch can change throughout machine reset (including the
+    // splash, while this raster is live). Two independent bit synchronizers
+    // cannot guarantee an atomic 01 <-> 10 change. Reuse the held mailbox;
+    // it stays live across machine resets and stopped raster clocks.
+    wire [15:0] video_geometry_source = {
+        ega_monitor_profile, vga_enabled, hsync_width_osd, vsync_width_osd,
         crt_v_offset, crt_h_offset
     };
-    logic [13:0] video_geometry_sent_q = 14'd0;
+    logic [15:0] video_geometry_sent_q = 16'd0;
     wire video_geometry_ready;
-    wire [13:0] video_geometry;
+    wire [15:0] video_geometry;
     always_ff @(posedge clk) begin
         if (video_geometry_ready && video_geometry_source != video_geometry_sent_q)
             video_geometry_sent_q <= video_geometry_source;
     end
-    at_cdc_snapshot #(.WIDTH(14)) video_geometry_cdc (
+    at_cdc_snapshot #(.WIDTH(16)) video_geometry_cdc (
         .src_clk   (clk),
         .src_send  (video_geometry_ready && video_geometry_source != video_geometry_sent_q),
         .src_data  (video_geometry_source),
@@ -620,7 +614,7 @@ module spk286_at_video_adapter (
         .thin_font                  (1'b0),
         .scandouble_en              (1'b0),
         .ega_enabled                (1'b1),
-        .ega_monitor_profile        (ega_monitor_profile_video_sync2_q),
+        .ega_monitor_profile        (video_geometry[15:14]),
         .vga_enabled                (video_geometry[13]),
         .vga_mode13_native          (vga_mode13_native_video_sync2_q),
         .vga_mode13_set             (1'b0),

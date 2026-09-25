@@ -6,7 +6,8 @@ USE std.env.ALL;
 -- Production scaler, unrelated clocks, triple buffering and an Avalon slave
 -- with bounded backpressure and delayed, ordered burst responses.
 ENTITY at_scaler_avalon_tb IS
-  GENERIC (PHASE_NS : natural := 0; INTERLACED : boolean := false);
+  GENERIC (PHASE_NS : natural := 0; INTERLACED : boolean := false;
+           LOCAL_CONFIG : boolean := false);
 END;
 ARCHITECTURE test OF at_scaler_avalon_tb IS
   SIGNAL ic,oc,ac,pc : std_logic := '0';
@@ -16,6 +17,13 @@ ARCHITECTURE test OF at_scaler_avalon_tb IS
   SIGNAL red,green,blue : unsigned(7 DOWNTO 0);
   SIGNAL hd,vd : natural RANGE 0 TO 4095;
   SIGNAL fb_enable : std_logic := '0';
+  SIGNAL config_update : std_logic := '0';
+  SIGNAL config_retime : std_logic := '0';
+  SIGNAL out_htotal : natural RANGE 0 TO 4095 := 160;
+  SIGNAL out_vtotal : natural RANGE 0 TO 4095 := 64;
+  SIGNAL out_vdisp : natural RANGE 0 TO 4095 := 48;
+  SIGNAL out_vsstart : natural RANGE 0 TO 4095 := 52;
+  SIGNAL out_vsend : natural RANGE 0 TO 4095 := 56;
   SIGNAL running : std_logic := '0';
   SIGNAL fb_base : unsigned(31 DOWNTO 0) := x"24000000";
   SIGNAL rd,wr,waitreq,rv : std_logic := '0';
@@ -49,17 +57,18 @@ BEGIN
     END IF;
   END PROCESS;
   dut: ENTITY work.ascal
-    GENERIC MAP(AT_CDC=>true, RAMBASE=>x"20000000", IHRES=>128, OHRES=>2304,
+    GENERIC MAP(AT_CDC=>true, AT_LOCAL_CONFIG=>LOCAL_CONFIG, RAMBASE=>x"20000000", IHRES=>128, OHRES=>2304,
       PALETTE=>false,PALETTE2=>false,ADAPTIVE=>false,FRAC=>8,N_DW=>128,N_AW=>28)
     PORT MAP(i_clk=>ic,i_ce=>'1',i_r=>x"55",i_g=>x"55",i_b=>x"55",
       i_hs=>hs,i_vs=>vs,i_de=>de,i_fl=>field,
       o_clk=>oc,o_ce=>'1',o_r=>red,o_g=>green,o_b=>blue,o_hs=>ohs,o_vs=>ovs,
       o_de=>ode,o_vbl=>OPEN,o_brd=>ordr,o_lltune=>OPEN,
       i_hdmax=>hd,i_vdmax=>vd,mode=>"01000",run=>running,
+      at_input_mode=>"01000",at_config_update=>config_update,at_config_retime=>config_retime,
       o_fb_ena=>fb_enable,o_fb_hsize=>64,o_fb_vsize=>16,
       o_fb_format=>"000101",o_fb_base=>fb_base,
-      htotal=>160,hsstart=>136,hsend=>144,hdisp=>128,hmin=>16,hmax=>111,
-      vtotal=>64,vsstart=>52,vsend=>56,vdisp=>48,vmin=>8,vmax=>39,
+      htotal=>out_htotal,hsstart=>136,hsend=>144,hdisp=>128,hmin=>16,hmax=>111,
+      vtotal=>out_vtotal,vsstart=>out_vsstart,vsend=>out_vsend,vdisp=>out_vdisp,vmin=>8,vmax=>39,
       poly_clk=>pc,poly_dw=>(OTHERS=>'0'),poly_a=>(OTHERS=>'0'),poly_wr=>'0',
       avl_clk=>ac,avl_waitrequest=>waitreq,avl_readdata=>rdata,avl_readdatavalid=>rv,
       avl_burstcount=>bc,avl_writedata=>wd,avl_address=>addr,avl_write=>wr,avl_read=>rd,
@@ -145,9 +154,27 @@ BEGIN
     WAIT FOR 133 ns; reset_na<='1';
     -- Like HPS startup, enable output only after input geometry is known.
     WAIT FOR 120 us; running<='1';
-    WAIT FOR 210 us; fb_enable<='1';
-    WAIT FOR 170 us; fb_base<=x"24800000";
-    WAIT FOR 115 us; running<='0';
+    WAIT FOR 210 us;
+    IF LOCAL_CONFIG THEN WAIT UNTIL falling_edge(ovs); WAIT UNTIL rising_edge(oc); END IF;
+    fb_enable<='1'; config_update<='1';
+    WAIT UNTIL rising_edge(oc); config_update<='0';
+    WAIT FOR 170 us;
+    IF LOCAL_CONFIG THEN WAIT UNTIL falling_edge(ovs); WAIT UNTIL rising_edge(oc); END IF;
+    fb_base<=x"24800000"; config_update<='1';
+    WAIT UNTIL rising_edge(oc); config_update<='0';
+    WAIT FOR 30 us;
+    IF LOCAL_CONFIG THEN
+      -- Taller raster: old VS lies inside the new active height. The wrapper
+      -- supplies the complete local packet, then pulses retime one cycle later.
+      WAIT UNTIL falling_edge(ovs); WAIT UNTIL rising_edge(oc);
+      out_htotal<=176; out_vtotal<=80; out_vdisp<=64; out_vsstart<=68; out_vsend<=72;
+      config_update<='1';
+      WAIT UNTIL rising_edge(oc); config_update<='0'; config_retime<='1';
+      WAIT UNTIL rising_edge(oc); config_retime<='0';
+      WAIT FOR 1 us;
+      ASSERT ode='0' REPORT "Taller raster exposed a partial active frame" SEVERITY failure;
+    END IF;
+    WAIT FOR 85 us; running<='0';
     WAIT FOR 10 us; running<='1';
     WAIT FOR 60 us; output_clock_enable<=false;
     WAIT FOR 3 us; output_clock_enable<=true;

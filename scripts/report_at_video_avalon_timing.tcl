@@ -55,6 +55,19 @@ if {$mode eq "baseline"} {
         frame_counter_logic {*u_at_frame_counter|vs_sync *u_at_frame_counter|vs_seen} {*u_at_frame_counter|frame_cnt[*]}
         shadowmask_apply {*HDMI_shadowmask*g_at_config*config_mailbox|dst_data[*]} {*HDMI_shadowmask*g_at_config*config_active_q[*]}
         shadowmask_local {*HDMI_shadowmask*g_at_config*config_active_q[*]} {*HDMI_shadowmask|*}
+        video_options_apply {*u_at_video_options*config_mailbox|dst_data[*]} {*u_at_video_options|scale[*] *u_at_video_options|display[*] *u_at_video_options|arx[*] *u_at_video_options|ary[*]}
+        video_options_local {*u_at_video_options|scale[*] *u_at_video_options|display[*] *u_at_video_options|arx[*] *u_at_video_options|ary[*]} {*}
+        monitor_profile_local {*u_video|video_geometry_cdc|dst_data[14] *u_video|video_geometry_cdc|dst_data[15]} {*}
+        scanlines_status_apply {*u_at_scanlines_status*config_mailbox|dst_data[*]} {*u_at_scanlines_status|status[*]}
+        scanlines_status_readback {*u_at_scanlines_status|status[*]} {io_dout_sys[*]}
+        scaler_geometry_apply {*u_at_scaler_config*geometry_config|dst_data[*]} {*u_at_scaler_config|active_q*}
+        scaler_geometry_local {*u_at_scaler_config|active_q*} {*}
+        scaler_aspect_phase {*u_at_video_options|arx[*] *u_at_video_options|ary[*]} {*u_at_scaler_config|aspect_video_q[*]}
+        scaler_aspect_local {*u_at_scaler_config|aspect_video_q[*]} {*}
+        scaler_frame_local {*u_at_scaler_config*scaler_frame_config|dst_data[*]} {*}
+        scaler_frame_retime {*u_at_scaler_config|output_retime *u_at_scaler_config*scaler_frame_config|dst_update} {*ascal|*}
+        scaler_input_mode {*u_at_scaler_config|input_mode[*]} {*ascal|i_mode[*]}
+        scaler_aspect_readback {*u_at_scaler_config*aspect_readback|dst_data[*]} {*}
     } {
         lappend groups $label [list -from [regs ${label}_src $src] -to [regs ${label}_dst $dst]]
     }
@@ -62,8 +75,13 @@ if {$mode eq "baseline"} {
     foreach {label instance} {
         capture_bank_config capture_bank_config
         capture_field_history capture_field_history
-        framebuffer_out_config framebuffer_out_config
+        scaler_geometry_config u_at_scaler_config*geometry_config
+        scaler_frame_config u_at_scaler_config*scaler_frame_config
+        scaler_aspect_config u_at_scaler_config*aspect_readback
         shadowmask_config HDMI_shadowmask*g_at_config*config_mailbox
+        video_geometry_config video_geometry_cdc
+        video_options_config u_at_video_options*config_mailbox
+        scanlines_status_config u_at_scanlines_status*config_mailbox
     } {
         # Selectors may contain wildcards; report filenames must work on Windows.
         set src [regs ${label}_src "*${instance}|payload_q\[*\]"]
@@ -79,6 +97,9 @@ if {$mode eq "baseline"} {
     set old [get_registers -nowarn {*ascal|avl_i_offset0[*] *ascal|avl_i_offset1[*] *ascal|avl_o_offset0[*] *ascal|avl_o_offset1[*]}]
     puts $inventory "legacy_async_offsets=[get_collection_size $old]"
     if {[get_collection_size $old]} { error "Old asynchronous bank offsets still present" }
+    set old_profile [get_registers -nowarn {*u_video|ega_monitor_profile_video_sync1_q[*] *u_video|ega_monitor_profile_video_sync2_q[*]}]
+    puts $inventory "legacy_independent_profile_bits=[get_collection_size $old_profile]"
+    if {[get_collection_size $old_profile]} { error "Old independent profile synchronizers still present" }
 }
 close $inventory
 set counts [open "$output/path_counts.txt" w]

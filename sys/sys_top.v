@@ -321,6 +321,9 @@ reg  [1:0] vol_boost = 0;
 reg  [11:0] coef_addr;
 reg  [9:0] coef_data;
 reg        coef_wr = 0;
+`ifdef SPK286_AT_CDC
+reg        coef_active = 0;
+`endif
 
 wire[12:0] ARX, ARY;
 reg [11:0] VSET = 0, HSET = 0;
@@ -353,6 +356,10 @@ reg [15:0] io_dout_sys;
 
 `ifdef SPK286_AT_CDC
 wire [1:0] sl_r;
+wire hdmi_vs_sys_rise;
+at_hdmi_vsync u_at_hdmi_vsync (
+	.clk_sys(clk_sys), .vs(HDMI_TX_VS), .rise(hdmi_vs_sys_rise)
+);
 at_scanlines_status u_at_scanlines_status (
 	.clk_video(clk_vid), .clk_sys(clk_sys), .scanlines(scanlines),
 	.fb_en(FB_EN), .status(sl_r)
@@ -363,7 +370,9 @@ always@(posedge clk_sys) begin
 	reg  [7:0] cmd;
 	reg        has_cmd;
 	reg  [7:0] cnt = 0;
+`ifndef SPK286_AT_CDC
 	reg        vs_d0,vs_d1,vs_d2;
+`endif
 	reg  [4:0] acx_att;
 	reg  [7:0] fb_crc;
 `ifndef SPK286_AT_CDC
@@ -371,6 +380,10 @@ always@(posedge clk_sys) begin
 `endif
 
 	coef_wr <= 0;
+`ifdef SPK286_AT_CDC
+	// Align the whole coefficient transaction with the registered write strobe.
+	coef_active <= io_uio && has_cmd && (cmd == 'h2A);
+`endif
 `ifndef SPK286_AT_CDC
 	sl_r <= FB_EN ? 2'b00 : scanlines;
 `endif
@@ -556,11 +569,15 @@ always@(posedge clk_sys) begin
 				^ ary[7:0] ^ ary[11:8];
 `endif
 
+`ifdef SPK286_AT_CDC
+	if(hdmi_vs_sys_rise) vs_wait <= 0;
+`else
 	vs_d0 <= HDMI_TX_VS;
 	if(vs_d0 == HDMI_TX_VS) vs_d1 <= vs_d0;
 
 	vs_d2 <= vs_d1;
 	if(~vs_d2 & vs_d1) vs_wait <= 0;
+`endif
 end
 
 `ifdef SPK286_AT_CDC
@@ -855,6 +872,9 @@ wire [13:0] at_fb_stride;
 		.poly_a   (coef_addr),
 		.poly_dw  (coef_data),
 		.poly_wr  (coef_wr),
+`ifdef SPK286_AT_CDC
+		.at_poly_active (coef_active),
+`endif
 
 		.pal1_clk (clk_pal),
 		.pal1_dw  (pal_d),
@@ -1208,12 +1228,18 @@ reg  [31:0] adj_data;
 
 	reg cfg_got = 0;
 	always @(posedge clk_sys) begin
+`ifndef SPK286_AT_CDC
 		reg vsd, vsd2;
+`endif
 		if(~cfg_ready || ~cfg_set) cfg_got <= cfg_set;
 		else begin
+`ifdef SPK286_AT_CDC
+			if(hdmi_vs_sys_rise) cfg_got <= cfg_set;
+`else
 			vsd  <= HDMI_TX_VS;
 			vsd2 <= vsd;
 			if(~vsd2 & vsd) cfg_got <= cfg_set;
+`endif
 		end
 	end
 

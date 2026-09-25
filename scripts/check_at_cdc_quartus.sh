@@ -18,6 +18,7 @@ docker run --rm -v "$root:/source:ro" -v "$output:/results" \
     sha256sum PCAT-286.qsf PCAT-286.sv SYSTEM.sdc sys/sys_top.sdc sys/sys_top.v \
       sys/sys.qip sys/shadowmask.sv sys/at_frame_counter.sv sys/at_scanlines_status.sv \
       sys/at_scaler_config.sv sys/math.sv \
+      sys/at_hdmi_vsync.sv \
       rtl/spk286_integration/spk286_integration.qip \
       rtl/spk286_integration/spk286_at_video_adapter.sv \
       rtl/spk286_integration/at_video_options_cdc.sv \

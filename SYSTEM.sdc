@@ -213,8 +213,14 @@ if {$at_cdc_enabled && $at_require_new} {
     at_snapshot capture_field_history 5.0
     # Completed UIO configuration is held until ack, then applied at HDMI VS.
     at_snapshot HDMI_shadowmask*g_at_config*config_mailbox 5.0
+    # Adaptive H/V flags are published after the coefficient write pipeline
+    # drains; the receiver applies the held pair at vertical blank.
+    at_snapshot ascal*g_at_poly_control*poly_adaptive_config 5.0
     # Source-registered VS level; only the second stage drives edge detection.
     at_sync frame_counter_vs $AT_VIDEO_OUT {*u_at_frame_counter|vs_meta}
+    # Registered HDMI output VS -> continuously running sys receiver. Only
+    # stage one is asynchronous; edge detection and all consumers remain timed.
+    at_sync hdmi_vsync $AT_HDMI {*u_at_hdmi_vsync|vs_meta}
 
     # Packed/planar selection is registered in the video domain before its
     # two-stage level synchronizer. Only the asynchronous first stage is cut.

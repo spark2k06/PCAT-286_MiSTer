@@ -244,6 +244,8 @@ ENTITY ascal IS
 		poly_dw  : IN unsigned(9 DOWNTO 0);
 		poly_a   : IN unsigned(FRAC+3 DOWNTO 0);
 		poly_wr  : IN std_logic;
+		-- AT transaction envelope, aligned with poly_wr in poly_clk.
+		at_poly_active : IN std_logic := '0';
 
 		------------------------------------
 		-- Avalon
@@ -1068,7 +1070,9 @@ ARCHITECTURE rtl OF ascal IS
 	SIGNAL o_poly_lerp_ta, o_poly_lerp_tb : signed(9 DOWNTO 0);
 	SIGNAL o_h_poly_t,o_h_poly_t2,o_v_poly_t   : type_poly_t;
 
-	SIGNAL o_v_poly_adaptive, o_h_poly_adaptive, o_v_poly_use_adaptive, o_h_poly_use_adaptive : std_logic;
+	SIGNAL o_v_poly_adaptive, o_h_poly_adaptive : std_logic := '0';
+	SIGNAL o_v_poly_use_adaptive, o_h_poly_use_adaptive : std_logic;
+	SIGNAL poly_adaptive_local : std_logic_vector(1 DOWNTO 0) := "00";
 	SIGNAL poly_wr_mode : std_logic_vector(2 DOWNTO 0);
 	SIGNAL poly_tdw : unsigned(39 DOWNTO 0);
 	SIGNAL poly_a2 : unsigned(FRAC-1 DOWNTO 0);
@@ -2608,8 +2612,8 @@ BEGIN
 			hfrac3_v:=o_hfrac(3)(11 DOWNTO 12-FRAC);
 			vfrac_v:=o_vfrac(11 DOWNTO 12-FRAC);
 
-			o_v_poly_use_adaptive <= to_std_logic((o_vmode(2 DOWNTO 0)/="000") AND (o_v_poly_adaptive = '1'));
-			o_h_poly_use_adaptive <= to_std_logic((o_hmode(2 DOWNTO 0)/="000") AND (o_h_poly_adaptive = '1'));
+			o_v_poly_use_adaptive <= to_std_logic((o_vmode(2 DOWNTO 0)/="000") AND (poly_adaptive_local(1) = '1'));
+			o_h_poly_use_adaptive <= to_std_logic((o_hmode(2 DOWNTO 0)/="000") AND (poly_adaptive_local(0) = '1'));
 			o_v_poly_addr<=to_integer(o_vfrac(11 DOWNTO 12-FRAC));
 
 			-- C3 / HC3 / VC4
@@ -2722,6 +2726,35 @@ BEGIN
 
 	-----------------------------------------------------------------------------
 	-- Polyphase ROMs
+	-- RAM writes remain a lossless stream in poly_clk. Publish only the two
+	-- metadata bits after the UIO envelope and both coefficient write stages
+	-- have drained. The mailbox holds a coherent pair until acknowledged.
+	g_at_poly_control : IF AT_CDC AND ADAPTIVE GENERATE
+		SIGNAL publish : std_logic;
+		SIGNAL source_data : std_logic_vector(1 DOWNTO 0);
+		SIGNAL pending : std_logic_vector(1 DOWNTO 0);
+	BEGIN
+		source_data <= o_v_poly_adaptive & o_h_poly_adaptive;
+		publish <= '1' WHEN at_poly_active='0' AND poly_wr='0' AND poly_wr_mode="000" ELSE '0';
+		poly_adaptive_config : ENTITY work.at_cdc_snapshot_vhd
+			GENERIC MAP (WIDTH => 2)
+			PORT MAP (src_clk => poly_clk, src_send => publish,
+				src_data => source_data,
+				src_ready => OPEN, dst_clk => o_clk,
+				dst_data => pending, dst_update => OPEN);
+		PROCESS(o_clk) BEGIN
+			IF rising_edge(o_clk) THEN
+				-- Commit at vertical blank, or before output has been enabled.
+				IF o_run='0' OR (o_vsv(1)='1' AND o_vsv(0)='0') THEN
+					poly_adaptive_local <= pending;
+				END IF;
+			END IF;
+		END PROCESS;
+	END GENERATE;
+	g_legacy_poly_control : IF NOT AT_CDC OR NOT ADAPTIVE GENERATE
+		poly_adaptive_local <= o_v_poly_adaptive & o_h_poly_adaptive;
+	END GENERATE;
+
 	Polikarpov:PROCESS(poly_clk) IS
 	BEGIN
 		IF rising_edge(poly_clk) THEN

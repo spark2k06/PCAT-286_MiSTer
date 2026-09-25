@@ -7,11 +7,16 @@ USE std.env.ALL;
 -- with bounded backpressure and delayed, ordered burst responses.
 ENTITY at_scaler_avalon_tb IS
   GENERIC (PHASE_NS : natural := 0; INTERLACED : boolean := false;
-           LOCAL_CONFIG : boolean := false);
+           LOCAL_CONFIG : boolean := false; FILTER_TEST : boolean := false);
 END;
 ARCHITECTURE test OF at_scaler_avalon_tb IS
   SIGNAL ic,oc,ac,pc : std_logic := '0';
   SIGNAL output_clock_enable : boolean := true;
+  SIGNAL filter_clock_enable, poly_clock_enable : boolean := true;
+  SIGNAL poly_active, poly_write : std_logic := '0';
+  SIGNAL poly_address : unsigned(11 DOWNTO 0) := (OTHERS=>'0');
+  SIGNAL poly_data : unsigned(9 DOWNTO 0) := (OTHERS=>'0');
+  SIGNAL scaler_mode : unsigned(4 DOWNTO 0);
   SIGNAL reset_na,hs,vs,de,field : std_logic := '0';
   SIGNAL ohs,ovs,ode,ordr : std_logic;
   SIGNAL red,green,blue : unsigned(7 DOWNTO 0);
@@ -38,10 +43,47 @@ BEGIN
     WAIT FOR PHASE_NS * 1 ns;
     LOOP
       WAIT FOR 3.367 ns;
-      IF output_clock_enable THEN oc<=NOT oc; END IF;
+      IF output_clock_enable AND filter_clock_enable THEN oc<=NOT oc; END IF;
     END LOOP;
   END PROCESS;
-  ac<=NOT ac AFTER 5 ns; pc<=NOT pc AFTER 10 ns;
+  ac<=NOT ac AFTER 5 ns;
+  PROCESS BEGIN WAIT FOR 10 ns; IF poly_clock_enable THEN pc<=NOT pc; END IF; END PROCESS;
+  scaler_mode <= "01100" WHEN FILTER_TEST ELSE "01000";
+  PROCESS
+    PROCEDURE table_write(bank : natural) IS
+    BEGIN
+      FOR word IN 0 TO 1023 LOOP
+        WAIT UNTIL falling_edge(pc);
+        poly_write<='1'; poly_address<=to_unsigned(bank*1024+word,12);
+        -- Both base and adaptive tables are normalized identity filters.
+        IF word MOD 4=1 THEN poly_data<=to_unsigned(256,10);
+        ELSE poly_data<=(OTHERS=>'0'); END IF;
+      END LOOP;
+      WAIT UNTIL falling_edge(pc); poly_write<='0';
+    END;
+  BEGIN
+    IF FILTER_TEST THEN
+      WAIT FOR 1 us; poly_active<='1';
+      table_write(0); table_write(1); table_write(2);
+      -- A long pause inside UIO is not a completed coefficient transaction.
+      poly_clock_enable<=false; WAIT FOR 100 us; poly_clock_enable<=true;
+      WAIT UNTIL falling_edge(pc); poly_active<='0';
+      WAIT FOR 90 us;
+      -- Replace H adaptive by V adaptive while the receiver clock is stopped.
+      filter_clock_enable<=false; poly_active<='1';
+      table_write(0); table_write(1); table_write(3);
+      WAIT UNTIL falling_edge(pc); poly_active<='0';
+      WAIT FOR 10 us; filter_clock_enable<=true;
+      WAIT FOR 90 us;
+      -- A horizontal-only update must preserve the vertical adaptive flag.
+      poly_active<='1'; table_write(0);
+      WAIT UNTIL falling_edge(pc); poly_active<='0';
+      WAIT FOR 90 us;
+      poly_active<='1'; table_write(1);
+      WAIT UNTIL falling_edge(pc); poly_active<='0';
+    END IF;
+    WAIT;
+  END PROCESS;
   PROCESS(ic)
     VARIABLE h,v : natural := 0;
   BEGIN
@@ -58,18 +100,18 @@ BEGIN
   END PROCESS;
   dut: ENTITY work.ascal
     GENERIC MAP(AT_CDC=>true, AT_LOCAL_CONFIG=>LOCAL_CONFIG, RAMBASE=>x"20000000", IHRES=>128, OHRES=>2304,
-      PALETTE=>false,PALETTE2=>false,ADAPTIVE=>false,FRAC=>8,N_DW=>128,N_AW=>28)
+      PALETTE=>false,PALETTE2=>false,ADAPTIVE=>FILTER_TEST,FRAC=>8,N_DW=>128,N_AW=>28)
     PORT MAP(i_clk=>ic,i_ce=>'1',i_r=>x"55",i_g=>x"55",i_b=>x"55",
       i_hs=>hs,i_vs=>vs,i_de=>de,i_fl=>field,
       o_clk=>oc,o_ce=>'1',o_r=>red,o_g=>green,o_b=>blue,o_hs=>ohs,o_vs=>ovs,
       o_de=>ode,o_vbl=>OPEN,o_brd=>ordr,o_lltune=>OPEN,
-      i_hdmax=>hd,i_vdmax=>vd,mode=>"01000",run=>running,
-      at_input_mode=>"01000",at_config_update=>config_update,at_config_retime=>config_retime,
+      i_hdmax=>hd,i_vdmax=>vd,mode=>scaler_mode,run=>running,
+      at_input_mode=>scaler_mode,at_config_update=>config_update,at_config_retime=>config_retime,
       o_fb_ena=>fb_enable,o_fb_hsize=>64,o_fb_vsize=>16,
       o_fb_format=>"000101",o_fb_base=>fb_base,
       htotal=>out_htotal,hsstart=>136,hsend=>144,hdisp=>128,hmin=>16,hmax=>111,
       vtotal=>out_vtotal,vsstart=>out_vsstart,vsend=>out_vsend,vdisp=>out_vdisp,vmin=>8,vmax=>39,
-      poly_clk=>pc,poly_dw=>(OTHERS=>'0'),poly_a=>(OTHERS=>'0'),poly_wr=>'0',
+      poly_clk=>pc,poly_dw=>poly_data,poly_a=>poly_address,poly_wr=>poly_write,at_poly_active=>poly_active,
       avl_clk=>ac,avl_waitrequest=>waitreq,avl_readdata=>rdata,avl_readdatavalid=>rv,
       avl_burstcount=>bc,avl_writedata=>wd,avl_address=>addr,avl_write=>wr,avl_read=>rd,
       avl_byteenable=>be,reset_na=>reset_na,pal1_dr=>OPEN,pal2_dr=>OPEN);

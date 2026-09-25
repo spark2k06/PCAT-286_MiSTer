@@ -68,6 +68,14 @@ if {$mode eq "baseline"} {
         scaler_frame_retime {*u_at_scaler_config|output_retime *u_at_scaler_config*scaler_frame_config|dst_update} {*ascal|*}
         scaler_input_mode {*u_at_scaler_config|input_mode[*]} {*ascal|i_mode[*]}
         scaler_aspect_readback {*u_at_scaler_config*aspect_readback|dst_data[*]} {*}
+        adaptive_flags_source {*ascal|o_h_poly_adaptive *ascal|o_v_poly_adaptive} {*ascal*g_at_poly_control*poly_adaptive_config|payload_q[*]}
+        adaptive_flags_apply {*ascal*g_at_poly_control*poly_adaptive_config|dst_data[*]} {*ascal|poly_adaptive_local[*]}
+        adaptive_flags_commit {*ascal|o_run *ascal|o_vsv[*]} {*ascal|poly_adaptive_local[*]}
+        adaptive_flags_local {*ascal|poly_adaptive_local[*]} {*}
+        hdmi_vsync_sync {*u_at_hdmi_vsync|vs_meta} {*u_at_hdmi_vsync|vs_sync}
+        hdmi_vsync_consumers {*u_at_hdmi_vsync|vs_sync *u_at_hdmi_vsync|vs_seen} {*}
+        hdmi_vsync_wait {*u_at_hdmi_vsync|vs_sync *u_at_hdmi_vsync|vs_seen} {vs_wait}
+        hdmi_vsync_pll {*u_at_hdmi_vsync|vs_sync *u_at_hdmi_vsync|vs_seen} {cfg_got}
     } {
         lappend groups $label [list -from [regs ${label}_src $src] -to [regs ${label}_dst $dst]]
     }
@@ -82,6 +90,7 @@ if {$mode eq "baseline"} {
         video_geometry_config video_geometry_cdc
         video_options_config u_at_video_options*config_mailbox
         scanlines_status_config u_at_scanlines_status*config_mailbox
+        adaptive_flags_config ascal*g_at_poly_control*poly_adaptive_config
     } {
         # Selectors may contain wildcards; report filenames must work on Windows.
         set src [regs ${label}_src "*${instance}|payload_q\[*\]"]

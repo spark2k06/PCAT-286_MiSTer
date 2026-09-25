@@ -13,8 +13,13 @@ docker run --rm -v "$root:/work:ro" -v "$build:/results" -w /results \
     ghdl -r --std=08 at_scaler_avalon_tb -gPHASE_NS=3 -gINTERLACED=true --assert-level=error --ieee-asserts=disable --vcd=interlaced.vcd
     ghdl -r --std=08 at_scaler_avalon_tb -gLOCAL_CONFIG=true --assert-level=error --ieee-asserts=disable --vcd=local.vcd
     ghdl -r --std=08 at_scaler_avalon_tb -gLOCAL_CONFIG=true -gPHASE_NS=3 -gINTERLACED=true --assert-level=error --ieee-asserts=disable --vcd=local-interlaced.vcd
+    ghdl -r --std=08 at_scaler_avalon_tb -gLOCAL_CONFIG=true -gFILTER_TEST=true --assert-level=error --ieee-asserts=disable --vcd=filter.vcd
+    ghdl -r --std=08 at_scaler_avalon_tb -gLOCAL_CONFIG=true -gFILTER_TEST=true -gPHASE_NS=3 -gINTERLACED=true --assert-level=error --ieee-asserts=disable --vcd=filter-interlaced.vcd
   ' >"$build/ghdl.log" 2>&1 || { tail -40 "$build/ghdl.log"; exit 1; }
 grep AT_SCALER_AVALON_PASS "$build/ghdl.log"
-for mode in progressive interlaced local local-interlaced; do
+for mode in progressive interlaced local local-interlaced filter filter-interlaced; do
   python3 "$root/scripts/check_at_scaler_vcd.py" "$build/$mode.vcd" | tee "$build/$mode.log"
+done
+for mode in filter filter-interlaced; do
+  python3 "$root/scripts/check_at_scaler_filter_vcd.py" "$build/$mode.vcd" | tee "$build/$mode-filter.log"
 done

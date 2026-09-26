@@ -303,7 +303,6 @@ module spk286_at_rtc_cmos (
                 7'h0D: read_cmos_byte = 8'h80;
                 7'h2E: read_cmos_byte = checksum_q[15:8];
                 7'h2F: read_cmos_byte = checksum_q[7:0];
-                7'h37: read_cmos_byte = cmos_q[7'h32];
                 default: read_cmos_byte = cmos_q[address];
             endcase
         end
@@ -374,9 +373,10 @@ module spk286_at_rtc_cmos (
                 (mgmt_address[6:0] != 7'h2E) &&
                 (mgmt_address[6:0] != 7'h2F) &&
                 !is_fixed_memory_address(mgmt_address[6:0])) begin
+                // 32h is the AT century byte; 37h is independent NVRAM.
+                // MRBIOS checksums 37h but excludes 32h, so aliasing them
+                // invalidates its configuration when DOS sets the date.
                 cmos_q[mgmt_address[6:0]] <= mgmt_writedata[7:0];
-                if (mgmt_address[6:0] == 7'h37)
-                    cmos_q[7'h32] <= mgmt_writedata[7:0];
                 if (is_checksum_address(mgmt_address[6:0]))
                     checksum_q <= checksum_q -
                                   {8'h00, cmos_q[mgmt_address[6:0]]} +
@@ -393,8 +393,6 @@ module spk286_at_rtc_cmos (
                 checksum_q[7:0] <= request_byte;
             else begin
                 cmos_q[index_q] <= request_byte;
-                if (index_q == 7'h37)
-                    cmos_q[7'h32] <= request_byte;
                 if (is_checksum_address(index_q))
                     checksum_q <= checksum_q -
                                   {8'h00, cmos_q[index_q]} +

@@ -8,9 +8,9 @@
 // battery-backed state: initialize it at FPGA configuration, retain it across
 // machine resets, and accept host writes even while CPU I/O is held in reset.
 //
-// The baseline AT memory profile contains 1 MiB of RAM: 640 KiB at
-// 000000h-09FFFFh plus 384 KiB at 100000h-15FFFFh. The Hardware OSD can select
-// larger profiles; their extended-memory CMOS fields follow the applied map.
+// The default AT memory profile contains 4 MiB of RAM: 640 KiB at
+// 000000h-09FFFFh plus 3456 KiB at 100000h-45FFFFh. The Hardware OSD can select
+// other profiles; their extended-memory CMOS fields follow the applied map.
 `timescale 1ns/1ps
 
 module spk286_at_rtc_cmos (
@@ -48,9 +48,9 @@ module spk286_at_rtc_cmos (
 
     localparam logic [7:0] CMOS_BASE_LOW       = 8'h80; // 640 KiB = 0280h
     localparam logic [7:0] CMOS_BASE_HIGH      = 8'h02;
-    localparam logic [7:0] CMOS_EXTENDED_LOW   = 8'h80; // 384 KiB = 0180h
-    localparam logic [7:0] CMOS_EXTENDED_HIGH  = 8'h01;
-    localparam logic [15:0] CMOS_INITIAL_SUM   = 16'h0103;
+    localparam logic [7:0] CMOS_EXTENDED_LOW   = 8'h80; // 3456 KiB = 0D80h
+    localparam logic [7:0] CMOS_EXTENDED_HIGH  = 8'h0D;
+    localparam logic [15:0] CMOS_INITIAL_SUM   = 16'h010F;
 
     logic       io_state_q;
     logic [1:0] io_byte_enable_q;
@@ -90,11 +90,12 @@ module spk286_at_rtc_cmos (
             // conventional base. The 16 MiB class follows the 16-bit-bus AT
             // map and reserves the top 128 KiB at FE0000h-FFFFFFh.
             case (size)
-                3'd1:    extended_memory_kib = 16'd1408;
-                3'd2:    extended_memory_kib = 16'd3456;
-                3'd3:    extended_memory_kib = 16'd7552;
-                3'd4:    extended_memory_kib = 16'd15232;
-                default: extended_memory_kib = 16'd384;
+                3'd0:    extended_memory_kib = 16'd3456;
+                3'd1:    extended_memory_kib = 16'd7552;
+                3'd2:    extended_memory_kib = 16'd15232;
+                3'd3:    extended_memory_kib = 16'd384;
+                3'd4:    extended_memory_kib = 16'd1408;
+                default: extended_memory_kib = 16'd3456;
             endcase
         end
     endfunction

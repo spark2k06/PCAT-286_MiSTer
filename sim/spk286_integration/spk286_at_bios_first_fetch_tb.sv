@@ -86,7 +86,7 @@ module spk286_at_bios_first_fetch_tb #(
 
     initial begin
         if ($test$plusargs("RAM16"))
-            installed_ram_size_osd = 3'd4;
+            installed_ram_size_osd = 3'd2;
     end
 
     logic execute_enable = 1'b1;
@@ -994,8 +994,8 @@ module spk286_at_bios_first_fetch_tb #(
         reg [8*512-1:0] wave_path;
         repeat(8) @(negedge clk); reset=0;
         wait(sdram_initialized); download_bios();
-        if (installed_ram_size_osd == 3'd4) begin
-            if (dut.installed_ram_size_q !== 3'd4 ||
+        if (installed_ram_size_osd == 3'd2) begin
+            if (dut.installed_ram_size_q !== 3'd2 ||
                 dut.u_memory_decode.extended_ram_limit !== 24'hFDFFFF)
                 $fatal(1, "RAM16 decoder profile was not applied");
             if (dut.u_devices.u_rtc.cmos_q[7'h17] !== 8'h80 ||

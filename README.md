@@ -70,9 +70,10 @@ configuration after their images have loaded.
 | `FE0000h–FEFFFFh` | 64 KiB | Unmapped in the 16 MiB profile | Reserved |
 | `FF0000h–FFFFFFh` | 64 KiB | Alias of the main system BIOS | Reset-vector alias |
 
-The **Installed RAM** OSD setting selects the extended-memory limit. The
-profiles are `15FFFFh` (1 MiB), `25FFFFh` (2 MiB), `45FFFFh` (4 MiB),
-`85FFFFh` (8 MiB) and `FDFFFFh` (16 MiB); see
+The **Installed RAM** OSD setting selects the extended-memory limit. Its
+default is 4 MiB (`000` in status bits `74:72`); the options are `45FFFFh`
+(4 MiB), `85FFFFh` (8 MiB), `FDFFFFh` (16 MiB), `15FFFFh` (1 MiB) and
+`25FFFFh` (2 MiB); see
 [Selectable PC/AT RAM size](docs/AT_MEMORY_SIZE_CONFIGURATION.md).
 
 EGA's graphics-controller map can select `A0000h–BFFFFh`, `A0000h–AFFFFh`,

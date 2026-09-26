@@ -94,32 +94,22 @@ module spk286_at_memory_decode_tb;
               "extended RAM start lost the 24-bit boundary");
         classify(24'h15FFFF, 4'h6, 1'b1);
         check(word_capable && extended_ram_select && write_allowed,
-              "extended RAM upper limit was not decoded");
+              "default 4 MiB profile lost its first extended-RAM block");
         classify(24'h160000, 4'h5, 1'b0);
+        check(word_capable && extended_ram_select && memory_cycle,
+              "default 4 MiB profile did not expose memory above 1 MiB");
+        classify(24'h45FFFF, 4'h6, 1'b1);
+        check(word_capable && extended_ram_select && write_allowed,
+              "default 4 MiB profile upper limit was not decoded");
+        classify(24'h460000, 4'h5, 1'b0);
         check(!word_capable && !extended_ram_select && !memory_cycle && unmapped_request,
-              "memory above the installed 1 MiB profile was decoded as RAM");
+              "default 4 MiB profile exposed memory above its limit");
         classify(24'hFEFFFF, 4'h6, 1'b1);
         check(!word_capable && !extended_ram_select && !write_allowed && unmapped_request,
               "high unmapped memory was exposed as SDRAM");
 
-        // Every selectable profile has an explicit, finite upper boundary.
+        // The 8 MiB profile is OSD code 001.
         installed_ram_size = 3'd1;
-        classify(24'h25FFFF, 4'h6, 1'b1);
-        check(extended_ram_select && write_allowed,
-              "2 MiB profile upper limit was not decoded");
-        classify(24'h260000, 4'h5, 1'b0);
-        check(!memory_cycle && unmapped_request,
-              "2 MiB profile exposed memory above its limit");
-
-        installed_ram_size = 3'd2;
-        classify(24'h45FFFF, 4'h6, 1'b1);
-        check(extended_ram_select && write_allowed,
-              "4 MiB profile upper limit was not decoded");
-        classify(24'h460000, 4'h5, 1'b0);
-        check(!memory_cycle && unmapped_request,
-              "4 MiB profile exposed memory above its limit");
-
-        installed_ram_size = 3'd3;
         classify(24'h85FFFF, 4'h6, 1'b1);
         check(extended_ram_select && write_allowed,
               "8 MiB profile upper limit was not decoded");
@@ -127,7 +117,8 @@ module spk286_at_memory_decode_tb;
         check(!memory_cycle && unmapped_request,
               "8 MiB profile exposed memory above its limit");
 
-        installed_ram_size = 3'd4;
+        // The 16 MiB profile is OSD code 010.
+        installed_ram_size = 3'd2;
         classify(24'hFDFFFF, 4'h6, 1'b1);
         check(extended_ram_select && write_allowed,
               "16 MiB profile upper limit was not decoded");
@@ -141,6 +132,23 @@ module spk286_at_memory_decode_tb;
         check(memory_cycle && system_bios_select && !extended_ram_select &&
               !unmapped_request,
               "64 KiB high BIOS alias did not start at FF0000h");
+
+        // The remaining small profiles are still selectable after the default.
+        installed_ram_size = 3'd3;
+        classify(24'h15FFFF, 4'h6, 1'b1);
+        check(extended_ram_select && write_allowed,
+              "1 MiB profile upper limit was not decoded");
+        classify(24'h160000, 4'h5, 1'b0);
+        check(!memory_cycle && unmapped_request,
+              "1 MiB profile exposed memory above its limit");
+
+        installed_ram_size = 3'd4;
+        classify(24'h25FFFF, 4'h6, 1'b1);
+        check(extended_ram_select && write_allowed,
+              "2 MiB profile upper limit was not decoded");
+        classify(24'h260000, 4'h5, 1'b0);
+        check(!memory_cycle && unmapped_request,
+              "2 MiB profile exposed memory above its limit");
         installed_ram_size = 3'd0;
 
         ems_window_enabled[0] = 1'b1;

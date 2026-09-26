@@ -115,7 +115,7 @@ module emu_at
         "P2-;",
         "P3,Hardware;",
         "P3-;",
-        "P3O[74:72],Installed RAM,1MB,2MB,4MB,8MB,16MB;",
+        "P3O[74:72],Installed RAM,4MB,8MB,16MB,1MB,2MB;",
         "P3oCD,Monitor,5154/ECD,5153/CGA,5151/MDA;",
         "P3ONO,Joystick 1, Analog, Digital, Disabled;",
         "P3OPQ,Joystick 2, Analog, Digital, Disabled;",

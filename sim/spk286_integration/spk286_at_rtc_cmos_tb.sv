@@ -210,9 +210,9 @@ module spk286_at_rtc_cmos_tb;
         check_cmos(7'h00, 8'h56, "host seconds were lost during reset");
         check_cmos(7'h0F, 8'h0A, "host shutdown byte was lost during reset");
         check_cmos(7'h7F, 8'h5A, "last host CMOS byte was lost during reset");
-        check_cmos(7'h18, 8'h01, "host reset upload replaced fixed RAM size");
+        check_cmos(7'h18, 8'h0D, "host reset upload replaced fixed RAM size");
         check_cmos(7'h2E, 8'h01, "reset upload checksum high byte was wrong");
-        check_cmos(7'h2F, 8'h94, "reset upload checksum low byte was wrong");
+        check_cmos(7'h2F, 8'hA0, "reset upload checksum low byte was wrong");
 
         cmos_write(7'h10, 8'h24);
         // Even a BIOS-supplied checksum is RAM, not resettable device state.
@@ -246,28 +246,28 @@ module spk286_at_rtc_cmos_tb;
         cmos_write(7'h14, 8'h00);
         cmos_write(7'h0F, 8'h00);
         cmos_write(7'h2E, 8'h01);
-        cmos_write(7'h2F, 8'h03);
+        cmos_write(7'h2F, 8'h0F);
 
-        // The CMOS description and actual decode agree on a 1 MiB AT:
-        // 640 KiB conventional plus 384 KiB above 1 MiB.
+        // The default CMOS description and actual decode agree on a 4 MiB AT:
+        // 640 KiB conventional plus 3456 KiB above 1 MiB.
         check_cmos(7'h15, 8'h80, "base-memory low byte was not 640 KiB");
         check_cmos(7'h16, 8'h02, "base-memory high byte was not 640 KiB");
-        check_cmos(7'h17, 8'h80, "extended-memory low byte was not 384 KiB");
-        check_cmos(7'h18, 8'h01, "extended-memory high byte was not 384 KiB");
+        check_cmos(7'h17, 8'h80, "extended-memory low byte was not 3456 KiB");
+        check_cmos(7'h18, 8'h0D, "extended-memory high byte was not 3456 KiB");
         check_cmos(7'h30, 8'h80, "duplicate extended-memory low byte differed");
-        check_cmos(7'h31, 8'h01, "duplicate extended-memory high byte differed");
+        check_cmos(7'h31, 8'h0D, "duplicate extended-memory high byte differed");
         check_cmos(7'h34, 8'h00, "memory above 16 MiB was advertised");
         check_cmos(7'h35, 8'h00, "memory above 16 MiB was advertised");
         check_cmos(7'h2E, 8'h01, "initial CMOS checksum high byte was wrong");
-        check_cmos(7'h2F, 8'h03, "initial CMOS checksum low byte was wrong");
+        check_cmos(7'h2F, 8'h0F, "initial CMOS checksum low byte was wrong");
 
         // Exercise every OSD profile explicitly. The 16 MiB selection must
         // advertise 15232 KiB (3B80h), an integral 238 blocks of 64 KiB.
-        check_ram_profile(3'd1, 16'd1408, 16'h0107);
-        check_ram_profile(3'd2, 16'd3456, 16'h010F);
-        check_ram_profile(3'd3, 16'd7552, 16'h011F);
-        check_ram_profile(3'd4, 16'd15232, 16'h013D);
-        check_ram_profile(3'd0, 16'd384, 16'h0103);
+        check_ram_profile(3'd0, 16'd3456, 16'h010F);
+        check_ram_profile(3'd1, 16'd7552, 16'h011F);
+        check_ram_profile(3'd2, 16'd15232, 16'h013D);
+        check_ram_profile(3'd3, 16'd384, 16'h0103);
+        check_ram_profile(3'd4, 16'd1408, 16'h0107);
 
         // Exact Landmark CMOS RAM algorithm (F000:A26C): save 10h-3Fh,
         // write/read 55h, write/read AAh, then restore all 48 bytes. This

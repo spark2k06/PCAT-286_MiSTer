@@ -4,19 +4,20 @@ The 80286 has a 24-bit physical address bus in protected mode, so its physical
 address ceiling is 16 MiB (`000000h–FFFFFFh`). Its 1 GiB figure is the maximum
 virtual address space per task, not physical RAM.
 
-The Hardware OSD's **Installed RAM** selector offers 1, 2, 4, 8 and 16 MiB.
-The value is sampled when **Reset & apply settings** resets the machine; the
-memory decoder and CMOS then use the same applied profile. The fixed base is
+The Hardware OSD's **Installed RAM** selector offers 4, 8, 16, 1 and 2 MiB, in
+that order. Its first option, 4 MiB, is the default (`000` in status bits
+`74:72`). The value is sampled when **Reset & apply settings** resets the
+machine; the memory decoder and CMOS then use the same applied profile. The fixed base is
 640 KiB at `000000h–09FFFFh`. Extended RAM starts at `100000h`, preserving the
 existing 384 KiB offset between the selected total and the high-memory limit.
 
-| OSD profile | Extended RAM range | CMOS extended RAM |
-|---:|---:|---:|
-| 1 MiB | `100000h–15FFFFh` | 384 KiB |
-| 2 MiB | `100000h–25FFFFh` | 1,408 KiB |
-| 4 MiB | `100000h–45FFFFh` | 3,456 KiB |
-| 8 MiB | `100000h–85FFFFh` | 7,552 KiB |
-| 16 MiB | `100000h–FDFFFFh` | 15,232 KiB |
+| OSD bits `74:72` | OSD profile | Extended RAM range | CMOS extended RAM |
+|---:|---:|---:|---:|
+| `000` | 4 MiB (default) | `100000h–45FFFFh` | 3,456 KiB |
+| `001` | 8 MiB | `100000h–85FFFFh` | 7,552 KiB |
+| `010` | 16 MiB | `100000h–FDFFFFh` | 15,232 KiB |
+| `011` | 1 MiB | `100000h–15FFFFh` | 384 KiB |
+| `100` | 2 MiB | `100000h–25FFFFh` | 1,408 KiB |
 
 The 16 MiB selection represents installed memory. Following the 86Box
 16-bit-bus AT map, CPU-visible extended RAM ends at `FDFFFFh`:

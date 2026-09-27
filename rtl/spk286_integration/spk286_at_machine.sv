@@ -30,6 +30,9 @@ module spk286_at_machine #(
     input  logic         clk_cpu,
     input  logic         cpu_sample_edge,
     input  logic         reset,
+    // The video raster can run its power-on timing while the machine remains
+    // reset for a missing system BIOS.
+    input  logic         video_reset,
     // CPU-local reset.  The AT splash holds the 286/BIU in reset while the
     // device router and EGA raster remain alive to render the splash itself.
     input  logic         cpu_reset,
@@ -839,6 +842,8 @@ module spk286_at_machine #(
         .clk                    (clk),
         .cpu_sample_edge        (cpu_sample_edge),
         .reset                  (reset),
+        .video_reset            (video_reset),
+        .prebios_video           ((reset || cpu_reset) && !video_reset),
         .clk_video              (clk_video),
         .splashscreen           (splashscreen),
         .ega_monitor_profile    (ega_monitor_profile),

@@ -83,6 +83,7 @@ module ega_top(
     // vertical blank.  MiSTer uses this to re-evaluate its video_mode mapping.
     output reg ega_vmode_toggle_out,
     input splashscreen,
+    input prebios_video,
     input thin_font,
     input scandouble_en,
     input ega_enabled,
@@ -304,12 +305,17 @@ module ega_top(
     wire [1:0] vga_unchained_profile;
     reg ega_vblank_q = 1'b0;
     wire ega_splash_active = ega_enabled & splashscreen;
+    // During a BIOS hold, keep the splash's power-on CRTC geometry active for
+    // video detection, but output black when no splash image is selected.
+    wire ega_prebios_active = ega_enabled & prebios_video;
+    wire ega_prebios_black = ega_prebios_active & !ega_splash_active;
     // The boot artwork is authored for the normal EGA connector palette.
     // Monitor switches are not applied until the BIOS starts, so keep the
     // splash on the 5154/ECD profile even when CGA or MDA is pending.
     wire [1:0] ega_monitor_profile_effective = ega_splash_active
                                               ? 2'b00 : ega_monitor_profile;
-    wire ega_display_sel = ega_enabled & (ega_video_active | ega_splash_active);
+    wire ega_display_sel = ega_enabled &
+                           (ega_video_active | ega_splash_active | ega_prebios_active);
     reg [4:0] ega_crtc_index_shadow = 5'd0;
     reg       ega_crtc_h_timing_seen = 1'b0;
     reg       ega_crtc_v_timing_seen = 1'b0;
@@ -1302,13 +1308,16 @@ module ega_top(
 
     assign bus_out = ega_bus_out_mux;
     assign bus_dir = ega_enabled ? ega_bus_dir_sel : 1'b0;
-    assign ega_red   = vga_mode13_active ? vga_red
+    assign ega_red   = ega_prebios_black ? 6'd0 :
+                       vga_mode13_active ? vga_red
                      : ega_5151_active    ? ega_5151_luma
                      : ega_dac_hit        ? vga_dac_sample_red   : ega_red_compat;
-    assign ega_green = vga_mode13_active ? vga_green
+    assign ega_green = ega_prebios_black ? 6'd0 :
+                       vga_mode13_active ? vga_green
                      : ega_5151_active    ? ega_5151_luma
                      : ega_dac_hit        ? vga_dac_sample_green : ega_green_compat;
-    assign ega_blue  = vga_mode13_active ? vga_blue
+    assign ega_blue  = ega_prebios_black ? 6'd0 :
+                       vga_mode13_active ? vga_blue
                      : ega_5151_active    ? ega_5151_luma
                      : ega_dac_hit        ? vga_dac_sample_blue  : ega_blue_compat;
     assign hsync = ega_enabled ? (vga_planar16_active ? vga_planar16_hsync :

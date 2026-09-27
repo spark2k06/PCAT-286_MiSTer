@@ -487,7 +487,8 @@ module spk286_at_machine_tb;
     );
 
     spk286_at_machine dut (
-        .clk(clk), .clk_cpu(clk), .cpu_sample_edge(1'b1), .reset(reset), .cpu_reset(reset), .clk_video(clk_video), .splashscreen(1'b0),
+        .clk(clk), .clk_cpu(clk), .cpu_sample_edge(1'b1), .reset(reset), .video_reset(reset),
+        .cpu_reset(reset), .clk_video(clk_video), .splashscreen(1'b0),
         .ega_monitor_profile(2'b00),
         .installed_ram_size_osd(3'd0),
         .at286ctl_eff_mpu401(runtime_mpu_enable),

@@ -38,7 +38,14 @@ module emu_at
 
     localparam CONF_STR_INFO = {
         "I,Monitor setting pending\n",
-        "Reset to apply;"
+        "Reset to apply\n",
+        "OSD: Hardware,",
+        "No PCAT BIOS selected\n",
+        "Machine halted\n",
+        "OSD: System & BIOS,",
+        "No EGA BIOS selected\n",
+        "Machine halted\n",
+        "OSD: System & BIOS;"
     };
 
 `ifndef SPK286_AT_NO_DEBUG
@@ -177,6 +184,10 @@ module emu_at
     wire [1:0]   at_monitor_profile_applied;
     wire         at_monitor_pending_info_req;
     wire [7:0]   at_monitor_pending_info;
+    wire         at_bios_info_req;
+    wire [7:0]   at_bios_info;
+    wire         at_info_req = at_bios_info_req | at_monitor_pending_info_req;
+    wire [7:0]   at_info = at_bios_info_req ? at_bios_info : at_monitor_pending_info;
     wire         at_monitor_profile_pending =
         at_monitor_profile_osd != at_monitor_profile_applied;
     wire         at_debug_enable = hps_status[71];
@@ -314,8 +325,8 @@ module emu_at
         .status_menumask      (hps_status_menumask),
         .video_rotated        (1'b0),
         .new_vmode            (1'b0),
-        .info_req             (at_monitor_pending_info_req),
-        .info                 (at_monitor_pending_info),
+        .info_req             (at_info_req),
+        .info                 (at_info),
         .status_in            (128'h0),
         .status_set           (1'b0),
         .uart_mode            (uart_mode),
@@ -470,7 +481,10 @@ module emu_at
 
     // Match the source profile: bits 4 and 5 expose the missing-main/EGA
     // indicators, while the lower menu bits control the MIDI/MT32-pi entries.
-    assign hps_status_menumask = {10'd0, ~ega_rom_loaded, ~main_rom_loaded,
+    wire at_bios_missing_main = !main_rom_loaded;
+    wire at_bios_missing_ega = main_rom_loaded && !ega_rom_loaded;
+    wire at_bios_required_missing = at_bios_missing_main || at_bios_missing_ega;
+    assign hps_status_menumask = {10'd0, at_bios_missing_ega, at_bios_missing_main,
                                   (`ENABLE_MIDI && mt32_available && at286ctl_eff_mpu401),
                                   3'b111};
 
@@ -823,6 +837,11 @@ module emu_at
     // Reuse the XT reset controls without clearing the loaded ROM flags.
     wire at_boot_reset = RESET | hps_status[0] | hps_buttons[1] |
                          !main_rom_loaded | !at_video_pll_locked;
+    // Keep the external raster and MiSTer output path running at the EGA
+    // power-on timing while the main BIOS is absent. The machine itself stays
+    // reset through at_boot_reset and at_machine_reset below.
+    wire at_video_output_reset = RESET | hps_status[0] | hps_buttons[1] |
+                                 !at_video_pll_locked;
     // The XT splash lifetime survives OSD reset and Reset & apply settings.
     // Only re-arm it when the core itself restarts or its boot prerequisites
     // disappear; the host reset controls belong to the machine reset below.
@@ -870,11 +889,25 @@ module emu_at
     assign at_splash_boot_hold = 1'b0;
 `endif
 
+    // Keep the processor stopped until both required firmware images exist.
+    // The periodic Info notice is independent of the optional splash artwork.
+    wire at_bios_hold;
+    spk286_at_bios_hold_notice u_at_bios_hold_notice (
+        .clock             (CLK_50M),
+        .splash_boot_phase (main_rom_loaded && at_splash_boot_hold),
+        .bios_missing_main (at_bios_missing_main),
+        .bios_missing_ega  (at_bios_missing_ega),
+        .hold              (at_bios_hold),
+        .info              (at_bios_info),
+        .info_req          (at_bios_info_req)
+    );
+
     // The splash is a real boot hold, not only a video overlay.  This keeps
     // CPU/BIU state frozen from boot settling until the image is removed.
     // As in XT, the pending interval is part of the boot hold; otherwise
     // the CPU runs before the first timer tick and is reset a second time.
-    wire at_machine_reset = at_boot_reset | at_splash_boot_hold;
+    wire at_machine_reset = at_boot_reset | at_splash_boot_hold |
+                            at_bios_required_missing | at_bios_hold;
 
     // The OSD choice represents physical EGA monitor switches. Sample it for
     // the active machine only during reset, then use that applied profile for
@@ -892,7 +925,7 @@ module emu_at
         .clock      (CLK_50M),
         .pending    (at_monitor_profile_pending),
         .osd_status (OSD_STATUS),
-        .suppress   (1'b0),
+        .suppress   (at_bios_hold),
         .info       (at_monitor_pending_info),
         .info_req   (at_monitor_pending_info_req)
     );
@@ -908,20 +941,20 @@ module emu_at
     // Reset release for each output pipeline is synchronized to its own
     // phase. This keeps PLL lock/BIOS-load reset out of recovery paths in the
     // 57.272 MHz output registers.
-    always_ff @(posedge at_video_clk_57 or posedge at_boot_reset) begin
-        if (at_boot_reset) begin
+    always_ff @(posedge at_video_clk_57 or posedge at_video_output_reset) begin
+        if (at_video_output_reset) begin
             at_video_pipe_reset_57_q1 <= 1'b1;
             at_video_pipe_reset_57_q2 <= 1'b1;
         end else begin
-            // The output pipeline must remain live while the splash is
-            // displayed; only the AT machine itself is held in reset.
+            // The output pipeline must remain live for the pre-BIOS raster and
+            // splash; only the AT machine itself stays held in reset.
             at_video_pipe_reset_57_q1 <= 1'b0;
             at_video_pipe_reset_57_q2 <= at_video_pipe_reset_57_q1;
         end
     end
 
-    always_ff @(posedge at_video_clk_57_ps or posedge at_boot_reset) begin
-        if (at_boot_reset) begin
+    always_ff @(posedge at_video_clk_57_ps or posedge at_video_output_reset) begin
+        if (at_video_output_reset) begin
             at_video_pipe_reset_57_ps_q1 <= 1'b1;
             at_video_pipe_reset_57_ps_q2 <= 1'b1;
         end else begin
@@ -1005,6 +1038,7 @@ module emu_at
         // Keep the AT devices and EGA raster alive during the splash.  Only
         // the CPU/BIU reset is extended over the splash interval.
         .reset                  (at_boot_reset),
+        .video_reset            (at_video_output_reset),
         .cpu_reset              (at_machine_reset),
         .clk_video              (at_video_clk_28),
         .splashscreen           (at_splashscreen),

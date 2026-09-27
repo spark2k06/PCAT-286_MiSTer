@@ -29,6 +29,9 @@ The supplied configuration expects these fixed memory windows:
   handler, and IRQ9 is then reserved for received MIDI bytes.
   With **USER I/O → MIDI**, it connects to an external MT32-pi; **COM2** uses
   the same USER I/O connector for the standard UART at `2F8h-2FFh`.
+- The MiSTer mouse appears as a Microsoft-compatible serial mouse on **COM1**
+  (`3F8h-3FFh`, IRQ4). Its PS/2 link is internal to the core; DOS should load
+  a serial mouse driver such as the supplied CuteMouse.
 - The MT32-pi page keeps the source choices for MT-32/General MIDI mode,
   ROM, SoundFont, reset and the optional external bridge.
 
@@ -74,7 +77,7 @@ minimal files under `hdd/`.
 ```bat
 @ECHO OFF
 SET PATH=C:\UTIL;%PATH%
-C:\UTIL\CTMOUSE\CTMOUSE.EXE
+C:\UTIL\CTMOUSE\CTMOUSE.EXE /S14 /Y
 ```
 
 The built-in devices are selected by their OSD options or by the per-program
@@ -89,10 +92,14 @@ Use `I7` if the effective Sound Blaster IRQ is 7. `T4` identifies Sound
 Blaster Pro. The variable tells DOS software where to find the device; it
 does not change the core's OSD or AT286CTL settings.
 
-The final line in the supplied example starts CuteMouse. It probes PS/2 first
-and then the serial ports, so the core's COM1 mouse normally needs no command
-line switches. See [`hdd/CTMOUSE/CTMOUSE.TXT`](../hdd/CTMOUSE/CTMOUSE.TXT)
-for explicit port, IRQ and protocol options.
+The final line in the supplied example starts CuteMouse. Install the supplied
+[`CTMOUSE`](../hdd/CTMOUSE/) directory at `C:\UTIL\CTMOUSE` or adjust the
+path. `/S14` selects BIOS COM1 with IRQ4, while `/Y` prevents CuteMouse from
+installing in Mouse Systems mode without detecting a mouse, which would show
+a cursor even though movement is unavailable. The BIOS must enumerate COM1
+at `03F8h`; the corrected AT machine decoder exposes that address. See
+[`hdd/CTMOUSE/CTMOUSE.TXT`](../hdd/CTMOUSE/CTMOUSE.TXT) for explicit port, IRQ
+and protocol options.
 
 ### Sound Blaster detection check
 

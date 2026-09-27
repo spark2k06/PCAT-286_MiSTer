@@ -56,11 +56,13 @@ module spk286_at_device_router (
     input  logic        midi_baudce,
     input  logic        uart_baudce,
     input  logic        midi_rx,
+    input  logic        uart1_rx,
     input  logic        uart2_rx,
     input  logic        uart2_cts_n,
     input  logic        uart2_dsr_n,
     input  logic        uart2_dcd_n,
     output logic        midi_tx,
+    output logic        uart1_rts_n,
     output logic        uart2_tx,
     output logic        uart2_rts_n,
     output logic        uart2_dtr_n,
@@ -171,6 +173,7 @@ module spk286_at_device_router (
     localparam logic [3:0] DEVICE_MPU401   = 4'd7;
     localparam logic [3:0] DEVICE_UART2    = 4'd8;
     localparam logic [3:0] DEVICE_EMS      = 4'd9;
+    localparam logic [3:0] DEVICE_UART1    = 4'd10;
     localparam logic [3:0] DEVICE_UNMAPPED = 4'd15;
 
     logic [2:0] router_state_q;
@@ -194,6 +197,7 @@ module spk286_at_device_router (
     logic       device_gameport_candidate;
     logic       device_sound_candidate;
     logic       device_mpu401_candidate;
+    logic       device_uart1_candidate;
     logic       device_uart2_candidate;
     logic       device_ems_candidate;
     logic       device_candidate;
@@ -251,6 +255,13 @@ module spk286_at_device_router (
     logic        mpu_interrupt;
     logic        mpu_protocol_error;
     logic [15:0] mpu_side_effect_count;
+    logic        uart1_request_accept;
+    logic        uart1_request_ready;
+    logic [15:0] uart1_read_data;
+    logic        uart1_read_data_valid;
+    logic        uart1_irq;
+    logic        uart1_protocol_error;
+    logic [15:0] uart1_side_effect_count;
     logic        uart2_request_accept;
     logic        uart2_request_ready;
     logic [15:0] uart2_read_data;
@@ -314,6 +325,10 @@ module spk286_at_device_router (
                                   request_io &&
                                   ((request_address[15:0] == 16'h0330) ||
                                    (request_address[15:0] == 16'h0331));
+        device_uart1_candidate = request_valid && request_command_valid &&
+                                 request_io &&
+                                 (request_address[15:0] >= 16'h03F8) &&
+                                 (request_address[15:0] <= 16'h03FF);
         device_uart2_candidate = (`ENABLE_MIDI) && request_valid &&
                                  request_command_valid && request_io &&
                                  (request_address[15:0] >= 16'h02F8) &&
@@ -356,7 +371,8 @@ module spk286_at_device_router (
         device_candidate = device_8042_candidate || device_rtc_candidate ||
                            device_storage_candidate || device_at286ctl_candidate ||
                            device_gameport_candidate || device_sound_candidate ||
-                           device_mpu401_candidate || device_uart2_candidate ||
+                           device_mpu401_candidate || device_uart1_candidate ||
+                           device_uart2_candidate ||
                            device_ems_candidate;
         lane_valid = ((request_address[0] == 1'b0) &&
                       (request_byte_enable == 2'b01)) ||
@@ -382,6 +398,8 @@ module spk286_at_device_router (
             selected_device = DEVICE_GAMEPORT;
         else if (device_mpu401_candidate)
             selected_device = DEVICE_MPU401;
+        else if (device_uart1_candidate)
+            selected_device = DEVICE_UART1;
         else if (device_uart2_candidate)
             selected_device = DEVICE_UART2;
         else if (device_ems_candidate)
@@ -511,6 +529,37 @@ module spk286_at_device_router (
         .irq                    (mpu_irq),
         .side_effect_count      (mpu_side_effect_count),
         .protocol_error         (mpu_protocol_error)
+    );
+
+    // COM1 is permanently present for the internal serial mouse. Asserted
+    // modem inputs match PCXT-EGA's UART1 wiring; RTS triggers mouse ID.
+    spk286_at_serial #(
+        .MPU_MODE(1'b0)
+    ) u_uart1 (
+        .clk                    (clk),
+        .reset                  (reset),
+        .baudce                 (uart_baudce),
+        .request_valid          (device_uart1_candidate),
+        .request_command_valid  (request_command_valid),
+        .request_write          (request_write),
+        .request_io             (request_io),
+        .request_address        (request_address),
+        .request_byte_enable    (request_byte_enable),
+        .request_data_out       (request_data_out),
+        .request_accept         (uart1_request_accept),
+        .request_ready          (uart1_request_ready),
+        .request_read_data      (uart1_read_data),
+        .request_read_data_valid(uart1_read_data_valid),
+        .rx                     (uart1_rx),
+        .cts_n                  (1'b0),
+        .dsr_n                  (1'b0),
+        .dcd_n                  (1'b0),
+        .tx                     (),
+        .rts_n                  (uart1_rts_n),
+        .dtr_n                  (),
+        .irq                    (uart1_irq),
+        .side_effect_count      (uart1_side_effect_count),
+        .protocol_error         (uart1_protocol_error)
     );
 
     spk286_at_serial #(
@@ -688,6 +737,8 @@ module spk286_at_device_router (
                 request_accept = gameport_request_accept;
             else if (device_mpu401_candidate)
                 request_accept = mpu_request_accept;
+            else if (device_uart1_candidate)
+                request_accept = uart1_request_accept;
             else if (device_uart2_candidate)
                 request_accept = uart2_request_accept;
             else if (device_ems_candidate)
@@ -712,6 +763,7 @@ module spk286_at_device_router (
         side_effect_count = kbd_side_effect_count + rtc_side_effect_count +
                              storage_side_effect_count + gameport_side_effect_count +
                              sound_side_effect_count + mpu_side_effect_count +
+                             uart1_side_effect_count +
                              uart2_side_effect_count + ems_side_effect_count;
         irq_request = 16'h0000;
         irq_request[1] = irq1;
@@ -727,6 +779,7 @@ module spk286_at_device_router (
         // the two lines or IDE/other slave IRQs become ambiguous.
         irq_request[9] = mpu_interrupt && at286ctl_eff_mpu401;
         irq_request[3] = uart2_irq;
+        irq_request[4] = uart1_irq;
         irq_request[6] = irq6;
         irq_request[8] = irq8;
         irq_request[14] = irq14;
@@ -751,7 +804,8 @@ module spk286_at_device_router (
     assign protocol_error = router_protocol_error_q | kbd_protocol_error |
                             rtc_protocol_error | storage_protocol_error |
                             gameport_protocol_error | sound_protocol_error |
-                            mpu_protocol_error | uart2_protocol_error |
+                            mpu_protocol_error | uart1_protocol_error |
+                            uart2_protocol_error |
                             ems_protocol_error;
 
     always_ff @(posedge clk) begin
@@ -811,6 +865,11 @@ module spk286_at_device_router (
                         router_state_q <= ROUTER_DONE;
                         response_data_q <= mpu_read_data;
                         response_data_valid_q <= mpu_read_data_valid;
+                    end else if (target_device_q == DEVICE_UART1 &&
+                                 uart1_request_ready) begin
+                        router_state_q <= ROUTER_DONE;
+                        response_data_q <= uart1_read_data;
+                        response_data_valid_q <= uart1_read_data_valid;
                     end else if (target_device_q == DEVICE_UART2 &&
                                  uart2_request_ready) begin
                         router_state_q <= ROUTER_DONE;

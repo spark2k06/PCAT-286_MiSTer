@@ -59,6 +59,8 @@ module spk286_at_devices_tb;
     wire [7:0]   at286ctl_vid;
     wire [15:0]  side_effect_count;
     wire [15:0]  irq_request;
+    logic        uart1_rx = 1'b1;
+    wire         uart1_rts_n;
     wire         devices_protocol_error;
     logic [15:0] mgmt_address = 16'h0000;
     logic [15:0] mgmt_writedata = 16'h0000;
@@ -124,7 +126,8 @@ module spk286_at_devices_tb;
     logic [15:0] dma_payloads [0:7];
 
     spk286_at_device_router devices (
-        .clk(clk), .reset(reset),
+        .clk(clk), .reset(reset), .uart_baudce(1'b1),
+        .uart1_rx(uart1_rx), .uart1_rts_n(uart1_rts_n),
         .video_reset(reset), .prebios_video(1'b0),
         .clk_video(clk_video), .splashscreen(splashscreen),
         .ega_monitor_profile(2'b00),
@@ -315,6 +318,21 @@ module spk286_at_devices_tb;
     task automatic router_read(input logic [15:0] port, output logic [7:0] value);
         begin
             router_read_lane(port, port[0] ? 2'b10 : 2'b01, value);
+        end
+    endtask
+
+    task automatic send_com1_byte(input logic [7:0] data);
+        integer bit_index;
+        begin
+            @(negedge clk);
+            uart1_rx = 1'b0;
+            repeat (16) @(negedge clk);
+            for (bit_index = 0; bit_index < 8; bit_index = bit_index + 1) begin
+                uart1_rx = data[bit_index];
+                repeat (16) @(negedge clk);
+            end
+            uart1_rx = 1'b1;
+            repeat (16) @(negedge clk);
         end
     endtask
 
@@ -535,6 +553,18 @@ module spk286_at_devices_tb;
         // not only as an isolated register-block simulation.
         router_read(16'h8980, value);
         check(value == 8'h45, "AT286CTL signature was not visible on the AT bus");
+
+        // COM1 is the internal serial mouse's UART, independent of MIDI.
+        router_write(16'h03fb, 8'h03);
+        router_write(16'h03f9, 8'h01);
+        router_write(16'h03fc, 8'h02);
+        check(!uart1_rts_n, "COM1 RTS did not reach the mouse boundary");
+        send_com1_byte(8'h4d);
+        check(irq_request[4], "COM1 receive did not assert AT IRQ4");
+        router_read(16'h03f8, value);
+        check(value == 8'h4d, "COM1 receive byte did not reach port 3F8h");
+        repeat (3) @(posedge clk);
+        check(!irq_request[4], "COM1 IRQ4 did not clear after RX read");
 
         router_write(16'h0201, 8'h00);
         repeat (36000) @(posedge clk);

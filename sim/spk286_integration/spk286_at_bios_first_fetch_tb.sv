@@ -926,7 +926,7 @@ module spk286_at_bios_first_fetch_tb #(
     spk286_at_machine #(
         .CPU_USES_SAMPLE_EDGE(CPU_DIV2_TEST)
     ) dut (
-        .clk(clk), .clk_cpu(clk_cpu),
+        .clk(clk), .clk_cpu(clk_cpu), .uart1_rx(1'b1),
         .cpu_sample_edge(CPU_DIV2_TEST ? ~clk_cpu_div : 1'b1),
         .reset(reset | machine_boot_reset), .video_reset(reset | machine_boot_reset),
         .cpu_reset(reset | cpu_boot_reset), .clk_video(clk_video), .splashscreen(1'b0),

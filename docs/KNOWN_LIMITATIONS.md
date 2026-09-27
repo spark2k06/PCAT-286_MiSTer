@@ -60,8 +60,9 @@ Older I0–I6 statements below describe their original acceptance scope.
 - The default `XT_COMPAT` machine remains XT-derived. The optional
   `AT_PROFILE` adds the AT CPU/bus/device composition and real EGA path, but
   it is not yet a complete IBM PC/AT implementation: real media, physical
-  PS/2 handling, 16-bit ISA timing and full DOS/hardware acceptance remain
-  pending.
+  full AT keyboard-device command handling, 16-bit ISA timing and full
+  DOS/hardware acceptance remain pending. The MiSTer mouse now uses the
+  imported PS/2-to-COM1 path; physical mouse acceptance is still pending.
   The CPU-visible 8042 now implements the IBM AT commands and status needed by
   the Landmark U126 and scan-lines diagnostics. The physical HPS path still
   needs complete make/break/extended conversion and keyboard-device command

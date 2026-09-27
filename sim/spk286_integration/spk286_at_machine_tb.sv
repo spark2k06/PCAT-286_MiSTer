@@ -493,6 +493,7 @@ module spk286_at_machine_tb;
         .installed_ram_size_osd(3'd0),
         .at286ctl_eff_mpu401(runtime_mpu_enable),
         .midi_baudce(1'b1), .uart_baudce(1'b1), .midi_rx(runtime_midi_rx),
+        .uart1_rx(1'b1),
         .uart2_rx(1'b1), .uart2_cts_n(1'b1), .uart2_dsr_n(1'b1),
         .uart2_dcd_n(1'b1),
         .execute_enable(execute_enable),

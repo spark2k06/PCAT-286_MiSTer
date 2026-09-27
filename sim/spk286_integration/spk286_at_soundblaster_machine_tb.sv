@@ -23,7 +23,7 @@ module spk286_at_soundblaster_machine_tb;
         .at286ctl_eff_ems(1'b0), .at286ctl_eff_umb(1'b0),
         .installed_ram_size_osd(3'd0),
         .midi_baudce(1'b0), .uart_baudce(1'b0),
-        .midi_rx(1'b1), .uart2_rx(1'b1), .uart2_cts_n(1'b1),
+        .midi_rx(1'b1), .uart1_rx(1'b1), .uart2_rx(1'b1), .uart2_cts_n(1'b1),
         .uart2_dsr_n(1'b1), .uart2_dcd_n(1'b1),
         .vga_enabled(1'b0), .vga_mode13_native(1'b0),
         .crt_h_offset(4'd0), .crt_v_offset(3'd0),

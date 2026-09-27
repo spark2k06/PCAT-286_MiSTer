@@ -25,6 +25,10 @@ module spk286_at_config_tb;
 
     initial begin
         #1;
+        if (!dut.u_at_machine.is_a5_io_port(16'h03f8) ||
+            !dut.u_at_machine.is_a5_io_port(16'h03ff) ||
+            dut.u_at_machine.is_a5_io_port(16'h0400))
+            $fatal(1, "AT_CONFIG: COM1 does not reach the AT device router");
         config_text = "";
         byte_count = $bits(dut.hps_io_at.CONF_STR) / 8;
         for (integer i = 0; i < byte_count; i = i + 1) begin

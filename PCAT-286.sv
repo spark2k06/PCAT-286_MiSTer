@@ -300,13 +300,13 @@ module emu_at
     wire [15:0] ioctl_data;
     wire        ioctl_wait;
 
-    // No legacy PS/2 device is instantiated in this profile.  hps_io still
-    // supplies its decoded event stream, which is translated into the AT
-    // 8042 host-byte boundary below.
+    // The keyboard uses the decoded HPS event stream at the AT 8042 boundary.
+    // The mouse retains the source profile's PS/2 wire protocol and serial
+    // COM1 converter so DOS sees a Microsoft-compatible mouse at 3F8h.
     wire ps2_kbd_clk_in  = 1'b1;
     wire ps2_kbd_data_in = 1'b1;
-    wire ps2_mouse_clk_in  = 1'b1;
-    wire ps2_mouse_data_in = 1'b1;
+    wire ps2_mouse_clk_in;
+    wire ps2_mouse_data_in;
 
     hps_io #(
         .CONF_STR (CONF_STR_AT),
@@ -374,6 +374,17 @@ module emu_at
                          mt32_midi_connected ?
                            mt32_pi_midi_rx : 1'b1;
     wire       midi_tx;
+    wire       uart1_rx;
+    wire       uart1_rts_n;
+    MSMouseWrapper #(.CLKFREQ(50_000_000)) u_serial_mouse (
+        .clk          (CLK_50M),
+        .ps2dta_in    (ps2_mouse_data_out),
+        .ps2clk_in    (ps2_mouse_clk_out),
+        .ps2dta_out   (ps2_mouse_data_in),
+        .ps2clk_out   (ps2_mouse_clk_in),
+        .rts          (~uart1_rts_n),
+        .rd           (uart1_rx)
+    );
     wire       uart2_rx = user_io_mt32 ? 1'b1 : USER_IN[0];
     wire       uart2_cts_n = user_io_mt32 ? 1'b1 : USER_IN[3];
     wire       uart2_dsr_n = user_io_mt32 ? 1'b1 : USER_IN[5];
@@ -398,8 +409,8 @@ module emu_at
     wire       mt32_use = user_io_mt32 && !mt32_disable;
     wire       mt32_mute = user_io_mt32 && mt32_disable;
 
-    // Exact MIDI baud enable: 50 MHz / (4 * 16 * 25) = 31250 baud. COM2
-    // receives the standard 1.8432 MHz x16 reference for 115200 baud.
+    // Exact MIDI baud enable: 50 MHz / (4 * 16 * 25) = 31250 baud. Both
+    // serial ports receive the standard 1.8432 MHz x16 reference.
     logic [1:0]  midi_baud_div_q;
     logic [25:0] uart_baud_phase_q;
     logic        midi_baudce;
@@ -1057,6 +1068,7 @@ module emu_at
         .midi_baudce           (midi_baudce),
         .uart_baudce           (uart_baudce),
         .midi_rx               (midi_rx),
+        .uart1_rx              (uart1_rx),
         .uart2_rx              (uart2_rx),
         .uart2_cts_n           (uart2_cts_n),
         .uart2_dsr_n           (uart2_dsr_n),
@@ -1207,6 +1219,7 @@ module emu_at
         .sb_sound_l             (at_sb_sound_l),
         .sb_sound_r             (at_sb_sound_r),
         .midi_tx               (midi_tx),
+        .uart1_rts_n           (uart1_rts_n),
         .uart2_tx              (uart2_tx),
         .uart2_rts_n           (uart2_rts_n),
         .uart2_dtr_n           (uart2_dtr_n),

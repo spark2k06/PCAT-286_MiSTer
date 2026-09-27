@@ -53,6 +53,7 @@ module spk286_at_machine #(
     input  logic         midi_baudce,
     input  logic         uart_baudce,
     input  logic         midi_rx,
+    input  logic         uart1_rx,
     input  logic         uart2_rx,
     input  logic         uart2_cts_n,
     input  logic         uart2_dsr_n,
@@ -146,6 +147,7 @@ module spk286_at_machine #(
     output logic signed [15:0] sb_sound_l,
     output logic signed [15:0] sb_sound_r,
     output logic         midi_tx,
+    output logic         uart1_rts_n,
     output logic         uart2_tx,
     output logic         uart2_rts_n,
     output logic         uart2_dtr_n,
@@ -599,6 +601,7 @@ module spk286_at_machine #(
                             ((port >= 16'h8980) && (port <= 16'h898F)) ||
                             ((port >= 16'h01F0) && (port <= 16'h01F7)) ||
                             ((port >= 16'h0200) && (port <= 16'h0207)) ||
+                            ((port >= 16'h03F8) && (port <= 16'h03FF)) ||
                             ((`ENABLE_MIDI) &&
                              (port >= 16'h02F8) && (port <= 16'h02FF)) ||
                             ((`ENABLE_MIDI) &&
@@ -873,11 +876,13 @@ module spk286_at_machine #(
         .midi_baudce           (midi_baudce),
         .uart_baudce           (uart_baudce),
         .midi_rx               (midi_rx),
+        .uart1_rx              (uart1_rx),
         .uart2_rx              (uart2_rx),
         .uart2_cts_n           (uart2_cts_n),
         .uart2_dsr_n           (uart2_dsr_n),
         .uart2_dcd_n           (uart2_dcd_n),
         .midi_tx               (midi_tx),
+        .uart1_rts_n           (uart1_rts_n),
         .uart2_tx              (uart2_tx),
         .uart2_rts_n           (uart2_rts_n),
         .uart2_dtr_n           (uart2_dtr_n),

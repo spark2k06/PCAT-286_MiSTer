@@ -35,6 +35,7 @@ module spk286_at_devices_tb;
 
     logic        keyboard_byte_valid = 1'b0;
     logic [7:0]  keyboard_byte = 8'h00;
+    wire         keyboard_byte_ready;
     wire         keyboard_output_valid;
     wire [7:0]   keyboard_output_byte;
     wire         irq1;
@@ -152,6 +153,7 @@ module spk286_at_devices_tb;
         .unmapped_request(unmapped_request),
         .keyboard_byte_valid(keyboard_byte_valid),
         .keyboard_byte(keyboard_byte),
+        .keyboard_byte_ready(keyboard_byte_ready),
         .keyboard_output_valid(keyboard_output_valid),
         .keyboard_output_byte(keyboard_output_byte), .irq1(irq1),
         .a20_enable(a20_enable), .cpu_reset_request(cpu_reset_request),
@@ -605,6 +607,18 @@ module spk286_at_devices_tb;
               "8042 self-test did not set command/system/output status");
         router_read(16'h0060, value);
         check(value == 8'h55, "8042 AA self-test response was not 55h");
+        check(!keyboard_byte_ready && a20_enable,
+              "8042 self-test did not inhibit keyboard and restore output port");
+        router_write(16'h0064, 8'h20);
+        router_wait_8042_output(value);
+        router_read(16'h0060, value);
+        check(value == 8'h10,
+              "8042 self-test did not reinitialize the command byte");
+        router_write(16'h0064, 8'hD0);
+        router_wait_8042_output(value);
+        router_read(16'h0060, value);
+        check(value == 8'hCF,
+              "8042 self-test did not reinitialize the output port");
         router_write(16'h0064, 8'hAB);
         router_wait_8042_output(value);
         router_read(16'h0060, value);

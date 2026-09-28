@@ -75,6 +75,21 @@ module spk286_at_bios_first_fetch_tb #(
     integer warm_reset_pulses_before = 0;
     integer warm_reset_fetches_before = 0;
     integer warm_reset_cpu_fetches_before = 0;
+    logic mrbios_soft_restart = 1'b0;
+    integer mrbios_restarts = 0;
+    integer mrbios_restart_target = 3;
+    integer mrbios_last_post_writes = 0;
+    logic [7:0] last_post_code = 0;
+    logic mrbios_fault_seen = 0;
+    logic mrbios_return_seen = 0;
+    logic mrbios_irq_fixture = 0;
+    logic mrbios_irq_injected = 0;
+    logic mrbios_cad_seen = 0;
+    integer mrbios_timer_irqs = 0;
+    integer mrbios_rep_writes = 0;
+    integer mrbios_fixture_bytes = 0;
+    reg [8*512-1:0] mrbios_fixture_path;
+    logic [7:0] mrbios_fixture [0:1023];
     logic keyboard_warm_reset_test = 1'b0;
     logic keyboard_warm_reset_injected = 1'b0;
     logic forced_warm_reset_test = 1'b0;
@@ -339,7 +354,10 @@ module spk286_at_bios_first_fetch_tb #(
                 @(negedge clk);
                 guard = guard + 1;
                 if (guard > 100000)
-                    $fatal(1, "keyboard injection timeout byte=%02h", value);
+                    $fatal(1, "keyboard injection timeout byte=%02h csip=%04h:%04h flags=%04h gpr=%032h irq=%04h intr=%b hlt=%b obf=%b data=%02h timer_irqs=%0d", value,
+                           debug_cs, debug_ip, dut.debug_flags, dut.debug_gpr,
+                           irq_request, intr, cpu_halted, keyboard_output_valid,
+                           keyboard_output_byte, mrbios_timer_irqs);
             end
             keyboard_byte = value;
             keyboard_byte_valid = 1'b1;
@@ -439,6 +457,8 @@ module spk286_at_bios_first_fetch_tb #(
             saw_low_rom_fetch <= 1'b0;
             first_bios_read_count <= 0;
         end else begin
+            if (mrbios_irq_fixture && dut.debug_event_completed && debug_event_vector == 8'h08)
+                mrbios_timer_irqs <= mrbios_timer_irqs + 1;
             if (trace_boot) begin
                 if (dut.irq0 != trace_irq0_prev && trace_lines < 160) begin
                     $display("TRACE_IRQ0 level=%b csip=%04h:%04h ticks=%04h:%04h",
@@ -450,6 +470,9 @@ module spk286_at_bios_first_fetch_tb #(
             end
             if (!profile_probe && backend_accept && (backend_owner == 2'd0)) begin
                 accepted_memory_beats <= accepted_memory_beats + 1;
+                if (mrbios_irq_fixture && backend_write && debug_cs == 0 &&
+                    backend_address >= 25'h0020000 && backend_address < 25'h0030000)
+                    mrbios_rep_writes <= mrbios_rep_writes + 1;
                 if (backend_address == 25'h00FFFF0 &&
                     dut.at_memory_address == 24'hFFFFF0) begin
                     saw_native_reset_fetch <= 1'b1;
@@ -495,6 +518,10 @@ module spk286_at_bios_first_fetch_tb #(
                 (cpu_bus_status == 4'hA)) begin
                 accepted_io_writes <= accepted_io_writes + 1;
                 if (cpu_address[15:0] == 16'h0080) begin
+                    last_post_code <= cpu_data_out[7:0];
+                    if ($test$plusargs("TRACE_POST"))
+                        $display("TRACE_POST t=%0t csip=%04h:%04h code=%02h", $time,
+                                 debug_cs, debug_ip, cpu_data_out[7:0]);
                     if (port80_writes < 4)
                         port80_sequence[port80_writes] <= cpu_data_out[7:0];
                     port80_writes <= port80_writes + 1;
@@ -783,6 +810,17 @@ module spk286_at_bios_first_fetch_tb #(
         if (CPU_DIV2_TEST)
             $display("CPU_DIV2 enabled");
         trace_boot = $test$plusargs("TRACE_BOOT");
+        mrbios_irq_fixture = $value$plusargs("MRBIOS_IRQ_FIXTURE=%s", mrbios_fixture_path);
+        if (mrbios_irq_fixture) begin
+            rom_file = $fopen(mrbios_fixture_path, "rb");
+            if (!rom_file) $fatal(1, "Cannot open MR BIOS IRQ RAM fixture");
+            mrbios_fixture_bytes = $fread(mrbios_fixture, rom_file);
+            $fclose(rom_file);
+            if (!mrbios_fixture_bytes || mrbios_fixture_bytes >= 1024)
+                $fatal(1, "Invalid MR BIOS IRQ RAM fixture size");
+        end
+        mrbios_soft_restart = $test$plusargs("MRBIOS_SOFT_RESTART") || mrbios_irq_fixture;
+        if ($value$plusargs("MRBIOS_RESTARTS=%d", mrbios_restart_target)) begin end
         phoenix_pm87 = $test$plusargs("PHOENIX_PM87");
         for (index = 0; index < 4; index = index + 1)
             port80_sequence[index] = 8'h00;
@@ -1075,6 +1113,73 @@ module spk286_at_bios_first_fetch_tb #(
         cpu_boot_reset=0;
         for(cycles=0;cycles<max_cpu_cycles;cycles=cycles+1) begin
             @(negedge clk);
+            if (mrbios_soft_restart) begin
+                if (mrbios_irq_fixture && debug_cs == 16'hF000 &&
+                    dut.debug_instruction_retired && dut.u_cpu.debug_instruction_ip == 16'hF497 &&
+                    !mrbios_cad_seen) begin
+                    mrbios_cad_seen = 1;
+                    $display("MRBIOS_CAD_HANDLER restart=%0d marker=%04h timer_irqs=%0d gpr=%032h",
+                             mrbios_restarts, pins.mem['h472 >> 1], mrbios_timer_irqs, dut.debug_gpr);
+                    if (pins.mem['h472 >> 1] != 16'h1234)
+                        $fatal(1, "Keyboard handler did not commit warm marker");
+                end
+                if (mrbios_irq_fixture && last_post_code == 8'hE1 && !mrbios_irq_injected) begin
+                    mrbios_irq_injected = 1;
+                    // Give the interrupted program time to enter its idle
+                    // workload, including REP MOVSW in the stress variant.
+                    repeat (1024) @(negedge clk);
+                    inject_ctrl_alt_delete();
+                end
+                if (!mrbios_fault_seen && debug_cs == 16'hF000 && debug_ip == 16'h9067) begin
+                    mrbios_fault_seen = 1;
+                    $display("MRBIOS_RAM_FAULT restart=%0d gpr=%032h flags=%04h scratch8c=%02h",
+                             mrbios_restarts, dut.debug_gpr, dut.debug_flags, dut.u_dma.page_q[12]);
+                end
+                if (!mrbios_return_seen && debug_cs == 16'hF000 && debug_ip == 16'hA64B) begin
+                    mrbios_return_seen = 1;
+                    $display("MRBIOS_RAM_RETURN restart=%0d gpr=%032h flags=%04h scratch8c=%02h",
+                             mrbios_restarts, dut.debug_gpr, dut.debug_flags, dut.u_dma.page_q[12]);
+                end
+                if (cpu_halted)
+                    $fatal(1, "MRBIOS_HALT post=%02h csip=%04h:%04h gpr=%032h flags=%04h",
+                           last_post_code, debug_cs, debug_ip, dut.debug_gpr, dut.debug_flags);
+                if (last_post_code == 8'h0B && port80_writes != mrbios_last_post_writes) begin
+                    if (mrbios_irq_fixture && mrbios_restarts != 0 && !mrbios_cad_seen)
+                        $fatal(1, "POST repeated without executing Ctrl-Alt-Delete handler");
+                    if (mrbios_restarts == mrbios_restart_target) begin
+                        if ($test$plusargs("MRBIOS_REQUIRE_REP") && mrbios_rep_writes == 0)
+                            $fatal(1, "REP fixture never reached its memory-copy workload");
+                        $display("MRBIOS_P03_RESTART_PASS restarts=%0d irq_fixture=%0d timer_irqs=%0d rep_writes=%0d hits=%0d misses=%0d refresh=%0d",
+                                 mrbios_restarts, mrbios_irq_fixture, mrbios_timer_irqs,
+                                 mrbios_rep_writes,
+                                 p03_buffer.debug_hit_count,
+                                 p03_buffer.debug_miss_count, refresh_count);
+                        $finish;
+                    end
+                    // Preserve CPU, chipset and production SDRAM buffer state.
+                    // Execute the ROM handler's own near jump to POST.
+                    if (mrbios_irq_fixture) begin
+                        for (integer offset = 0; offset < mrbios_fixture_bytes; offset = offset + 1)
+                            pins.mem[('h7000 + offset) >> 1][(offset & 1)*8 +: 8] = mrbios_fixture[offset];
+                    end else
+                        pins.mem['h472 >> 1] = 16'h1234;
+                    mrbios_last_post_writes = port80_writes;
+                    mrbios_restarts = mrbios_restarts + 1;
+                    mrbios_fault_seen = 0;
+                    mrbios_return_seen = 0;
+                    mrbios_irq_injected = 0;
+                    mrbios_cad_seen = 0;
+                    dut.u_cpu.sim_redirect = 1;
+                    dut.u_cpu.sim_redirect_ip = mrbios_irq_fixture ? 16'h7000 : 16'hF49A;
+                    dut.u_cpu.sim_cs_load = mrbios_irq_fixture;
+                    dut.u_cpu.sim_cs = 0;
+                    @(posedge clk);
+                    #1;
+                    dut.u_cpu.sim_redirect = 0;
+                    dut.u_cpu.sim_cs_load = 0;
+                    $display("MRBIOS_P03_RESTART restart=%0d cycle=%0d", mrbios_restarts, cycles);
+                end
+            end
             if (keyboard_warm_reset_test && !keyboard_warm_reset_injected &&
                 cycles >= keyboard_warm_reset_at &&
                 keyboard_translate_set1 && keyboard_byte_ready) begin

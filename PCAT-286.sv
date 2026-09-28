@@ -1596,6 +1596,46 @@ module emu_at
     wire [23:0] at_debug_rgb_out;
 
 `ifndef SPK286_AT_NO_DEBUG
+`ifdef SPK286_AT_DEBUG_STABLE_RASTER
+    // Diagnostic output timing is independent of the EGA CRTC. A BIOS
+    // reprogramming the CRTC can otherwise freeze the last debug snapshot on
+    // screen even while the CPU and the snapshot mailbox keep running.
+    logic at_debug_ce_q;
+    logic [9:0] at_debug_hpos_q;
+    logic [8:0] at_debug_vpos_q;
+    always_ff @(posedge at_video_clk_57_ps) begin
+        if (at_video_pipe_reset_57_ps) begin
+            at_debug_ce_q   <= 1'b0;
+            at_debug_hpos_q <= 10'd0;
+            at_debug_vpos_q <= 9'd0;
+        end else begin
+            at_debug_ce_q <= ~at_debug_ce_q;
+            if (at_debug_ce_q) begin
+                if (at_debug_hpos_q == 10'd899) begin
+                    at_debug_hpos_q <= 10'd0;
+                    at_debug_vpos_q <= at_debug_vpos_q == 9'd448 ?
+                                       9'd0 : at_debug_vpos_q + 9'd1;
+                end else
+                    at_debug_hpos_q <= at_debug_hpos_q + 10'd1;
+            end
+        end
+    end
+    wire at_debug_hs = !(at_debug_hpos_q >= 10'd720 &&
+                         at_debug_hpos_q < 10'd816);
+    wire at_debug_vs = !(at_debug_vpos_q >= 9'd440 &&
+                         at_debug_vpos_q < 9'd442);
+    wire at_debug_hb = !(at_debug_hpos_q >= 10'd48 &&
+                         at_debug_hpos_q < 10'd688);
+    wire at_debug_vb = !(at_debug_vpos_q >= 9'd35 &&
+                         at_debug_vpos_q < 9'd435);
+    wire at_debug_pxl_cen = at_debug_ce_q;
+`else
+    wire at_debug_hs = at_video_hs_out_q;
+    wire at_debug_vs = at_video_vs_out_q;
+    wire at_debug_hb = at_video_hb_out_q;
+    wire at_debug_vb = at_video_vb_out_q;
+    wire at_debug_pxl_cen = at_video_ce_out_q;
+`endif
     // The single-page overlay is passive and never drives the machine.
     spk286_debug_min_overlay #(
         .COLW(8),
@@ -1605,14 +1645,18 @@ module emu_at
         .src_rst                (at_boot_reset),
         .src_clk                (CLK_50M),
         .clk                    (at_video_clk_57_ps),
-        .pxl_cen                (at_video_ce_out_q),
-        .HS                     (at_video_hs_out_q),
-        .VS                     (at_video_vs_out_q),
-        .HB                     (at_video_hb_out_q),
-        .VB                     (at_video_vb_out_q),
+        .pxl_cen                (at_debug_pxl_cen),
+        .HS                     (at_debug_hs),
+        .VS                     (at_debug_vs),
+        .HB                     (at_debug_hb),
+        .VB                     (at_debug_vb),
+`ifdef SPK286_AT_DEBUG_STABLE_RASTER
+        .rgb_in                 (24'h000000),
+`else
         .rgb_in                 ({at_video_r_out_q,
                                   at_video_g_out_q,
                                   at_video_b_out_q}),
+`endif
         .cpu_reset              (at_machine_reset | at_cpu_reset_request),
         .cpu_halted             (at_cpu_halted),
         .cpu_shutdown           (at_cpu_shutdown),
@@ -1683,7 +1727,7 @@ module emu_at
     always_ff @(posedge at_video_clk_57_ps) begin
         if (at_video_pipe_reset_57_ps)
             at_use_debug_q <= 1'b0;
-        else if (at_video_vb_out_q)
+        else if (at_debug_vb)
             at_use_debug_q <= at_debug_enable_sync2_q;
     end
 `else
@@ -1700,7 +1744,11 @@ module emu_at
                           loader_protocol_error;
 
     assign CLK_VIDEO    = at_video_clk_57_ps;
+`ifndef SPK286_AT_NO_DEBUG
+    assign CE_PIXEL     = at_use_debug_q ? at_debug_pxl_cen : at_video_ce_out_q;
+`else
     assign CE_PIXEL     = at_video_ce_out_q;
+`endif
     assign VIDEO_ARX    = at_video_arx_q;
     assign VIDEO_ARY    = at_video_ary_q;
     assign VGA_R        = at_use_debug_q ? at_debug_rgb_out[23:16] :
@@ -1709,8 +1757,13 @@ module emu_at
                           at_video_g_out_q;
     assign VGA_B        = at_use_debug_q ? at_debug_rgb_out[7:0] :
                           at_video_b_out_q;
+`ifndef SPK286_AT_NO_DEBUG
+    assign VGA_HS       = at_use_debug_q ? at_debug_hs : at_video_hs_out_q;
+    assign VGA_VS       = at_use_debug_q ? at_debug_vs : at_video_vs_out_q;
+`else
     assign VGA_HS       = at_video_hs_out_q;
     assign VGA_VS       = at_video_vs_out_q;
+`endif
     assign VGA_DE       = at_use_debug_q ?
                           (~at_debug_hb_out & ~at_debug_vb_out) :
                           at_video_de_out_q;

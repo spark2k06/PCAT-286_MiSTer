@@ -63,7 +63,8 @@ module spk286_at_keyboard_tb;
         @(negedge clk);
     endtask
 
-    task automatic expect_byte(input [7:0] expected, input bit log_key = 0);
+    task automatic expect_byte(input [7:0] expected, input bit log_key = 0,
+                               input bit expect_irq = 1);
         integer cycles;
         cycles = 0;
         // 8042 self-test/device replies are intentionally delayed by 1023
@@ -72,7 +73,8 @@ module spk286_at_keyboard_tb;
             @(negedge clk);
             cycles = cycles + 1;
         end
-        if (!obf || !irq1) $fatal(1, "Missing output/IRQ1 for %02x", expected);
+        if (!obf || irq1 !== expect_irq)
+            $fatal(1, "Missing output or wrong IRQ1 for %02x", expected);
         // Model slow BIOS service: queued prefixes/breaks must not overwrite
         // the current byte or disappear while the CPU has not read it yet.
         repeat (11) begin
@@ -155,16 +157,18 @@ module spk286_at_keyboard_tb;
         expect_sequence(64'h77F0_14F0_E177_14E1, 8);
         expect_idle();
 
-        // Retain events while AD inhibits the interface. Controller replies
-        // must not be translated and must take priority over queued events.
+        // MR BIOS enters POST without a CPU reset. Key releases may arrive
+        // while the 8042 self-test runs; its reply must not raise IRQ1 and
+        // those events must wait for BIOS keyboard reconfiguration.
         set_command_byte(8'h65);
-        write_port(16'h64, 8'hAD);
-        key_event(1, 0, 8'h32); key_event(0, 0, 8'h32);
-        expect_idle();
         write_port(16'h64, 8'hAA);
-        expect_byte(8'h55);
+        key_event(1, 0, 8'h32); key_event(0, 0, 8'h32);
+        expect_byte(8'h55, 0, 0);
         write_port(16'h64, 8'hAB);
-        expect_byte(8'h00);
+        expect_byte(8'h00, 0, 0);
+        // Self-test reinitializes the command byte and inhibits the keyboard.
+        // POST must restore its IRQ/translation policy before enabling input.
+        set_command_byte(8'h75);
         write_port(16'h64, 8'hAE);
         expect_sequence(64'hB030, 2);
         expect_idle();

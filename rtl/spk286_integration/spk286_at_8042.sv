@@ -52,6 +52,7 @@ module spk286_at_8042 (
     logic [11:0] response_delay_q;
     logic       keyboard_reset_bat_pending_q;
     logic [7:0] command_byte_q;
+    logic       system_flag_q;
     logic [7:0] output_port_q;
     logic       write_command_byte_q;
     logic       write_output_port_q;
@@ -108,7 +109,7 @@ module spk286_at_8042 (
             // last host write command/data, system flag, empty input buffer,
             // and the live controller output-buffer state.
             current_read_data = {3'b000, 1'b1, last_write_command_q,
-                                 command_byte_q[2], input_buffer_full_q,
+                                 system_flag_q, input_buffer_full_q,
                                  output_buffer_valid_q};
         else
             current_read_data = output_buffer_q;
@@ -128,9 +129,11 @@ module spk286_at_8042 (
             response_delay_q <= 12'd0;
             keyboard_reset_bat_pending_q <= 1'b0;
             command_byte_q <= 8'h01;
+            system_flag_q <= 1'b0;
             // The IBM AT releases the CPU reset line with its A20 gate
             // closed. BIOS POST opens it explicitly through the 8042
-            // output-port protocol (P2=01h; only bits 0 and 1 are modelled).
+            // output-port protocol (P2=01h; only the reset and A20 pins have
+            // behavioral effects).
             output_port_q <= 8'h01;
             write_command_byte_q <= 1'b0;
             write_output_port_q <= 1'b0;
@@ -192,7 +195,16 @@ module spk286_at_8042 (
                         end
                         8'h60: write_command_byte_q <= 1'b1;
                         8'hAA: begin
-                            command_byte_q[2] <= 1'b1;
+                            // The AT controller self-test reinitializes its
+                            // command byte and output port. In particular it
+                            // inhibits keyboard input and IRQ1 while POST
+                            // consumes the 55h reply. Keep the status system
+                            // flag independent of the new command byte.
+                            command_byte_q <= 8'h10;
+                            system_flag_q <= 1'b1;
+                            keyboard_enabled_q <= 1'b0;
+                            output_port_q <= 8'hCF;
+                            keyboard_reset_bat_pending_q <= 1'b0;
                             response_pending_data_q <= 8'h55;
                             response_pending_q <= 1'b1;
                             response_delay_q <= RESPONSE_DELAY_CYCLES;
@@ -242,6 +254,7 @@ module spk286_at_8042 (
                     last_write_command_q <= 1'b0;
                     if (write_command_byte_q) begin
                         command_byte_q <= request_byte;
+                        system_flag_q <= request_byte[2];
                         keyboard_enabled_q <= !request_byte[4];
                         write_command_byte_q <= 1'b0;
                     end else if (write_output_port_q) begin

@@ -216,13 +216,15 @@ fixed VGA planar 16-colour profile:
 | Unchained 320×200 | Four pixels per byte across four planes | 320×200 |
 | Unchained 360×200 | Four pixels per byte across four planes | 360×200 |
 | Unchained 320×240 | Four pixels per byte across four planes | 320×240 |
+| Dyna Blaster mode 12h tweak | Four pixels per byte across four planes | 256×232 |
 
 The extension starts disabled, exactly as on an IBM EGA, and `VGATSR.COM`
 enables it through AT286CTL. `VGA 13h+ CRT` then selects its output raster:
 `Native` uses the standard 800-clock, 31.5 kHz / 70 Hz VGA timing, while `60Hz`
 keeps a 15.70 kHz / 59.9 Hz television-compatible raster. The 360×200 Native
 profile retains a 912-clock line for its wider picture, and 320×240 borrows
-vertical blanking.
+vertical blanking. Dyna Blaster's 256×232 profile uses 512×464 at 31.5 kHz /
+60 Hz in Native and a direct 256×232 raster at 15.7 kHz / 60 Hz on TV.
 
 An IBM-compatible warm boot clears the VGA 13h+ AT286CTL field when the BIOS
 writes its standard `1234h` marker to `0040:0072`, so the private VGA raster
@@ -264,6 +266,15 @@ registers 00h–09h are readable as on VGA, so the read/modify/write updates of
 R07 and R09 used by that software preserve the vertical timing and scanline
 repeat bits. On exit, VGATSR restores the pre-VGA CRTC/attribute state before
 chaining the requested EGA BIOS mode.
+
+Dyna Blaster starts with `INT 10h/12h` and then directly programs an unchained
+256-colour 256×232 viewport. VGATSR stages that request through EGA mode 0Dh
+to initialise planar VRAM and marks it with private control value `12h`; VGA+
+selects the new raster only after the game's CRTC and graphics-register
+signature is complete. CRTC Offset 32 and 64 provide 256- and 512-pixel
+virtual rows, with Start Address, pel panning and Line Compare handled by the
+unchained renderer. This is a game-specific mode 12h entry path, not VGA
+640×480×16. See [the Dyna Blaster mode details](docs/vga-dyna-blaster.md).
 
 The core still recognises only the listed timing signatures after Chain-4 is
 disabled; it is not a generic Mode X or full VGA CRTC implementation. Other

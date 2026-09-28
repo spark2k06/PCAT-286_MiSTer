@@ -69,3 +69,43 @@ Queda la validación en placa: recompilar AT_FAST, cargar el RBF nuevo y la
 misma ROM, y escribir `ab`, Shift+A y Enter. No se ha ejecutado Quartus ni
 86Box. El diálogo de comandos de dispositivo físico (LEDs, typematic, etc.)
 no se amplía en este cambio.
+
+## Cursores con teclado AT 101 (ANSI) — 2026-09-28
+
+La configuración que funciona en 86Box usa el teclado **101 (ANSI)**. Ese
+modelo entrega las teclas de navegación como `E0` más el código de cursor;
+eliminar `E0` no reproduciría esa configuración. La comparación con
+`D:/GitHub/86box_dev/src/device/keyboard_at.c` y `keyboard.c` mostró
+diferencias en el modelo de teclado. El ejecutable facilitado de *Prince of
+Persia* 1.3 (SHA-256 `1315BBF282C85A5D014FF4EF24B3A015F639A503044B43ABE17FE0A33E55341D`)
+mostró además la causa directa del fallo con cursores:
+
+* Su IRQ1 lee `60h` y luego encadena la IRQ1 del BIOS, que vuelve a leer ese
+  puerto. El adaptador ponía el segundo byte de `E0 48` en el buffer del 8042
+  inmediatamente después de la primera lectura. La lectura encadenada podía
+  consumir `48h` antes de que la IRQ1 del juego lo viera. Con el numérico solo
+  llegaba un byte y no había esa carrera.
+
+* El comando `F2h` no contestaba. En 86Box el teclado AT 101 responde
+  `FAh ABh 83h`; la identificación permite a la BIOS detectar el teclado
+  ampliado.
+* El core emitía solo `E0` y el código de navegación. 86Box añade eventos
+  temporales de Shift alrededor de Home, cursores, PgUp/PgDn, Insert y Delete
+  cuando Num Lock o Shift lo requieren. El teclado actualiza Num Lock con el
+  parámetro del comando de LEDs `EDh`, que el core tampoco atendía.
+
+Ahora el 8042 virtual responde a `F2h` y a las dos fases de `EDh`. El adaptador
+usa el estado de Num Lock y de ambos Shift para emitir las mismas secuencias
+de navegación del teclado 101 en set 1 traducido y set 2 sin traducir. Las
+teclas del bloque numérico siguen usando sus códigos originales y no reciben
+los eventos temporales de Shift. El 8042 espera además un intervalo equivalente
+a un byte PS/2 (1 ms a 50 MHz) tras consumir un byte de teclado antes de
+presentar el siguiente. No se añade ningún modo de teclado al OSD.
+
+`scripts/test_at_keyboard.sh` comprueba ambas simulaciones, la identidad
+`FA AB 83`, el cambio de LEDs, los códigos con Num Lock/Shift y la doble
+lectura de IRQ1 de Prince. Esa prueba falló antes de introducir la espera y
+pasó después. También pasan
+`scripts/test_a5_at_devices.sh`, `scripts/test_at_profile_elab.sh` y ambas
+variantes de `scripts/test_at_mrbios_restart.sh`. Queda por comprobar Prince
+en placa con la BIOS usada por el usuario.

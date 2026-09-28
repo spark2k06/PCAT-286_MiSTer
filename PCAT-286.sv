@@ -821,6 +821,7 @@ module emu_at
     wire [7:0] keyboard_byte;
     wire keyboard_byte_ready;
     wire keyboard_translate_set1;
+    wire keyboard_num_lock;
     wire keyboard_event_overflow;
 
     // Keep the AT machine in reset until the private video PLL is usable as
@@ -863,6 +864,7 @@ module emu_at
         .reset                  (at_boot_reset),
         .ps2_key                (ps2_key),
         .translate_set1         (keyboard_translate_set1),
+        .num_lock               (keyboard_num_lock),
         .keyboard_byte_ready    (keyboard_byte_ready),
         .keyboard_byte_valid    (keyboard_byte_valid),
         .keyboard_byte          (keyboard_byte),
@@ -1092,6 +1094,7 @@ module emu_at
         .keyboard_byte          (keyboard_byte),
         .keyboard_byte_ready    (keyboard_byte_ready),
         .keyboard_translate_set1(keyboard_translate_set1),
+        .keyboard_num_lock      (keyboard_num_lock),
         .periodic_tick          (periodic_tick),
         .second_tick             (second_tick),
         .parity_event           (1'b0),

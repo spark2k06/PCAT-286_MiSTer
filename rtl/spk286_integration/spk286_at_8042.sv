@@ -5,7 +5,11 @@
 // to command-byte bit 6. Controller replies bypass that conversion.
 `timescale 1ns/1ps
 
-module spk286_at_8042 (
+module spk286_at_8042 #(
+    // One PS/2 frame is about 1 ms. Keep a second keyboard byte out of
+    // port 60h while a chained IRQ1 handler is still processing the first.
+    parameter integer KEYBOARD_GAP_CYCLES = 50_000
+) (
     input  logic        clk,
     input  logic        reset,
 
@@ -25,6 +29,7 @@ module spk286_at_8042 (
     input  logic [7:0]  keyboard_byte,
     output logic        keyboard_byte_ready,
     output logic        keyboard_translate_set1,
+    output logic        keyboard_num_lock,
     output logic        keyboard_output_valid,
     output logic [7:0]  keyboard_output_byte,
     output logic        irq1,
@@ -46,16 +51,21 @@ module spk286_at_8042 (
     logic       io_read_data_valid_q;
     logic [7:0] output_buffer_q;
     logic       output_buffer_valid_q;
+    logic       output_buffer_keyboard_q;
+    logic [15:0] keyboard_gap_q;
     logic       input_buffer_full_q;
     logic       response_pending_q;
     logic [7:0] response_pending_data_q;
     logic [11:0] response_delay_q;
-    logic       keyboard_reset_bat_pending_q;
+    // Follow-up bytes after the first keyboard reply: BAT or 101-key ID.
+    logic [1:0] keyboard_reply_followup_q;
     logic [7:0] command_byte_q;
     logic       system_flag_q;
     logic [7:0] output_port_q;
     logic       write_command_byte_q;
     logic       write_output_port_q;
+    logic       write_keyboard_leds_q;
+    logic       keyboard_num_lock_q;
     logic       reset_pulse_q;
     logic       keyboard_enabled_q;
     logic       last_write_command_q;
@@ -87,10 +97,12 @@ module spk286_at_8042 (
     assign keyboard_output_valid = output_buffer_valid_q;
     assign keyboard_output_byte = output_buffer_q;
     assign keyboard_translate_set1 = command_byte_q[6];
+    assign keyboard_num_lock = keyboard_num_lock_q;
     // Hold queued keyboard bytes while OBF is full, a controller/device reply
     // is pending, or the interface is inhibited. Host writes have priority.
     assign keyboard_byte_ready = !reset && keyboard_enabled_q &&
                                  !output_buffer_valid_q &&
+                                 (keyboard_gap_q == 16'd0) &&
                                  !response_pending_q &&
                                  !(request_accept && request_write);
     assign irq1 = output_buffer_valid_q && command_byte_q[0];
@@ -123,11 +135,13 @@ module spk286_at_8042 (
             io_read_data_valid_q <= 1'b0;
             output_buffer_q <= 8'h00;
             output_buffer_valid_q <= 1'b0;
+            output_buffer_keyboard_q <= 1'b0;
+            keyboard_gap_q <= 16'd0;
             input_buffer_full_q <= 1'b0;
             response_pending_q <= 1'b0;
             response_pending_data_q <= 8'h00;
             response_delay_q <= 12'd0;
-            keyboard_reset_bat_pending_q <= 1'b0;
+            keyboard_reply_followup_q <= 2'd0;
             command_byte_q <= 8'h01;
             system_flag_q <= 1'b0;
             // The IBM AT releases the CPU reset line with its A20 gate
@@ -137,6 +151,8 @@ module spk286_at_8042 (
             output_port_q <= 8'h01;
             write_command_byte_q <= 1'b0;
             write_output_port_q <= 1'b0;
+            write_keyboard_leds_q <= 1'b0;
+            keyboard_num_lock_q <= 1'b0;
             reset_pulse_q <= 1'b0;
             keyboard_enabled_q <= 1'b1;
             last_write_command_q <= 1'b0;
@@ -146,6 +162,8 @@ module spk286_at_8042 (
             if (io_state_q == IO_DONE)
                 io_state_q <= IO_IDLE;
             reset_pulse_q <= 1'b0;
+            if (keyboard_gap_q != 16'd0)
+                keyboard_gap_q <= keyboard_gap_q - 16'd1;
 
             // The host input buffer remains busy for at least one controller
             // cycle.  Controller replies are posted only after IBF has
@@ -159,16 +177,30 @@ module spk286_at_8042 (
                 else begin
                     output_buffer_q <= response_pending_data_q;
                     output_buffer_valid_q <= 1'b1;
-                    if (keyboard_reset_bat_pending_q) begin
-                        // A keyboard reset first acknowledges FFh, then runs
-                        // BAT and posts AAh after the host consumes the ACK.
-                        response_pending_data_q <= 8'hAA;
-                        response_pending_q <= 1'b1;
-                        response_delay_q <= RESPONSE_DELAY_CYCLES;
-                        keyboard_reset_bat_pending_q <= 1'b0;
-                    end else begin
-                        response_pending_q <= 1'b0;
-                    end
+                    output_buffer_keyboard_q <= 1'b0;
+                    case (keyboard_reply_followup_q)
+                        2'd1: begin
+                            // FFh: ACK, then BAT completion.
+                            response_pending_data_q <= 8'hAA;
+                            response_pending_q <= 1'b1;
+                            response_delay_q <= RESPONSE_DELAY_CYCLES;
+                            keyboard_reply_followup_q <= 2'd0;
+                        end
+                        2'd2: begin
+                            // F2h: ACK, then the 101-key AT identity AB 83.
+                            response_pending_data_q <= 8'hAB;
+                            response_pending_q <= 1'b1;
+                            response_delay_q <= RESPONSE_DELAY_CYCLES;
+                            keyboard_reply_followup_q <= 2'd3;
+                        end
+                        2'd3: begin
+                            response_pending_data_q <= 8'h83;
+                            response_pending_q <= 1'b1;
+                            response_delay_q <= RESPONSE_DELAY_CYCLES;
+                            keyboard_reply_followup_q <= 2'd0;
+                        end
+                        default: response_pending_q <= 1'b0;
+                    endcase
                 end
             end
 
@@ -180,8 +212,11 @@ module spk286_at_8042 (
 
                 if (!request_write) begin
                     io_read_data_q <= current_read_data;
-                    if (request_address[15:0] == 16'h0060)
+                    if (request_address[15:0] == 16'h0060) begin
+                        if (output_buffer_valid_q && output_buffer_keyboard_q)
+                            keyboard_gap_q <= KEYBOARD_GAP_CYCLES[15:0];
                         output_buffer_valid_q <= 1'b0;
+                    end
                 end else if (request_address[15:0] == 16'h0064) begin
                     input_buffer_full_q <= 1'b1;
                     last_write_command_q <= 1'b1;
@@ -204,7 +239,7 @@ module spk286_at_8042 (
                             system_flag_q <= 1'b1;
                             keyboard_enabled_q <= 1'b0;
                             output_port_q <= 8'hCF;
-                            keyboard_reset_bat_pending_q <= 1'b0;
+                            keyboard_reply_followup_q <= 2'd0;
                             response_pending_data_q <= 8'h55;
                             response_pending_q <= 1'b1;
                             response_delay_q <= RESPONSE_DELAY_CYCLES;
@@ -261,6 +296,25 @@ module spk286_at_8042 (
                         output_port_q <= request_byte | 8'h01;
                         reset_pulse_q <= !request_byte[0];
                         write_output_port_q <= 1'b0;
+                    end else if (write_keyboard_leds_q) begin
+                        // The 101-key keyboard accepts the EDh LED parameter.
+                        // Its Num Lock bit controls the fake Shift sequences
+                        // sent with the separate cursor cluster.
+                        keyboard_num_lock_q <= request_byte[1];
+                        write_keyboard_leds_q <= 1'b0;
+                        response_pending_data_q <= 8'hFA;
+                        response_pending_q <= 1'b1;
+                        response_delay_q <= RESPONSE_DELAY_CYCLES;
+                    end else if (request_byte == 8'hED) begin
+                        write_keyboard_leds_q <= 1'b1;
+                        response_pending_data_q <= 8'hFA;
+                        response_pending_q <= 1'b1;
+                        response_delay_q <= RESPONSE_DELAY_CYCLES;
+                    end else if (request_byte == 8'hF2) begin
+                        response_pending_data_q <= 8'hFA;
+                        response_pending_q <= 1'b1;
+                        response_delay_q <= RESPONSE_DELAY_CYCLES;
+                        keyboard_reply_followup_q <= 2'd2;
                     end else if (request_byte == 8'hFF) begin
                         // The HPS supplies decoded key events, so there is no
                         // serial keyboard to answer this AT keyboard command.
@@ -269,7 +323,9 @@ module spk286_at_8042 (
                         response_pending_data_q <= 8'hFA;
                         response_pending_q <= 1'b1;
                         response_delay_q <= RESPONSE_DELAY_CYCLES;
-                        keyboard_reset_bat_pending_q <= 1'b1;
+                        keyboard_reply_followup_q <= 2'd1;
+                        keyboard_num_lock_q <= 1'b0;
+                        write_keyboard_leds_q <= 1'b0;
                     end
                 end
             end
@@ -280,6 +336,7 @@ module spk286_at_8042 (
             if (keyboard_byte_valid && keyboard_byte_ready) begin
                 output_buffer_q <= keyboard_byte;
                 output_buffer_valid_q <= 1'b1;
+                output_buffer_keyboard_q <= 1'b1;
             end
 
             if (port_selected && !lane_valid)

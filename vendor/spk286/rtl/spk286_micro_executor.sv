@@ -1724,6 +1724,8 @@ module spk286_micro_executor (
                         end else if ((descriptor_load_tr && descriptor_success_live) ||
                             (segment_reload_operation && descriptor_segment_success_live && !descriptor_unused_accessed) ||
                             (cs_validation_operation && descriptor_cs_success_live && !descriptor_unused_accessed) ||
+                            (call_gate_cs_validation_operation && descriptor_call_gate_cs_success_live &&
+                             !descriptor_cs_offset_fault && !descriptor_unused_accessed) ||
                             (call_ss_validation_operation && descriptor_call_ss_success_live && !descriptor_unused_accessed) ||
                             (iret_cs_validation_operation && descriptor_iret_cs_success_live &&
                              ({1'b0, tmp0_q} <= {1'b0, descriptor_limit}) && !descriptor_unused_accessed) ||

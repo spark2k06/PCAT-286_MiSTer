@@ -16,6 +16,7 @@ module spk286_micro_executor (
     input  logic lock_prefix,
     input logic [15:0] target_read_data, effective_offset, address_base,
     input logic [15:0] segment_limit,
+    input logic segment_expand_down,
     input logic [15:0] stack_segment_limit,
     /* Only the expand-down bit is consumed by the current stack-range
        predicate; the remaining access bits stay in the segment cache. */
@@ -262,7 +263,7 @@ module spk286_micro_executor (
                          (check_pop2 && stack_pointer[0] && stack_pointer>=16'hFFFD) || (check_push8 && push8_invalid) || (check_pop8 && pop8_invalid) ||
                          (check_stack_word && tmp0_q == 16'hFFFF) ||
                          (check_rm32 && effective_offset[0] && effective_offset > 16'hFFFC) || iret_outer_range_fault ||
-                         iret_outer_restored_range_fault || call_stack_range_fault;
+                         call_stack_range_fault;
     assign bounds_fault = check_bounds && ($signed(tmp1_q) < $signed(auxiliary_q) || $signed(tmp1_q) > $signed(tmp0_q));
     assign set_frame_address = allowed && operation == spk286_microcode_pkg::MC_SET_STACK_ADDRESS_TMP0 && temporary_valid_q[0];
     assign read_frame_address = allowed && operation == spk286_microcode_pkg::MC_READ_STACK_ADDRESS_TMP0 && frame_address_valid_q;
@@ -350,8 +351,13 @@ module spk286_micro_executor (
     assign system_is_gdtr = operation == spk286_microcode_pkg::MC_SYSTEM_STORE_GDTR || operation == spk286_microcode_pkg::MC_SYSTEM_LOAD_GDTR;
     assign system_selected_limit = system_is_gdtr ? protected_gdtr_limit : protected_idtr_limit;
     assign system_selected_base = system_is_gdtr ? protected_gdtr_base : protected_idtr_base;
+    // Table operands span six bytes. Expand-down segments admit offsets
+    // above their limit, with the same non-wrapping 16-bit upper boundary.
     assign system_limit_fault = system_table_operation && !operand_register_direct &&
-                                ({1'b0, effective_offset} + 17'd5 > {1'b0, segment_limit});
+                                (segment_expand_down ?
+                                 (effective_offset <= segment_limit ||
+                                  {1'b0, effective_offset} + 17'd5 > 17'h0FFFF) :
+                                 ({1'b0, effective_offset} + 17'd5 > {1'b0, segment_limit}));
     assign system_begin = system_operation && !system_active_q && !system_limit_fault;
     assign system_operand_request = system_active_q && system_operation && !system_limit_fault;
     assign system_operand_write = system_operand_request && (system_table_store || system_msw_store || system_selector_store);
@@ -362,7 +368,9 @@ module spk286_micro_executor (
                                system_msw_store ? protected_msw :
                                system_index_q == 2'd0 ? system_selected_limit :
                                system_index_q == 2'd1 ? system_selected_base[15:0] :
-                               {8'd0, system_selected_base[23:16]};
+                               // Intel leaves byte six undefined; use the
+                               // 286 FF convention used by OS/2 and 86Box.
+                               {8'hFF, system_selected_base[23:16]};
     assign protected_msw_load_en = task_commit_tr_write || (system_msw_load && system_operand_done) || clts_commit;
     assign protected_msw_load_data = task_commit_tr_write ? (protected_msw | 16'h0008) :
                                      clts_commit ? (protected_msw & 16'hFFF7) : operand_read_data;
@@ -442,7 +450,7 @@ module spk286_micro_executor (
     logic [16:0] call_gate_frame_bytes;
     logic iret_cs_validation_operation, iret_ss_validation_operation;
     logic iret_outer_frame_operation, iret_outer_required;
-    logic iret_outer_pop, iret_outer_pop_done, iret_outer_range_fault, iret_outer_restored_range_fault;
+    logic iret_outer_pop, iret_outer_pop_done, iret_outer_range_fault;
     logic iret_outer_ready_q, iret_ss_candidate_valid_q;
     logic [1:0] iret_outer_phase_q;
     logic [15:0] iret_outer_sp_q, iret_outer_ss_q;
@@ -865,7 +873,7 @@ module spk286_micro_executor (
                                            (descriptor_operand_done && descriptor_phase_q == 3'd4 && descriptor_success_q));
     assign descriptor_null_commit = descriptor_begin && descriptor_selector_null && !descriptor_pre_fault && descriptor_load_ldtr;
     assign system_fault = task_service_fault || system_privilege_fault || arpl_fault || clts_fault || call_tss_pre_fault || (call_stack_range_fault && protected_msw[0]) ||
-                          iret_outer_restored_range_fault || descriptor_pre_fault || descriptor_post_fault ||
+                          descriptor_pre_fault || descriptor_post_fault ||
                           event_gate_pre_fault || event_gate_post_fault;
     assign system_fault_vector = task_service_fault ? task_service_fault_vector : system_privilege_fault ? 8'd13 :
                                  arpl_fault ? 8'd6 :
@@ -874,7 +882,6 @@ module spk286_micro_executor (
                                  !protected_msw[0] ? 8'd6 :
                                  call_tss_pre_fault ? 8'd10 :
                                  call_stack_range_fault ? 8'd12 :
-                                 iret_outer_restored_range_fault ? 8'd12 :
                                  event_gate_pre_fault ? 8'd13 :
                                  event_gate_post_fault ? (!event_gate_present && event_gate_valid ? 8'd11 : 8'd13) :
                                  descriptor_pre_fault ? 8'd13 :
@@ -900,7 +907,6 @@ module spk286_micro_executor (
                                        ((task_service_fault_error_code & 16'hFFFC) |
                                         (task_fault_external ? 16'h0001 : 16'h0000)) :
                                      (call_tss_pre_fault || (call_stack_range_fault && protected_msw[0])) ? call_gate_selector_q :
-                                     iret_outer_restored_range_fault ? iret_ss_selector_q :
                                      (event_gate_pre_fault || event_gate_post_fault) ?
                                        (event_gate_entry_offset | 16'h0002 | (task_fault_external ? 16'h0001 : 16'h0000)) :
                                      descriptor_cs_offset_fault ? 16'd0 :
@@ -1079,14 +1085,10 @@ module spk286_micro_executor (
                                        ({1'b0, return_stack_pointer} + {1'b0, allocation_valid_q ? allocation_q : 16'd0} + 17'd3 > 17'h0FFFF)) :
                                       ({1'b0, return_stack_pointer} + {1'b0, allocation_valid_q ? allocation_q : 16'd0} + 17'd3 >
                                        {1'b0, stack_segment_limit})));
-    assign iret_outer_restored_range_fault = commit_context && iret_outer_required && iret_ss_candidate_valid_q &&
-                                             (iret_ss_access_q[2] ?
-                                              ({1'b0, iret_outer_sp_q} <= {1'b0, iret_ss_limit_q} ||
-                                               ({1'b0, iret_outer_sp_q} +
-                                                {1'b0, allocation_valid_q ? allocation_q : 16'd0} > 17'h0FFFF)) :
-                                              ({1'b0, iret_outer_sp_q} +
-                                               {1'b0, allocation_valid_q ? allocation_q : 16'd0} >
-                                               {1'b0, iret_ss_limit_q}));
+    // Restoring outer SS:SP does not access the new stack. RETF validates
+    // the source frame and target descriptor; a subsequent stack access
+    // checks its own range. In particular, an empty stack may have
+    // SP=limit+1, and RETF's immediate adjustment wraps at 16 bits.
     assign call_stack_range_fault = check_call_frame && (protected_msw[0] || !event_active) &&
                                    (call_gate_outer_required ?
                                     (!call_stack_ready_q || call_stack_sp_q[0] ||
@@ -1172,8 +1174,7 @@ module spk286_micro_executor (
     assign context_commit = ((iret_commit && (!protected_msw[0] || (cs_candidate_valid_q && (!iret_outer_required || iret_ss_candidate_valid_q)))) ||
                              (commit_context && (!protected_msw[0] || cs_candidate_valid_q || event_active) &&
                               (!call_gate_outer_required || call_ss_candidate_valid_q) &&
-                              (!iret_outer_required || iret_ss_candidate_valid_q) &&
-                              !iret_outer_restored_range_fault)) &&
+                              (!iret_outer_required || iret_ss_candidate_valid_q))) &&
                             redirect_ready;
     assign context_cs = tmp1_q;
     assign iret_outer_sp_commit = context_commit && iret_commit && iret_outer_required;
@@ -1381,7 +1382,7 @@ module spk286_micro_executor (
     assign operand_select_rm = descriptor_active_q || event_gate_active_q || call_tss_active_q || system_operation || io_transfer || string_request || vector_request || stack_request || check_operand || operation == spk286_microcode_pkg::MC_READ_RM16 || operation == spk286_microcode_pkg::MC_READ_RM16_TMP1 ||
                                operation == spk286_microcode_pkg::MC_WRITE_RM16 || operation == spk286_microcode_pkg::MC_WRITE_RESULT_RM16 ||
                                operation == spk286_microcode_pkg::MC_READ_RM8 || operation == spk286_microcode_pkg::MC_READ_RM8_TMP1 || operation == spk286_microcode_pkg::MC_WRITE_RM8 || operation == spk286_microcode_pkg::MC_WRITE_RESULT_RM8 || arpl_operation;
-    assign operand_byte = (descriptor_write) || (system_table_operation && system_index_q == 2'd2) || io_byte || (string_request && string_byte) || operation == spk286_microcode_pkg::MC_WRITE_REG8_TMP1 || operation == spk286_microcode_pkg::MC_READ_REG8 || operation == spk286_microcode_pkg::MC_READ_RM8 ||
+    assign operand_byte = (descriptor_write) || (system_table_load && system_index_q == 2'd2) || io_byte || (string_request && string_byte) || operation == spk286_microcode_pkg::MC_WRITE_REG8_TMP1 || operation == spk286_microcode_pkg::MC_READ_REG8 || operation == spk286_microcode_pkg::MC_READ_RM8 ||
                           operation == spk286_microcode_pkg::MC_READ_REG8_TMP1 || operation == spk286_microcode_pkg::MC_READ_RM8_TMP1 ||
                           operation == spk286_microcode_pkg::MC_WRITE_REG8 || operation == spk286_microcode_pkg::MC_WRITE_RM8 ||
                           operation == spk286_microcode_pkg::MC_WRITE_RESULT_REG8 || operation == spk286_microcode_pkg::MC_WRITE_RESULT_RM8;

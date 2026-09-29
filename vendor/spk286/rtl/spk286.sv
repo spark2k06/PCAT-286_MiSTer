@@ -839,6 +839,7 @@ module spk286 (
         .destination_read_data(register_state[source_index_q * 16 +: 16]),
         .source_index(source_index_q), .lock_prefix(lock_prefix), .target_read_data(register_state[destination_q * 16 +: 16]),
         .effective_offset(operand_offset), .address_base(register_state[48 +: 16]), .segment_limit(segment_limit), .stack_segment_limit(debug_segment_limits[32 +: 16]), .stack_segment_access(debug_segment_access[23:16]), .operand_register_direct(operand_register_direct), .operand_rm_index(operand_rm),
+        .segment_expand_down(protected_msw[0] && protected_segment_is_expand_down),
         .address_override(address_override), .address_offset(address_offset),
         .direct_flags_data(direct_flags_data), .direct_flags_mask(direct_flags_mask),
         .destination_byte_data(register_state[destination_q[1:0] * 16 + (destination_q[2] ? 8 : 0) +: 8]),
@@ -1074,7 +1075,7 @@ module spk286 (
                            invalid_opcode_fault || system_limit_fault || system_fault ||
                            protected_access_fault || protected_fetch_fault || demanded_code_fault || length_fault || loadall_fault;
     assign fault_vector = (invalid_form || invalid_opcode_fault) ? 8'd6 : loadall_fault ? loadall_fault_vector : system_fault ? system_fault_vector :
-                          protected_access_ss_fault ? 8'd12 : protected_access_fault ? 8'd13 :
+                          (protected_access_ss_fault || (system_limit_fault && protected_msw[0] && service_segment == 2'd2)) ? 8'd12 : protected_access_fault ? 8'd13 :
                           protected_fetch_fault ? 8'd13 : bounds_fault ? 8'd5 : arithmetic_fault ? 8'd0 : 8'd13;
     // PM3c frame contract: protected selector faults in the #TS/#NP/#SS/#GP
     // family carry one 16-bit error word.  Non-selector protected faults use

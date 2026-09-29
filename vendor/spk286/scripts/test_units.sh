@@ -27,6 +27,8 @@ tests+=(spk286_protected_entry)
 tests+=(spk286_protected_direct_call)
 tests+=(spk286_protected_return_restart)
 tests+=(spk286_descriptor_inspection)
+tests+=(spk286_system_table_range)
+tests+=(spk286_outer_return_sp)
 tests+=(spk286_register_execution)
 tests+=(spk286_immediate_execution spk286_immediate_throughput)
 if [[ "$unit" != all ]]; then tests=("$unit"); fi

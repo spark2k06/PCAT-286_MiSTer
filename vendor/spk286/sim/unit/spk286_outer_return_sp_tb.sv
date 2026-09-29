@@ -57,10 +57,12 @@ module spk286_outer_return_sp_tb;
 
     task automatic run_case(input integer form, input logic expand_down,
                             input integer boundary, input integer bad_ss,
-                            input logic [1:0] policy);
+                            input logic [1:0] policy, input integer h07_mode);
         integer deadline, frame_sp_pos;
         logic [15:0] final_sp, saved_sp, push_offset, stack_limit, selector;
+        logic [15:0] source_cs, source_ss, target_cs;
         logic [7:0] access_byte;
+        logic [7:0] target_access;
         logic [7:0] es_access, ds_access;
         logic push_valid;
         string label;
@@ -84,12 +86,19 @@ module spk286_outer_return_sp_tb;
             push_valid = expand_down ? (push_offset > stack_limit && push_offset != 16'hFFFF) :
                                       ({1'b0, push_offset} + 17'd1 <= {1'b0, stack_limit});
             selector = bad_ss == 4 ? 16'h0000 : 16'h0067;
+            source_cs = h07_mode == 4 ? 16'h0271 : 16'h0270;
+            source_ss = h07_mode == 4 ? 16'h0039 : 16'h0038;
+            target_cs = h07_mode == 2 || h07_mode == 4 ? 16'h13A0 :
+                        h07_mode == 3 ? 16'h13A2 : 16'h13A3;
+            target_access = h07_mode == 2 || h07_mode == 4 ? 8'h9F :
+                            h07_mode == 3 ? 8'hFF : h07_mode == 5 ? 8'h5F :
+                            h07_mode != 0 ? 8'hDF : 8'hFB;
             access_byte = bad_ss == 1 ? 8'h73 : bad_ss == 2 ? 8'h93 : bad_ss == 3 ? 8'hFB :
                           expand_down ? 8'hF7 : 8'hF3;
             es_access = boundary == 1 ? 8'hF3 : boundary == 2 ? 8'h9E : 8'h93;
             ds_access = boundary == 6 ? 8'h93 : 8'hF3;
-            label = $sformatf("form=%0d ED=%0d boundary=%0d badSS=%0d policy=%0d",
-                              form, expand_down, boundary, bad_ss, policy);
+            label = $sformatf("form=%0d ED=%0d boundary=%0d badSS=%0d policy=%0d H07=%0d",
+                              form, expand_down, boundary, bad_ss, policy, h07_mode);
 
             // Reproduce OS/2's CPL0 -> CPL3 RETF and LDT stack selector.
             // The hidden caches are initialized by LOADALL; no new-stack
@@ -97,22 +106,22 @@ module spk286_outer_return_sp_tb;
             memory[0] = 8'h0F; memory[1] = 8'h05;
             word_put('h806, 16'h0001); word_put('h818, 16'h0246);
             word_put('h81A, 16'h0985); word_put('h81C, 16'h0028);
-            word_put('h81E, 16'h0BF0); word_put('h820, 16'h0038);
-            word_put('h822, 16'h0270); word_put('h824, 16'h0210);
+            word_put('h81E, 16'h0BF0); word_put('h820, source_ss);
+            word_put('h822, source_cs); word_put('h824, 16'h0210);
             word_put('h82C, 16'hF8F2);
             cache('h836, 24'h000000, 16'h207F, es_access);
-            cache('h83C, 24'h010000, 16'h819E, 8'h9B);
-            cache('h842, 24'h000000, 16'hF4DF, 8'h97);
+            cache('h83C, 24'h010000, 16'h819E, h07_mode == 4 ? 8'hBB : 8'h9B);
+            cache('h842, 24'h000000, 16'hF4DF, h07_mode == 4 ? 8'hB7 : 8'h97);
             cache('h848, 24'h000000, 16'h638F, ds_access);
             cache('h84E, 24'h002000, 16'h1AFF, 8'h00);
             cache('h854, 24'h004000, 16'h009F, 8'h82);
             cache('h85A, 24'h005000, 16'h03FF, 8'h00);
             cache('h860, 24'h000000, 16'h0000, 8'h00);
-            descriptor('h33A0, 24'h010000, 16'h819E, 8'hFB);
+            descriptor('h33A0, 24'h010000, 16'h819E, target_access);
             descriptor('h4060, 24'h020000, stack_limit, access_byte);
             memory['h10985] = form == 0 ? 8'hCB : form == 1 ? 8'hCA : 8'hCF;
             word_put('h10986, 16'h0004);
-            word_put('hF8F2, 16'h32D0); word_put('hF8F4, 16'h13A3);
+            word_put('hF8F2, 16'h32D0); word_put('hF8F4, target_cs);
             if (form == 2) word_put('hF8F6, 16'h0246);
             frame_sp_pos = 'hF8F6 + (form == 1 ? 4 : form == 2 ? 2 : 0);
             word_put(frame_sp_pos, saved_sp); word_put(frame_sp_pos+2, selector);
@@ -128,7 +137,32 @@ module spk286_outer_return_sp_tb;
             while (!shutdown && debug_timing_event_requests == 0 && debug_gpr[15:0] != 16'hBEEF && deadline < 2500) begin
                 tick(); deadline = deadline + 1;
             end
-            if (bad_ss != 0) begin
+            if (h07_mode == 2) begin
+                check(!shutdown && debug_timing_event_requests == 0 && debug_gpr[15:0] == 16'hBEEF &&
+                      debug_cs == target_cs && debug_segment_selectors[47:32] == source_ss &&
+                      debug_gpr[79:64] == (16'hF8F6 + (form == 1 ? 16'd4 : form == 2 ? 16'd2 : 16'd0)) &&
+                      outer_writes == 0,
+                      {label, " same-level conforming return keeps the original stack"});
+            end else if (h07_mode == 3 || h07_mode == 4 || h07_mode == 5) begin
+                check(debug_timing_event_requests == 1 &&
+                      debug_event_vector == (h07_mode == 5 ? 8'd11 : 8'd13) &&
+                      debug_event_error_code == (target_cs & 16'hFFFC),
+                      {label, " invalid conforming selector faults with its index"});
+                check(debug_cs == source_cs && debug_segment_selectors[47:32] == source_ss &&
+                      debug_gpr[79:64] == 16'hF8F2 && outer_writes == 0,
+                      {label, " rejected conforming return preserves source context"});
+            end else if (h07_mode != 0 && bad_ss != 0) begin
+                check(debug_timing_event_requests == 1 && debug_event_vector == 8'd12 &&
+                      debug_event_error_code == 16'h0064 && debug_cs == source_cs &&
+                      debug_segment_selectors[47:32] == source_ss && debug_gpr[79:64] == 16'hF8F2 &&
+                      outer_writes == 0,
+                      {label, " conforming outer return validates the saved SS before commit"});
+            end else if (h07_mode != 0) begin
+                check(!shutdown && debug_timing_event_requests == 0 && debug_gpr[15:0] == 16'hBEEF &&
+                      debug_cs == target_cs && debug_segment_selectors[47:32] == 16'h0067 &&
+                      debug_gpr[79:64] == final_sp && outer_writes == 0,
+                      {label, " conforming outer return publishes saved RPL and SS:SP"});
+            end else if (bad_ss != 0) begin
                 check(debug_timing_event_requests == 1 && debug_event_vector == (bad_ss == 1 ? 8'd12 : 8'd13) &&
                       debug_event_error_code == (bad_ss == 4 ? 16'h0000 : 16'h0064),
                       {label, " invalid SS descriptor still rejects the return"});
@@ -182,9 +216,12 @@ module spk286_outer_return_sp_tb;
             for (integer form = 0; form < 3; form = form + 1) begin
                 for (integer ed = 0; ed < 2; ed = ed + 1)
                     for (integer boundary = 0; boundary < 7; boundary = boundary + 1)
-                        run_case(form, 1'(ed), boundary, 0, 2'(policy));
+                        run_case(form, 1'(ed), boundary, 0, 2'(policy), 0);
                 for (integer bad_ss = 1; bad_ss < 5; bad_ss = bad_ss + 1)
-                    run_case(form, 0, 0, bad_ss, 2'(policy));
+                    run_case(form, 0, 0, bad_ss, 2'(policy), 0);
+                for (integer h07_mode = 1; h07_mode <= 5; h07_mode = h07_mode + 1)
+                    run_case(form, 0, 0, 0, 2'(policy), h07_mode);
+                run_case(form, 0, 0, 1, 2'(policy), 1);
             end
         if (failures != 0) $fatal(1, "OUTER_RETURN_SP: %0d failures / %0d cases", failures, cases);
         $display("OUTER_RETURN_SP PASS: %0d checks / %0d cases", checks, cases);

@@ -652,10 +652,9 @@ module spk286_micro_executor (
     assign descriptor_cs_success_live = descriptor_cs_access_valid && descriptor_present;
     assign descriptor_iret_cs_success_live = descriptor_valid && descriptor_reserved_valid && descriptor_present &&
                                              descriptor_unused_segment && descriptor_class == spk286_protected_pkg::DESC_CODE &&
-                                             ((descriptor_unused_conforming && descriptor_unused_dpl <= protected_cpl) ||
-                                              (!descriptor_unused_conforming &&
-                                               descriptor_unused_dpl == descriptor_unused_rpl &&
-                                               descriptor_unused_rpl >= protected_cpl));
+                                             descriptor_unused_rpl >= protected_cpl &&
+                                             ((descriptor_unused_conforming && descriptor_unused_dpl <= descriptor_unused_rpl) ||
+                                              (!descriptor_unused_conforming && descriptor_unused_dpl == descriptor_unused_rpl));
     assign descriptor_call_gate_success_live = descriptor_valid && descriptor_reserved_valid && descriptor_present &&
                                               descriptor_class == spk286_protected_pkg::DESC_CALL_GATE &&
                                               descriptor_unused_dpl >= protected_cpl &&
@@ -1073,9 +1072,8 @@ module spk286_micro_executor (
     assign push_event_error = allowed && operation == spk286_microcode_pkg::MC_PUSH_EVENT_ERROR;
     assign push_transfer = push_operation && push_enabled;
     assign push_event_error_transfer = push_event_error && push_enabled && event_error_valid;
-    assign iret_outer_required = protected_msw[0] && temporary_valid_q[1] && (tmp1_q[1:0] > protected_cpl) &&
-                                 !(cs_candidate_valid_q && cs_candidate_class_q == spk286_protected_pkg::DESC_CODE &&
-                                   cs_candidate_access_q[2]);
+    assign iret_outer_required = protected_msw[0] && protected_return_cursor_q &&
+                                 temporary_valid_q[1] && (tmp1_q[1:0] > protected_cpl);
     assign iret_outer_pop = iret_outer_frame_operation && iret_outer_required && iret_outer_phase_q < 2'd2;
     assign iret_outer_pop_done = iret_outer_pop && operand_done;
     assign call_gate_frame_bytes = 17'd8 + {11'd0, call_gate_parameter_count_q, 1'b0} +
@@ -1564,13 +1562,12 @@ module spk286_micro_executor (
             end
             if (cs_validation_success_event) begin
                 cs_candidate_valid_q <= 1'b1;
-                // The selector RPL is ignored for conforming targets.  A
-                // direct transfer and an intra-level event retain the
-                // current CPL; an inter-level non-conforming transfer uses
-                // the destination code DPL as the new CS RPL.
+                // RETF/IRET use the saved selector RPL for both conforming
+                // and non-conforming targets. Direct transfers and intra-level
+                // events retain CPL; inter-level events use the target DPL.
                 cs_candidate_selector_q <= {tmp1_q[15:2],
                                             iret_cs_validation_operation ?
-                                                (descriptor_unused_conforming ? protected_cpl : descriptor_unused_rpl) :
+                                                descriptor_unused_rpl :
                                             call_gate_cs_validation_operation ?
                                                 (descriptor_unused_conforming ? protected_cpl : descriptor_unused_dpl) :
                                             ((event_gate_candidate_valid_q && !descriptor_unused_conforming &&
@@ -1581,7 +1578,7 @@ module spk286_micro_executor (
                 cs_candidate_class_q <= descriptor_class;
                 cs_candidate_dpl_q <= descriptor_unused_dpl;
                 cs_candidate_rpl_q <= iret_cs_validation_operation ?
-                                      (descriptor_unused_conforming ? protected_cpl : descriptor_unused_rpl) :
+                                      descriptor_unused_rpl :
                                       call_gate_cs_validation_operation ?
                                           (descriptor_unused_conforming ? protected_cpl : descriptor_unused_dpl) :
                                       ((event_gate_candidate_valid_q && !descriptor_unused_conforming &&

@@ -324,6 +324,7 @@ module spk286 (
     logic [31:0] protected_segment_access;
     logic [15:0] protected_segment_classes;
     logic [3:0] protected_segment_valid, protected_segment_present, protected_segment_protected, protected_segment_tables;
+    logic protected_outer_return_commit;
     logic [7:0] protected_segment_dpl, protected_segment_rpl;
     logic [1:0] current_cpl;
     logic protected_segment_commit_en;
@@ -412,6 +413,11 @@ module spk286 (
     // are not a privilege level until a protected CS load has committed.
     // Protected loads normalize CS.RPL to CPL, including conforming code.
     assign current_cpl = protected_segment_protected[1] ? debug_cs[1:0] : 2'd0;
+    assign protected_outer_return_commit = context_commit && protected_msw[0] &&
+                                           protected_segment_commit_en && protected_segment_commit_en2 &&
+                                           protected_segment_commit_index == 2'd1 &&
+                                           protected_segment_commit_index2 == 2'd2 &&
+                                           protected_segment_commit_selector[1:0] > current_cpl;
 
     assign selected_segment_index = execute_enable ? service_segment : segment_read_index;
     assign debug_segment_selectors = protected_msw[0] ? protected_segment_selectors : real_segment_selectors;
@@ -560,6 +566,8 @@ module spk286 (
         .segment_commit_class2(protected_segment_commit_class2), .segment_commit_present2(protected_segment_commit_present2),
         .segment_commit_protected2(protected_segment_commit_protected2), .segment_commit_dpl2(protected_segment_commit_dpl2),
         .segment_commit_table_indicator2(protected_segment_commit_table_indicator2), .segment_commit_rpl2(protected_segment_commit_rpl2),
+        .outer_return_commit(protected_outer_return_commit),
+        .outer_return_cpl(protected_segment_commit_selector[1:0]),
         .loadall_commit_en(loadall_commit_valid), .loadall_msw(loadall_msw),
         .loadall_gdtr_limit(loadall_gdtr_limit), .loadall_gdtr_base(loadall_gdtr_base),
         .loadall_idtr_limit(loadall_idtr_limit), .loadall_idtr_base(loadall_idtr_base),

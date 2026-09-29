@@ -61,6 +61,7 @@ module spk286_outer_return_sp_tb;
         integer deadline, frame_sp_pos;
         logic [15:0] final_sp, saved_sp, push_offset, stack_limit, selector;
         logic [7:0] access_byte;
+        logic [7:0] es_access, ds_access;
         logic push_valid;
         string label;
         begin
@@ -85,6 +86,8 @@ module spk286_outer_return_sp_tb;
             selector = bad_ss == 4 ? 16'h0000 : 16'h0067;
             access_byte = bad_ss == 1 ? 8'h73 : bad_ss == 2 ? 8'h93 : bad_ss == 3 ? 8'hFB :
                           expand_down ? 8'hF7 : 8'hF3;
+            es_access = boundary == 1 ? 8'hF3 : boundary == 2 ? 8'h9E : 8'h93;
+            ds_access = boundary == 6 ? 8'h93 : 8'hF3;
             label = $sformatf("form=%0d ED=%0d boundary=%0d badSS=%0d policy=%0d",
                               form, expand_down, boundary, bad_ss, policy);
 
@@ -97,10 +100,10 @@ module spk286_outer_return_sp_tb;
             word_put('h81E, 16'h0BF0); word_put('h820, 16'h0038);
             word_put('h822, 16'h0270); word_put('h824, 16'h0210);
             word_put('h82C, 16'hF8F2);
-            cache('h836, 24'h000000, 16'h207F, 8'h93);
+            cache('h836, 24'h000000, 16'h207F, es_access);
             cache('h83C, 24'h010000, 16'h819E, 8'h9B);
             cache('h842, 24'h000000, 16'hF4DF, 8'h97);
-            cache('h848, 24'h000000, 16'h638F, 8'hF3);
+            cache('h848, 24'h000000, 16'h638F, ds_access);
             cache('h84E, 24'h002000, 16'h1AFF, 8'h00);
             cache('h854, 24'h004000, 16'h009F, 8'h82);
             cache('h85A, 24'h005000, 16'h03FF, 8'h00);
@@ -132,6 +135,9 @@ module spk286_outer_return_sp_tb;
                 check(debug_cs == 16'h0270 && debug_segment_selectors[47:32] == 16'h0038 &&
                       debug_gpr[79:64] == 16'hF8F2 && outer_writes == 0,
                       {label, " descriptor fault preserves original context"});
+                check(debug_segment_selectors[15:0] == 16'h0210 &&
+                      debug_segment_selectors[63:48] == 16'h0BF0,
+                      {label, " rejected return preserves both data segments"});
             end else begin
                 check(!shutdown && debug_timing_event_requests == 0 && debug_gpr[15:0] == 16'hBEEF &&
                       debug_cs == 16'h13A3 && debug_segment_selectors[47:32] == 16'h0067 &&
@@ -141,6 +147,15 @@ module spk286_outer_return_sp_tb;
                       word_at('hF8F4) == 16'h13A3 && word_at(frame_sp_pos) == saved_sp &&
                       word_at(frame_sp_pos+2) == selector,
                       {label, " return does not write the restored stack or source frame"});
+                check(debug_segment_selectors[15:0] ==
+                          ((boundary == 1 || boundary == 2) ? 16'h0210 : 16'h0000) &&
+                      debug_segment_selectors[63:48] ==
+                          (boundary == 6 ? 16'h0000 : 16'h0BF0) &&
+                      debug_segment_access[7:0] ==
+                          ((boundary == 1 || boundary == 2) ? es_access : 8'h00) &&
+                      debug_segment_access[31:24] ==
+                          (boundary == 6 ? 8'h00 : ds_access),
+                      {label, " outer return clears only data caches invalid at the new CPL"});
                 if (debug_timing_event_requests == 0) begin
                     deadline = 0;
                     while (!shutdown && debug_timing_event_requests == 0 && debug_gpr[15:0] != 16'hCAFE && deadline < 1200) begin

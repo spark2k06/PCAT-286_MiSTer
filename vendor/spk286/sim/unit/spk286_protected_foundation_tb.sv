@@ -167,6 +167,7 @@ module spk286_protected_foundation_tb;
         .segment_commit_class2(segment_commit_class2), .segment_commit_present2(segment_commit_present2),
         .segment_commit_protected2(segment_commit_protected2), .segment_commit_dpl2(segment_commit_dpl2),
         .segment_commit_table_indicator2(segment_commit_table_indicator2), .segment_commit_rpl2(segment_commit_rpl2),
+        .outer_return_commit(1'b0), .outer_return_cpl(2'd0),
         .loadall_commit_en(loadall_commit_en), .loadall_msw(loadall_msw),
         .loadall_gdtr_limit(loadall_gdtr_limit), .loadall_gdtr_base(loadall_gdtr_base),
         .loadall_idtr_limit(loadall_idtr_limit), .loadall_idtr_base(loadall_idtr_base),

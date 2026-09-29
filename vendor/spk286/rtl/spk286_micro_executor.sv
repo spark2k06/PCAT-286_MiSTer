@@ -374,6 +374,7 @@ module spk286_micro_executor (
     logic descriptor_load_access, descriptor_load_limit, descriptor_inspect_operation;
     logic segment_reload_operation, cs_validation_operation, call_ss_validation_operation;
     logic descriptor_segment_null_commit, descriptor_segment_success_live, descriptor_cs_success_live;
+    logic descriptor_cs_access_valid;
     logic descriptor_begin, descriptor_operand_done, descriptor_operation_done;
     logic descriptor_write, descriptor_null_commit, descriptor_success_live, descriptor_success_q;
     logic descriptor_verify_success_live, descriptor_verify_negative, descriptor_inspect_negative;
@@ -620,7 +621,7 @@ module spk286_micro_executor (
                                           !descriptor_selector_ti &&
                                           descriptor_class == spk286_protected_pkg::DESC_TSS_AVAIL &&
                                           task_descriptor_privilege_valid;
-    assign descriptor_cs_success_live = descriptor_valid && descriptor_reserved_valid && descriptor_present &&
+    assign descriptor_cs_access_valid = descriptor_valid && descriptor_reserved_valid &&
                                        descriptor_unused_segment && descriptor_class == spk286_protected_pkg::DESC_CODE &&
                                        (event_gate_candidate_valid_q ?
                                         ((descriptor_unused_conforming && descriptor_unused_dpl <= protected_cpl) ||
@@ -630,6 +631,7 @@ module spk286_micro_executor (
                                         ((descriptor_unused_conforming && descriptor_unused_dpl <= protected_cpl) ||
                                          (!descriptor_unused_conforming && descriptor_unused_dpl == protected_cpl &&
                                           descriptor_unused_rpl <= protected_cpl)));
+    assign descriptor_cs_success_live = descriptor_cs_access_valid && descriptor_present;
     assign descriptor_iret_cs_success_live = descriptor_valid && descriptor_reserved_valid && descriptor_present &&
                                              descriptor_unused_segment && descriptor_class == spk286_protected_pkg::DESC_CODE &&
                                              ((descriptor_unused_conforming && descriptor_unused_dpl <= protected_cpl) ||
@@ -865,6 +867,13 @@ module spk286_micro_executor (
                                  iret_outer_restored_range_fault ? 8'd12 :
                                  event_gate_pre_fault ? 8'd13 :
                                  event_gate_post_fault ? (!event_gate_present && event_gate_valid ? 8'd11 : 8'd13) :
+                                 descriptor_pre_fault ? 8'd13 :
+                                 // Direct code transfers check type/privilege before
+                                 // presence. A valid absent target requests #NP so
+                                 // the OS can load it and retry the instruction.
+                                 ((call_gate_validation_operation || cs_validation_operation) &&
+                                  descriptor_unused_segment) ?
+                                    (!descriptor_present && descriptor_cs_access_valid ? 8'd11 : 8'd13) :
                                   call_gate_validation_operation || call_gate_cs_validation_operation ?
                                     (!descriptor_present && descriptor_valid ? 8'd11 : 8'd13) :
                                   iret_ss_validation_operation ?
@@ -884,7 +893,10 @@ module spk286_micro_executor (
                                      iret_outer_restored_range_fault ? iret_ss_selector_q :
                                      (event_gate_pre_fault || event_gate_post_fault) ?
                                        (event_gate_entry_offset | 16'h0002 | (task_fault_external ? 16'h0001 : 16'h0000)) :
-                                     (descriptor_pre_fault || descriptor_post_fault) ? descriptor_selector_value : 16'd0;
+                                     descriptor_cs_offset_fault ? 16'd0 :
+                                     (descriptor_pre_fault || descriptor_post_fault) ?
+                                       ((descriptor_selector_value & 16'hFFFC) |
+                                        (task_fault_external ? 16'h0001 : 16'h0000)) : 16'd0;
     assign protected_ldtr_commit_en = task_commit_ldtr_write || descriptor_null_commit ||
                                        (descriptor_operand_done && descriptor_phase_q == 3'd3 && descriptor_load_ldtr && descriptor_success_live);
     assign protected_tr_commit_en = task_commit_tr_write ||

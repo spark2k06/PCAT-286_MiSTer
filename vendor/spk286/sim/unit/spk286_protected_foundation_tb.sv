@@ -255,8 +255,15 @@ module spk286_protected_foundation_tb;
         check_expect(descriptor_valid && descriptor_class == DESC_TSS_AVAIL && descriptor_base == 24'h012222,
                "available 286 TSS descriptor");
         raw_descriptor = {16'h0001, 8'h9A, 8'h00, 16'h0000, 16'h0000}; #1;
-        check_expect(!descriptor_valid && !reserved_valid && descriptor_class == DESC_CODE,
-               "reserved descriptor word rejected");
+        check_expect(descriptor_valid && reserved_valid && descriptor_class == DESC_CODE,
+               "286 code descriptor ignores the upper word (Intel 386 PRM 13.3.2)");
+        raw_descriptor = {16'h0010, 8'h7B, 8'h1F, 16'h8290, 16'h042F}; #1;
+        check_expect(descriptor_valid && reserved_valid && !descriptor_present && descriptor_class == DESC_CODE,
+               "Windows absent code descriptor remains typed with nonzero upper word");
+        raw_descriptor = {16'hA5FF, 8'hF3, 8'h12, 16'h3456, 16'hFEDC}; #1;
+        check_expect(descriptor_valid && reserved_valid && descriptor_class == DESC_DATA &&
+                     descriptor_base == 24'h123456 && descriptor_limit == 16'hFEDC,
+               "286 data descriptor upper word does not extend base or limit");
         raw_descriptor = {16'h0000, 8'h88, 8'h00, 16'h0000, 16'h0000}; #1;
         check_expect(!descriptor_valid && descriptor_class == DESC_INVALID, "reserved system type rejected");
         raw_descriptor = {16'h0000, 8'h1A, 8'h00, 16'h0000, 16'h0000}; #1;

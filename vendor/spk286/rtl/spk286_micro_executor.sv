@@ -675,7 +675,9 @@ module spk286_micro_executor (
                                              (descriptor_verify_write &&
                                              (descriptor_class == spk286_protected_pkg::DESC_DATA ||
                                                descriptor_class == spk286_protected_pkg::DESC_EXPAND_DOWN) && descriptor_unused_writable));
-    assign descriptor_inspect_success_live = descriptor_valid && descriptor_reserved_valid && descriptor_present &&
+    // LAR/LSL inspect a visible descriptor even when its segment is absent.
+    // In particular, Windows keeps loader metadata in an absent limit field.
+    assign descriptor_inspect_success_live = descriptor_valid && descriptor_reserved_valid &&
                                              descriptor_unused_dpl >= descriptor_effective_privilege &&
                                              (descriptor_load_access ||
                                               (descriptor_load_limit &&

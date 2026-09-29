@@ -515,9 +515,16 @@ module spk286_micro_executor (
     assign descriptor_inspect_operation = descriptor_load_access || descriptor_load_limit;
     assign segment_reload_operation = allowed && operation == spk286_microcode_pkg::MC_WRITE_SEG16_TMP0 &&
                                      temporary_valid_q[0] && protected_msw[0];
-    assign cs_validation_operation = allowed && operation == spk286_microcode_pkg::MC_VALIDATE_CS && protected_msw[0];
+    // A far CALL may name code directly. Only a resolved call gate grants
+    // gate-target privilege rules; direct calls use the ordinary CS checks,
+    // accessed-bit update and CPL-preserving cache commit shared with JMP.
+    assign cs_validation_operation = allowed && protected_msw[0] &&
+                                     (operation == spk286_microcode_pkg::MC_VALIDATE_CS ||
+                                      (operation == spk286_microcode_pkg::MC_VALIDATE_CALL_CS &&
+                                       !call_gate_candidate_valid_q));
     assign call_gate_validation_operation = allowed && operation == spk286_microcode_pkg::MC_VALIDATE_CALL_GATE && protected_msw[0];
-    assign call_gate_cs_validation_operation = allowed && operation == spk286_microcode_pkg::MC_VALIDATE_CALL_CS && protected_msw[0];
+    assign call_gate_cs_validation_operation = allowed && operation == spk286_microcode_pkg::MC_VALIDATE_CALL_CS &&
+                                               protected_msw[0] && call_gate_candidate_valid_q;
     assign call_stack_validation_operation = allowed && operation == spk286_microcode_pkg::MC_VALIDATE_CALL_STACK;
     assign call_ss_validation_operation = allowed && operation == spk286_microcode_pkg::MC_VALIDATE_CALL_SS && protected_msw[0];
     assign call_gate_stack_switch_operation = allowed && operation == spk286_microcode_pkg::MC_CALL_GATE_STACK_SWITCH;
@@ -715,6 +722,7 @@ module spk286_micro_executor (
                                     (task_gate_target_active_q ? !task_descriptor_success_live :
                                      descriptor_class == spk286_protected_pkg::DESC_CALL_GATE ? !descriptor_call_gate_success_live :
                                      descriptor_class == spk286_protected_pkg::DESC_TASK_GATE ? !task_gate_success_live :
+                                     descriptor_class == spk286_protected_pkg::DESC_CODE ? !descriptor_cs_success_live :
                                      !task_descriptor_success_live) :
                                    (call_gate_cs_validation_operation ?
                                     (descriptor_cs_offset_fault || !descriptor_call_gate_cs_success_live) :
@@ -816,6 +824,7 @@ module spk286_micro_executor (
                                         (task_gate_target_active_q ? task_descriptor_success_live :
                                          descriptor_class == spk286_protected_pkg::DESC_CALL_GATE ? descriptor_call_gate_success_live :
                                          descriptor_class == spk286_protected_pkg::DESC_TASK_GATE ? !task_gate_success_live :
+                                         descriptor_class == spk286_protected_pkg::DESC_CODE ? descriptor_cs_success_live :
                                          task_descriptor_success_live)) ||
                                       (descriptor_operand_done && descriptor_phase_q == 3'd3 && call_ss_validation_operation &&
                                        (!descriptor_call_ss_success_live || descriptor_unused_accessed)) ||

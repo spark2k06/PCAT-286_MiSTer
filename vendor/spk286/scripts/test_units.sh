@@ -26,6 +26,7 @@ tests+=(spk286_loadall_service spk286_loadall_integration spk286_loadall_protect
 tests+=(spk286_protected_entry)
 tests+=(spk286_protected_direct_call)
 tests+=(spk286_protected_return_restart)
+tests+=(spk286_protected_pop_segment_restart)
 tests+=(spk286_descriptor_inspection)
 tests+=(spk286_system_table_range)
 tests+=(spk286_outer_return_sp)

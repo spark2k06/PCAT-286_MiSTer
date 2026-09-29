@@ -831,6 +831,7 @@ module spk286 (
     spk286_micro_executor micro_executor (
         .clk(clk), .reset(reset), .cancel(semantic_cancel), .start(service_start),
         .operation_valid(operation_valid), .operation(micro_word), .operation_done(executor_done), .operation_retire(operation_retire), .dispatch_request(dispatch_request),
+        .segment_pop_opcode(opcode_q == 8'h07 || opcode_q == 8'h17 || opcode_q == 8'h1F),
         .byte_valid(queue_consume_valid && !length_fault), .byte_data(queue_consume_data), .byte_ready(executor_byte_ready),
         .decode_operand(operand_decode_enable), .decode_done(operand_decode_done), .decode_modrm_valid(operand_context_valid),
         .decode_byte_ready(operand_byte_ready), .operand_request(operand_request),

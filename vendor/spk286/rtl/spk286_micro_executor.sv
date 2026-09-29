@@ -13,6 +13,7 @@ module spk286_micro_executor (
     input  logic [7:0] byte_data,
     output logic byte_ready,
     input  logic [2:0] destination, source_index,
+    input  logic segment_pop_opcode,
     input  logic lock_prefix,
     input logic [15:0] target_read_data, effective_offset, address_base,
     input logic [15:0] segment_limit,
@@ -229,13 +230,14 @@ module spk286_micro_executor (
     logic set_frame_address, read_frame_address, decrement_frame_address, allocate_stack, set_ea_plus2;
     logic push8_invalid, pop8_invalid, stack_cursor_valid_q, stack_arch_write;
     logic begin_return_cursor, protected_return_cursor_q, return_same_sp_commit, add_allocation_arch;
+    logic segment_pop_sp_commit;
     logic [15:0] stack_cursor_q, return_stack_pointer;
-    assign stack_arch_write = stack_write_sp && !stack_cursor_valid_q;
-    // A protected RETF/IRET fault must restart with its original SS:SP.
-    // Reuse the tentative stack cursor until the validated context commits;
-    // real-mode returns retain their existing incremental stack semantics.
+    assign stack_arch_write = stack_write_sp && !(stack_cursor_valid_q || begin_return_cursor);
+    // Keep a tentative SP until protected returns or POP Sreg validate all
+    // descriptors. A fault must leave the original SS:SP restartable.
     assign begin_return_cursor = protected_msw[0] && (check_pop2 ||
-                                 (allowed && operation == spk286_microcode_pkg::MC_TASK_RETURN && !architectural_flags[14]));
+                                 (allowed && operation == spk286_microcode_pkg::MC_TASK_RETURN && !architectural_flags[14]) ||
+                                 (segment_pop_opcode && pop_operation && !stack_cursor_valid_q));
     assign return_stack_pointer = protected_return_cursor_q ? stack_cursor_q : stack_pointer;
     assign add_allocation_arch = add_allocation_sp && !protected_return_cursor_q;
     logic [2:0] frame_read_index, frame_write_index;
@@ -941,6 +943,8 @@ module spk286_micro_executor (
                                          (descriptor_operand_done && descriptor_phase_q == 3'd3 && segment_reload_operation &&
                                           descriptor_segment_success_live && descriptor_unused_accessed) ||
                                          (descriptor_operand_done && descriptor_phase_q == 3'd4 && segment_reload_operation && descriptor_success_q);
+    assign segment_pop_sp_commit = protected_return_cursor_q && segment_pop_opcode &&
+                                   segment_reload_operation && protected_segment_commit_en;
     assign protected_segment_commit_index = task_commit_segment_write ? 2'd0 : task_commit_segment_write2 ? 2'd2 :
                                            (context_commit && protected_msw[0] && cs_candidate_valid_q) ? 2'd1 : segment_index;
     assign protected_segment_commit_selector = task_commit_segment_write || task_commit_segment_write2 ?
@@ -1420,15 +1424,15 @@ module spk286_micro_executor (
                             (operation == spk286_microcode_pkg::MC_ADD_ALLOCATION_SP && iret_outer_required) ||
                             ((operand_request && operand_done) && !system_operand_request && !descriptor_active_q && !event_gate_active_q &&
                              !iret_outer_frame_operation && !call_tss_active_q && !call_gate_stack_write && !copy_call_parameters);
-    assign sequential_gpr_write_en = task_commit_gpr_write || iret_outer_sp_commit || retf_outer_sp_commit || return_same_sp_commit || call_gate_sp_commit || descriptor_result_write || fixed_result_write || string_index_write || string_count_write || string_write_acc || add_allocation_arch || frame_write_gpr || allocate_stack || move_source || stack_arch_write || (count_operation && decrement_count) || move_word || result_to_dst || (operand_gpr_write_en && !system_msw_load);
-    assign sequential_gpr_write_byte = (task_commit_gpr_write || iret_outer_sp_commit || retf_outer_sp_commit || return_same_sp_commit || call_gate_sp_commit) ? 1'b0 :
+    assign sequential_gpr_write_en = task_commit_gpr_write || iret_outer_sp_commit || retf_outer_sp_commit || return_same_sp_commit || call_gate_sp_commit || segment_pop_sp_commit || descriptor_result_write || fixed_result_write || string_index_write || string_count_write || string_write_acc || add_allocation_arch || frame_write_gpr || allocate_stack || move_source || stack_arch_write || (count_operation && decrement_count) || move_word || result_to_dst || (operand_gpr_write_en && !system_msw_load);
+    assign sequential_gpr_write_byte = (task_commit_gpr_write || iret_outer_sp_commit || retf_outer_sp_commit || return_same_sp_commit || call_gate_sp_commit || segment_pop_sp_commit) ? 1'b0 :
                             ((string_write_acc && string_byte) ||
                              (!descriptor_result_write && !fixed_result_write && !string_index_write && !string_count_write && !string_write_acc &&
                               (!add_allocation_arch && !frame_write_gpr && !allocate_stack && !stack_arch_write && !count_operation &&
                                ((move_word && operation == spk286_microcode_pkg::MC_MOVE8) ||
                                 (result_to_dst && operation == spk286_microcode_pkg::MC_WRITE_RESULT_DST8) || operand_gpr_write_byte))));
-    assign sequential_gpr_write_index = task_commit_gpr_write ? task_commit_phase_q[2:0] : (iret_outer_sp_commit || retf_outer_sp_commit || return_same_sp_commit || call_gate_sp_commit) ? 3'd4 : descriptor_result_write ? shift_kind : fixed_result_write ? (write_result_dx ? 3'd2 : 3'd0) : string_index_write ? (string_step_source ? 3'd6 : 3'd7) : string_count_write ? 3'd1 : string_write_acc ? 3'd0 : add_allocation_arch ? 3'd4 : frame_write_gpr ? frame_write_index : allocate_stack ? 3'd4 : move_source ? source_index : stack_arch_write ? 3'd4 : (count_operation ? 3'd1 : (move_word || result_to_dst ? destination : operand_gpr_write_index));
-    assign sequential_gpr_write_data = task_commit_gpr_write ? task_loaded_gpr[task_commit_phase_q[2:0] * 16 +: 16] : iret_outer_sp_commit ? iret_outer_sp_q : retf_outer_sp_commit ? iret_outer_sp_q + allocation_q : return_same_sp_commit ? stack_cursor_q + ((commit_context && allocation_valid_q) ? allocation_q : 16'd0) : call_gate_sp_commit ? stack_cursor_q : descriptor_result_write ? descriptor_result_data : fixed_result_write ? (write_result_dx ? auxiliary_q : tmp2_q) : string_index_write ? (architectural_flags[10] ? string_index-string_delta : string_index+string_delta) : string_count_write ? count_value-16'd1 : string_write_acc ? tmp0_q : add_allocation_arch ? stack_pointer+allocation_q : frame_write_gpr ? tmp0_q : allocate_stack ? stack_cursor_q - allocation_q : move_source ? tmp1_q : stack_arch_write ? stack_next_sp : (count_operation ? count_value - 16'd1 : (result_to_dst ? tmp2_q : (move_word ? tmp0_q : operand_gpr_write_data)));
+    assign sequential_gpr_write_index = task_commit_gpr_write ? task_commit_phase_q[2:0] : (iret_outer_sp_commit || retf_outer_sp_commit || return_same_sp_commit || call_gate_sp_commit || segment_pop_sp_commit) ? 3'd4 : descriptor_result_write ? shift_kind : fixed_result_write ? (write_result_dx ? 3'd2 : 3'd0) : string_index_write ? (string_step_source ? 3'd6 : 3'd7) : string_count_write ? 3'd1 : string_write_acc ? 3'd0 : add_allocation_arch ? 3'd4 : frame_write_gpr ? frame_write_index : allocate_stack ? 3'd4 : move_source ? source_index : stack_arch_write ? 3'd4 : (count_operation ? 3'd1 : (move_word || result_to_dst ? destination : operand_gpr_write_index));
+    assign sequential_gpr_write_data = task_commit_gpr_write ? task_loaded_gpr[task_commit_phase_q[2:0] * 16 +: 16] : iret_outer_sp_commit ? iret_outer_sp_q : retf_outer_sp_commit ? iret_outer_sp_q + allocation_q : return_same_sp_commit ? stack_cursor_q + ((commit_context && allocation_valid_q) ? allocation_q : 16'd0) : call_gate_sp_commit ? stack_cursor_q : segment_pop_sp_commit ? stack_cursor_q : descriptor_result_write ? descriptor_result_data : fixed_result_write ? (write_result_dx ? auxiliary_q : tmp2_q) : string_index_write ? (architectural_flags[10] ? string_index-string_delta : string_index+string_delta) : string_count_write ? count_value-16'd1 : string_write_acc ? tmp0_q : add_allocation_arch ? stack_pointer+allocation_q : frame_write_gpr ? tmp0_q : allocate_stack ? stack_cursor_q - allocation_q : move_source ? tmp1_q : stack_arch_write ? stack_next_sp : (count_operation ? count_value - 16'd1 : (result_to_dst ? tmp2_q : (move_word ? tmp0_q : operand_gpr_write_data)));
     assign sequential_flags_write_en = !reset && (task_commit_flags_write || arpl_commit || direct_flags || descriptor_verify_flags_write || descriptor_inspect_flags_write || commit_flags || restore_flags || set_if || clear_if_tf || clear_event_flags || iret_commit);
     assign task_flags_write_en = !reset && task_commit_flags_write;
     assign sequential_flags_write_data = task_commit_flags_write ? task_loaded_flags : arpl_commit ? (arpl_adjust ? 16'h0040 : 16'h0000) : direct_flags ? direct_flags_data : descriptor_verify_flags_write ? (descriptor_verify_success_live ? 16'h0040 : 16'h0000) : descriptor_inspect_flags_write ? (descriptor_inspect_success_live ? 16'h0040 : 16'h0000) : restore_flags ? tmp0_q : (iret_commit ? tmp2_q : (set_if ? {6'd0, if_value, 9'd0} : ((clear_if_tf || clear_event_flags) ? 16'd0 : flags_q)));
@@ -1780,7 +1784,7 @@ module spk286_micro_executor (
                 stack_cursor_valid_q <= 1'b1;
                 protected_return_cursor_q <= 1'b1;
             end
-            if (stack_write_sp && stack_cursor_valid_q) stack_cursor_q <= stack_next_sp;
+            if (stack_write_sp && (stack_cursor_valid_q || begin_return_cursor)) stack_cursor_q <= stack_next_sp;
             if (read_stack_cursor) begin tmp0_q <= stack_cursor_q; temporary_valid_q[0] <= 1'b1; end
             if (frame_read_gpr) begin tmp0_q <= register_state[frame_read_index*16 +: 16]; temporary_valid_q[0] <= 1'b1; end
             if (save_auxiliary) begin auxiliary_q <= tmp0_q; auxiliary_valid_q <= 1'b1; end

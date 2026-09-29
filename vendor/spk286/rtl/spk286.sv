@@ -667,6 +667,7 @@ module spk286 (
         .clk(clk), .reset(reset), .ready(fetch_bus_ready), .data_in(data_in),
         .code_base(debug_segment_bases[24 +: 24]),
         .code_limit(debug_segment_limits[16 +: 16]),
+        .wrap_ip(!protected_msw[0]),
         .restart(stream_restart), .restart_ip(stream_ip),
         .request(execute_enable ? fetch_request_internal : fetch_request),
         .suspend(event_active || halted || shutdown),

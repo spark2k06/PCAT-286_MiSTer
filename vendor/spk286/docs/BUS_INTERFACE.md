@@ -38,9 +38,12 @@ Response data is retained until its consumer accepts it.
 For code fetch, an even word request uses both lanes (A0=0, BHE_n=0); an odd request returns one
 byte from D15:8 (A0=1, BHE_n=0). A final even byte at the cached segment limit
 uses only D7:0 (BHE_n=1). Inactive byte data is discarded. The next request is
-word-aligned after an odd byte. No request crosses the cached segment limit;
-the cursor retains exhaustion instead of wrapping. This does not yet generate
-an architectural exception. Data words have a separate whole-width limit check.
+word-aligned after an odd byte. The top-level enables 16-bit IP wrap in real
+mode, so a fetch ending at FFFF can continue at offset 0000. In protected mode
+the cursor retains its 17th overflow bit and blocks rather than silently
+wrapping; both modes still enforce the cached segment limit. The resulting
+fetch fault is delivered through the core's exception path. Data words have a
+separate whole-width limit check.
 
 On redirect, an outstanding request completes unchanged and its response is
 discarded. The new stream starts afterward. RESET can abort the request.

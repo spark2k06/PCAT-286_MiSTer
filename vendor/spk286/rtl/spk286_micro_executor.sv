@@ -727,9 +727,10 @@ module spk286_micro_executor (
                                                   descriptor_class == spk286_protected_pkg::DESC_EXPAND_DOWN) &&
                                                  descriptor_unused_writable && descriptor_unused_dpl == protected_cpl &&
                                                  descriptor_unused_rpl == protected_cpl) :
+                                                // Data reads from conforming code ignore DPL/RPL.
                                                 (descriptor_unused_segment &&
-                                                 ((descriptor_unused_conforming && descriptor_unused_dpl <= protected_cpl) ||
-                                                  (!descriptor_unused_conforming && descriptor_unused_dpl >= descriptor_effective_privilege)) &&
+                                                 (descriptor_unused_conforming ||
+                                                  descriptor_unused_dpl >= descriptor_effective_privilege) &&
                                                  (descriptor_class != spk286_protected_pkg::DESC_CODE || descriptor_unused_readable))))));
     assign descriptor_result_data = descriptor_load_access ? {descriptor_access_rights, 8'h00} : descriptor_limit;
     assign descriptor_result_write = descriptor_active_q && descriptor_operand_done && descriptor_phase_q == 3'd3 &&

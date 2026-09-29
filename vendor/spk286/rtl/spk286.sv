@@ -13,6 +13,10 @@ module spk286 (
     output logic         halted, shutdown, event_completed,
     output logic [7:0]   debug_event_vector,
     output logic [2:0]   debug_event_kind,
+    output logic         debug_event_error_valid,
+    output logic [15:0]  debug_event_error_code,
+    output logic [7:0]   debug_fault_vector,
+    output logic [15:0]  debug_fault_error_code,
     output logic [15:0]  debug_instruction_ip,
     output logic         debug_nmi_pending, debug_nmi_blocked, debug_sti_shadow,
 
@@ -321,6 +325,7 @@ module spk286 (
     logic [15:0] protected_segment_classes;
     logic [3:0] protected_segment_valid, protected_segment_present, protected_segment_protected, protected_segment_tables;
     logic [7:0] protected_segment_dpl, protected_segment_rpl;
+    logic [1:0] current_cpl;
     logic protected_segment_commit_en;
     logic [1:0] protected_segment_commit_index;
     logic [15:0] protected_segment_commit_selector, protected_segment_commit_limit;
@@ -402,6 +407,11 @@ module spk286 (
     assign segment_state_commit_dpl = protected_segment_commit_en ? protected_segment_commit_dpl : 2'd0;
     assign segment_state_commit_table_indicator = protected_segment_commit_en ? protected_segment_commit_table_indicator : 1'b0;
     assign segment_state_commit_rpl = protected_segment_commit_en ? protected_segment_commit_rpl : segment_state_commit_selector[1:0];
+
+    // LMSW preserves the real-mode CS value/cache. Its low selector bits
+    // are not a privilege level until a protected CS load has committed.
+    // Protected loads normalize CS.RPL to CPL, including conforming code.
+    assign current_cpl = protected_segment_protected[1] ? debug_cs[1:0] : 2'd0;
 
     assign selected_segment_index = execute_enable ? service_segment : segment_read_index;
     assign debug_segment_selectors = protected_msw[0] ? protected_segment_selectors : real_segment_selectors;
@@ -621,7 +631,7 @@ module spk286 (
     /* verilator lint_off PINMISSING */
     spk286_loadall_service loadall_service (
         .clk(clk), .reset(reset), .cancel(semantic_cancel), .start(loadall_start),
-        .current_protected(protected_msw[0]), .current_cpl(debug_cs[1:0]),
+        .current_protected(protected_msw[0]), .current_cpl(current_cpl),
         .memory_done(loadall_memory_done), .memory_read_data(memory_read_data),
         .memory_request(loadall_memory_request), .memory_write(loadall_memory_write),
         .memory_byte(loadall_memory_byte), .memory_address(loadall_memory_address),
@@ -869,7 +879,7 @@ module spk286 (
         .protected_tr_base(protected_tr_base), .protected_tr_limit(protected_tr_limit),
         .protected_tr_valid(protected_tr_valid), .protected_tr_present(protected_tr_present),
         .protected_ss_selector(protected_segment_selectors[2*16 +: 16]),
-        .protected_cpl(debug_cs[1:0]),
+        .protected_cpl(current_cpl),
         .protected_msw_load_en(protected_msw_load_en), .protected_msw_load_data(protected_msw_load_data), .protected_msw_load_mask(protected_msw_load_mask),
         .protected_gdtr_load_en(protected_gdtr_load_en), .protected_idtr_load_en(protected_idtr_load_en),
         .protected_gdtr_load_limit(protected_gdtr_load_limit), .protected_idtr_load_limit(protected_idtr_load_limit),
@@ -1106,4 +1116,8 @@ module spk286 (
         .sti_shadow(debug_sti_shadow), .instruction_ip(debug_instruction_ip), .event_kind(event_kind)
     );
     assign debug_event_kind = event_kind;
+    assign debug_event_error_valid = event_error_valid;
+    assign debug_event_error_code = event_error_code;
+    assign debug_fault_vector = fault_vector;
+    assign debug_fault_error_code = fault_error_code;
 endmodule

@@ -285,7 +285,7 @@ module spk286_micro_executor (
     logic system_operation, system_table_operation, system_table_store, system_table_load;
     logic system_msw_store, system_msw_load, system_ldtr_store, system_tr_store;
     logic system_verify_read, system_verify_write;
-    logic system_privilege_fault;
+    logic system_privilege_fault, halt_privilege_fault;
     logic arpl_check_operation, arpl_operation, arpl_adjust, arpl_commit, arpl_fault;
     logic clts_operation, clts_commit, clts_privilege_fault, clts_lock_fault, clts_fault;
     logic system_selector_store, system_operand_request, system_operand_write;
@@ -898,10 +898,10 @@ module spk286_micro_executor (
                                             descriptor_unused_accessed) ||
                                            (descriptor_operand_done && descriptor_phase_q == 3'd4 && descriptor_success_q));
     assign descriptor_null_commit = descriptor_begin && descriptor_selector_null && !descriptor_pre_fault && descriptor_load_ldtr;
-    assign system_fault = task_service_fault || system_privilege_fault || arpl_fault || clts_fault || call_tss_pre_fault || (call_stack_range_fault && protected_msw[0]) ||
+    assign system_fault = task_service_fault || system_privilege_fault || halt_privilege_fault || arpl_fault || clts_fault || call_tss_pre_fault || (call_stack_range_fault && protected_msw[0]) ||
                           descriptor_pre_fault || descriptor_post_fault ||
                           event_gate_pre_fault || event_gate_post_fault;
-    assign system_fault_vector = task_service_fault ? task_service_fault_vector : system_privilege_fault ? 8'd13 :
+    assign system_fault_vector = task_service_fault ? task_service_fault_vector : (system_privilege_fault || halt_privilege_fault) ? 8'd13 :
                                  arpl_fault ? 8'd6 :
                                  clts_lock_fault ? 8'd6 :
                                  clts_privilege_fault ? 8'd13 :
@@ -1218,7 +1218,11 @@ module spk286_micro_executor (
     assign software_event_request = request_event;
     assign software_vector = tmp0_q[7:0];
     assign halt_operation = allowed && operation == spk286_microcode_pkg::MC_HALT;
-    assign halt_request = halt_operation;
+    // HLT is always privileged on a protected-mode 286, even with IOPL=3.
+    // Extenders use its #GP(0) path for service stubs; a denied HLT must not
+    // enter the event controller's halted state before fault delivery.
+    assign halt_privilege_fault = halt_operation && protected_msw[0] && protected_cpl != 2'd0;
+    assign halt_request = halt_operation && !halt_privilege_fault;
 
     // A direct far CALL/JMP may have selected an available 80286 TSS in the
     // preceding descriptor service. TASK_SWITCH is deliberately a no-op for

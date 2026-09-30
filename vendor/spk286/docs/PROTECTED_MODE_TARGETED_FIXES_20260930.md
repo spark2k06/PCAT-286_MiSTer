@@ -82,3 +82,53 @@ SPK286_BUILD_DIR="$PWD/build/pm-targeted-20260930" SPK286_BUILD_JOBS=4 \
 
 Whole-project regression and hardware/synthesis checks remain deferred as
 requested; no new OS boot was run for this milestone.
+
+## H01 — System instruction mode and privilege matrix
+
+Intel chapter 10 and the instruction appendices distinguish protected-only
+instructions from instructions restricted to CPL0. Native 86Box's 286
+`op0F00_common` and `NOTRM` paths support the same matrix. The new generic
+microcode checks precede operand reads; the executor also suppresses table
+transactions and null-LDTR publication on privilege denial. SLDT/STR are
+unprivileged when PE=1. LLDT/LTR denial reports #GP(0), before selector checks.
+LAR/LSL/VERR/VERW reject real mode without an operand transaction.
+
+The reproducer initially fails on real-mode SLDT, which incorrectly writes its
+destination instead of requesting #UD. The completed matrix uses valid system
+descriptors so wrong privilege checks cannot hide behind invalid types.
+
+| Check | Actual result |
+|---|---|
+| New `spk286_system_access`, both simulators | 2112 cases / 9144 checks in each |
+| Existing `spk286_protected_system`, both | 538 checks in each |
+| Existing `spk286_protected_ltr`, both | 23 checks in each |
+| Existing `spk286_clts_privilege`, both | 13 checks in each |
+| Microcode ROM / decoder, both | 304 / 263 checks in each |
+| All focused microcode/compiler tests | 101 passed, including six new H01 tests |
+| Independent active literal and canonical round-trip audit | Pass |
+| Verilator RTL lint / generated consistency | Pass |
+
+The bank covers all rows of the H01 matrix at CPL0..3, PE=0/1, all supported
+register/memory forms, optional DS prefix, READY stalls and all timing policies.
+Invalid memory operands and valid/null/TI LLDT/LTR selectors check fault
+priority. Denied operations preserve GPRs, FLAGS, MSW, descriptor caches,
+selectors and BUSY, with no operand or descriptor side effect. Allowed stores
+and loads are checked for their exact values, including LTR's BUSY write.
+
+Format 24 adds two generic controls and exactly eight microcode words. The old
+format-23 literal remains frozen; its historical immediate-execution test now
+reconstructs that literal, while the new H01 test independently verifies the
+entire current image as that literal plus the eight specified insertions.
+The active audit fixture was constructed from that independent delta, not by
+changing instruction expectations to fit RTL. No compatible protected-mode
+physical SingleStep corpus is available for this matrix; native source and
+Intel remain supporting/primary references respectively.
+
+```sh
+SPK286_BUILD_DIR="$PWD/build/pm-targeted-20260930" SPK286_BUILD_JOBS=4 \
+  bash scripts/test_units.sh both spk286_system_access
+python3 -m unittest discover -s tests -p 'test_microcode*.py'
+```
+
+Logs: `build/h01-*.log`. Whole-project RTL regression, OS boot, Quartus synthesis
+and physical protected-mode measurements remain outside this milestone.

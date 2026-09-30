@@ -131,6 +131,16 @@ null/non-null selectors and invalid operands. A rejected operation must not
 update LDTR/TR, the BUSY bit, destination memory or general registers. Resolve
 fault precedence before combining a privilege violation with a bad operand.
 
+**2026-09-30 implementation follow-up: H01 corrected.** SLDT/STR are now
+unprivileged in protected mode and reject real mode. Explicit microcode checks
+reject forbidden LLDT/LTR before reading their operand; privilege faults carry
+zero, not the operand selector, as their error code. VERR/VERW and LAR/LSL also
+reject real mode before operand access. The full listed mode/CPL matrix passes
+2112 directed cases / 9144 checks in each simulator, including valid/null/TI
+selectors and invalid memory operands. Existing system/LTR/CLTS banks and
+compiler/ROM/decoder checks pass. See
+[targeted milestone evidence](PROTECTED_MODE_TARGETED_FIXES_20260930.md).
+
 ### H02 — IOPL, interrupt control, HLT and LOCK (S; LOCK oracle caveat, P1)
 
 The micro-executor's `set_if` and `halt_request` paths are unconditional after

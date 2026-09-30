@@ -3,7 +3,11 @@
 The authoritative source is `source/*.mc`, compiled by
 `tools/microcode/compile_microcode.py` using Python's standard library.
 `SPK286_MICROCODE_FORMAT.md` defines the architecture; this file documents the
-preserved Phase 2.75/3/4 formats and the incremental extensions below; format 22 is current.
+preserved formats and incremental extensions. Format 22 adds register-direct
+ALU/MOV execution; format 23 extends the atomic register commit to immediate
+operands while retaining the validated memory sequence. See
+[`REGISTER_EXECUTION_OPTIMIZATION.md`](../docs/REGISTER_EXECUTION_OPTIMIZATION.md)
+and [`IMMEDIATE_EXECUTION_OPTIMIZATION.md`](../docs/IMMEDIATE_EXECUTION_OPTIMIZATION.md).
 
 ```text
 make microcode        # regenerate all five committed artifacts
@@ -440,3 +444,15 @@ and independent review remain pending; no new waiver or Phase 8 work is claimed.
 See PHASE7_REP_EVENT_EVIDENCE.md and PHASE7_IO_CAPTURE_REVIEW.md for evidence
 limitations. Complete Phase 7 remains incomplete; this directory is not a
 verified Git delivery.
+
+## Protected system access checks — format 24, 2026-09-30
+
+H01 adds controls 193 (`CHECK_PROTECTED_MODE`) and 194
+(`CHECK_SYSTEM_PRIVILEGE`). The active image has 122 entries / 731 words,
+ten address bits and eight control bits. LLDT/LTR check protected mode and
+CPL0 before reading the selector operand. SLDT/STR, VERR/VERW and LAR/LSL check
+protected mode before their operand side effects. These are semantic checks,
+not timing padding. Existing compiler formats and their frozen literals remain
+supported. The independent active fixture is `microcode_system_access.json`,
+derived by inserting exactly eight controls into the frozen format-23 image.
+See `docs/PROTECTED_MODE_TARGETED_FIXES_20260930.md` for bounded verification.

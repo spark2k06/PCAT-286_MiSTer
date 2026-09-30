@@ -285,7 +285,7 @@ module spk286_micro_executor (
     logic system_operation, system_table_operation, system_table_store, system_table_load;
     logic system_msw_store, system_msw_load, system_ldtr_store, system_tr_store;
     logic system_verify_read, system_verify_write;
-    logic system_privilege_fault, halt_privilege_fault;
+    logic system_privilege_fault, system_mode_fault, system_protected_check, system_privilege_check, halt_privilege_fault;
     logic arpl_check_operation, arpl_operation, arpl_adjust, arpl_commit, arpl_fault;
     logic clts_operation, clts_commit, clts_privilege_fault, clts_lock_fault, clts_fault;
     logic system_selector_store, system_operand_request, system_operand_write;
@@ -333,8 +333,15 @@ module spk286_micro_executor (
     assign system_msw_load = allowed && operation == spk286_microcode_pkg::MC_SYSTEM_LOAD_MSW;
     assign system_ldtr_store = allowed && operation == spk286_microcode_pkg::MC_SYSTEM_STORE_LDTR;
     assign system_tr_store = allowed && operation == spk286_microcode_pkg::MC_SYSTEM_STORE_TR;
+    // Mode/privilege checks are explicit microcode operations before the
+    // operand read. SLDT/STR themselves are unprivileged in protected mode.
+    assign system_protected_check = allowed && operation == spk286_microcode_pkg::MC_CHECK_PROTECTED_MODE;
+    assign system_privilege_check = allowed && operation == spk286_microcode_pkg::MC_CHECK_SYSTEM_PRIVILEGE;
+    assign system_mode_fault = !protected_msw[0] && (system_protected_check || system_privilege_check ||
+                                                   system_ldtr_store || system_tr_store);
     assign system_privilege_fault = protected_msw[0] && protected_cpl != 2'd0 &&
-                                    (system_table_load || system_msw_load || system_ldtr_store || system_tr_store);
+                                    (system_table_load || system_msw_load || system_privilege_check ||
+                                     descriptor_load_ldtr || descriptor_load_tr);
     assign system_verify_read = allowed && operation == spk286_microcode_pkg::MC_SYSTEM_VERIFY_READ;
     assign system_verify_write = allowed && operation == spk286_microcode_pkg::MC_SYSTEM_VERIFY_WRITE;
     assign arpl_check_operation = allowed && operation == spk286_microcode_pkg::MC_SYSTEM_ARPL_CHECK;
@@ -360,8 +367,8 @@ module spk286_micro_executor (
                                  (effective_offset <= segment_limit ||
                                   {1'b0, effective_offset} + 17'd5 > 17'h0FFFF) :
                                  ({1'b0, effective_offset} + 17'd5 > {1'b0, segment_limit}));
-    assign system_begin = system_operation && !system_active_q && !system_limit_fault;
-    assign system_operand_request = system_active_q && system_operation && !system_limit_fault;
+    assign system_begin = system_operation && !system_active_q && !system_limit_fault && !system_privilege_fault && !system_mode_fault;
+    assign system_operand_request = system_active_q && system_operation && !system_limit_fault && !system_privilege_fault && !system_mode_fault;
     assign system_operand_write = system_operand_request && (system_table_store || system_msw_store || system_selector_store);
     assign system_operand_done = system_operand_request && operand_done;
     assign system_done = system_operand_done && (!system_table_operation || system_index_q == 2'd2);
@@ -620,7 +627,7 @@ module spk286_micro_executor (
                                          (descriptor_selector_ti && (!protected_ldtr_valid || !protected_ldtr_present)));
     assign descriptor_segment_null_commit = descriptor_begin && segment_reload_operation &&
                                            descriptor_selector_null && !descriptor_pre_fault && segment_index != 2'd2;
-    assign descriptor_read_begin = descriptor_begin && !descriptor_pre_fault && !descriptor_verify_negative && !descriptor_inspect_negative &&
+    assign descriptor_read_begin = descriptor_begin && !descriptor_pre_fault && !system_privilege_fault && !descriptor_verify_negative && !descriptor_inspect_negative &&
                                    !descriptor_segment_null_commit && !descriptor_selector_null;
     assign descriptor_raw_q = {descriptor_word3_q, descriptor_word2_q, descriptor_word1_q, descriptor_word0_q};
     assign descriptor_raw_candidate = (descriptor_operand_done && descriptor_phase_q == 3'd3) ?
@@ -897,11 +904,11 @@ module spk286_micro_executor (
                                             ({1'b0, tmp0_q} <= {1'b0, descriptor_limit}) &&
                                             descriptor_unused_accessed) ||
                                            (descriptor_operand_done && descriptor_phase_q == 3'd4 && descriptor_success_q));
-    assign descriptor_null_commit = descriptor_begin && descriptor_selector_null && !descriptor_pre_fault && descriptor_load_ldtr;
-    assign system_fault = task_service_fault || system_privilege_fault || halt_privilege_fault || arpl_fault || clts_fault || call_tss_pre_fault || (call_stack_range_fault && protected_msw[0]) ||
+    assign descriptor_null_commit = descriptor_begin && descriptor_selector_null && !descriptor_pre_fault && !system_privilege_fault && descriptor_load_ldtr;
+    assign system_fault = task_service_fault || system_mode_fault || system_privilege_fault || halt_privilege_fault || arpl_fault || clts_fault || call_tss_pre_fault || (call_stack_range_fault && protected_msw[0]) ||
                           descriptor_pre_fault || descriptor_post_fault ||
                           event_gate_pre_fault || event_gate_post_fault;
-    assign system_fault_vector = task_service_fault ? task_service_fault_vector : (system_privilege_fault || halt_privilege_fault) ? 8'd13 :
+    assign system_fault_vector = task_service_fault ? task_service_fault_vector : system_mode_fault ? 8'd6 : (system_privilege_fault || halt_privilege_fault) ? 8'd13 :
                                  arpl_fault ? 8'd6 :
                                  clts_lock_fault ? 8'd6 :
                                  clts_privilege_fault ? 8'd13 :
@@ -936,6 +943,7 @@ module spk286_micro_executor (
     assign system_fault_error_code = task_service_fault ?
                                        ((task_service_fault_error_code & 16'hFFFC) |
                                         (task_fault_external ? 16'h0001 : 16'h0000)) :
+                                     (system_mode_fault || system_privilege_fault) ? 16'd0 :
                                      (call_tss_pre_fault || (call_stack_range_fault && protected_msw[0])) ? call_gate_selector_q :
                                      (event_gate_pre_fault || event_gate_post_fault) ?
                                        (event_gate_entry_offset | 16'h0002 | (task_fault_external ? 16'h0001 : 16'h0000)) :
@@ -1437,7 +1445,7 @@ module spk286_micro_executor (
                             (call_gate_stack_switch_operation && (!call_gate_outer_required || (call_gate_stack_write_done && call_gate_stack_switch_phase_q == 2'd1))) ||
                             call_parameter_operation_done ||
                             (check_bounds && !bounds_fault) || read_segment || segment_write || adjust_complete || (check_arithmetic && !arithmetic_fault_q) || dispatch_request || constant_zero || constant_ones || read_ea || read_target || move_source || set_address || add_base || shift_complete || count_low || direct_flags || sign_extend_byte || sign_fill_word || constant_one || read_flags || restore_flags || set_if || clear_if_tf || read_event_flags || read_event_cs || read_event_ip ||
-                            context_commit || request_event || halt_operation || clear_event_flags || (push_event_error && (!event_error_valid || push_event_error_transfer && operand_done)) || (ack_operation && (!event_needs_ack || ack_done)) || ((fetch_byte || fetch_byte_tmp1) && byte_valid) ||
+                            context_commit || request_event || halt_operation || system_protected_check || system_privilege_check || clear_event_flags || (push_event_error && (!event_error_valid || push_event_error_transfer && operand_done)) || (ack_operation && (!event_needs_ack || ack_done)) || ((fetch_byte || fetch_byte_tmp1) && byte_valid) ||
                             read_ip || target_relative || target_absolute || adjust_stack || count_operation ||
                             (push_operation && !push_enabled) || (redirect_operation && (!branch_taken || redirect_ready)) || move_word || read_destination || compute_alu || commit_flags || discard_result || result_to_dst ||
                             (fetch_word && byte_valid && high_byte_q) || (fetch_signed_byte && byte_valid) ||

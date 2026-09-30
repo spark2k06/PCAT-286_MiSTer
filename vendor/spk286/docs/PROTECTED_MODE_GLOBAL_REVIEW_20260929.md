@@ -168,8 +168,19 @@ also accepts MEMTEST, TELLME, TELLPROT, SWTEST, XMEMTEST and BIOSDUMP; the origi
 BIG simulation was stopped by the user before completion; the user subsequently
 confirmed BIG working on PCAT/MiSTer hardware on 2026-09-30. These utilities do
 not close the privilege matrix. CLI/STI, scalar/string I/O and explicit LOCK
-remain separate pending work. See the bounded validation, captured context and
+were separate pending work at that checkpoint. See the bounded validation, captured context and
 user-reported hardware acceptance in [Phar Lap HLT diagnosis](PHAR_LAP_HLT_20260930.md).
+
+**2026-09-30 second implementation follow-up: CLI/STI and I/O corrected;
+H02 remains partial for LOCK and protected REP-zero precedence.** All 16
+CPL/IOPL combinations pass the new 2772-case bank in Verilator and Icarus.
+Denial produces #GP(0) before IF, STI-shadow, port, memory or string count/index
+side effects. Allowed scalar byte/word immediate/DX and INS/OUTS cases include
+REP, DF, odd ports, READY stalls and all three timing policies. Existing I/O,
+HLT and lifecycle banks pass; 1400 physical real-mode SingleStep samples pass.
+No I/O bitmap or other 386 feature is added. Explicit LOCK and the privilege
+check for protected zero-count REP remain unresolved and were not changed.
+See [targeted milestone evidence](PROTECTED_MODE_TARGETED_FIXES_20260930.md).
 
 ### H03 — POPF and non-task IRET flag masks (S, P0)
 

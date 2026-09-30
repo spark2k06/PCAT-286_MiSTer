@@ -6,7 +6,7 @@ from tools.microcode.audit_microcode import canonical_source, read_generated_wor
 
 
 class SystemAccessMicrocodeTests(unittest.TestCase):
-    def test_current_rom_adds_only_the_eight_documented_checks(self):
+    def test_frozen_h01_rom_adds_only_the_eight_documented_checks(self):
         old = json.loads((ROOT / 'tests/fixtures/microcode_immediate_execution.json').read_text())
         additions = {
             'SYSTEM_STORE_LDTR': (0, 193), 'SYSTEM_STORE_TR': (0, 193),
@@ -24,10 +24,11 @@ class SystemAccessMicrocodeTests(unittest.TestCase):
                 offset, code = additions[name]
                 body.insert(offset, code)
             expected_words.extend(body)
-        program = compile_sources({p.name: p.read_text() for p in (ROOT / 'microcode/source').glob('*.mc')})
+        frozen = json.loads((ROOT / 'tests/fixtures/microcode_system_access.json').read_text())
+        program = compile_sources({'format24.mc': canonical_source(frozen['words'], frozen['entries'],
+                    frozen['labels'], {int(k): v for k, v in frozen['branch_targets'].items()})})
         self.assertEqual([encode(op) for op in program.operations], expected_words)
         self.assertEqual(program.entries, expected_entries)
-        frozen = json.loads((ROOT / 'tests/fixtures/microcode_system_access.json').read_text())
         self.assertEqual(frozen['words'], expected_words)
         self.assertEqual(frozen['entries'], expected_entries)
         generated = generate(program)

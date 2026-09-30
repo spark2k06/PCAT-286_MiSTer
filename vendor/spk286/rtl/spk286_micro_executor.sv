@@ -182,10 +182,16 @@ module spk286_micro_executor (
     output logic [7:0] system_fault_vector,
     output logic [15:0] system_fault_error_code
 );
-    logic fetch_port, io_read, io_write, io_byte;
+    logic fetch_port, io_read, io_write, io_byte, io_operation, io_privilege_check, io_privilege_fault, if_control_operation;
+    assign if_control_operation = allowed && operation == spk286_microcode_pkg::MC_SET_IF;
+    assign io_privilege_check = allowed && operation == spk286_microcode_pkg::MC_CHECK_IO_PRIVILEGE;
+    assign io_operation = allowed && (operation == spk286_microcode_pkg::MC_IO_READ8 || operation == spk286_microcode_pkg::MC_IO_READ16 ||
+                                     operation == spk286_microcode_pkg::MC_IO_WRITE8 || operation == spk286_microcode_pkg::MC_IO_WRITE16);
+    assign io_privilege_fault = protected_msw[0] && protected_cpl > architectural_flags[13:12] &&
+                                (if_control_operation || io_privilege_check || io_operation);
     assign fetch_port = allowed && operation == spk286_microcode_pkg::MC_FETCH_PORT;
-    assign io_read = allowed && temporary_valid_q[1] && (operation == spk286_microcode_pkg::MC_IO_READ8 || operation == spk286_microcode_pkg::MC_IO_READ16);
-    assign io_write = allowed && &temporary_valid_q[1:0] && (operation == spk286_microcode_pkg::MC_IO_WRITE8 || operation == spk286_microcode_pkg::MC_IO_WRITE16);
+    assign io_read = allowed && !io_privilege_fault && temporary_valid_q[1] && (operation == spk286_microcode_pkg::MC_IO_READ8 || operation == spk286_microcode_pkg::MC_IO_READ16);
+    assign io_write = allowed && !io_privilege_fault && &temporary_valid_q[1:0] && (operation == spk286_microcode_pkg::MC_IO_WRITE8 || operation == spk286_microcode_pkg::MC_IO_WRITE16);
     assign io_byte = operation == spk286_microcode_pkg::MC_IO_READ8 || operation == spk286_microcode_pkg::MC_IO_WRITE8;
     assign io_transfer = io_read || io_write;
     assign io_port = tmp1_q;
@@ -905,10 +911,10 @@ module spk286_micro_executor (
                                             descriptor_unused_accessed) ||
                                            (descriptor_operand_done && descriptor_phase_q == 3'd4 && descriptor_success_q));
     assign descriptor_null_commit = descriptor_begin && descriptor_selector_null && !descriptor_pre_fault && !system_privilege_fault && descriptor_load_ldtr;
-    assign system_fault = task_service_fault || system_mode_fault || system_privilege_fault || halt_privilege_fault || arpl_fault || clts_fault || call_tss_pre_fault || (call_stack_range_fault && protected_msw[0]) ||
+    assign system_fault = task_service_fault || system_mode_fault || system_privilege_fault || io_privilege_fault || halt_privilege_fault || arpl_fault || clts_fault || call_tss_pre_fault || (call_stack_range_fault && protected_msw[0]) ||
                           descriptor_pre_fault || descriptor_post_fault ||
                           event_gate_pre_fault || event_gate_post_fault;
-    assign system_fault_vector = task_service_fault ? task_service_fault_vector : system_mode_fault ? 8'd6 : (system_privilege_fault || halt_privilege_fault) ? 8'd13 :
+    assign system_fault_vector = task_service_fault ? task_service_fault_vector : system_mode_fault ? 8'd6 : (system_privilege_fault || io_privilege_fault || halt_privilege_fault) ? 8'd13 :
                                  arpl_fault ? 8'd6 :
                                  clts_lock_fault ? 8'd6 :
                                  clts_privilege_fault ? 8'd13 :
@@ -943,7 +949,7 @@ module spk286_micro_executor (
     assign system_fault_error_code = task_service_fault ?
                                        ((task_service_fault_error_code & 16'hFFFC) |
                                         (task_fault_external ? 16'h0001 : 16'h0000)) :
-                                     (system_mode_fault || system_privilege_fault) ? 16'd0 :
+                                     (system_mode_fault || system_privilege_fault || io_privilege_fault) ? 16'd0 :
                                      (call_tss_pre_fault || (call_stack_range_fault && protected_msw[0])) ? call_gate_selector_q :
                                      (event_gate_pre_fault || event_gate_post_fault) ?
                                        (event_gate_entry_offset | 16'h0002 | (task_fault_external ? 16'h0001 : 16'h0000)) :
@@ -1197,7 +1203,7 @@ module spk286_micro_executor (
     assign fetch_byte_tmp1 = allowed && operation == spk286_microcode_pkg::MC_FETCH_IMM8_TMP1;
     assign read_flags = allowed && operation == spk286_microcode_pkg::MC_READ_FLAGS;
     assign restore_flags = allowed && operation == spk286_microcode_pkg::MC_RESTORE_FLAGS && temporary_valid_q[0];
-    assign set_if = allowed && operation == spk286_microcode_pkg::MC_SET_IF;
+    assign set_if = if_control_operation && !io_privilege_fault;
     assign clear_if_tf = allowed && operation == spk286_microcode_pkg::MC_CLEAR_IF_TF;
     assign read_event_flags = allowed && operation == spk286_microcode_pkg::MC_EVENT_FLAGS;
     assign read_event_cs = allowed && operation == spk286_microcode_pkg::MC_EVENT_CS;
@@ -1445,7 +1451,7 @@ module spk286_micro_executor (
                             (call_gate_stack_switch_operation && (!call_gate_outer_required || (call_gate_stack_write_done && call_gate_stack_switch_phase_q == 2'd1))) ||
                             call_parameter_operation_done ||
                             (check_bounds && !bounds_fault) || read_segment || segment_write || adjust_complete || (check_arithmetic && !arithmetic_fault_q) || dispatch_request || constant_zero || constant_ones || read_ea || read_target || move_source || set_address || add_base || shift_complete || count_low || direct_flags || sign_extend_byte || sign_fill_word || constant_one || read_flags || restore_flags || set_if || clear_if_tf || read_event_flags || read_event_cs || read_event_ip ||
-                            context_commit || request_event || halt_operation || system_protected_check || system_privilege_check || clear_event_flags || (push_event_error && (!event_error_valid || push_event_error_transfer && operand_done)) || (ack_operation && (!event_needs_ack || ack_done)) || ((fetch_byte || fetch_byte_tmp1) && byte_valid) ||
+                            context_commit || request_event || halt_operation || system_protected_check || system_privilege_check || io_privilege_check || clear_event_flags || (push_event_error && (!event_error_valid || push_event_error_transfer && operand_done)) || (ack_operation && (!event_needs_ack || ack_done)) || ((fetch_byte || fetch_byte_tmp1) && byte_valid) ||
                             read_ip || target_relative || target_absolute || adjust_stack || count_operation ||
                             (push_operation && !push_enabled) || (redirect_operation && (!branch_taken || redirect_ready)) || move_word || read_destination || compute_alu || commit_flags || discard_result || result_to_dst ||
                             (fetch_word && byte_valid && high_byte_q) || (fetch_signed_byte && byte_valid) ||

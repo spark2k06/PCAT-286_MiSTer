@@ -118,8 +118,9 @@ and loads are checked for their exact values, including LTR's BUSY write.
 Format 24 adds two generic controls and exactly eight microcode words. The old
 format-23 literal remains frozen; its historical immediate-execution test now
 reconstructs that literal, while the new H01 test independently verifies the
-entire current image as that literal plus the eight specified insertions.
-The active audit fixture was constructed from that independent delta, not by
+entire H01 image as that literal plus the eight specified insertions. H02 now
+checks the next delta separately, retaining this format-24 fixture frozen.
+The H01 audit fixture was constructed from that independent delta, not by
 changing instruction expectations to fit RTL. No compatible protected-mode
 physical SingleStep corpus is available for this matrix; native source and
 Intel remain supporting/primary references respectively.
@@ -132,3 +133,87 @@ python3 -m unittest discover -s tests -p 'test_microcode*.py'
 
 Logs: `build/h01-*.log`. Whole-project RTL regression, OS boot, Quartus synthesis
 and physical protected-mode measurements remain outside this milestone.
+
+## H02 subset — CLI/STI and scalar/string I/O privilege
+
+Intel section 10.1 and the instruction appendices require CPL <= IOPL for
+CLI/STI, IN/OUT and INS/OUTS when PE=1. Native 86Box's flag and I/O permission
+paths support that rule. The 286 has no I/O permission bitmap. The new check
+produces restartable #GP(0); real-mode execution remains allowed.
+
+Before correction, a CPL1/IOPL0 CLI case retires instead of faulting. The
+executor now suppresses IF and port controls on privilege denial. Eight
+semantic ROM checks run after port capture and before any count/index, memory
+or port side effect, including OUTS source reads. String iteration labels
+follow the check; the existing protected REP-zero ambiguity is not resolved.
+
+| Check | Actual result |
+|---|---|
+| New `spk286_iopl_access`, both simulators | 2772 cases / 49334 checks in each |
+| Existing `spk286_scalar_io`, both | 452 cases / 24943 checks in each |
+| Existing `spk286_string_io_lifecycle`, both | 424 cases / 38100 checks in each |
+| Existing `spk286_string_io_zero_events`, both | 56 cases / 3665 checks in each |
+| Existing `spk286_hlt_privilege`, both | 104 cases / 208 checks in each |
+| Focused microcode/compiler tests | 105 passed, including four new H02 tests |
+| Independent literal, canonical round-trip / generated consistency / RTL lint | Pass |
+| Physical SingleStep FA/FB, E4..E7, EC..EF, 6C..6F samples | 1400 passed / 0 failed; real mode only |
+
+The new bank covers all 16 CPL/IOPL combinations, all timing policies, READY
+stalls, scalar immediate/DX byte/word I/O, CLI/STI with old IF=0/1, single/REP
+INS/OUTS with DF=0/1, optional DS prefix, odd/even ports and allowed word-port
+wrap at FFFF. Denied invalid string-memory controls additionally require
+privilege denial before any operand access. It checks full GPRs, FLAGS,
+restart IP, exact port counts/data/byte lanes and string destination bytes.
+Denied operations cannot request a port cycle, modify IF, create STI shadow,
+touch string memory or change CX/SI/DI.
+
+The existing lifecycle fixture used an eight-word layout. Its reach helper now
+uses nine words and starts repeated iterations after the one-time privilege
+check. Adding pause/cancel/reset controls at that operation increases its
+total from 400 to 424 cases; architectural register, memory, port and event
+expectations are unchanged. The zero-event helper uses the same new length.
+
+Format 25 adds exactly eight words (122 entries / 739 words). Its independent
+fixture derives from the frozen format-24 literal, including label and branch
+address shifts. Compiler checks reject missing, late, duplicate and
+iteration-local privilege checks. Logs: `build/h02-*.log`.
+
+```sh
+SPK286_BUILD_DIR="$PWD/build/pm-targeted-20260930" SPK286_BUILD_JOBS=4 \
+  bash scripts/test_units.sh both spk286_iopl_access
+python3 -m unittest discover -s tests -p 'test_microcode*.py'
+python3 -m tools.microcode.audit_microcode
+```
+
+The agreed H02 subset is complete. HLT was closed earlier; explicit LOCK and
+protected zero-count REP privilege precedence remain open. Whole-project
+regression, OS boots, new Quartus synthesis and physical protected-mode
+measurements remain deferred.
+
+## Final cumulative PCAT CPU-option check
+
+After all four changes, RTL lint and the four new banks also pass with
+`SPK286_P02_FETCH_CHAIN` and `SPK286_P05_PARALLEL_LIMIT_CHECK`, matching the
+PCAT / 86Box integration options. Icarus results are respectively 158 / 216 /
+2112 / 2772 cases, with the same check counts listed above. Logs are under
+`build/pm-targeted-20260930/pcat-options/` and
+`build/pm-targeted-pcat-lint.log`. This is a directed cumulative check, not a
+whole-project regression or cycle-accurate hardware certification. H12's
+outer-return range exception-vector discrepancy remains open as recorded above.
+
+The four banks and lint also pass on the exact PCAT vendor RTL with the same
+P02/P05 options and identical case/check totals. That variant retains PCAT's
+pre-existing real-mode IP-wrap correction (`75a307d`), which is not introduced
+or changed by these milestones. Its LOADALL/SALC source filenames and comments
+were aligned to the standalone sources so generated source hashes and listing
+locations pass `compile_microcode --check`; this changes no ROM words. Vendor
+logs: `build/pm-targeted-20260930/vendor-options/`.
+
+The existing Release 86Box/SPK286 backend was rebuilt against the PCAT vendor
+source with `SPK286_PCAT_CPU_OPTIMIZATIONS=ON`. Its actual linker output was
+installed at `D:/GitHub/86Box_dev/build/spk286/86Box-linux`, used by the existing
+launchers. SHA-256:
+`664de0fbd6223551e71dbe4eb6a029c12d8e90d6f889b79c705d5fa5ac16d365`.
+Previous binary: `86Box-linux.pre-pm-targeted-20260930`. Build log:
+`D:/GitHub/86Box_dev/build/spk286/targeted-fixes-build.log`.
+No emulator session or OS boot was launched for this final preparation.

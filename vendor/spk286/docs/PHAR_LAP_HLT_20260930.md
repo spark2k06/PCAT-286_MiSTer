@@ -109,8 +109,10 @@ memory-test acceptance criterion.
 
 Eight supplied programs now return DOS errorlevel 0 with the original 286's
 functional results: HELLO, MEM1, MEMTEST, TELLME, TELLPROT, `SWTEST /n1`,
-`XMEMTEST -TEST` and BIOSDUMP. BIG's unmodified million-position traversal is
-still running; it is not included in acceptance. This is not whole-suite closure.
+`XMEMTEST -TEST` and BIOSDUMP. BIG's unmodified million-position traversal was
+stopped at the user's request around 29.25%; it is not included in acceptance.
+The final capture is retained, and the user will confirm behavior on hardware.
+This is not whole-suite closure.
 
 MEMTEST matches byte for byte. XMEMTEST traverses all 97 reported blocks and
 prints `All Extended Memory tested O.K.`; its complete output matches after

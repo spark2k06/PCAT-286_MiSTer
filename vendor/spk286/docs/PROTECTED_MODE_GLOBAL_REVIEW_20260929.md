@@ -155,7 +155,7 @@ instead of raising #GP(0), even with IOPL=3. The micro-executor now faults befor
 requesting HALT. Both simulators pass the dedicated 104-case privilege bank;
 HELLO and MEM1 finish on the rebuilt 86Box/SPK286 backend. Follow-up comparison
 also accepts MEMTEST, TELLME, TELLPROT, SWTEST, XMEMTEST and BIOSDUMP; the original
-BIG traversal is still running. These utilities do not close the privilege
+BIG traversal was stopped by the user before completion. These utilities do not close the privilege
 matrix. CLI/STI, scalar/string I/O and explicit LOCK remain separate pending
 work. See the bounded validation
 and captured context in [Phar Lap HLT diagnosis](PHAR_LAP_HLT_20260930.md).

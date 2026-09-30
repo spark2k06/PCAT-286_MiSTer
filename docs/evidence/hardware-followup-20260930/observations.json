@@ -1,0 +1,132 @@
+{
+  "basis": "Manual readings of OBS02 video; all register/counter strings are hexadecimal.",
+  "fault": {
+    "cs": "0377",
+    "ip": "05F7",
+    "opcode": "8B",
+    "modrm": "47",
+    "decoded_ea": "0008",
+    "error_valid": true,
+    "vector": "0D",
+    "error": "0000",
+    "mark": "00F4",
+    "matching_context_bit7": true,
+    "flags": "0246",
+    "msw": "FFFD",
+    "gpr": {
+      "AX": "0437",
+      "BX": "0000",
+      "CX": "0CB7",
+      "DX": "0000",
+      "SP": "1CB8",
+      "BP": "1CC2",
+      "SI": "0CB7",
+      "DI": "0CB7"
+    },
+    "segments": {
+      "ES": {
+        "selector": "0000",
+        "base": "000000",
+        "limit": "0000",
+        "access": "00"
+      },
+      "CS": {
+        "selector": "0377",
+        "base": "3B8840",
+        "limit": "2F50",
+        "access": "FB"
+      },
+      "SS": {
+        "selector": "0087",
+        "base": "381960",
+        "limit": "24EF",
+        "access": "F3"
+      },
+      "DS": {
+        "selector": "044F",
+        "base": "39DD80",
+        "limit": "5165",
+        "access": "F3"
+      }
+    }
+  },
+  "stable_cpu": {
+    "NP": "003D",
+    "GP": "0009",
+    "SS": "0000",
+    "DF": "0000",
+    "I76": "0743",
+    "previous_fault": "0228:53F6 #GP(0324)",
+    "latest_np": "082F:25D0 #NP(080C)"
+  },
+  "cpu_samples": [
+    {
+      "frame": "frame-04.png",
+      "EV": "0921",
+      "I70": "0196"
+    },
+    {
+      "frame": "frame-28.png",
+      "EV": "0C3A",
+      "I70": "04AF"
+    }
+  ],
+  "irq_samples": [
+    {
+      "frame": "frame-06.png",
+      "IRQ0": "03B1",
+      "IRQ8": "064D",
+      "INTA": "1D38",
+      "RTC_C_reads": "0BFC"
+    },
+    {
+      "frame": "frame-31.png",
+      "IRQ0": "0578",
+      "IRQ8": "0985",
+      "INTA": "2071",
+      "RTC_C_reads": "126E"
+    }
+  ],
+  "stable_io": {
+    "PIC21_A1": "A9DE",
+    "PIC20_A0": "2020",
+    "vector_seen": "70FC",
+    "RTC_A_B": "2B52",
+    "RTC_lastC_index": "800C",
+    "IRQ1": "000C",
+    "IRQ14": "16A5",
+    "ATA_commands": "03B0",
+    "ATA_data_reads": "3E00",
+    "ATA_command_status": "3050",
+    "ATA_DCR_error": "0801",
+    "ATA_status_reads": "2F0C"
+  },
+  "stable_ega": {
+    "io_writes": "0E1E",
+    "aperture_writes": "9BB0",
+    "aperture_reads": "1596",
+    "misc_seq1": "A701",
+    "seq2_seq4": "0F06",
+    "gdc5_gdc6": "0005",
+    "attr10_attr12": "080F",
+    "attraddr_crtc11": "002B",
+    "crtc_start": "0000",
+    "offset_mask": "28FF",
+    "lastio_seq0": "0203",
+    "last_io_port": "03C4"
+  },
+  "derived_watch_addresses": {
+    "LES_argument_physical": "38362C",
+    "near_return_physical": "383624",
+    "DS_020A_physical": "39DF8A",
+    "DS_020E_physical": "39DF8E"
+  },
+  "limitations": [
+    "Segment override byte and instruction memory bytes are not present in OBS02; code mapping is strongly corroborated by opcode, ModRM, EA and CS limit.",
+    "No stack bytes, return address, preceding LES bus data or WinCreateWindow results were captured.",
+    "Cleanup callers are established statically; the executed call path is not captured.",
+    "Shadow EGA registers are completed bus writes, not device readback.",
+    "Bus counters survive CPU-only resets; CPU event counters do not.",
+    "Null-access protection is consistent; the origin of the null pointer and first failing operation remain unresolved."
+  ]
+}

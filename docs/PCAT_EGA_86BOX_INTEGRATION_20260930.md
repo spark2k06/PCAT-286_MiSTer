@@ -287,3 +287,12 @@ En el momento de registrar esta aceptación, el `config.tcl` de trabajo ya
 está en 50 MHz sin depuración (`SPK286_AT_NO_DEBUG` activo y DIV2 comentado).
 La configuración y los cambios previos del observador se conservan aparte del
 commit funcional de EGA.
+
+## Limpieza posterior y seguimiento
+
+Tras la aceptación se ha retirado el observador temporal OBS01/OBS02 y se ha
+conservado el observador compacto ya versionado. La configuración permanece
+en 50 MHz sin depuración. Los hallazgos útiles, la discrepancia pendiente del
+PIC y las capturas seleccionadas quedan en
+[el documento de seguimiento](HARDWARE_FOLLOWUPS_20260930.md), en un commit
+separado de la corrección funcional.

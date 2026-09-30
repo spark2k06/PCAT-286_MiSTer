@@ -110,9 +110,10 @@ memory-test acceptance criterion.
 Eight supplied programs now return DOS errorlevel 0 with the original 286's
 functional results: HELLO, MEM1, MEMTEST, TELLME, TELLPROT, `SWTEST /n1`,
 `XMEMTEST -TEST` and BIOSDUMP. BIG's unmodified million-position traversal was
-stopped at the user's request around 29.25%; it is not included in acceptance.
-The final capture is retained, and the user will confirm behavior on hardware.
-This is not whole-suite closure.
+stopped at the user's request around 29.25%; that simulation is not included in
+86Box acceptance.
+The final capture is retained. The user subsequently confirmed BIG working on
+MiSTer, as recorded below. The interrupted 86Box run remains incomplete.
 
 MEMTEST matches byte for byte. XMEMTEST traverses all 97 reported blocks and
 prints `All Extended Memory tested O.K.`; its complete output matches after
@@ -137,3 +138,20 @@ The complete result table, local trial locations, binary hashes, interpretation
 and host-teardown issue are recorded in the integration repository at
 `D:/GitHub/86Box_dev/docs/SPK286_PHAR_LAP_20260930.md`. The control is the original
 86Box 286 interpreter, not a new physical protected-mode silicon measurement.
+
+## User-confirmed MiSTer acceptance
+
+On 2026-09-30 the user reported "Probado y funciona, commit" after receiving the
+DOS image at
+`D:/GitHub/86Box_dev/build/pharlap/big-control-complete-20260930-191110/native/dos-test.img`.
+That image contains all supplied programs in `C:\PHAR_LAP`; its AUTOEXEC runs
+BIG and redirects the output to `C:\RESULTS`. The report records functional
+hardware acceptance of the Phar Lap BIG workload with SPK286 in PCAT/MiSTer.
+
+This adds user-reported FPGA hardware validation to the HLT correction already
+committed as SPK286 `ae13488` and PCAT `5021f6c`. The hardware result is a direct
+user report, without an attached output dump or bitstream identifier. It does
+not turn the stopped BIG simulation into a completed byte comparison or imply
+that every other supplied program was rerun on hardware. H02's CLI/STI, I/O and
+explicit LOCK matrix remains open. No additional RTL change or regression was
+needed to record this accepted result.

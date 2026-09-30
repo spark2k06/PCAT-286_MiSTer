@@ -188,6 +188,15 @@ Native reference: `x86seg.c::pmodeint` and its flags update. Enter interrupt and
 trap gates with NT=1, verify the saved flag word, live NT=0, appropriate IF/TF,
 and a normal handler IRET. Otherwise IRET can incorrectly follow the TSS backlink.
 
+**2026-09-30 implementation follow-up: H04 corrected.** The protected ordinary
+event mask now clears NT after saving the old FLAGS, for both interrupt and
+trap gates. Real-mode and task-gate entry keep their separate rules. The new
+158-case bank passes in both simulators, including software INT, #GP delivery,
+same/inward transfers, NT=0/1 and all timing policies. It also verifies that
+handler IRET takes the ordinary stack-return path. Restoring NT from that frame
+is still H03, which this correction does not close. See
+[targeted milestone evidence](PROTECTED_MODE_TARGETED_FIXES_20260930.md).
+
 ### H05 — VERR/VERW and conforming descriptor inspection (S/C, P1)
 
 `descriptor_verify_success_live` at micro-executor 675 requires P=1, and VERR

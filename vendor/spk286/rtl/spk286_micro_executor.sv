@@ -1473,7 +1473,12 @@ module spk286_micro_executor (
     // mode/privilege policy before the architectural write.
     assign sequential_flags_write_mask = task_commit_flags_write ? 16'hFFFF : arpl_commit ? 16'h0040 : direct_flags ? direct_flags_mask : descriptor_verify_flags_write ? 16'h0040 : descriptor_inspect_flags_write ? 16'h0040 : restore_flags ?
                               (!protected_msw[0] ? 16'h0FD5 : (protected_cpl == 2'd0 ? 16'h7FD5 : 16'h4FD5)) :
-                              iret_commit ? 16'h0FD5 : (set_if ? 16'h0200 : (clear_if_tf ? 16'h0300 : (clear_event_flags ? ((!protected_msw[0] || event_gate_class_q == spk286_protected_pkg::DESC_INT_GATE) ? 16'h0300 : 16'h0100) : flags_mask_q)));
+                              iret_commit ? 16'h0FD5 : (set_if ? 16'h0200 : (clear_if_tf ? 16'h0300 : (clear_event_flags ?
+                              // Ordinary protected gates save old FLAGS first,
+                              // then clear NT/TF and, for an interrupt gate, IF.
+                              // Task entry has its own FLAGS publication path.
+                              (!protected_msw[0] ? 16'h0300 :
+                               event_gate_class_q == spk286_protected_pkg::DESC_INT_GATE ? 16'h4300 : 16'h4100) : flags_mask_q)));
 
     always_ff @(posedge clk) begin
         if (reset || cancel || start) begin

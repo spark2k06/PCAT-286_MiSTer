@@ -104,3 +104,34 @@ before the complete control and is not classified as a CPU failure. XMEMTEST
 without arguments only reports available memory and returns nonzero; the
 successful `-TEST` sweep, rather than that informational invocation, is the
 memory-test acceptance criterion.
+
+## Extended integration acceptance recorded after the HLT fix
+
+Eight supplied programs now return DOS errorlevel 0 with the original 286's
+functional results: HELLO, MEM1, MEMTEST, TELLME, TELLPROT, `SWTEST /n1`,
+`XMEMTEST -TEST` and BIOSDUMP. BIG's unmodified million-position traversal is
+still running; it is not included in acceptance. This is not whole-suite closure.
+
+MEMTEST matches byte for byte. XMEMTEST traverses all 97 reported blocks and
+prints `All Extended Memory tested O.K.`; its complete output matches after
+removing only the observation time and elapsed-time line. TELLPROT/SWTEST match
+apart from timings. TELLME matches apart from time, measured speed, RUN286
+timings, the distinct test batches and resulting file-date/free-space fields. These utilities do not
+cover the full remaining CLI/STI/I/O/LOCK matrix in H02.
+
+BIOSDUMP returns identical 65536-byte BIOS.OUT contents in the isolated and
+matched-sequence comparisons, SHA-256
+`6f936ee53ba58663d1ccc7b80b1f5caba841f3f816c4dca15477ca540f9f252f`.
+Its IVT/BDA dump has time-dependent differences: the floppy timeout and BIOS
+ticks, plus an old POST stack word at physical `03C2`. The surrounding words
+are AX=`8C80`, IP=`D170`/`D172`, CS=`F000`, FLAGS=`0246`. MR BIOS sets its POST
+stack below `0400` and its captured ROM contains `D170: OUT EB,AX` followed by
+`D172: LOOP D164`, with AX=`8C80` loaded before the wait. This is consistent with
+retained context sampled at adjacent interrupt boundaries, rather than two
+different installed F0 handlers. Other IVT bytes match; no new CPU fault is
+established by these differences. H20 event-order cases remain independently open.
+
+The complete result table, local trial locations, binary hashes, interpretation
+and host-teardown issue are recorded in the integration repository at
+`D:/GitHub/86Box_dev/docs/SPK286_PHAR_LAP_20260930.md`. The control is the original
+86Box 286 interpreter, not a new physical protected-mode silicon measurement.

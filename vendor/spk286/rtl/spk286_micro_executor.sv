@@ -426,6 +426,8 @@ module spk286_micro_executor (
     logic [1:0] descriptor_effective_privilege;
     logic descriptor_cs_offset_fault, cs_validation_success_event;
     logic call_gate_validation_operation, call_gate_cs_validation_operation;
+    logic jmp_gate_probe_operation, jmp_gate_cs_validation_operation, jmp_gate_target_begin;
+    logic descriptor_call_gate_access_valid, descriptor_call_gate_cs_access_valid;
     logic call_stack_validation_operation, call_gate_stack_switch_operation;
     logic call_gate_stack_switch_begin, call_gate_stack_switch_active_q;
     logic call_gate_stack_write, call_gate_stack_write_done;
@@ -537,13 +539,23 @@ module spk286_micro_executor (
     // A far CALL may name code directly. Only a resolved call gate grants
     // gate-target privilege rules; direct calls use the ordinary CS checks,
     // accessed-bit update and CPL-preserving cache commit shared with JMP.
+    // VALIDATE_CS resolves a JMP call gate within the descriptor service.
+    // An IDT event already has its own gate and must only validate code here.
+    assign jmp_gate_cs_validation_operation = allowed && protected_msw[0] &&
+                                              operation == spk286_microcode_pkg::MC_VALIDATE_CS &&
+                                              call_gate_candidate_valid_q && !event_gate_candidate_valid_q;
     assign cs_validation_operation = allowed && protected_msw[0] &&
-                                     (operation == spk286_microcode_pkg::MC_VALIDATE_CS ||
+                                     ((operation == spk286_microcode_pkg::MC_VALIDATE_CS &&
+                                       !jmp_gate_cs_validation_operation) ||
                                       (operation == spk286_microcode_pkg::MC_VALIDATE_CALL_CS &&
                                        !call_gate_candidate_valid_q));
+    assign jmp_gate_probe_operation = cs_validation_operation &&
+                                      operation == spk286_microcode_pkg::MC_VALIDATE_CS &&
+                                      !event_gate_candidate_valid_q;
     assign call_gate_validation_operation = allowed && operation == spk286_microcode_pkg::MC_VALIDATE_CALL_GATE && protected_msw[0];
-    assign call_gate_cs_validation_operation = allowed && operation == spk286_microcode_pkg::MC_VALIDATE_CALL_CS &&
-                                               protected_msw[0] && call_gate_candidate_valid_q;
+    assign call_gate_cs_validation_operation = jmp_gate_cs_validation_operation ||
+                                               (allowed && operation == spk286_microcode_pkg::MC_VALIDATE_CALL_CS &&
+                                                protected_msw[0] && call_gate_candidate_valid_q);
     assign call_stack_validation_operation = allowed && operation == spk286_microcode_pkg::MC_VALIDATE_CALL_STACK;
     assign call_ss_validation_operation = allowed && operation == spk286_microcode_pkg::MC_VALIDATE_CALL_SS && protected_msw[0];
     assign call_gate_stack_switch_operation = allowed && operation == spk286_microcode_pkg::MC_CALL_GATE_STACK_SWITCH;
@@ -655,10 +667,13 @@ module spk286_micro_executor (
                                              descriptor_unused_rpl >= protected_cpl &&
                                              ((descriptor_unused_conforming && descriptor_unused_dpl <= descriptor_unused_rpl) ||
                                               (!descriptor_unused_conforming && descriptor_unused_dpl == descriptor_unused_rpl));
-    assign descriptor_call_gate_success_live = descriptor_valid && descriptor_reserved_valid && descriptor_present &&
+    assign descriptor_call_gate_access_valid = descriptor_valid && descriptor_reserved_valid &&
                                               descriptor_class == spk286_protected_pkg::DESC_CALL_GATE &&
                                               descriptor_unused_dpl >= protected_cpl &&
                                               descriptor_unused_dpl >= descriptor_unused_rpl;
+    assign descriptor_call_gate_success_live = descriptor_call_gate_access_valid && descriptor_present;
+    assign jmp_gate_target_begin = descriptor_operand_done && descriptor_phase_q == 3'd3 &&
+                                    jmp_gate_probe_operation && descriptor_call_gate_success_live;
     assign task_gate_success_live = descriptor_valid && descriptor_reserved_valid && descriptor_present &&
                                     descriptor_class == spk286_protected_pkg::DESC_TASK_GATE &&
                                     descriptor_unused_dpl >= protected_cpl &&
@@ -667,9 +682,15 @@ module spk286_micro_executor (
                                     !task_gate_target_active_q &&
                                     (call_gate_validation_operation || cs_validation_operation) &&
                                     task_gate_success_live;
-    assign descriptor_call_gate_cs_success_live = descriptor_valid && descriptor_reserved_valid && descriptor_present &&
+    // Gate target RPL is ignored. JMP preserves CPL: nonconforming code must
+    // match it; conforming code may have a numerically smaller DPL. CALL may
+    // additionally enter a more privileged nonconforming segment.
+    assign descriptor_call_gate_cs_access_valid = descriptor_valid && descriptor_reserved_valid &&
                                                  descriptor_unused_segment && descriptor_class == spk286_protected_pkg::DESC_CODE &&
-                                                 descriptor_unused_dpl <= protected_cpl;
+                                                 descriptor_unused_dpl <= protected_cpl &&
+                                                 (!jmp_gate_cs_validation_operation || descriptor_unused_conforming ||
+                                                  descriptor_unused_dpl == protected_cpl);
+    assign descriptor_call_gate_cs_success_live = descriptor_call_gate_cs_access_valid && descriptor_present;
     assign descriptor_cs_candidate_success_live = call_gate_cs_validation_operation ? descriptor_call_gate_cs_success_live :
                                                    iret_cs_validation_operation ? descriptor_iret_cs_success_live : descriptor_cs_success_live;
     assign descriptor_effective_privilege = descriptor_unused_rpl > protected_cpl ? descriptor_unused_rpl : protected_cpl;
@@ -751,8 +772,11 @@ module spk286_micro_executor (
                                    (call_ss_validation_operation ? !descriptor_call_ss_success_live :
                                    (iret_cs_validation_operation ?
                                    ((({1'b0, tmp0_q} > {1'b0, descriptor_limit}) && descriptor_iret_cs_success_live) || !descriptor_iret_cs_success_live) :
-                                    (cs_validation_operation ? ((task_descriptor_success_live || task_gate_target_begin) ? 1'b0 :
-                                                                (descriptor_cs_offset_fault || !descriptor_cs_success_live)) :
+                                    (cs_validation_operation ?
+                                     ((jmp_gate_probe_operation && descriptor_class == spk286_protected_pkg::DESC_CALL_GATE) ?
+                                       !descriptor_call_gate_success_live :
+                                      ((task_descriptor_success_live || task_gate_target_begin) ? 1'b0 :
+                                       (descriptor_cs_offset_fault || !descriptor_cs_success_live))) :
                                    (iret_ss_validation_operation ? !descriptor_iret_ss_success_live :
                                     (segment_reload_operation ? !descriptor_segment_success_live :
                                     (!descriptor_verify_operation && !descriptor_inspect_operation && !descriptor_success_live))))))));
@@ -811,7 +835,7 @@ module spk286_micro_executor (
     assign protected_descriptor_access = descriptor_active_q;
     assign protected_gate_access = event_gate_active_q ||
                                   (descriptor_active_q &&
-                                   (call_gate_validation_operation || task_gate_target_active_q));
+                                   (call_gate_validation_operation || jmp_gate_probe_operation || task_gate_target_active_q));
     always_comb begin
         protected_descriptor_address = descriptor_selector_address;
         if (descriptor_phase_q == 3'd1) protected_descriptor_address = descriptor_selector_address + 24'd2;
@@ -855,7 +879,7 @@ module spk286_micro_executor (
                                        (descriptor_cs_offset_fault || !descriptor_call_gate_cs_success_live || descriptor_unused_accessed)) ||
                                        (descriptor_operand_done && descriptor_phase_q == 3'd4 && call_gate_cs_validation_operation && descriptor_success_q) ||
                                       (descriptor_operand_done && descriptor_phase_q == 3'd3 && cs_validation_operation &&
-                                         (!task_gate_target_begin && (task_descriptor_success_live ||
+                                         (!task_gate_target_begin && !jmp_gate_target_begin && (task_descriptor_success_live ||
                                           (!task_descriptor_success_live &&
                                            (descriptor_cs_offset_fault || !descriptor_cs_success_live || descriptor_unused_accessed))))) ||
                                       (descriptor_operand_done && descriptor_phase_q == 3'd4 && cs_validation_operation && descriptor_success_q) ||
@@ -887,6 +911,10 @@ module spk286_micro_executor (
                                  event_gate_pre_fault ? 8'd13 :
                                  event_gate_post_fault ? (!event_gate_present && event_gate_valid ? 8'd11 : 8'd13) :
                                  descriptor_pre_fault ? 8'd13 :
+                                 jmp_gate_cs_validation_operation ?
+                                   (!descriptor_present && descriptor_call_gate_cs_access_valid ? 8'd11 : 8'd13) :
+                                 (jmp_gate_probe_operation && descriptor_class == spk286_protected_pkg::DESC_CALL_GATE) ?
+                                   (!descriptor_present && descriptor_call_gate_access_valid ? 8'd11 : 8'd13) :
                                  // Direct code transfers check type/privilege before
                                  // presence. A valid absent target requests #NP so
                                  // the OS can load it and retry the instruction.
@@ -1600,7 +1628,8 @@ module spk286_micro_executor (
                     call_gate_parameter_count_q <= 5'd0;
                 end
             end
-            if (descriptor_operand_done && descriptor_phase_q == 3'd3 && call_gate_validation_operation &&
+            if (descriptor_operand_done && descriptor_phase_q == 3'd3 &&
+                (call_gate_validation_operation || jmp_gate_target_begin) &&
                 descriptor_call_gate_success_live) begin
                 call_gate_candidate_valid_q <= 1'b1;
                 call_gate_selector_q <= tmp1_q;
@@ -1716,7 +1745,14 @@ module spk286_micro_executor (
                     3'd2: begin descriptor_word2_q <= operand_read_data; descriptor_phase_q <= 3'd3; end
                     3'd3: begin
                         descriptor_word3_q <= operand_read_data;
-                        if (task_gate_target_begin) begin
+                        if (jmp_gate_target_begin) begin
+                            // Keep VALIDATE_CS pending, but start a fresh read
+                            // so null, table-limit and LDTR checks run on the
+                            // target selector before any target descriptor bus cycle.
+                            descriptor_active_q <= 1'b0;
+                            descriptor_phase_q <= 3'd0;
+                            descriptor_success_q <= 1'b0;
+                        end else if (task_gate_target_begin) begin
                             task_gate_target_active_q <= 1'b1;
                             task_gate_target_selector_q <= descriptor_unused_gate_selector;
                             task_gate_nested_call_q <= call_gate_validation_operation;

@@ -416,6 +416,16 @@ outer RETF/IRET, call-gate frame or interrupt frame. Distinguish valid unaligned
 accesses from an actual FFFF-to-0000 operand overrun. Verify both bus byte
 cycles as well as the architectural result; do not erase legitimate wrap checks.
 
+**2026-09-30 implementation follow-up: H14 corrected.** Removed only the two
+blanket odd-SP predicates. Directed RETF, RETF-immediate, IRET, inward CALL
+with parameter copying and interrupt/trap entry/return pass with odd/even SP
+and ordinary/expand-down stacks: 216 cases in each simulator. Actual odd words
+use paired byte transfers; invalid limits, wrap and frame underflow still reject
+without frame writes or architectural stack publication. The negative return
+controls also expose H12's known range-vector routing gap (#GP instead of #SS);
+H14 certifies their rejection/restart, not their exception-vector conformance.
+See [targeted milestone evidence](PROTECTED_MODE_TARGETED_FIXES_20260930.md).
+
 ### H15 — Late task-switch hidden-state publication (C, P0)
 
 PM5 already fixed outgoing saves, BUSY transitions, loaded general-register

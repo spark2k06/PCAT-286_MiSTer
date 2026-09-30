@@ -1110,19 +1110,18 @@ module spk286_micro_executor (
                                    ((event_gate_candidate_valid_q && event_error_valid) ? 17'd2 : 17'd0);
     assign iret_outer_range_fault = iret_outer_frame_operation && iret_outer_required &&
                                     iret_outer_phase_q == 2'd0 &&
-                                    (return_stack_pointer[0] ||
-                                     (stack_segment_access[2] ?
+                                    (stack_segment_access[2] ?
                                       ({1'b0, return_stack_pointer} <= {1'b0, stack_segment_limit} ||
                                        ({1'b0, return_stack_pointer} + {1'b0, allocation_valid_q ? allocation_q : 16'd0} + 17'd3 > 17'h0FFFF)) :
                                       ({1'b0, return_stack_pointer} + {1'b0, allocation_valid_q ? allocation_q : 16'd0} + 17'd3 >
-                                       {1'b0, stack_segment_limit})));
+                                       {1'b0, stack_segment_limit}));
     // Restoring outer SS:SP does not access the new stack. RETF validates
     // the source frame and target descriptor; a subsequent stack access
     // checks its own range. In particular, an empty stack may have
     // SP=limit+1, and RETF's immediate adjustment wraps at 16 bits.
     assign call_stack_range_fault = check_call_frame && (protected_msw[0] || !event_active) &&
                                    (call_gate_outer_required ?
-                                    (!call_stack_ready_q || call_stack_sp_q[0] ||
+                                    (!call_stack_ready_q ||
                                      {1'b0, call_stack_sp_q} < call_gate_frame_bytes ||
                                      (call_ss_access_q[2] ?
                                       ({1'b0, call_stack_sp_q} - call_gate_frame_bytes <= {1'b0, call_ss_limit_q} ||

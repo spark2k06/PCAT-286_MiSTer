@@ -26,6 +26,8 @@ tests=(spk286_registers spk286_segments spk286_loadall_service spk286_loadall_pr
 tests+=(spk286_loadall_integration)
 tests+=(spk286_npx_traps)
 tests+=(spk286_esc_boundaries)
+tests+=(spk286_double_fault_cpu)
+tests+=(spk286_double_fault_events)
 tests+=(spk286_protected_entry)
 tests+=(spk286_protected_direct_call)
 tests+=(spk286_conforming_data_load)
@@ -139,6 +141,9 @@ for name in "${tests[@]}"; do
     if [[ "$name" == spk286_event_streams ]]; then
         python3 -m tools.event_streams --output "$BUILD_DIR/event-streams.txt"
         run_args=("+stream_vectors=$BUILD_DIR/event-streams.txt")
+    fi
+    if [[ "$name" == spk286_event_lifecycle && "${SPK286_TEST_REAL_MODE_FETCH_WRAP:-0}" == 1 ]]; then
+        run_args+=("+real_mode_fetch_wrap=1")
     fi
     if [[ "$name" == spk286_timing_capture ]]; then
         mkdir -p "$BUILD_DIR/timing"

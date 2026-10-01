@@ -401,6 +401,19 @@ protection fault, a working #DF task gate, failing #DF delivery, saved context,
 zero error code, and NMI/RESET recovery from shutdown. Check CPU bus shutdown
 independently of the board adapter's reset response.
 
+**2026-10-01 implemented:** the controller now delivers the second exception
+or #DF according to the 286 first-exception rule. #DF carries zero, retains
+saved context/EXT provenance and can enter a dedicated task. A failed #DF
+entry shuts down; one recovery NMI is permitted, while failure of that NMI
+requires RESET. Its required task-gate test also fixed premature completion
+of the shared error push. Stale SS instruction shadows are cleared on shutdown
+so a failed task handoff cannot inhibit recovery NMI. Both simulators pass
+475 controller cases, 26 CPU cases and the affected event/task banks;
+33,000 inherited physical event
+captures pass. See [H11 specification and receipt](PROTECTED_MODE_H11_DOUBLE_FAULT_20261001.md).
+H11 is closed in this scope. H15's wider task-fault stages and H20's separate
+event-ordering evidence remain pending.
+
 ### H12 — Stack fault routing and selector error metadata (S/C, P0)
 
 `iret_outer_range_fault` feeds generic `range_fault` (micro-executor 265).
@@ -653,9 +666,10 @@ close the remaining protected-mode findings.
 ## 5. Coverage map and future work packages
 
 The map below records the original review scope. As of the 2026-10-01
-H03/H10/H12/H13 block and scoped H18 correction, closed findings are H01,
-H03, H04, H06, H07, H08, H09, H10, H12, H13, H14, H18, H21 and H22.
-Remaining work is H02 (partial), H05, H11, H15, H16, H17, H19 and H20.
+H03/H10/H12/H13 block, scoped H18 and H11 corrections, closed findings are H01,
+H03, H04, H06, H07, H08, H09, H10, H11, H12, H13, H14, H18, H21 and H22.
+The concrete ESC first-word finding in H19 is also closed. Remaining work is
+H02 (partial), H05, H15, H16, H17, H19 (remaining matrix) and H20.
 See the marked follow-ups and
 [block validation](PROTECTED_MODE_BLOCK_20261001.md) for closure evidence;
 the original work packages do not reopen completed findings.

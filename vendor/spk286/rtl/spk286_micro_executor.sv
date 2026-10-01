@@ -1500,7 +1500,10 @@ module spk286_micro_executor (
                             (fetch_word && byte_valid && high_byte_q) || (fetch_signed_byte && byte_valid) ||
                             (decode_operand && decode_done) || system_done || descriptor_operation_done || event_gate_operation_done ||
                              ((task_switch_operation && !task_descriptor_candidate_valid_q) ||
-                             (task_commit_done_q && task_service_complete_q) || task_switch_skip ||
+                             // Task completion belongs to TASK_SWITCH. Keeping
+                             // it true for the tail would finish PUSH_EVENT_ERROR
+                             // before its bus response/SP commit (H11 #DF gate).
+                             (task_switch_operation && task_commit_done_q && task_service_complete_q) || task_switch_skip ||
                              task_event_switch_skip ||
                              task_return_noop || task_return_commit_done || task_return_skip) ||
                              (arpl_check_operation && protected_msw[0]) || arpl_fault || arpl_commit || clts_commit || clts_fault ||

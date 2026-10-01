@@ -261,7 +261,7 @@ module spk286 (
     logic [15:0] decoded_flags_mask, decoded_undefined_mask;
     logic [15:0] internal_flags_write_data, internal_flags_write_mask;
     logic internal_task_flags_write;
-    logic event_active, event_cancel, event_dispatch, event_request, event_software, event_needs_ack;
+    logic event_active, event_cancel, event_dispatch, event_request, event_software, event_needs_ack, event_external;
     logic [2:0] event_kind;
     logic [15:0] event_ip, event_cs, event_flags;
     logic event_error_valid;
@@ -378,9 +378,9 @@ module spk286 (
     // EXT identifies an event external to the program, not every exception.
     // Intel 286 PRM B-1 includes INTR/NMI, single step and NPX #NM/#9;
     // software INT and instruction-generated protection faults keep EXT=0.
-    assign task_fault_external = event_active &&
-                                 (event_kind == 3'd2 || event_kind == 3'd3 || event_kind == 3'd4 ||
-                                  (event_kind == 3'd1 && (debug_event_vector == 8'd7 || debug_event_vector == 8'd9)));
+    // The event controller retains the original provenance across H11
+    // replacement exceptions, whose current kind/vector can be #GP/#DF.
+    assign task_fault_external = event_active && event_external;
     assign stream_restart = restart || internal_redirect || event_cancel || loadall_commit_valid;
     assign stream_ip = restart ? ip_write_data :
                        (internal_redirect ? internal_target :
@@ -612,7 +612,8 @@ module spk286 (
         .current_selector(protected_tr_selector), .current_base(protected_tr_base),
         .current_limit(protected_tr_limit), .current_access(protected_tr_access),
         .current_descriptor_address(protected_gdtr_base + {8'd0, protected_tr_selector[15:3], 3'b000}),
-        .current_ip(debug_ip), .current_flags(debug_flags), .current_gpr(register_state),
+        .current_ip(event_active ? event_ip : debug_ip),
+        .current_flags(event_active ? event_flags : debug_flags), .current_gpr(register_state),
         .current_segments(protected_segment_selectors), .current_ldtr(protected_ldtr_selector),
         .gdtr_limit(protected_gdtr_limit), .gdtr_base(protected_gdtr_base),
         .memory_done(task_memory_done), .memory_read_data(memory_read_data),
@@ -1096,7 +1097,7 @@ module spk286 (
     // the architecturally defined zero word until their individual source
     // classification is extended.
     assign fault_error_valid = protected_msw[0] &&
-                                (fault_vector == 8'd10 || fault_vector == 8'd11 ||
+                                (fault_vector == 8'd8 || fault_vector == 8'd10 || fault_vector == 8'd11 ||
                                  fault_vector == 8'd12 || fault_vector == 8'd13);
     assign fault_error_code = system_fault ? system_fault_error_code :
                               loadall_fault ? loadall_fault_error_code : 16'd0;
@@ -1116,6 +1117,7 @@ module spk286 (
     end
     spk286_events events (
         .clk(clk), .reset(reset), .cancel(restart), .enable(execute_enable && commit_allowed && !reset && !restart),
+        .protected_mode(protected_msw[0]), .delivery_commit(internal_redirect),
         .intr(intr), .nmi(nmi), .ss_load(((internal_segment_write || protected_segment_commit_en) && decoded_segment_index == 2'd2) || protected_segment_commit_en2), .ss_shadow(unused_ss_shadow), .instruction_start((prefix_accept || opcode_start) && !context_active), .opcode_dispatch(opcode_start), .instruction_active(micro_active || context_active),
         .repeat_boundary(repeat_boundary), .repeat_stepped(repeat_stepped),
         .retired(raw_retired), .opcode(queue_consume_data), .ip(debug_ip), .cs(debug_cs), .flags(debug_flags),
@@ -1124,7 +1126,7 @@ module spk286 (
         .software_request(software_taken), .software_vector(selected_software_vector),
         .halt_request(halt_request), .dispatch_ready(decode_ready), .ack_done(ack_done), .ack_vector(ack_vector),
         .event_active(event_active), .cancel_operation(event_cancel), .dispatch(event_dispatch), .event_request(event_request),
-        .event_completed(event_completed), .event_software(event_software), .event_vector(debug_event_vector),
+        .event_completed(event_completed), .event_software(event_software), .event_external(event_external), .event_vector(debug_event_vector),
         .event_ip(event_ip), .event_cs(event_cs), .event_flags(event_flags),
         .event_error_valid(event_error_valid), .event_error_code(event_error_code), .event_needs_ack(event_needs_ack),
         .halted(halted), .shutdown(shutdown), .nmi_pending(debug_nmi_pending), .nmi_blocked(debug_nmi_blocked),

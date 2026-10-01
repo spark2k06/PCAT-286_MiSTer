@@ -17,7 +17,7 @@ PROBES=(
     ('next-ip','spk286_events','spk286_event_lifecycle',
      'instruction_ip : ip;','instruction_ip : ip + 16\'d1;','INTR boundary frame'),
     ('frame-flags','spk286_events','spk286_event_instructions',
-     'event_flags <= flags;','event_flags <= flags & 16\'hFCFF;','physical lane'),
+     '                event_flags <= flags;\n','                event_flags <= flags & 16\'hFCFF;\n','physical lane'),
     ('frame-cs','spk286_micro_executor','spk286_event_instructions',
      'read_event_cs ? event_cs : event_ip','read_event_cs ? event_ip : event_cs','physical lane'),
     ('ivt-stride','spk286_micro_executor','spk286_event_instructions',

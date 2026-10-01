@@ -128,7 +128,7 @@ No expected architectural result was weakened. Logs are under
 ## H13 — Descriptor type/privilege before presence
 
 **Implemented and directed validation passed.** Intel 80286 PRM load, CALL,
-INT, RET/IRET algorithms and task-switch B-12/B-13 validate access/type and
+RET/IRET algorithms, interrupt table 9-1 and task-switch B-12/B-13 validate access/type and
 privilege before presence. A descriptor with both invalid access and P=0 must
 report the access exception (#GP, or #TS for task/TSS-derived segments).
 Only otherwise valid absent descriptors request #NP/#SS. Native 86Box's
@@ -168,6 +168,31 @@ CPU executor as recorded under H12.
 Reproduce with `bash scripts/test_units.sh both spk286_fault_precedence` and
 `bash scripts/test_units.sh both spk286_task_segment_service`.
 Logs are under `build/pm-block-20261001/h13-*`.
+
+## Inherited matrix expectation corrections
+
+The first whole-project run stopped in the established Icarus expand-down
+matrix. The CPL1 SS absent-descriptor case expected #SS even for RPL0,
+although Intel MOV B-73/B-74 requires RPL=CPL before testing presence.
+Other DS/ES/SS and CALL-gate absent cases had the same mixed-condition
+expectation issue. Their vector expressions now distinguish invalid privilege
+(#GP) from otherwise valid absence (#NP/#SS).
+
+The subsequent matrix run exposed historical ordinary-event target-RPL
+rejections. These now require successful delivery and normalized CS for all
+four target RPLs, as specified by H10. Gate-DPL and outward-target rejection
+controls remain. No cases or state assertions were removed; no production RTL,
+microcode, physical identities or comparison masks changed during this repair.
+
+For interrupt targets, the access-before-presence classification follows
+Intel table 9-1 and native 86Box's 16-bit `pmodeint` DPL check. The appendix
+INT overview places target presence earlier in its narrative algorithm; this
+block does not establish silicon sequencing of every simultaneous gate,
+target and new-stack fault. General cross-stage delivery remains H11/H19.
+
+The original regression failure and intermediate matrix failure remain in
+`build/pm-block-20261001/full/regression-first.log` and
+`build/pm-block-20261001/h10-h13-inherited-first.log`.
 
 ## Remaining protected-mode stories after this block
 

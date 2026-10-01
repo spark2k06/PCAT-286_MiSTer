@@ -1554,7 +1554,53 @@ module spk286_micro_executor (
                                ((move_word && operation == spk286_microcode_pkg::MC_MOVE8) ||
                                 (result_to_dst && operation == spk286_microcode_pkg::MC_WRITE_RESULT_DST8) || operand_gpr_write_byte))));
     assign sequential_gpr_write_index = task_commit_gpr_write ? task_commit_phase_q[2:0] : (iret_outer_sp_commit || retf_outer_sp_commit || return_same_sp_commit || call_gate_sp_commit || segment_pop_sp_commit) ? 3'd4 : descriptor_result_write ? shift_kind : fixed_result_write ? (write_result_dx ? 3'd2 : 3'd0) : string_index_write ? (string_step_source ? 3'd6 : 3'd7) : string_count_write ? 3'd1 : string_write_acc ? 3'd0 : add_allocation_arch ? 3'd4 : frame_write_gpr ? frame_write_index : allocate_stack ? 3'd4 : move_source ? source_index : stack_arch_write ? 3'd4 : (count_operation ? 3'd1 : (move_word || result_to_dst ? destination : operand_gpr_write_index));
-    assign sequential_gpr_write_data = task_commit_gpr_write ? task_loaded_gpr[task_commit_phase_q[2:0] * 16 +: 16] : iret_outer_sp_commit ? iret_outer_sp_q : retf_outer_sp_commit ? iret_outer_sp_q + allocation_q : return_same_sp_commit ? stack_cursor_q + ((commit_context && allocation_valid_q) ? allocation_q : 16'd0) : call_gate_sp_commit ? stack_cursor_q : segment_pop_sp_commit ? stack_cursor_q : descriptor_result_write ? descriptor_result_data : fixed_result_write ? (write_result_dx ? auxiliary_q : tmp2_q) : string_index_write ? (architectural_flags[10] ? string_index-string_delta : string_index+string_delta) : string_count_write ? count_value-16'd1 : string_write_acc ? tmp0_q : add_allocation_arch ? stack_pointer+allocation_q : frame_write_gpr ? tmp0_q : allocate_stack ? stack_cursor_q - allocation_q : move_source ? tmp1_q : stack_arch_write ? stack_next_sp : (count_operation ? count_value - 16'd1 : (result_to_dst ? tmp2_q : (move_word ? tmp0_q : operand_gpr_write_data)));
+    // Preserve the original complete priority, but separate selection from
+    // the 16-bit data reduction so a late completion need not cross a mux chain.
+    logic [19:0] gpr_data_requests;
+    (* keep *) logic [19:0] gpr_data_onehot;
+    logic [319:0] gpr_data_values;
+    function automatic logic [15:0] reduce_gpr_data(
+        input logic [19:0] enables, input logic [319:0] values
+    );
+        reduce_gpr_data = 16'd0;
+        for (integer i = 0; i < 20; i = i + 1)
+            reduce_gpr_data = reduce_gpr_data | ({16{enables[i]}} & values[i*16 +: 16]);
+    endfunction
+    genvar gpr_data_index;
+    generate
+    for (gpr_data_index = 0; gpr_data_index < 20; gpr_data_index = gpr_data_index + 1) begin : g_gpr_data_priority
+        if (gpr_data_index == 0) begin : g_first
+            assign gpr_data_onehot[gpr_data_index] = gpr_data_requests[gpr_data_index];
+        end else begin : g_remaining
+            assign gpr_data_onehot[gpr_data_index] = gpr_data_requests[gpr_data_index] &&
+                                                   !(|gpr_data_requests[gpr_data_index-1:0]);
+        end
+    end
+    endgenerate
+    assign gpr_data_requests = {1'b1, move_word, result_to_dst, count_operation, stack_arch_write, move_source, allocate_stack, frame_write_gpr, add_allocation_arch, string_write_acc, string_count_write, string_index_write, fixed_result_write, descriptor_result_write, segment_pop_sp_commit, call_gate_sp_commit, return_same_sp_commit, retf_outer_sp_commit, iret_outer_sp_commit, task_commit_gpr_write};
+    assign gpr_data_values = {
+        (operand_gpr_write_data),
+        (tmp0_q),
+        (tmp2_q),
+        (count_value - 16'd1),
+        (stack_next_sp),
+        (tmp1_q),
+        (stack_cursor_q - allocation_q),
+        (tmp0_q),
+        (stack_pointer+allocation_q),
+        (tmp0_q),
+        (count_value-16'd1),
+        (architectural_flags[10] ? string_index-string_delta : string_index+string_delta),
+        (write_result_dx ? auxiliary_q : tmp2_q),
+        (descriptor_result_data),
+        (stack_cursor_q),
+        (stack_cursor_q),
+        (stack_cursor_q + ((commit_context && allocation_valid_q) ? allocation_q : 16'd0)),
+        (iret_outer_sp_q + allocation_q),
+        (iret_outer_sp_q),
+        (task_loaded_gpr[task_commit_phase_q[2:0] * 16 +: 16])
+    };
+    assign sequential_gpr_write_data = reduce_gpr_data(gpr_data_onehot, gpr_data_values);
     assign sequential_flags_write_en = !reset && (task_commit_flags_write || arpl_commit || direct_flags || descriptor_verify_flags_write || descriptor_inspect_flags_write || commit_flags || restore_flags || set_if || clear_if_tf || clear_event_flags || iret_commit);
     assign task_flags_write_en = !reset && task_commit_flags_write;
     assign sequential_flags_write_data = task_commit_flags_write ? task_loaded_flags : arpl_commit ? (arpl_adjust ? 16'h0040 : 16'h0000) : direct_flags ? direct_flags_data : descriptor_verify_flags_write ? (descriptor_verify_success_live ? 16'h0040 : 16'h0000) : descriptor_inspect_flags_write ? (descriptor_inspect_success_live ? 16'h0040 : 16'h0000) : restore_flags ? tmp0_q : (iret_commit ? tmp2_q : (set_if ? {6'd0, if_value, 9'd0} : ((clear_if_tf || clear_event_flags) ? 16'd0 : flags_q)));

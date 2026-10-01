@@ -475,6 +475,39 @@ module spk286 (
         protected_range_exceeded(stack_offset, selected_segment_limit, protected_segment_is_expand_down, operand_byte) :
         address_override ? protected_range_exceeded(address_offset, selected_segment_limit, protected_segment_is_expand_down, operand_byte) :
         protected_range_exceeded(operand_offset, selected_segment_limit, protected_segment_is_expand_down, operand_byte);
+    // Compare cache ranges before selecting the cache and offset sources.
+    // Keep real-mode hidden limits, vector/I-O overlap and LOADALL state exact.
+    (* keep *) logic [3:0] operand_io_ranges, operand_address_ranges, operand_stack_ranges;
+    (* keep *) logic [3:0] operand_regular_ranges, operand_vector_ranges;
+    logic parallel_operand_within_limit;
+    genvar operand_cache_index;
+    generate
+    for (operand_cache_index = 0; operand_cache_index < 4; operand_cache_index = operand_cache_index + 1) begin : g_operand_cache_range
+        wire [15:0] cache_limit = protected_msw[0] ?
+            protected_segment_limits[operand_cache_index*16 +: 16] :
+            real_segment_limits[operand_cache_index*16 +: 16];
+        wire cache_expand_down = protected_msw[0] &&
+            !protected_segment_access[operand_cache_index*8+3] &&
+            protected_segment_access[operand_cache_index*8+2];
+        assign operand_io_ranges[operand_cache_index] =
+            !protected_range_exceeded(16'd0, cache_limit, cache_expand_down, operand_byte);
+        assign operand_address_ranges[operand_cache_index] =
+            !protected_range_exceeded(address_offset, cache_limit, cache_expand_down, operand_byte);
+        assign operand_stack_ranges[operand_cache_index] =
+            !protected_range_exceeded(stack_offset, cache_limit, cache_expand_down, operand_byte);
+        assign operand_regular_ranges[operand_cache_index] =
+            !protected_range_exceeded(operand_offset, cache_limit, cache_expand_down, operand_byte);
+        assign operand_vector_ranges[operand_cache_index] =
+            !protected_range_exceeded(io_transfer ? 16'd0 : vector_offset, 16'hFFFF, cache_expand_down, operand_byte);
+    end
+    endgenerate
+    assign parallel_operand_within_limit =
+        (protected_event_access || protected_descriptor_access || protected_tss_access || protected_call_stack_access) ? 1'b1 :
+        vector_request ? operand_vector_ranges[selected_segment_index] :
+        io_transfer ? operand_io_ranges[selected_segment_index] :
+        address_override && !stack_request ? operand_address_ranges[selected_segment_index] :
+        stack_request ? operand_stack_ranges[selected_segment_index] :
+        operand_regular_ranges[selected_segment_index];
     assign protected_call_range_fault = stack_request ?
         protected_range_exceeded(stack_offset, protected_call_stack_limit, protected_call_stack_expand_down, operand_byte) :
         address_override ? protected_range_exceeded(address_offset, protected_call_stack_limit, protected_call_stack_expand_down, operand_byte) :
@@ -1026,7 +1059,18 @@ module spk286 (
     assign loadall_memory_done = loadall_memory_request && memory_response_valid;
     assign task_memory_done = task_memory_request && memory_response_valid;
 
-    spk286_operand operand (
+    spk286_operand #(
+`ifdef SPK286_P05_PARALLEL_LIMIT_CHECK
+        .USE_PARALLEL_RANGE(1'b1)
+`else
+        .USE_PARALLEL_RANGE(1'b0)
+`endif
+    ) operand (
+`ifdef SPK286_P05_PARALLEL_LIMIT_CHECK
+        .parallel_within_limit(parallel_operand_within_limit),
+`else
+        .parallel_within_limit(1'b0),
+`endif
         .clk(clk), .reset(reset), .cancel(semantic_cancel), .request_valid(operand_request && !protected_access_fault),
         .request_byte(operand_byte), .request_write(operand_write), .request_check(operand_check), .select_rm(operand_select_rm), .write_data(operand_write_data),
         .done(operand_done), .unlimited_memory_done(unlimited_memory_done), .read_data(operand_read_data), .register_state(register_state),

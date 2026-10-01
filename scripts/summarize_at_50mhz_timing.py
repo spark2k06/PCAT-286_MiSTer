@@ -18,6 +18,13 @@ def table_rows(text):
             yield [value.strip() for value in line.strip("; ").split(";")]
 
 
+def parse_fmax(text):
+    # An empty trailing Note column is stripped by table_rows. Those rows
+    # still have all three actual values and include the CPU/system clock.
+    return {row[2]: float(row[0].split()[0]) for row in table_rows(text)
+            if len(row) in (3, 4) and re.fullmatch(r"\d+(?:\.\d+)? MHz", row[0])}
+
+
 def parse_report(path):
     text = path.read_text(errors="replace")
     summary = text.split("Path #1:", 1)[0]
@@ -113,10 +120,7 @@ def main():
         for row in table_rows(check):
             if len(row) == 2 and row[1] == "No clock feeds this register's clock port.":
                 no_clocks[re.split(r"[|~]", row[0], maxsplit=1)[0]] += 1
-        fmax = {}
-        for row in table_rows((reports / corner / "fmax.rpt").read_text()):
-            if len(row) == 4 and row[0].endswith(" MHz"):
-                fmax[row[2]] = float(row[0].split()[0])
+        fmax = parse_fmax((reports / corner / "fmax.rpt").read_text())
         result["corner_metadata"][corner] = {
             "check_timing_issues": checks, "unclocked_node_families": dict(no_clocks),
             "fmax_mhz": fmax}

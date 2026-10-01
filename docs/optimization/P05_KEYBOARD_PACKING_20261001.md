@@ -76,6 +76,18 @@ and [the fitted audit](../evidence/keyboard-packing-20261001/audit.json).
 The existing SDRAM budget and coverage limitations remain as documented in
 the original audit; this milestone does not claim external-board sign-off.
 
+### Fmax metadata parser correction
+
+The original summary parser omitted Fmax rows whose trailing `Note` cell
+was empty. Raw fitted reports and all setup/hold/path metrics were retained
+correctly. The focused parser check now covers both empty and populated
+notes, including integer frequencies. Re-parsing the exact same fitted
+reports leaves every path metric unchanged and recovers the main clock's
+Fmax. The committed original receipt is preserved; corrected local metadata
+is `build/keyboard-packing-fmax-corrected-summary.json`. Subsequent summaries
+use the corrected parser. Slack at the real clock remains the acceptance
+criterion, rather than Fmax alone.
+
 ## Reproduction
 
 ```sh

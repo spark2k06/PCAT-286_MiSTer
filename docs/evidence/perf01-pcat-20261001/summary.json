@@ -1,0 +1,1073 @@
+{
+  "date": "2026-10-01",
+  "scope": "Directed synthetic firmware, not commercial CheckIt or full regression",
+  "pcat_base_commit": "3e162225904d36ee402e0b15145876b3d5415474",
+  "spk286_commit": "2073e967cb7828f5c60dff57b5d15138848a1362",
+  "86box_commit": "cfb9f52cd8bac82624b5b819794cdb714d0bf1fe",
+  "clock_mhz": 50,
+  "performance_macros": [
+    "SPK286_P05_PARALLEL_LIMIT_CHECK",
+    "SPK286_P01_FAST_MEMORY_START",
+    "SPK286_P02_FETCH_CHAIN",
+    "SPK286_P06_EARLY_MEMORY_ADDRESS"
+  ],
+  "code_buffer": {
+    "lines": 64,
+    "bytes_per_line": 8,
+    "code_only": true
+  },
+  "counterfactual_modes": {
+    "1": "All physical owner accesses ideal",
+    "2": "Code fills ideal",
+    "3": "Data reads and writes ideal",
+    "4": "Data reads ideal",
+    "5": "Writes ideal",
+    "6": "Simulation-only 1KiB data-read cache with physical writes"
+  },
+  "verification": {
+    "physical_runs": 8,
+    "owner_counterfactual_runs": 24,
+    "always_ready_probe_runs": 8,
+    "probe_physical_baselines_identical": true,
+    "final_gpr_flags_full_backing_memory_and_retire_write_counts_match": true,
+    "architectural_scope": "No devices/IRQ/DMA/HPS contention in these workloads; physical SDRAM refresh enabled"
+  },
+  "source_sha256": {
+    "vendor/spk286/microcode/generated/spk286_microcode_pkg.sv": "fa46ce895abf5dbc813273c2b3b436afa111fbcac519ea571fed806f0d7b5314",
+    "vendor/spk286/microcode/generated/spk286_microcode_rom.sv": "871aab512360fad8ab966028edf796ba49abe559b0d957dab54a9568e8e321e6",
+    "vendor/spk286/rtl/spk286_protected_pkg.sv": "1e4d70a8c9c068402af7441a792e58a1e9e5545d6ba2edb40c236fd93547877f",
+    "vendor/spk286/rtl/spk286_tss_pkg.sv": "04d2c46e1ed5be52f7822b9d948da11860c6ec4d419b2c1cfddf6a834ea09592",
+    "vendor/spk286/rtl/spk286_adjust.sv": "dfa7b1ffcfa3278d0ae9baf58c9a63f8190cb4146bd385194d296b78ae3ceb58",
+    "vendor/spk286/rtl/spk286_alu_decode.sv": "633b8daad1036370e5b9070d86c64a8a610b026113dc373998eb91030e2cc2a2",
+    "vendor/spk286/rtl/spk286_alu.sv": "103cd07b5a3ae79e96b2bb42aa0eb411ba1b4ee6261f7e5f9cfbc5a41f21d232",
+    "vendor/spk286/rtl/spk286_biu.sv": "0c17999947f7d3ed4e044e10893516d9dfd1ed30a3b4af1578dcc6cfc8202d33",
+    "vendor/spk286/rtl/spk286_condition.sv": "2885a31a13ad49c64460a329b640d4329725c7c8ce82cc0b983148563e9431a9",
+    "vendor/spk286/rtl/spk286_control_decode.sv": "d56e5de2a0f89f017fc96bb91a85e872dd4b8478d8858f61a7bdc540664860df",
+    "vendor/spk286/rtl/spk286_decoder.sv": "bd435f92a3ca2540b9de6f3d71e8a6b880ee7a01a5adfac3af5b2f855589f21b",
+    "vendor/spk286/rtl/spk286_descriptor.sv": "cf6ab285f3be15332eb32868571f879c66b5b3c7d250fd5ea1d05b909c36ea5d",
+    "vendor/spk286/rtl/spk286_effective_address.sv": "cb2ec2959b616f92594353a36ecea7e0af18774b32d4cd9a7e547fd28516d988",
+    "vendor/spk286/rtl/spk286_events.sv": "fb5253389daf3e69338a9aed2e3dfcb0d2352a4ac1e48b07baea3c68ea60fa9d",
+    "vendor/spk286/rtl/spk286_fetch.sv": "84ecc45dee9b859819f55e6e74a7214baacc018065775167b411521d4aa06266",
+    "vendor/spk286/rtl/spk286_flags_decode.sv": "81527f7053df20cdb32a4a56c499bfaa3abea65e1e956530c1f15ea3b2d032ed",
+    "vendor/spk286/rtl/spk286_instruction_context.sv": "1a17b502e71e13d8520bd3f31cf42f69685a4d49155ae3c0f02c9882729b3aa7",
+    "vendor/spk286/rtl/spk286_loadall_service.sv": "f32239d7b48abbfad8d5798d2b62aa84fb5ba6a54b748342240afa9e42f6d617",
+    "vendor/spk286/rtl/spk286_micro_executor.sv": "85561a95cc3c0d0b20eb10896424d26c55991ddce558a5263837e849d57c92d0",
+    "vendor/spk286/rtl/spk286_microsequencer.sv": "fa4e62a44d7710adc7b10df8e88f4f02c4b9d61afc511b0afb7de188ed220004",
+    "vendor/spk286/rtl/spk286_modrm.sv": "621ab5d58c2f8877559d151d0e270f0062ac069cd781e3c7ac9a8565c3d7193c",
+    "vendor/spk286/rtl/spk286_muldiv.sv": "0816c915198cd2433aec9a74695b90ad398f9a29a39eef8b1e7858810192682f",
+    "vendor/spk286/rtl/spk286_operand_decode.sv": "1121b175eb793a1309cdb5c6f7c2145de1ec8c90d9d99a9139726986752e091a",
+    "vendor/spk286/rtl/spk286_operand.sv": "0b89f38624875de0450fc8b3accaaadb75f81c29f54fa4249a58c8f0d5c96885",
+    "vendor/spk286/rtl/spk286_prefetch_queue.sv": "629649f09e4a1641c0ae7cd5aa619a8744fe6ab9548bfdc677284d78c535ed34",
+    "vendor/spk286/rtl/spk286_protected_state.sv": "fff4a24b02ab9499c64fd22037c4746f69726e34a7ded03d96b8baefef387014",
+    "vendor/spk286/rtl/spk286_registers.sv": "c395b673525c79b206b8555c4b71b42e037914b5851f2513e018985fcaa245df",
+    "vendor/spk286/rtl/spk286_selector.sv": "cd003eaccbb361fece41fa4fff352015d4d2e2723ed7656bfdf4457b40af4c33",
+    "vendor/spk286/rtl/spk286_segments.sv": "099b8210c1f2eaf3252db7ac0eadb1481d038f73c72972141761d396b8544a4a",
+    "vendor/spk286/rtl/spk286_shift.sv": "722482adde5777f89947ec03572f183436db4dfa8f6e599ab972f5eb55f108fc",
+    "vendor/spk286/rtl/spk286_stack_range.sv": "e59f5f231422eca0f8ea0016b4fa65b714a66d0d694eb8b38c44683f68f60fea",
+    "vendor/spk286/rtl/spk286_stack.sv": "30c94c57730dd333ba4533193b805891a9eb5ce772bf9e263e608224662be577",
+    "vendor/spk286/rtl/spk286_task_segment_service.sv": "083823336285dcf44cbe586ea31d78f861cae60a9ad66a45c6b3d0322d51d620",
+    "vendor/spk286/rtl/spk286_task_switch_service.sv": "73eb067716965144ac9dd3ea63632913758710395b6f0908cbe5561470c922e5",
+    "vendor/spk286/rtl/spk286_tss_descriptor_service.sv": "b48f687c7e77b6383709ceaf8362b0846902e1da9905234b0a95321ddafc4ed0",
+    "vendor/spk286/rtl/spk286_tss_service.sv": "e720c9ad15449983febda2b3a8c4171f169a74f94586b9cc1ca4a14fd23acdda",
+    "vendor/spk286/rtl/spk286_timing_policy.sv": "479b333fca7ef32b409b6f12cb7bfa3d016d6d4259bc09495959794bdf95e4d3",
+    "vendor/spk286/rtl/spk286_timing_trace.sv": "37e8e3ffdc726558cb80dc08f62e6b849d30a9d1cd58d5bc15779670eff0daf1",
+    "vendor/spk286/rtl/spk286.sv": "d0e95b9d55b95b27ec2ff65b78fcd71ec8811d3dcfb89cd5cffb631c78b70eb8",
+    "rtl/spk286_integration/spk286_machine_cpu.sv": "f2d65ac6b65dc4fa4f6151b8c31a798ad3ab90094ca36bc2a0829f02ec70e002",
+    "rtl/spk286_integration/spk286_at_bus_bridge.sv": "b77c8defc275e4291d3c0bf7c2c361f1dc73fafe8decda8ddae60053498be565",
+    "rtl/spk286_integration/spk286_at_memory_decode.sv": "1b6b4280d4c64c03841c44c7ab6a88b03832c6af716b98d0e97289856b8d756c",
+    "rtl/spk286_integration/spk286_at_mister_memory_port.sv": "f847324185570537a28aebfddfd26badcbd14a4033de42bcb5d2eb56ed46b4cb",
+    "rtl/spk286_integration/spk286_at_sdram_read_buffer.sv": "5e7b3512394c570fab8e82723c0d093f125e5b8d53c867d99ba0ae30570fdfcb",
+    "rtl/spk286_integration/spk286_at_mister_sdram_owner.sv": "f865b9765b5e7629915228fcfa4847004956d0e49aadb41f21603ac1c5bc15f6",
+    "rtl/KFPC-XT/HDL/KFSDRAM/HDL/KFSDRAM.sv": "f5b9335c86dc8ad52eca58d7fea91d8aa35ba7126cde559d9e63fc5a31b86aef",
+    "sim/spk286_integration/spk286_sdram_pin_model.sv": "372586598eb82f7e0f808a44efb535db60e55dcdba4b6cf0e733281a9b468ce2",
+    "sim/spk286_integration/spk286_checkit_workload_tb.sv": "aa8673927308c2b431baae50d41e5ea3a22ec1510e80e39f0fcc00f034803a0a",
+    "config.tcl": "e98e90075b2686c6810a61066283e23d181e7b20913070ceced5314d73785d02",
+    "sim/spk286_integration/spk286_checkit_profile.svh": "a48da6278ca34a3a14cead64ad4cf39c9580151299ad9ae4dbb04ec8ae1815d6",
+    "sim/spk286_integration/spk286_checkit_ideal_owner.svh": "e9c6a29a5138d159cc548de2381951ce9b808f517557571cb747007ba9c8d1fc",
+    "scripts/test_checkit_directed.sh": "de321c0f7f010fcb1ee4c9cce97758209884a760c5e2830bd951121855a7bf68",
+    "scripts/at_performance_flags.sh": "d2c424628bfd256ebdf7ae6f6a08acae410809b1ebe972efde951e651a5b3e8d",
+    "tests/firmware/checkit_dhrystone.asm": "69f013bb329d55a0f78f780717e46913b1ded555bf05aebe72c8fbefaea435ea",
+    "tests/firmware/checkit_dhrystone21.asm": "ad1a59ab25b6a8d9ab1426028002ed10e174a98b8d61947a2a2251486c383f28",
+    "tests/firmware/checkit_whetstone.asm": "44a703852bf5ac59f20ccfa1aa37c1bddf5732114f571465f70e92e29dca1e3b",
+    "tests/firmware/checkit_working_set.asm": "263ff11f6d43a033932cad061d3430a9dc138f89215e7ceef67edacce9b73edc",
+    "scripts/profile_at_ideal_bus.py": "cff37bb840f1c9965eb0299734f505b40f8a15f8bf7d1b26f46d8ab502b1c63b",
+    "PCAT-286.sv": "61c71566b0b8ca730af83dfb29a39392aca0e96635edea9c7f3fe8e2f353c7e1",
+    "rtl/spk286_integration/spk286_at_machine.sv": "d2402d8880a98f20e52493d2aa321035ab11ec606b3a8d2139cdcaa5dc641bda"
+  },
+  "86box_source_sha256": {
+    "src/cpu/spk286_backend.cpp": "993d2cb98a2a542b97e5d8bbe8da92be3332ae26c8207b575ac171090ef797fc",
+    "src/cpu/spk286_host.c": "85333849872bf3b05df48300012dfa2d7bfc6a9a0d4f40987de89663471c2880",
+    "src/cpu/cpu.c": "4ee45609c7eda91f74526e4f1d955b65acd36a18123878b0529f76c5aea5f069",
+    "src/cpu/cpu_table.c": "eb3e4019a908ac55e629b233f732c5a30f1886388a93010e16330a115fde1873",
+    "src/cpu/386_common.c": "610fc8c7760a39df32e5c054706a351fff270ab0ec6e5ce1e6adb6c0160272a7",
+    "src/mem/mmu_2386.c": "4a3e6b96a9684db496465278898874e796d198ebf6ed363f86f8bdc7a163a338",
+    "src/mem/mem.c": "d48c7d9c90ed99f590e3ea86878512f99fa6d8c68f23aabaff8e5e154b1ac465"
+  },
+  "generated_probe_harness_sha256": "0a66fb0d9771e82743af2be8f91f89d971d58e026e70a1c673470c4119a0dd38",
+  "profile_json_sha256": "ca0264d8f65ba3c8e59a68e1be96ac1b00f380f1f23277644069343f9ced5bf4",
+  "ideal_cpu_bus_json_sha256": "b0e1cdef71230319a4d8cf410c3f823114febd7cde8b818fb30ba334bef9bfab",
+  "local_rbf": {
+    "path": "output_files/PCAT-286.rbf",
+    "bytes": 4055780,
+    "sha256": "59a899efb6f2b328ee3aa4c72a7bc616a5716384b7b14d4aae173b74a3c3732d",
+    "loaded_rbf_attested": false,
+    "flow_status": "Successful - Thu Oct 1 09:25:32 2026",
+    "nominal_cpu_mhz": 50,
+    "flow_macros_match_current_performance_options": true,
+    "timing_closure_claimed": false
+  },
+  "runs": [
+    {
+      "workload": "dhrystone",
+      "physical_result": {
+        "workload": "dhrystone",
+        "p03": 1,
+        "cycles": 1018179,
+        "retired": 38656,
+        "reads": 89732,
+        "writes": 21124,
+        "code_fetches": 156768,
+        "external_wait": 620269,
+        "queue_empty": 59835,
+        "sdram_reads": 37812,
+        "sdram_writes": 21124,
+        "hits": 52067,
+        "misses": 49,
+        "fills": 49,
+        "physical_reads": 37812,
+        "invalidations": 0
+      },
+      "signature": {
+        "gpr": "4800560000007c00000700000000600d",
+        "flags": "0016",
+        "memory": "3d5537bf66334dce",
+        "ideal_owner": "0"
+      },
+      "cpu_categories": {
+        "opcode_starved": {
+          "cycles": 26505,
+          "bus_wait_overlap": 13675
+        },
+        "instruction_byte_starved": {
+          "cycles": 9838,
+          "bus_wait_overlap": 4029
+        },
+        "operand_service": {
+          "cycles": 604304,
+          "bus_wait_overlap": 487048
+        },
+        "internal_microcode": {
+          "cycles": 299192,
+          "bus_wait_overlap": 88135
+        },
+        "dispatch_or_prefix": {
+          "cycles": 39684,
+          "bus_wait_overlap": 12149
+        },
+        "retirement_boundary": {
+          "cycles": 38656,
+          "bus_wait_overlap": 15233
+        },
+        "other": {
+          "cycles": 0,
+          "bus_wait_overlap": 0
+        }
+      },
+      "latency": {
+        "code_hit": {
+          "count": 52067,
+          "total": 156201,
+          "front": 52067,
+          "backend": 52067,
+          "return": 52067,
+          "max": 3,
+          "mean_wait_clocks": 3.0
+        },
+        "code_miss": {
+          "count": 49,
+          "total": 566,
+          "front": 76,
+          "backend": 441,
+          "return": 49,
+          "max": 16,
+          "mean_wait_clocks": 11.551020408163266
+        },
+        "code_bypass": {
+          "count": 0,
+          "total": 0,
+          "front": 0,
+          "backend": 0,
+          "return": 0,
+          "max": 0,
+          "mean_wait_clocks": null
+        },
+        "data_read": {
+          "count": 37616,
+          "total": 305786,
+          "front": 42474,
+          "backend": 225696,
+          "return": 37616,
+          "max": 14,
+          "mean_wait_clocks": 8.129147171416419
+        },
+        "data_write": {
+          "count": 21124,
+          "total": 157715,
+          "front": 30971,
+          "backend": 105620,
+          "return": 21124,
+          "max": 13,
+          "mean_wait_clocks": 7.466152243893202
+        }
+      },
+      "misc": {
+        "queue_empty_not_demanded": 23492,
+        "data_wait_for_code": 36874,
+        "code_wait_for_data": 0,
+        "data_admission": 58516,
+        "data_response": 545788,
+        "code_transfers": 52116,
+        "code_bytes": 101803,
+        "consumed_bytes": 73521,
+        "flushed_bytes": 17527,
+        "redirects": 5375,
+        "cancelled_code": 3285,
+        "fast_register_ops": 9500,
+        "owner_refresh": 58386
+      },
+      "code_hit_fraction": 0.9990597896999002,
+      "owner_sensitivity": {
+        "1": {
+          "cycles": 730653,
+          "speedup_vs_physical": 1.393519221846759,
+          "signature": {
+            "gpr": "4800560000007c00000700000000600d",
+            "flags": "0016",
+            "memory": "3d5537bf66334dce",
+            "ideal_owner": "1"
+          },
+          "data_cache": {
+            "words": "512",
+            "hits": "0",
+            "misses": "0",
+            "write_updates": "0"
+          },
+          "log_sha256": "4eb248aa61f94f3d54b4a8eed9b6548788145b173d0dc3d5df04096c6f28da07"
+        },
+        "2": {
+          "cycles": 1020614,
+          "speedup_vs_physical": 0.9976141812673548,
+          "signature": {
+            "gpr": "4800560000007c00000700000000600d",
+            "flags": "0016",
+            "memory": "3d5537bf66334dce",
+            "ideal_owner": "2"
+          },
+          "data_cache": {
+            "words": "512",
+            "hits": "0",
+            "misses": "0",
+            "write_updates": "0"
+          },
+          "log_sha256": "d27e8b2b9f794157dafcf3c7b65eadf0fdbc551a67bea6d7837289c553cf4030"
+        },
+        "3": {
+          "cycles": 730875,
+          "speedup_vs_physical": 1.3930959466393023,
+          "signature": {
+            "gpr": "4800560000007c00000700000000600d",
+            "flags": "0016",
+            "memory": "3d5537bf66334dce",
+            "ideal_owner": "3"
+          },
+          "data_cache": {
+            "words": "512",
+            "hits": "0",
+            "misses": "0",
+            "write_updates": "0"
+          },
+          "log_sha256": "bc48c947b6dbe37b1bfc00f7b3f68f4c6dcc9ff5c0eb557ee95955646e4924e6"
+        },
+        "4": {
+          "cycles": 822259,
+          "speedup_vs_physical": 1.238270423309444,
+          "signature": {
+            "gpr": "4800560000007c00000700000000600d",
+            "flags": "0016",
+            "memory": "3d5537bf66334dce",
+            "ideal_owner": "4"
+          },
+          "data_cache": {
+            "words": "512",
+            "hits": "0",
+            "misses": "0",
+            "write_updates": "0"
+          },
+          "log_sha256": "03fbdbe59dfbd5338430883aab259ea77f63e57f224ea722b0af09e3d5500ad4"
+        },
+        "5": {
+          "cycles": 927428,
+          "speedup_vs_physical": 1.097852340019926,
+          "signature": {
+            "gpr": "4800560000007c00000700000000600d",
+            "flags": "0016",
+            "memory": "3d5537bf66334dce",
+            "ideal_owner": "5"
+          },
+          "data_cache": {
+            "words": "512",
+            "hits": "0",
+            "misses": "0",
+            "write_updates": "0"
+          },
+          "log_sha256": "d43d8b1830743638d9682b9171090f8a9c1b0471eb6740c318b59480f0d2ac94"
+        },
+        "6": {
+          "cycles": 825714,
+          "speedup_vs_physical": 1.2330891809997166,
+          "signature": {
+            "gpr": "4800560000007c00000700000000600d",
+            "flags": "0016",
+            "memory": "3d5537bf66334dce",
+            "ideal_owner": "6"
+          },
+          "data_cache": {
+            "words": "512",
+            "hits": "36960",
+            "misses": "656",
+            "write_updates": "19161"
+          },
+          "log_sha256": "f4de52420758150049493961b77740aec10c80be01f58ba50d534ca9ea97cdd8"
+        }
+      },
+      "physical_log_sha256": "ee54d52240bbd904793fba24e0770b5bb12e7d77e791993e5a9546035f3c79fe",
+      "always_ready": {
+        "workload": "dhrystone",
+        "physical_cycles": 1018179,
+        "always_ready_cycles": 501701,
+        "physical_over_ideal": 2.0294537981785963,
+        "gpr_flags_memory_and_retire_write_counts_match": true,
+        "always_ready_signature": {
+          "gpr": "4800560000007c00000700000000600d",
+          "flags": "0016",
+          "memory": "3d5537bf66334dce",
+          "ideal_owner": "0"
+        }
+      }
+    },
+    {
+      "workload": "whetstone",
+      "physical_result": {
+        "workload": "whetstone",
+        "p03": 1,
+        "cycles": 778897,
+        "retired": 44486,
+        "reads": 93397,
+        "writes": 16516,
+        "code_fetches": 223402,
+        "external_wait": 496231,
+        "queue_empty": 89433,
+        "sdram_reads": 19280,
+        "sdram_writes": 16516,
+        "hits": 74273,
+        "misses": 52,
+        "fills": 52,
+        "physical_reads": 19280,
+        "invalidations": 0
+      },
+      "signature": {
+        "gpr": "4800630000007c000031fffe0000600d",
+        "flags": "0016",
+        "memory": "3bee53bc61d7964a",
+        "ideal_owner": "0"
+      },
+      "cpu_categories": {
+        "opcode_starved": {
+          "cycles": 41470,
+          "bus_wait_overlap": 21002
+        },
+        "instruction_byte_starved": {
+          "cycles": 18457,
+          "bus_wait_overlap": 6985
+        },
+        "operand_service": {
+          "cycles": 367723,
+          "bus_wait_overlap": 296547
+        },
+        "internal_microcode": {
+          "cycles": 262273,
+          "bus_wait_overlap": 142907
+        },
+        "dispatch_or_prefix": {
+          "cycles": 44488,
+          "bus_wait_overlap": 10782
+        },
+        "retirement_boundary": {
+          "cycles": 44486,
+          "bus_wait_overlap": 18008
+        },
+        "other": {
+          "cycles": 0,
+          "bus_wait_overlap": 0
+        }
+      },
+      "latency": {
+        "code_hit": {
+          "count": 74273,
+          "total": 222819,
+          "front": 74273,
+          "backend": 74273,
+          "return": 74273,
+          "max": 3,
+          "mean_wait_clocks": 3.0
+        },
+        "code_miss": {
+          "count": 52,
+          "total": 582,
+          "front": 62,
+          "backend": 468,
+          "return": 52,
+          "max": 16,
+          "mean_wait_clocks": 11.192307692307692
+        },
+        "code_bypass": {
+          "count": 0,
+          "total": 0,
+          "front": 0,
+          "backend": 0,
+          "return": 0,
+          "max": 0,
+          "mean_wait_clocks": null
+        },
+        "data_read": {
+          "count": 19072,
+          "total": 155553,
+          "front": 22049,
+          "backend": 114432,
+          "return": 19072,
+          "max": 14,
+          "mean_wait_clocks": 8.156092701342281
+        },
+        "data_write": {
+          "count": 16516,
+          "total": 117276,
+          "front": 18180,
+          "backend": 82580,
+          "return": 16516,
+          "max": 13,
+          "mean_wait_clocks": 7.100750787115524
+        }
+      },
+      "misc": {
+        "queue_empty_not_demanded": 29506,
+        "data_wait_for_code": 41655,
+        "code_wait_for_data": 0,
+        "data_admission": 35588,
+        "data_response": 332135,
+        "code_transfers": 74325,
+        "code_bytes": 144734,
+        "consumed_bytes": 97461,
+        "flushed_bytes": 30886,
+        "redirects": 8191,
+        "cancelled_code": 5631,
+        "fast_register_ops": 5012,
+        "owner_refresh": 44286
+      },
+      "code_hit_fraction": 0.9993003699966364,
+      "owner_sensitivity": {
+        "1": {
+          "cycles": 612589,
+          "speedup_vs_physical": 1.27148381704536,
+          "signature": {
+            "gpr": "4800630000007c000031fffe0000600d",
+            "flags": "0016",
+            "memory": "3bee53bc61d7964a",
+            "ideal_owner": "1"
+          },
+          "data_cache": {
+            "words": "512",
+            "hits": "0",
+            "misses": "0",
+            "write_updates": "0"
+          },
+          "log_sha256": "558fba6d3cff058dbd44d2f22cb8a7134f4c5fc6de12894b4d8a3e76884ce4d4"
+        },
+        "2": {
+          "cycles": 778664,
+          "speedup_vs_physical": 1.0002992304768168,
+          "signature": {
+            "gpr": "4800630000007c000031fffe0000600d",
+            "flags": "0016",
+            "memory": "3bee53bc61d7964a",
+            "ideal_owner": "2"
+          },
+          "data_cache": {
+            "words": "512",
+            "hits": "0",
+            "misses": "0",
+            "write_updates": "0"
+          },
+          "log_sha256": "44c49a081b6746bbd489935bc5abd22227e38e6945ebdb41373339e609e68dce"
+        },
+        "3": {
+          "cycles": 612828,
+          "speedup_vs_physical": 1.2709879444150725,
+          "signature": {
+            "gpr": "4800630000007c000031fffe0000600d",
+            "flags": "0016",
+            "memory": "3bee53bc61d7964a",
+            "ideal_owner": "3"
+          },
+          "data_cache": {
+            "words": "512",
+            "hits": "0",
+            "misses": "0",
+            "write_updates": "0"
+          },
+          "log_sha256": "51e76357b26cce52e40803bf9d7dab787119cc4a6d33a284ba9f97863d501bbc"
+        },
+        "4": {
+          "cycles": 681578,
+          "speedup_vs_physical": 1.1427848316700362,
+          "signature": {
+            "gpr": "4800630000007c000031fffe0000600d",
+            "flags": "0016",
+            "memory": "3bee53bc61d7964a",
+            "ideal_owner": "4"
+          },
+          "data_cache": {
+            "words": "512",
+            "hits": "0",
+            "misses": "0",
+            "write_updates": "0"
+          },
+          "log_sha256": "f4b6b753ed439a64a13519036c978d36f7bef65724e538ee0f3036f51c85719e"
+        },
+        "5": {
+          "cycles": 713954,
+          "speedup_vs_physical": 1.0909624429585099,
+          "signature": {
+            "gpr": "4800630000007c000031fffe0000600d",
+            "flags": "0016",
+            "memory": "3bee53bc61d7964a",
+            "ideal_owner": "5"
+          },
+          "data_cache": {
+            "words": "512",
+            "hits": "0",
+            "misses": "0",
+            "write_updates": "0"
+          },
+          "log_sha256": "94d124d4e5d4d78d005946c85e67e78014ef2f8cdae23521d0f30ad559cdfc3f"
+        },
+        "6": {
+          "cycles": 682610,
+          "speedup_vs_physical": 1.1410571189991356,
+          "signature": {
+            "gpr": "4800630000007c000031fffe0000600d",
+            "flags": "0016",
+            "memory": "3bee53bc61d7964a",
+            "ideal_owner": "6"
+          },
+          "data_cache": {
+            "words": "512",
+            "hits": "18808",
+            "misses": "264",
+            "write_updates": "14972"
+          },
+          "log_sha256": "736fb6dc67eaee28c0f11038d6e9a4bcceb2f965c35a6e6e34bc2e6ed040ef79"
+        }
+      },
+      "physical_log_sha256": "32d3bfbe752979e636f32a49d99e33616006fa18b58e1a606f6a98373b204ae0",
+      "always_ready": {
+        "workload": "whetstone",
+        "physical_cycles": 778897,
+        "always_ready_cycles": 432999,
+        "physical_over_ideal": 1.7988424915530983,
+        "gpr_flags_memory_and_retire_write_counts_match": true,
+        "always_ready_signature": {
+          "gpr": "4800630000007c000031fffe0000600d",
+          "flags": "0016",
+          "memory": "3bee53bc61d7964a",
+          "ideal_owner": "0"
+        }
+      }
+    },
+    {
+      "workload": "working_set",
+      "physical_result": {
+        "workload": "working_set",
+        "p03": 1,
+        "cycles": 1014656,
+        "retired": 56886,
+        "reads": 105851,
+        "writes": 19791,
+        "code_fetches": 424718,
+        "external_wait": 729710,
+        "queue_empty": 174572,
+        "sdram_reads": 99387,
+        "sdram_writes": 19791,
+        "hits": 66452,
+        "misses": 19996,
+        "fills": 19996,
+        "physical_reads": 99387,
+        "invalidations": 0
+      },
+      "signature": {
+        "gpr": "4800740000007c00000b00020000600d",
+        "flags": "0016",
+        "memory": "59258436c35aa1ce",
+        "ideal_owner": "0"
+      },
+      "cpu_categories": {
+        "opcode_starved": {
+          "cycles": 108017,
+          "bus_wait_overlap": 81046
+        },
+        "instruction_byte_starved": {
+          "cycles": 24692,
+          "bus_wait_overlap": 11315
+        },
+        "operand_service": {
+          "cycles": 462039,
+          "bus_wait_overlap": 383651
+        },
+        "internal_microcode": {
+          "cycles": 306134,
+          "bus_wait_overlap": 193638
+        },
+        "dispatch_or_prefix": {
+          "cycles": 56888,
+          "bus_wait_overlap": 28032
+        },
+        "retirement_boundary": {
+          "cycles": 56886,
+          "bus_wait_overlap": 32028
+        },
+        "other": {
+          "cycles": 0,
+          "bus_wait_overlap": 0
+        }
+      },
+      "latency": {
+        "code_hit": {
+          "count": 66452,
+          "total": 199356,
+          "front": 66452,
+          "backend": 66452,
+          "return": 66452,
+          "max": 3,
+          "mean_wait_clocks": 3.0
+        },
+        "code_miss": {
+          "count": 19996,
+          "total": 225361,
+          "front": 25401,
+          "backend": 179964,
+          "return": 19996,
+          "max": 17,
+          "mean_wait_clocks": 11.270304060812162
+        },
+        "code_bypass": {
+          "count": 0,
+          "total": 0,
+          "front": 0,
+          "backend": 0,
+          "return": 0,
+          "max": 0,
+          "mean_wait_clocks": null
+        },
+        "data_read": {
+          "count": 19403,
+          "total": 160152,
+          "front": 24331,
+          "backend": 116418,
+          "return": 19403,
+          "max": 14,
+          "mean_wait_clocks": 8.253981343091274
+        },
+        "data_write": {
+          "count": 19791,
+          "total": 144840,
+          "front": 26094,
+          "backend": 98955,
+          "return": 19791,
+          "max": 13,
+          "mean_wait_clocks": 7.31847809610429
+        }
+      },
+      "misc": {
+        "queue_empty_not_demanded": 41863,
+        "data_wait_for_code": 106222,
+        "code_wait_for_data": 0,
+        "data_admission": 39194,
+        "data_response": 422845,
+        "code_transfers": 86448,
+        "code_bytes": 170280,
+        "consumed_bytes": 117454,
+        "flushed_bytes": 34173,
+        "redirects": 9324,
+        "cancelled_code": 8172,
+        "fast_register_ops": 11573,
+        "owner_refresh": 57588
+      },
+      "code_hit_fraction": 0.7686933185267444,
+      "owner_sensitivity": {
+        "1": {
+          "cycles": 742669,
+          "speedup_vs_physical": 1.36622910071647,
+          "signature": {
+            "gpr": "4800740000007c00000b00020000600d",
+            "flags": "0016",
+            "memory": "59258436c35aa1ce",
+            "ideal_owner": "1"
+          },
+          "data_cache": {
+            "words": "512",
+            "hits": "0",
+            "misses": "0",
+            "write_updates": "0"
+          },
+          "log_sha256": "7c87bea54e7ff0a1222400e75bd1f38cec461612ab43bc167ab365a311be18ab"
+        },
+        "2": {
+          "cycles": 924332,
+          "speedup_vs_physical": 1.0977181359078771,
+          "signature": {
+            "gpr": "4800740000007c00000b00020000600d",
+            "flags": "0016",
+            "memory": "59258436c35aa1ce",
+            "ideal_owner": "2"
+          },
+          "data_cache": {
+            "words": "512",
+            "hits": "0",
+            "misses": "0",
+            "write_updates": "0"
+          },
+          "log_sha256": "eafdba38f5ee00567eaff9447f22112f188589e0ef64a4a9dfd0c7c226002daf"
+        },
+        "3": {
+          "cycles": 827646,
+          "speedup_vs_physical": 1.225954091483557,
+          "signature": {
+            "gpr": "4800740000007c00000b00020000600d",
+            "flags": "0016",
+            "memory": "59258436c35aa1ce",
+            "ideal_owner": "3"
+          },
+          "data_cache": {
+            "words": "512",
+            "hits": "0",
+            "misses": "0",
+            "write_updates": "0"
+          },
+          "log_sha256": "6717ccc95ea896e8bc30c58c64818ace05759ada3f8dd92948eb2346f40386f9"
+        },
+        "4": {
+          "cycles": 911258,
+          "speedup_vs_physical": 1.1134673166106634,
+          "signature": {
+            "gpr": "4800740000007c00000b00020000600d",
+            "flags": "0016",
+            "memory": "59258436c35aa1ce",
+            "ideal_owner": "4"
+          },
+          "data_cache": {
+            "words": "512",
+            "hits": "0",
+            "misses": "0",
+            "write_updates": "0"
+          },
+          "log_sha256": "ca0cb7f0544c188abd323d138352a5cc37d74d7800f57be5177d39048302191e"
+        },
+        "5": {
+          "cycles": 927741,
+          "speedup_vs_physical": 1.0936845520463145,
+          "signature": {
+            "gpr": "4800740000007c00000b00020000600d",
+            "flags": "0016",
+            "memory": "59258436c35aa1ce",
+            "ideal_owner": "5"
+          },
+          "data_cache": {
+            "words": "512",
+            "hits": "0",
+            "misses": "0",
+            "write_updates": "0"
+          },
+          "log_sha256": "3f4afd02bd6b451f188a7ae26a6903ac5e8d53705c1b9f8bedabbc76bfd86888"
+        },
+        "6": {
+          "cycles": 913531,
+          "speedup_vs_physical": 1.110696845536714,
+          "signature": {
+            "gpr": "4800740000007c00000b00020000600d",
+            "flags": "0016",
+            "memory": "59258436c35aa1ce",
+            "ideal_owner": "6"
+          },
+          "data_cache": {
+            "words": "512",
+            "hits": "19011",
+            "misses": "392",
+            "write_updates": "18247"
+          },
+          "log_sha256": "44d644624fadd80e82642525861f2f47a03cabbda7d8b23fe04ec0538674827b"
+        }
+      },
+      "physical_log_sha256": "74dc56e5375ac1c92363697e632ca804cf5ccc9c91bd1bfbff00a59ca5447a40",
+      "always_ready": {
+        "workload": "working_set",
+        "physical_cycles": 1014656,
+        "always_ready_cycles": 509984,
+        "physical_over_ideal": 1.98958398694861,
+        "gpr_flags_memory_and_retire_write_counts_match": true,
+        "always_ready_signature": {
+          "gpr": "4800740000007c00000b00020000600d",
+          "flags": "0016",
+          "memory": "59258436c35aa1ce",
+          "ideal_owner": "0"
+        }
+      }
+    },
+    {
+      "workload": "dhrystone21",
+      "physical_result": {
+        "workload": "dhrystone21",
+        "p03": 1,
+        "cycles": 1003290,
+        "retired": 59249,
+        "reads": 127408,
+        "writes": 20125,
+        "code_fetches": 334482,
+        "external_wait": 651907,
+        "queue_empty": 169927,
+        "sdram_reads": 26932,
+        "sdram_writes": 20125,
+        "hits": 105354,
+        "misses": 1626,
+        "fills": 1626,
+        "physical_reads": 26932,
+        "invalidations": 0
+      },
+      "signature": {
+        "gpr": "4800512000007c00000500000000600d",
+        "flags": "0016",
+        "memory": "ef78ab197813f369",
+        "ideal_owner": "0"
+      },
+      "cpu_categories": {
+        "opcode_starved": {
+          "cycles": 63393,
+          "bus_wait_overlap": 36762
+        },
+        "instruction_byte_starved": {
+          "cycles": 54111,
+          "bus_wait_overlap": 23766
+        },
+        "operand_service": {
+          "cycles": 426131,
+          "bus_wait_overlap": 345025
+        },
+        "internal_microcode": {
+          "cycles": 340896,
+          "bus_wait_overlap": 192154
+        },
+        "dispatch_or_prefix": {
+          "cycles": 59510,
+          "bus_wait_overlap": 29076
+        },
+        "retirement_boundary": {
+          "cycles": 59249,
+          "bus_wait_overlap": 25124
+        },
+        "other": {
+          "cycles": 0,
+          "bus_wait_overlap": 0
+        }
+      },
+      "latency": {
+        "code_hit": {
+          "count": 105354,
+          "total": 316062,
+          "front": 105354,
+          "backend": 105354,
+          "return": 105354,
+          "max": 3,
+          "mean_wait_clocks": 3.0
+        },
+        "code_miss": {
+          "count": 1626,
+          "total": 18419,
+          "front": 2159,
+          "backend": 14634,
+          "return": 1626,
+          "max": 16,
+          "mean_wait_clocks": 11.32779827798278
+        },
+        "code_bypass": {
+          "count": 0,
+          "total": 0,
+          "front": 0,
+          "backend": 0,
+          "return": 0,
+          "max": 0,
+          "mean_wait_clocks": null
+        },
+        "data_read": {
+          "count": 20428,
+          "total": 169845,
+          "front": 26849,
+          "backend": 122568,
+          "return": 20428,
+          "max": 14,
+          "mean_wait_clocks": 8.314323477579793
+        },
+        "data_write": {
+          "count": 20125,
+          "total": 147580,
+          "front": 26830,
+          "backend": 100625,
+          "return": 20125,
+          "max": 13,
+          "mean_wait_clocks": 7.333167701863354
+        }
+      },
+      "misc": {
+        "queue_empty_not_demanded": 52423,
+        "data_wait_for_code": 47264,
+        "code_wait_for_data": 0,
+        "data_admission": 40553,
+        "data_response": 385578,
+        "code_transfers": 106980,
+        "code_bytes": 204232,
+        "consumed_bytes": 140184,
+        "flushed_bytes": 40289,
+        "redirects": 11877,
+        "cancelled_code": 7267,
+        "fast_register_ops": 17177,
+        "owner_refresh": 57276
+      },
+      "code_hit_fraction": 0.9848008973639932,
+      "owner_sensitivity": {
+        "1": {
+          "cycles": 799918,
+          "speedup_vs_physical": 1.2542410597086202,
+          "signature": {
+            "gpr": "4800512000007c00000500000000600d",
+            "flags": "0016",
+            "memory": "ef78ab197813f369",
+            "ideal_owner": "1"
+          },
+          "data_cache": {
+            "words": "512",
+            "hits": "0",
+            "misses": "0",
+            "write_updates": "0"
+          },
+          "log_sha256": "0b4f5d10ef3301cba6f2aa6ff224dbd5391066483f670746c4e2c4042de1ffcf"
+        },
+        "2": {
+          "cycles": 994790,
+          "speedup_vs_physical": 1.0085445169332221,
+          "signature": {
+            "gpr": "4800512000007c00000500000000600d",
+            "flags": "0016",
+            "memory": "ef78ab197813f369",
+            "ideal_owner": "2"
+          },
+          "data_cache": {
+            "words": "512",
+            "hits": "0",
+            "misses": "0",
+            "write_updates": "0"
+          },
+          "log_sha256": "a58b51f9e9e7052aa917d02d8c9473d1bd7c62a755dc758ac87ee1362b7175e7"
+        },
+        "3": {
+          "cycles": 807338,
+          "speedup_vs_physical": 1.2427137085087039,
+          "signature": {
+            "gpr": "4800512000007c00000500000000600d",
+            "flags": "0016",
+            "memory": "ef78ab197813f369",
+            "ideal_owner": "3"
+          },
+          "data_cache": {
+            "words": "512",
+            "hits": "0",
+            "misses": "0",
+            "write_updates": "0"
+          },
+          "log_sha256": "15e7ef88ad2b77ccf921c49a009930325e058d6b7c7182a188bc61ba7bbf8ba7"
+        },
+        "4": {
+          "cycles": 895530,
+          "speedup_vs_physical": 1.1203309771866938,
+          "signature": {
+            "gpr": "4800512000007c00000500000000600d",
+            "flags": "0016",
+            "memory": "ef78ab197813f369",
+            "ideal_owner": "4"
+          },
+          "data_cache": {
+            "words": "512",
+            "hits": "0",
+            "misses": "0",
+            "write_updates": "0"
+          },
+          "log_sha256": "5c70e5f16566b832ce0f690e808633937469e9fa4eb9a482bd3d12caa874d067"
+        },
+        "5": {
+          "cycles": 914465,
+          "speedup_vs_physical": 1.097133296517636,
+          "signature": {
+            "gpr": "4800512000007c00000500000000600d",
+            "flags": "0016",
+            "memory": "ef78ab197813f369",
+            "ideal_owner": "5"
+          },
+          "data_cache": {
+            "words": "512",
+            "hits": "0",
+            "misses": "0",
+            "write_updates": "0"
+          },
+          "log_sha256": "d50000209ba8464a0a47a15f230b2673b475537067cac23c7fe1d18964bcfd31"
+        },
+        "6": {
+          "cycles": 897624,
+          "speedup_vs_physical": 1.1177174407101413,
+          "signature": {
+            "gpr": "4800512000007c00000500000000600d",
+            "flags": "0016",
+            "memory": "ef78ab197813f369",
+            "ideal_owner": "6"
+          },
+          "data_cache": {
+            "words": "512",
+            "hits": "20052",
+            "misses": "376",
+            "write_updates": "9680"
+          },
+          "log_sha256": "77270c7411b676eab9fde8c565326d61d52496af37820d339eebf275a6a88c80"
+        }
+      },
+      "physical_log_sha256": "592df03db2886a3008e6ac70415a432003adc91562cb2d44a44b2536e027b87c",
+      "always_ready": {
+        "workload": "dhrystone21",
+        "physical_cycles": 1003290,
+        "always_ready_cycles": 561536,
+        "physical_over_ideal": 1.7866886539776612,
+        "gpr_flags_memory_and_retire_write_counts_match": true,
+        "always_ready_signature": {
+          "gpr": "4800512000007c00000500000000600d",
+          "flags": "0016",
+          "memory": "ef78ab197813f369",
+          "ideal_owner": "0"
+        }
+      }
+    }
+  ]
+}

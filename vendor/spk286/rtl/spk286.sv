@@ -846,9 +846,17 @@ module spk286 (
         .destination(decode_destination), .source_index(decode_source_index), .entry(decode_entry)
     );
 
+`ifdef SPK286_P07_SYNC_MICROCODE
+    logic [spk286_microcode_pkg::MC_ADDR_WIDTH-1:0] next_micro_pc;
+    spk286_microcode_sync_rom microcode_rom (
+        .clk(clk), .address(next_micro_pc), .word(micro_word), .valid(micro_valid)
+    );
+`else
+    logic [spk286_microcode_pkg::MC_ADDR_WIDTH-1:0] unused_next_micro_pc;
     spk286_microcode_rom microcode_rom (
         .address(micro_pc), .word(micro_word), .valid(micro_valid)
     );
+`endif
 
     assign micro_end = micro_word == spk286_microcode_pkg::MC_END;
     assign loadall_start = operation_valid && micro_word == spk286_microcode_pkg::MC_LOADALL;
@@ -887,6 +895,11 @@ module spk286 (
         .branch_target_valid(counter_branch_request ? counter_branch_target[spk286_microcode_pkg::MC_ADDR_WIDTH] : dispatch_valid),
         .operation_valid(operation_valid), .active(micro_active),
         .micro_pc(micro_pc), .micro_entry(micro_entry),
+`ifdef SPK286_P07_SYNC_MICROCODE
+        .next_micro_pc(next_micro_pc),
+`else
+        .next_micro_pc(unused_next_micro_pc),
+`endif
         .retired(raw_retired), .fault(microcode_fault)
     );
 

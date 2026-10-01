@@ -1,5 +1,9 @@
 # P05 — Primer candidato AT: implementación y evidencia
 
+Update 2026-10-01: the [current 50 MHz audit](P05_50MHZ_AUDIT_20261001.md)
+uses the single `PCAT-286` project and supersedes these historical route
+rankings and revision names. Timing closure remains open.
+
 Actualización posterior: [corrección y compilación AT sin debug](P05_AT_NO_DEBUG_BUILD.md).
 Ese documento recoge la retirada de observadores, el error de cadena OSD y la
 preparación con seed 2. Los apartados siguientes describen el primer candidato.

@@ -12,7 +12,10 @@ and separates open findings from that resolved boot failure.
 Added 2026-10-01. Status: numeric reference accepted; directed memory-path
 attribution and a coherent 1 KiB RAM-read buffer implemented and checked;
 hardware CheckIt/CHECKNUM improvement observed; repeat-run and timing acceptance
-remain open. The initial CheckIt 3.03C report was 3584
+remain open. The [current fitted 50 MHz audit](optimization/P05_50MHZ_AUDIT_20261001.md)
+identifies CPU protected-stack control, keyboard sequence packing and upstream
+SDRAM acceptance as physical limits. One first-stage video CDC constraint
+omission is corrected; real 50 MHz violations remain. The initial CheckIt 3.03C report was 3584
 Dhrystones / 71.9K Whetstones on MiSTer,
 versus 4143 / 70.9K for the **original native 86Box 286 at 25 MHz**. The supplied
 native screenshot is not SPK286-in-86Box. The new standalone CHECKNUM frontend

@@ -1,5 +1,9 @@
 # P05 — Cierre de timing del perfil AT en FPGA
 
+Update 2026-10-01: see the [current fitted-path audit](P05_50MHZ_AUDIT_20261001.md)
+for the single `PCAT-286` project, verified CDC correction and next bounded
+RTL candidates. Earlier figures below belong to their stated historical fits.
+
 Estado: especificación de auditoría y corrección física. Base: `4a05f97`,
 2026-09-13. Aplican los [requisitos comunes](README.md).
 

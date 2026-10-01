@@ -1,0 +1,268 @@
+
+ /----------------------------------------------------------------------------\
+ |                                                                            |
+ |  yosys -- Yosys Open SYnthesis Suite                                       |
+ |                                                                            |
+ |  Copyright (C) 2012 - 2020  Claire Xenia Wolf <claire@yosyshq.com>         |
+ |                                                                            |
+ |  Permission to use, copy, modify, and/or distribute this software for any  |
+ |  purpose with or without fee is hereby granted, provided that the above    |
+ |  copyright notice and this permission notice appear in all copies.         |
+ |                                                                            |
+ |  THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES  |
+ |  WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF          |
+ |  MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR   |
+ |  ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES    |
+ |  WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN     |
+ |  ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF   |
+ |  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.            |
+ |                                                                            |
+ \----------------------------------------------------------------------------/
+
+ Yosys 0.33 (git sha1 2584903a060)
+
+
+-- Executing script file `/mnt/d/GitHub/PCAT-286_MiSTer/build/rtc-bcd-lookup-20261002/rtc_bcd_candidate.ys' --
+
+1. Executing Verilog-2005 frontend: /mnt/d/GitHub/PCAT-286_MiSTer/build/rtc-bcd-lookup-20261002/rtc_bcd_reference.sv
+Parsing SystemVerilog input from `/mnt/d/GitHub/PCAT-286_MiSTer/build/rtc-bcd-lookup-20261002/rtc_bcd_reference.sv' to AST representation.
+Generating RTLIL representation for module `\rtc_bcd_reference'.
+Successfully finished Verilog frontend.
+
+2. Executing Verilog-2005 frontend: /mnt/d/GitHub/PCAT-286_MiSTer/build/rtc-bcd-lookup-20261002/rtc_bcd_candidate.sv
+Parsing SystemVerilog input from `/mnt/d/GitHub/PCAT-286_MiSTer/build/rtc-bcd-lookup-20261002/rtc_bcd_candidate.sv' to AST representation.
+Generating RTLIL representation for module `\rtc_bcd_candidate'.
+Successfully finished Verilog frontend.
+
+3. Executing Verilog-2005 frontend: /mnt/d/GitHub/PCAT-286_MiSTer/build/rtc-bcd-lookup-20261002/rtc_bcd_candidate_miter.sv
+Parsing SystemVerilog input from `/mnt/d/GitHub/PCAT-286_MiSTer/build/rtc-bcd-lookup-20261002/rtc_bcd_candidate_miter.sv' to AST representation.
+Generating RTLIL representation for module `\miter'.
+Successfully finished Verilog frontend.
+
+4. Executing HIERARCHY pass (managing design hierarchy).
+
+4.1. Analyzing design hierarchy..
+Top module:  \miter
+Used module:     \rtc_bcd_candidate
+Used module:     \rtc_bcd_reference
+
+4.2. Analyzing design hierarchy..
+Top module:  \miter
+Used module:     \rtc_bcd_candidate
+Used module:     \rtc_bcd_reference
+Removed 0 unused modules.
+Mapping positional arguments of cell miter.candidate_dut (rtc_bcd_candidate).
+Mapping positional arguments of cell miter.reference_dut (rtc_bcd_reference).
+
+5. Executing PROC pass (convert processes to netlists).
+
+5.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+5.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Removed 1 dead cases from process $proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/rtc-bcd-lookup-20261002/rtc_bcd_candidate.sv:0$13 in module rtc_bcd_candidate.
+Marked 1 switch rules as full_case in process $proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/rtc-bcd-lookup-20261002/rtc_bcd_candidate.sv:0$13 in module rtc_bcd_candidate.
+Removed a total of 1 dead cases.
+
+5.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 0 redundant assignments.
+Promoted 8 assignments to connections.
+
+5.4. Executing PROC_INIT pass (extract init attributes).
+
+5.5. Executing PROC_ARST pass (detect async resets in processes).
+
+5.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 1 switch.
+
+5.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\rtc_bcd_candidate.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/rtc-bcd-lookup-20261002/rtc_bcd_candidate.sv:0$13'.
+     1/1: $1\binary_to_bcd$func$/mnt/d/GitHub/PCAT-286_MiSTer/build/rtc-bcd-lookup-20261002/rtc_bcd_candidate.sv:269$12.$result[7:0]$17
+Creating decoders for process `\rtc_bcd_reference.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/rtc-bcd-lookup-20261002/rtc_bcd_reference.sv:0$3'.
+
+5.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+No latch inferred for signal `\rtc_bcd_candidate.\binary_to_bcd$func$/mnt/d/GitHub/PCAT-286_MiSTer/build/rtc-bcd-lookup-20261002/rtc_bcd_candidate.sv:269$11.$result' from process `\rtc_bcd_candidate.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/rtc-bcd-lookup-20261002/rtc_bcd_candidate.sv:0$13'.
+No latch inferred for signal `\rtc_bcd_candidate.\binary_to_bcd$func$/mnt/d/GitHub/PCAT-286_MiSTer/build/rtc-bcd-lookup-20261002/rtc_bcd_candidate.sv:269$12.$result' from process `\rtc_bcd_candidate.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/rtc-bcd-lookup-20261002/rtc_bcd_candidate.sv:0$13'.
+No latch inferred for signal `\rtc_bcd_candidate.\binary_to_bcd$func$/mnt/d/GitHub/PCAT-286_MiSTer/build/rtc-bcd-lookup-20261002/rtc_bcd_candidate.sv:269$12.value' from process `\rtc_bcd_candidate.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/rtc-bcd-lookup-20261002/rtc_bcd_candidate.sv:0$13'.
+No latch inferred for signal `\rtc_bcd_reference.\binary_to_bcd$func$/mnt/d/GitHub/PCAT-286_MiSTer/build/rtc-bcd-lookup-20261002/rtc_bcd_reference.sv:12$1.$result' from process `\rtc_bcd_reference.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/rtc-bcd-lookup-20261002/rtc_bcd_reference.sv:0$3'.
+No latch inferred for signal `\rtc_bcd_reference.\binary_to_bcd$func$/mnt/d/GitHub/PCAT-286_MiSTer/build/rtc-bcd-lookup-20261002/rtc_bcd_reference.sv:12$2.$result' from process `\rtc_bcd_reference.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/rtc-bcd-lookup-20261002/rtc_bcd_reference.sv:0$3'.
+No latch inferred for signal `\rtc_bcd_reference.\binary_to_bcd$func$/mnt/d/GitHub/PCAT-286_MiSTer/build/rtc-bcd-lookup-20261002/rtc_bcd_reference.sv:12$2.value' from process `\rtc_bcd_reference.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/rtc-bcd-lookup-20261002/rtc_bcd_reference.sv:0$3'.
+No latch inferred for signal `\rtc_bcd_reference.\binary_to_bcd$func$/mnt/d/GitHub/PCAT-286_MiSTer/build/rtc-bcd-lookup-20261002/rtc_bcd_reference.sv:12$2.tens' from process `\rtc_bcd_reference.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/rtc-bcd-lookup-20261002/rtc_bcd_reference.sv:0$3'.
+No latch inferred for signal `\rtc_bcd_reference.\binary_to_bcd$func$/mnt/d/GitHub/PCAT-286_MiSTer/build/rtc-bcd-lookup-20261002/rtc_bcd_reference.sv:12$2.ones' from process `\rtc_bcd_reference.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/rtc-bcd-lookup-20261002/rtc_bcd_reference.sv:0$3'.
+
+5.9. Executing PROC_DFF pass (convert process syncs to FFs).
+
+5.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+5.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Found and cleaned up 1 empty switch in `\rtc_bcd_candidate.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/rtc-bcd-lookup-20261002/rtc_bcd_candidate.sv:0$13'.
+Removing empty process `rtc_bcd_candidate.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/rtc-bcd-lookup-20261002/rtc_bcd_candidate.sv:0$13'.
+Removing empty process `rtc_bcd_reference.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/rtc-bcd-lookup-20261002/rtc_bcd_reference.sv:0$3'.
+Cleaned up 1 empty switch.
+
+5.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module miter.
+Optimizing module rtc_bcd_candidate.
+Optimizing module rtc_bcd_reference.
+
+6. Executing FLATTEN pass (flatten design).
+Deleting now unused module rtc_bcd_candidate.
+Deleting now unused module rtc_bcd_reference.
+<suppressed ~2 debug messages>
+
+7. Executing OPT pass (performing simple optimizations).
+
+7.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module miter.
+
+7.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\miter'.
+Removed a total of 0 cells.
+
+7.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \miter..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Removed 0 multiplexer ports.
+
+7.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \miter.
+Performed a total of 0 changes.
+
+7.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\miter'.
+Removed a total of 0 cells.
+
+7.6. Executing OPT_DFF pass (perform DFF optimizations).
+
+7.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \miter..
+Removed 0 unused cells and 15 unused wires.
+<suppressed ~1 debug messages>
+
+7.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module miter.
+
+7.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+7.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \miter..
+  Creating internal representation of mux trees.
+  No muxes found in this module.
+Removed 0 multiplexer ports.
+
+7.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \miter.
+Performed a total of 0 changes.
+
+7.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\miter'.
+Removed a total of 0 cells.
+
+7.13. Executing OPT_DFF pass (perform DFF optimizations).
+
+7.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \miter..
+
+7.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module miter.
+
+7.16. Finished OPT passes. (There is nothing left to do.)
+
+8. Executing MEMORY_MAP pass (converting memories to logic and flip-flops).
+Mapping memory $flatten\candidate_dut.$auto$proc_rom.cc:150:do_switch$20 in module \miter:
+  created 256 $dff cells and 0 static cells of width 8.
+  read interface: 0 $dff and 255 $mux cells.
+  write interface: 0 write mux blocks.
+
+9. Executing OPT pass (performing simple optimizations).
+
+9.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module miter.
+
+9.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\miter'.
+Removed a total of 0 cells.
+
+9.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \miter..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~1 debug messages>
+
+9.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \miter.
+Performed a total of 0 changes.
+
+9.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\miter'.
+<suppressed ~279 debug messages>
+Removed a total of 93 cells.
+
+9.6. Executing OPT_DFF pass (perform DFF optimizations).
+
+9.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \miter..
+Removed 0 unused cells and 349 unused wires.
+<suppressed ~1 debug messages>
+
+9.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module miter.
+
+9.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+9.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \miter..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~4 debug messages>
+
+9.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \miter.
+Performed a total of 0 changes.
+
+9.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\miter'.
+Removed a total of 0 cells.
+
+9.13. Executing OPT_DFF pass (perform DFF optimizations).
+
+9.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \miter..
+
+9.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module miter.
+
+9.16. Finished OPT passes. (There is nothing left to do.)
+
+10. Executing SAT pass (solving SAT problems in the circuit).
+
+Setting up SAT problem:
+Final constraint equation: { } = { }
+Imported 165 cells to SAT database.
+Import proof-constraint: \ok = 1'1
+Final proof equation: \ok = 1'1
+Import show expression: \value
+Import show expression: \reference_result
+Import show expression: \candidate_result
+
+Solving problem with 7821 variables and 20785 clauses..
+SAT proof finished - no model found: SUCCESS!
+
+                  /$$$$$$      /$$$$$$$$     /$$$$$$$    
+                 /$$__  $$    | $$_____/    | $$__  $$   
+                | $$  \ $$    | $$          | $$  \ $$   
+                | $$  | $$    | $$$$$       | $$  | $$   
+                | $$  | $$    | $$__/       | $$  | $$   
+                | $$/$$ $$    | $$          | $$  | $$   
+                |  $$$$$$/ /$$| $$$$$$$$ /$$| $$$$$$$//$$
+                 \____ $$$|__/|________/|__/|_______/|__/
+                       \__/                              
+
+End of script. Logfile hash: 3a9bcf14ff, CPU: user 0.11s system 0.00s, MEM: 17.06 MB peak
+Yosys 0.33 (git sha1 2584903a060)
+Time spent: 37% 1x sat (0 sec), 15% 7x opt_expr (0 sec), ...

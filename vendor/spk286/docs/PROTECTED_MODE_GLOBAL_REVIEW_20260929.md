@@ -529,7 +529,7 @@ NT=0/1, direct TSS JMP and task-gate JMP, and observe PUSHF without relying on
 a subsequent IRET. Keep CALL/INT and nested IRET controls. Software compatibility
 evidence and measured silicon evidence must be recorded separately.
 
-### H18 — Processor-extension traps despite a no-287 profile (S, P1)
+### H18 — Processor-extension traps despite a no-287 profile (S, P1; CPU-side scope corrected)
 
 `microcode/source/zzzzzzzzzzzzzzzz_esc.mc` consumes ESC syntax and retires without
 testing MSW.EM/TS. Decoder `supported` has no WAIT (9B) path. A legal unsupported
@@ -550,6 +550,16 @@ Keep external 287 BUSY/error/operand transfer support a separately scoped task.
 in the no-coprocessor profile. Arithmetic execution and an external 287
 interface are outside this story. Software emulation can handle the CPU traps.
 
+**2026-10-01 implementation follow-up:** ESC now checks EM || TS before
+ModR/M/displacement; WAIT checks MP && TS and otherwise completes with BUSY
+inactive. The existing event engine delivers restartable #NM with no error word.
+Directed tests cover PE/CPL, all controls, prefixes, READY, handlers/IRET,
+CLTS retry, emulation skip, pause and cancellation. See
+[H18 implementation and evidence](PROTECTED_MODE_H18_NPX_20261001.md).
+H18's agreed CPU-side scope is closed; full ESC address-validation conformance
+is not claimed. The supplemental physical probe exposed a pre-existing D8
+boundary failure now explicitly recorded under H19 below.
+
 ### H19 — Remaining boundary and restart matrix (C, P1/P2)
 
 The SGDT and RETF regressions cover important boundaries, but cannot certify all
@@ -563,6 +573,15 @@ limits, odd addresses, null DS/ES, execute-only CS override, read-only segments,
 GDT/LDT entry ending exactly at the table limit, and 24-bit physical-address
 wrap. Record whether the 286 permits earlier reads/writes before a later fault;
 do not impose universal rollback where Intel describes partial execution.
+
+**2026-10-01 executable finding:** the supplemental D8 no-NPX physical cohort
+has 33 real-mode #GP captures at effective offset FFFF. All 33 fail identically
+on pre-H18 `3657489` and the H18 CPU, which retires ESC instead. The other 4,967
+D8 captures pass. This is a concrete operand-boundary/precheck defect inside
+H19, independent of EM/TS trap handling; retain #NM priority when fixing it.
+Native 86Box's no-FPU path is also syntax-only and is insufficient as its oracle.
+The [H18 evidence](PROTECTED_MODE_H18_NPX_20261001.md) and receipt retain
+every failed identity. No exclusion or failure waiver closes this finding.
 
 ### H20 — Event ordering policies and diagnostics (P/C, P1/P2)
 
@@ -626,22 +645,23 @@ close the remaining protected-mode findings.
 ## 5. Coverage map and future work packages
 
 The map below records the original review scope. As of the 2026-10-01
-H03/H10/H12/H13 block, closed findings are H01, H03, H04, H06, H07, H08,
-H09, H10, H12, H13, H14, H21 and H22. Remaining work is H02 (partial),
-H05, H11, H15, H16, H17, H18, H19 and H20. See the marked follow-ups and
+H03/H10/H12/H13 block and scoped H18 correction, closed findings are H01,
+H03, H04, H06, H07, H08, H09, H10, H12, H13, H14, H18, H21 and H22.
+Remaining work is H02 (partial), H05, H11, H15, H16, H17, H19 and H20.
+See the marked follow-ups and
 [block validation](PROTECTED_MODE_BLOCK_20261001.md) for closure evidence;
 the original work packages do not reopen completed findings.
 
 | Domain | Existing support / reviewed areas | Remaining closure |
 |---|---|---|
-| Entry/reset/MSW | LMSW, one-way PE, CLTS, LOADALL, CPL entry fix | H01/H18; physical LOADALL policies remain separate |
+| Entry/reset/MSW | LMSW, one-way PE, CLTS, LOADALL, CPL entry fix, H18 #NM | Physical LOADALL policies remain separate |
 | Descriptor tables | GDTR/IDTR, LDTR/TR, SGDT/SIDT, table limits | H01/H05/H16/H19 |
 | Segmentation | Cache reload, type/access/limit, null selectors, expand-down | H06/H08/H13/H19 |
 | Privileged operations | Partial system-instruction checks | H01/H02/H03 |
 | Code transfers and stack state | Direct CALL/JMP, gates, same/outer returns, POP segments | H07/H09/H10/H12/H14/H21 |
 | Events | IDT gates, frames, task gates, interrupts and traps | H04/H11/H12/H13/H20 |
 | Task management | TSS save/load, BUSY, backlink, TS, late-fault handling | H13/H15/H16/H17 |
-| Floating-point interface | ESC syntax only; no 287 execution | H18 CPU-side emulation traps |
+| Floating-point interface | CPU-side ESC/WAIT/#NM; no 287 execution | H19 ESC operand boundaries; external NPX interface separately scoped |
 | Machine integration | MR BIOS, DOS/Windows experiments, OS/2 disk | Workload evidence below; not an ISA oracle |
 | Timing/bus | READY, HOLD/LOCK, instruction timing policy | Architectural results invariant across policies; cycle certification separate |
 

@@ -1,0 +1,667 @@
+{
+  "schema_version": 1,
+  "story": "H18",
+  "date_utc": "2026-10-01T06:51:26.001503+00:00",
+  "status": "PASS_H18_CPU_TRAP_SCOPE_WITH_OPEN_H19_ESC_BOUNDARY",
+  "scope": "CPU-side ESC/WAIT/#NM in no-NPX profile; no 80287 arithmetic, external NPX interface or full ESC boundary certification",
+  "baseline_spk286": "3657489",
+  "baseline_pcat": "5de5afe",
+  "native_86box_source": "b8ec886a8ae72b073d40d8c9bf4c808b0ead4b7a",
+  "physical_source": "37c73caf53dcd22d3dd369ff09305d13d117a4fe",
+  "full_project_regression_run": false,
+  "new_os_or_hardware_run": false,
+  "directed": {
+    "simulators": [
+      "iverilog",
+      "verilator"
+    ],
+    "npx_cases_each": 9079,
+    "npx_assertions_each": 58615,
+    "related_banks": [
+      "spk286_decoder",
+      "spk286_microcode_rom",
+      "spk286_microsequencer",
+      "spk286_esc_instructions",
+      "spk286_clts",
+      "spk286_clts_privilege",
+      "spk286_event_nt",
+      "spk286_fault_metadata",
+      "spk286_fault_precedence",
+      "spk286_system_access",
+      "spk286_loadall_integration",
+      "spk286_return_flags",
+      "spk286_protected_task"
+    ],
+    "vendor_banks": [
+      "spk286_decoder",
+      "spk286_npx_traps",
+      "spk286_esc_instructions",
+      "spk286_clts",
+      "spk286_clts_privilege",
+      "spk286_event_nt"
+    ],
+    "vendor_defines": [
+      "SPK286_P01_FAST_MEMORY_START",
+      "SPK286_P02_FETCH_CHAIN",
+      "SPK286_P05_PARALLEL_LIMIT_CHECK"
+    ],
+    "compiler_tests": 109,
+    "python_tests": 347,
+    "lint": "PASS",
+    "vendor_lint": "PASS",
+    "microcode_check_and_independent_audit": "PASS",
+    "reset_smokes": "PASS_BOTH",
+    "state_vectors": "PASS_1_AND_3_FIXTURES",
+    "portable_synthesis": "PASS_INCLUDING_MAPPED_CPU",
+    "timing_requests": {
+      "0": "baseline",
+      "1": "rejected_with_diagnostic_and_baseline_fallback",
+      "2": "Max"
+    }
+  },
+  "microcode": {
+    "format": 26,
+    "entries": 123,
+    "words": 742,
+    "word_width": 8,
+    "address_width": 10
+  },
+  "physical_probe": {
+    "status": "FAILED_OPEN_H19_D8; NOT_WAIVED",
+    "9B": {
+      "executed": 5000,
+      "passed": 5000,
+      "failed": 0
+    },
+    "D8": {
+      "executed": 5000,
+      "passed": 4967,
+      "failed": 33,
+      "baseline_failed": 33,
+      "same_failed_captures_individually_selected_before_after": true,
+      "revoked": 0,
+      "excluded": 0,
+      "not_evaluable": 0
+    },
+    "independent_evidence": {
+      "9B": {
+        "independent_parser_equal": 5000,
+        "source_sha256": "1ca35366b44b1481cde4c52de0e40aee388e35e0ec8e58413f47d9652f19287c"
+      },
+      "D8": {
+        "independent_parser_equal": 5000,
+        "source_sha256": "4fb3540180b6d30e9eb3cb958c6ff81f5be6bb4aac588d682f2dda82b7a3dc4d"
+      },
+      "H19_ESC_boundary": {
+        "status": "OPEN_PREEXISTING_FAILURE",
+        "before_commit": "3657489",
+        "expected_vector": 13,
+        "failed_before": 33,
+        "failed_after": 33,
+        "cases": [
+          {
+            "index": 78,
+            "hash": "65e4a86f5069143ad8b8cf3f63b6c1cfc28d6927",
+            "bytes": [
+              216,
+              36,
+              244
+            ],
+            "exception": {
+              "number": 13,
+              "flag_address": 581508
+            },
+            "effective_offset": 65535
+          },
+          {
+            "index": 128,
+            "hash": "b8a2bf7fb8ac10c9170772e3830186024792a2f9",
+            "bytes": [
+              216,
+              44,
+              244
+            ],
+            "exception": {
+              "number": 13,
+              "flag_address": 216533
+            },
+            "effective_offset": 65535
+          },
+          {
+            "index": 233,
+            "hash": "e02e7327a2c3d6499b91bd5f55772427138fb72d",
+            "bytes": [
+              216,
+              31,
+              244
+            ],
+            "exception": {
+              "number": 13,
+              "flag_address": 517852
+            },
+            "effective_offset": 65535
+          },
+          {
+            "index": 278,
+            "hash": "4f6386755453ec25023a30b7c76aa2ebab54e71e",
+            "bytes": [
+              216,
+              28,
+              244
+            ],
+            "exception": {
+              "number": 13,
+              "flag_address": 555968
+            },
+            "effective_offset": 65535
+          },
+          {
+            "index": 306,
+            "hash": "961240d23a6e3b18e07f0a69e5113248c24a2054",
+            "bytes": [
+              216,
+              20,
+              244
+            ],
+            "exception": {
+              "number": 13,
+              "flag_address": 801670
+            },
+            "effective_offset": 65535
+          },
+          {
+            "index": 332,
+            "hash": "de67e3401a8a6d3609782876ae7b021bf76336bf",
+            "bytes": [
+              216,
+              28,
+              244
+            ],
+            "exception": {
+              "number": 13,
+              "flag_address": 392782
+            },
+            "effective_offset": 65535
+          },
+          {
+            "index": 363,
+            "hash": "d18ee11a3e117c50410a50bd183b5de2861fbdea",
+            "bytes": [
+              216,
+              15,
+              244
+            ],
+            "exception": {
+              "number": 13,
+              "flag_address": 1023020
+            },
+            "effective_offset": 65535
+          },
+          {
+            "index": 1194,
+            "hash": "4bc4c470d8c8a4b420b46b37b9119250f165eb80",
+            "bytes": [
+              216,
+              20,
+              244
+            ],
+            "exception": {
+              "number": 13,
+              "flag_address": 981846
+            },
+            "effective_offset": 65535
+          },
+          {
+            "index": 1499,
+            "hash": "d7f21a92dc2789ce5531cf71f35d1d5add7d1047",
+            "bytes": [
+              216,
+              10,
+              244
+            ],
+            "exception": {
+              "number": 13,
+              "flag_address": 350204
+            },
+            "effective_offset": 65535
+          },
+          {
+            "index": 1540,
+            "hash": "cfc31ff8ce9a8650b998cc0ab0efe642a2865e1c",
+            "bytes": [
+              38,
+              216,
+              39,
+              244
+            ],
+            "exception": {
+              "number": 13,
+              "flag_address": 308072
+            },
+            "effective_offset": 65535
+          },
+          {
+            "index": 1791,
+            "hash": "5218c774b44b57f7e408140873d3fc4d7aff466c",
+            "bytes": [
+              216,
+              4,
+              244
+            ],
+            "exception": {
+              "number": 13,
+              "flag_address": 589904
+            },
+            "effective_offset": 65535
+          },
+          {
+            "index": 1795,
+            "hash": "c6726a801716a1731c7af23c7d4189bea1a5685c",
+            "bytes": [
+              216,
+              2,
+              244
+            ],
+            "exception": {
+              "number": 13,
+              "flag_address": 507972
+            },
+            "effective_offset": 65535
+          },
+          {
+            "index": 1835,
+            "hash": "9b14c33f121595d44cb2425bb8bb88eef6cad63f",
+            "bytes": [
+              216,
+              4,
+              244
+            ],
+            "exception": {
+              "number": 13,
+              "flag_address": 973860
+            },
+            "effective_offset": 65535
+          },
+          {
+            "index": 1881,
+            "hash": "da500a9faaa7015a6b7f737fcc8ea2435997ee11",
+            "bytes": [
+              216,
+              47,
+              244
+            ],
+            "exception": {
+              "number": 13,
+              "flag_address": 1076150
+            },
+            "effective_offset": 65535
+          },
+          {
+            "index": 2106,
+            "hash": "30257360aa5c50aad08b0630e9a16b41b483af2a",
+            "bytes": [
+              216,
+              20,
+              244
+            ],
+            "exception": {
+              "number": 13,
+              "flag_address": 113527
+            },
+            "effective_offset": 65535
+          },
+          {
+            "index": 2258,
+            "hash": "7c691b605f9936f68545c5520d053a88a537ec91",
+            "bytes": [
+              216,
+              13,
+              244
+            ],
+            "exception": {
+              "number": 13,
+              "flag_address": 635337
+            },
+            "effective_offset": 65535
+          },
+          {
+            "index": 2283,
+            "hash": "d85cb85abba87b83a4dbc790cf52acee66d58a04",
+            "bytes": [
+              216,
+              7,
+              244
+            ],
+            "exception": {
+              "number": 13,
+              "flag_address": 109416
+            },
+            "effective_offset": 65535
+          },
+          {
+            "index": 2327,
+            "hash": "761202774c513f5ceece984566e60539d5948af5",
+            "bytes": [
+              216,
+              20,
+              244
+            ],
+            "exception": {
+              "number": 13,
+              "flag_address": 118591
+            },
+            "effective_offset": 65535
+          },
+          {
+            "index": 2538,
+            "hash": "db46a852f03cc8197c04151aac78a92fa0a74fc8",
+            "bytes": [
+              216,
+              2,
+              244
+            ],
+            "exception": {
+              "number": 13,
+              "flag_address": 1032183
+            },
+            "effective_offset": 65535
+          },
+          {
+            "index": 2625,
+            "hash": "47d53b5b5eaa89fa60634ce72901ed228c775b1f",
+            "bytes": [
+              216,
+              52,
+              244
+            ],
+            "exception": {
+              "number": 13,
+              "flag_address": 265140
+            },
+            "effective_offset": 65535
+          },
+          {
+            "index": 2626,
+            "hash": "cb71adf713d27d87c98d2db48504a894d65a07ea",
+            "bytes": [
+              216,
+              20,
+              244
+            ],
+            "exception": {
+              "number": 13,
+              "flag_address": 117898
+            },
+            "effective_offset": 65535
+          },
+          {
+            "index": 2764,
+            "hash": "705601343561c38cb40a7b10a4daf902b0ff68e0",
+            "bytes": [
+              46,
+              216,
+              41,
+              244
+            ],
+            "exception": {
+              "number": 13,
+              "flag_address": 615664
+            },
+            "effective_offset": 65535
+          },
+          {
+            "index": 2790,
+            "hash": "d33ba813b8cad5211f40b4f260aed5c026246d10",
+            "bytes": [
+              54,
+              62,
+              216,
+              37,
+              244
+            ],
+            "exception": {
+              "number": 13,
+              "flag_address": 606086
+            },
+            "effective_offset": 65535
+          },
+          {
+            "index": 2793,
+            "hash": "eccb2acea7bb0405e40506091266a8d1650ac76d",
+            "bytes": [
+              216,
+              56,
+              244
+            ],
+            "exception": {
+              "number": 13,
+              "flag_address": 1016877
+            },
+            "effective_offset": 65535
+          },
+          {
+            "index": 2964,
+            "hash": "7ec194bd6def320966339ca8815a79e7e4581700",
+            "bytes": [
+              216,
+              7,
+              244
+            ],
+            "exception": {
+              "number": 13,
+              "flag_address": 1070912
+            },
+            "effective_offset": 65535
+          },
+          {
+            "index": 3025,
+            "hash": "2e2416761b6acc3c01dfbce24131bc6eb65bd9df",
+            "bytes": [
+              62,
+              46,
+              216,
+              60,
+              244
+            ],
+            "exception": {
+              "number": 13,
+              "flag_address": 106974
+            },
+            "effective_offset": 65535
+          },
+          {
+            "index": 3551,
+            "hash": "f15699678bdbdfd9ec9247954730f755d08523c9",
+            "bytes": [
+              216,
+              31,
+              244
+            ],
+            "exception": {
+              "number": 13,
+              "flag_address": 329458
+            },
+            "effective_offset": 65535
+          },
+          {
+            "index": 3654,
+            "hash": "224db88fe49cd848513eac9a9e932c9805049cc0",
+            "bytes": [
+              216,
+              53,
+              244
+            ],
+            "exception": {
+              "number": 13,
+              "flag_address": 1058716
+            },
+            "effective_offset": 65535
+          },
+          {
+            "index": 3805,
+            "hash": "85f63702221adb25cbea80d20421b55371c763c0",
+            "bytes": [
+              38,
+              216,
+              55,
+              244
+            ],
+            "exception": {
+              "number": 13,
+              "flag_address": 913818
+            },
+            "effective_offset": 65535
+          },
+          {
+            "index": 4005,
+            "hash": "f5ab55a33e6ba239e6a052af7040ed63ed320d1f",
+            "bytes": [
+              216,
+              28,
+              244
+            ],
+            "exception": {
+              "number": 13,
+              "flag_address": 236276
+            },
+            "effective_offset": 65535
+          },
+          {
+            "index": 4217,
+            "hash": "5b6b747ddbed73bcd1f85d5107e791a0ad209092",
+            "bytes": [
+              216,
+              45,
+              244
+            ],
+            "exception": {
+              "number": 13,
+              "flag_address": 904652
+            },
+            "effective_offset": 65535
+          },
+          {
+            "index": 4850,
+            "hash": "7a389b6cd38a8e12ef26b548a17f7eccad3d6969",
+            "bytes": [
+              216,
+              60,
+              244
+            ],
+            "exception": {
+              "number": 13,
+              "flag_address": 249432
+            },
+            "effective_offset": 65535
+          },
+          {
+            "index": 4927,
+            "hash": "f2dd342301aa7d0aa18ce59ee4e3c41ed104ef38",
+            "bytes": [
+              216,
+              13,
+              244
+            ],
+            "exception": {
+              "number": 13,
+              "flag_address": 794320
+            },
+            "effective_offset": 65535
+          }
+        ]
+      }
+    }
+  },
+  "commands": [
+    "SPK286_BUILD_DIR=$PWD/build/h18-20261001 bash scripts/test_units.sh both spk286_npx_traps",
+    "make microcode-test microcode-audit lint",
+    "python3 -m unittest discover -s tests -v",
+    "SPK286_BUILD_DIR=$PWD/build/h18-20261001 bash scripts/synth_check.sh",
+    "SPK286_BUILD_DIR=$PWD/build/h18-20261001 make state-smoke",
+    "SPK286_BUILD_DIR=$PWD/build/h18-20261001 bash scripts/test_verilator.sh",
+    "SPK286_BUILD_DIR=$PWD/build/h18-20261001 bash scripts/test_iverilog.sh",
+    "SPK286_BUILD_DIR=$PWD/build/h18-20261001 python3 -m tools.run_singlestep --opcode 9B --opcode D8 --full --include-prefixes --include-exceptions # expected retained H19 failure",
+    "cmake --build build/spk286 -j4 # in 86Box_dev"
+  ],
+  "source_sha256": {
+    "rtl/spk286_decoder.sv": "bd435f92a3ca2540b9de6f3d71e8a6b880ee7a01a5adfac3af5b2f855589f21b",
+    "rtl/spk286_micro_executor.sv": "08c8819b32c276c99f2224bb344c4944996ba7abc1efcd9d1ec8b5894575e0ba",
+    "microcode/source/zzzzzzzzzzzzzzzz_esc.mc": "e65d73659fd7b87f379a7f103584f6e5d98ae565bc70a1a4accae7eb689c2601",
+    "sim/unit/spk286_npx_traps_tb.sv": "e4daf0bfcdc3cd9b43008ba0967d5b71482c708f805a58a6c92f014d657f1d31",
+    "tools/microcode/compile_microcode.py": "c00ff5a88001c88b8393ca139c144d947d82aac2b10ee779bee2f75aced28b7d",
+    "tools/microcode/audit_microcode.py": "a61beebc72aed154381505818ccd20676f4a5464703854eff0e208cdb92c03a3",
+    "tools/run_singlestep.py": "3d972f966134f034cf1ecd45d12a4ce3df0ded50e3a1ccf9d93fc213525859fa",
+    "tests/test_microcode_npx_access.py": "d055ac1c24018e0740f9202120bf5dde521379a5dce474d37f452126a32ea79a",
+    "tests/test_singlestep_npx.py": "bab18a597de40aef5ae31d5ac0dc3c4939bb6b93f2f412492e7289d2202906bc",
+    "tests/fixtures/microcode_npx_access.json": "0037b117e5dde59c329c266cb6d778bad5370947ecd187f33aad163421b57da6",
+    "microcode/generated/spk286_microcode.lst": "a21cbaffcd4fdfa0bdc7a0cad778b97d9eae45fa7d22b1b59b90b39db2b43f78",
+    "microcode/generated/spk286_microcode_pkg.sv": "e5737f2a687ee2928e72caa60db8278a95100cb6e17f95a66ea36ca8f9776887",
+    "microcode/generated/spk286_microcode_rom.sv": "5c16c2e9f39f2e1698d95706d3a5cb8f7357e4829ae6df9b4149b015fe7061fb",
+    "microcode/generated/spk286_microcode_symbols.json": "c12a56ff537ef1d74e1f35335e8a4cc42fd739722dd2b898bfd6e700ead5b9e1",
+    "microcode/generated/spk286_microcode_validation.json": "41f3cbfa9825e5e573d5f661811859d438fb06a1335b552bdee17d887a866a0c"
+  },
+  "retained_logs_directory": "D:/GitHub/SPK286/build/h18-20261001",
+  "retained_log_sha256": {
+    "baseline-esc.log": "8257cf55e2297abacc48288ac8b541beb10f3702703108b587b3f7ec7d1aa68a",
+    "baseline-wait.log": "6e9e0bb4c8b61ae221233d4fa101ad8b26a2f9f15ad9226546829900a636fb15",
+    "static.log": "90d414073682bc27858700257333e08dd134ce3626e1149146f313ba890d54db",
+    "python.log": "142b00f1586d520562896316343bdef7fb59dfe8ca05a556e76538495bf5a0f0",
+    "affected.log": "dcc9f845cbf7444ed2bd3b2af2a9cf357d20123595a268a3f2b928c07f74378a",
+    "npx-final.log": "398b85f563f7616703cd5c2e6272a544cf24379a4de3c69d54ad27ffe1d0574e",
+    "vendor.log": "fb7b5d173bb191c89a65538929fd196a68c98e0cd1facb6d2e18d22ad251e577",
+    "vendor-lint.log": "1f068b4ab7a409945e4358c05cc6ce5a20dc22c7a6e92b86faeddc43b89e905d",
+    "physical.log": "0c6b8f759cc1791f3725f04b3c20f9730015b679cea9d972e5199848d0582cda",
+    "baseline-d8.log": "1965d5b31005b3dd251ca435757ebf8ac6b3ff09c3187afa2f3d0f820c96bdc7",
+    "corpus-evidence.log": "516307d65ec4d9bb353fc61b85cc069a900c3f6ff8db3500172ddfa3b95a53f7",
+    "d8-boundary-before.log": "e6fc6ba02d7de1f94ab6a0dd83157486b8a4c02d930ccad1d8625652c2c21aad",
+    "d8-boundary-after.log": "c8c0c39038173db7c77472c6c75089605c99d1e431d2492c1a7937935aa31b3e",
+    "synth.log": "d48f6de1d234fe7679ce3e462a437fa65503679402ca968767047d4ca618e62c",
+    "smoke.log": "be4480dbadd440eb69896ad33c2277d015c73ab8c80dea0a2d5f393c29e0bfc1",
+    "reset-verilator.log": "d39ada02bf7ea71a699b8a1506751f44fb9e408917e804a82cad4e3a05bc5c6f",
+    "reset-iverilog.log": "6c68a7d29dba6baf7943db919e52242bed84543f5a018c7eb38bf15de3d36b2e",
+    "spk286_decoder.log": "4b73729260f831c048182c6131f30690fa9b1dcc9b23b1ea7258df6246ca5ed7",
+    "spk286_microcode_rom.log": "59582b6a1b267c73b2023cafddbf8ae2e01db472aa2e2d77d40d7b0dae696015",
+    "spk286_microsequencer.log": "d83ed1132e9067fd9ddc4f47332939fe0af1371b0ff510586a5c6852b8b45a47",
+    "spk286_esc_instructions.log": "d862965bb30feac7b333e044e5a81a0a0e9370c34838efcab1f1bfefdd19e7a4",
+    "spk286_clts.log": "c2c9d36c73042e706b749e1bb5d16373df004a1974cccdc3e86898081db05bfa",
+    "spk286_clts_privilege.log": "609c6ecf93e73e76caffacdc30d0f5c549147b96622d80bc3c2497f5273aaef6",
+    "spk286_event_nt.log": "13dbed8105f4025fb17644b991540585176a66b5f2cfcae472a3d7522a6bb1cc",
+    "spk286_fault_metadata.log": "06439fc1668695dfd11273086a91024b0086d8c3a50b306dae51b0359a1f9706",
+    "spk286_fault_precedence.log": "38713247bb1901a65c525de997ba86f3a3c1606e10c5428633b559723828203a",
+    "spk286_system_access.log": "d7c7f7e70fafcaf7ba11f04796ccbe008e40c02c68c37f808994d1b5f0e3c376",
+    "spk286_loadall_integration.log": "79a5908eec0b4ba89dee3f1c9321a360596bd7762d997b45aa592c242fb96035",
+    "spk286_return_flags.log": "93899d6f3f9725e2c0a753a282cf5a2b9768ac77eccc107958c89bc8cfbc6cf6",
+    "spk286_protected_task.log": "9867d7db667f46b7cdba5be51c24b716ea28cbcaa2a9f8724eae0a17c1416a47",
+    "vendor-spk286_decoder.log": "83b0acfb3b51d1d8240ae6dbfb170f239d8ecdeea88a77cc35f824f332febfeb",
+    "vendor-spk286_npx_traps.log": "e1c30f9e5c8a2f92a56d77eb3592e74527a7c3c8a4cbda7e36741c59cf46dc99",
+    "vendor-spk286_esc_instructions.log": "78f364bfdc3749bdc9ab2a88b2d7fae2eadbcd8cddebd0ffc0f2351179a24bd4",
+    "vendor-spk286_clts.log": "f48c04728a68f8b6e5205be98fb9d93e699b1f06f067eef75983deedabb361f8",
+    "vendor-spk286_clts_privilege.log": "073c44ac34af6ec860264a252ea046a701c95d4f005e624549619bca1e269f1b",
+    "vendor-spk286_event_nt.log": "93c6d998653ca07c5865eece444df14c58a17c698a2f5266c715ac03f052b863"
+  },
+  "pcat_fetch_customization_sha256": {
+    "rtl/spk286.sv": "f36165361a645699e32db1e99d6596c497ff40a298ac017cde41b21fd1030c3e",
+    "rtl/spk286_fetch.sv": "84ecc45dee9b859819f55e6e74a7214baacc018065775167b411521d4aa06266"
+  },
+  "86box": {
+    "path": "D:/GitHub/86Box_dev/build/spk286/86Box-linux",
+    "sha256": "e32abb43767e6724bd913d7fa8f6349b2dc0f7b815507ef513e8a5aefbaf3823",
+    "source": "D:/GitHub/PCAT-286_MiSTer/vendor/spk286",
+    "build_type": "Release",
+    "defines": [
+      "SPK286_P02_FETCH_CHAIN",
+      "SPK286_P05_PARALLEL_LIMIT_CHECK"
+    ],
+    "build_log": "D:/GitHub/86Box_dev/build/spk286/h18-20261001-build.log"
+  },
+  "remaining_stories": [
+    "H02 (partial)",
+    "H05",
+    "H11",
+    "H15",
+    "H16",
+    "H17",
+    "H19",
+    "H20"
+  ]
+}

@@ -296,6 +296,14 @@ module spk286_micro_executor (
     logic system_privilege_fault, system_mode_fault, system_protected_check, system_privilege_check, halt_privilege_fault;
     logic arpl_check_operation, arpl_operation, arpl_adjust, arpl_commit, arpl_fault;
     logic clts_operation, clts_commit, clts_privilege_fault, clts_lock_fault, clts_fault;
+    logic npx_esc_check, npx_wait_check, npx_fault;
+    // Intel 286 PRM 10.2.2: ESC traps on EM || TS, WAIT on MP && TS.
+    // These CPU-side checks apply in both modes and at every CPL. No NPX
+    // interface is modeled; the no-coprocessor profile has BUSY inactive.
+    assign npx_esc_check = allowed && operation == spk286_microcode_pkg::MC_CHECK_NPX_ESC;
+    assign npx_wait_check = allowed && operation == spk286_microcode_pkg::MC_CHECK_NPX_WAIT;
+    assign npx_fault = (npx_esc_check && (protected_msw[2] || protected_msw[3])) ||
+                       (npx_wait_check && protected_msw[1] && protected_msw[3]);
     logic system_selector_store, system_operand_request, system_operand_write;
     logic system_operand_done, system_done, system_begin, system_is_gdtr;
     logic [15:0] system_write_data;
@@ -929,7 +937,7 @@ module spk286_micro_executor (
                                             descriptor_unused_accessed) ||
                                            (descriptor_operand_done && descriptor_phase_q == 3'd4 && descriptor_success_q));
     assign descriptor_null_commit = descriptor_begin && descriptor_selector_null && !descriptor_pre_fault && !system_privilege_fault && descriptor_load_ldtr;
-    assign system_fault = task_service_fault || system_mode_fault || system_privilege_fault || io_privilege_fault || halt_privilege_fault || arpl_fault || clts_fault || call_tss_pre_fault || (stack_range_fault && protected_msw[0]) ||
+    assign system_fault = npx_fault || task_service_fault || system_mode_fault || system_privilege_fault || io_privilege_fault || halt_privilege_fault || arpl_fault || clts_fault || call_tss_pre_fault || (stack_range_fault && protected_msw[0]) ||
                           descriptor_pre_fault || descriptor_post_fault ||
                           event_gate_pre_fault || event_gate_post_fault;
     // Type/privilege checks precede presence for each transfer class.
@@ -939,7 +947,7 @@ module spk286_micro_executor (
                                               descriptor_class == spk286_protected_pkg::DESC_TASK_GATE ? task_gate_access_valid :
                                               descriptor_class == spk286_protected_pkg::DESC_CODE ? descriptor_cs_access_valid :
                                               task_descriptor_access_valid;
-    assign system_fault_vector = task_service_fault ? task_service_fault_vector : system_mode_fault ? 8'd6 : (system_privilege_fault || io_privilege_fault || halt_privilege_fault) ? 8'd13 :
+    assign system_fault_vector = npx_fault ? 8'd7 : task_service_fault ? task_service_fault_vector : system_mode_fault ? 8'd6 : (system_privilege_fault || io_privilege_fault || halt_privilege_fault) ? 8'd13 :
                                  arpl_fault ? 8'd6 :
                                  clts_lock_fault ? 8'd6 :
                                  clts_privilege_fault ? 8'd13 :
@@ -977,7 +985,7 @@ module spk286_micro_executor (
                                    (!descriptor_present && descriptor_segment_access_valid ?
                                     (segment_index == 2'd2 ? 8'd12 : 8'd11) : 8'd13) :
                                  (!descriptor_present && descriptor_system_access_valid ? 8'd11 : 8'd13);
-    assign system_fault_error_code = task_service_fault ?
+    assign system_fault_error_code = npx_fault ? 16'd0 : task_service_fault ?
                                        ((task_service_fault_error_code & 16'hFFFC) |
                                         (task_fault_external ? 16'h0001 : 16'h0000)) :
                                      (system_mode_fault || system_privilege_fault || io_privilege_fault) ? 16'd0 :
@@ -1484,7 +1492,9 @@ module spk286_micro_executor (
                             (call_gate_stack_switch_operation && (!call_gate_outer_required || (call_gate_stack_write_done && call_gate_stack_switch_phase_q == 2'd1))) ||
                             call_parameter_operation_done ||
                             (check_bounds && !bounds_fault) || read_segment || segment_write || adjust_complete || (check_arithmetic && !arithmetic_fault_q) || dispatch_request || constant_zero || constant_ones || read_ea || read_target || move_source || set_address || add_base || shift_complete || count_low || direct_flags || sign_extend_byte || sign_fill_word || constant_one || read_flags || restore_flags || set_if || clear_if_tf || read_event_flags || read_event_cs || read_event_ip ||
-                            context_commit || request_event || halt_operation || system_protected_check || system_privilege_check || io_privilege_check || clear_event_flags || (push_event_error && (!event_error_valid || push_event_error_transfer && operand_done)) || (ack_operation && (!event_needs_ack || ack_done)) || ((fetch_byte || fetch_byte_tmp1) && byte_valid) ||
+                            context_commit || request_event || halt_operation || system_protected_check || system_privilege_check || io_privilege_check ||
+                            ((npx_esc_check || npx_wait_check) && !npx_fault) ||
+                            clear_event_flags || (push_event_error && (!event_error_valid || push_event_error_transfer && operand_done)) || (ack_operation && (!event_needs_ack || ack_done)) || ((fetch_byte || fetch_byte_tmp1) && byte_valid) ||
                             read_ip || target_relative || target_absolute || adjust_stack || count_operation ||
                             (push_operation && !push_enabled) || (redirect_operation && (!branch_taken || redirect_ready)) || move_word || read_destination || compute_alu || commit_flags || discard_result || result_to_dst ||
                             (fetch_word && byte_valid && high_byte_q) || (fetch_signed_byte && byte_valid) ||

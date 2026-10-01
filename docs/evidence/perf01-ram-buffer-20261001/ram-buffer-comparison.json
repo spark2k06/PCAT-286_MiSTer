@@ -1,0 +1,697 @@
+{
+  "scope": "Four synthetic firmware kernels, physical SDRAM with refresh, no DMA/HPS/IRQ contention.",
+  "clock_mhz": 50,
+  "code_buffer_bytes": 512,
+  "data_buffer_bytes": 1024,
+  "performance_macros": [
+    "SPK286_P05_PARALLEL_LIMIT_CHECK",
+    "SPK286_P01_FAST_MEMORY_START",
+    "SPK286_P02_FETCH_CHAIN",
+    "SPK286_P06_EARLY_MEMORY_ADDRESS",
+    "SPK286_AT_RAM_READ_BUFFER"
+  ],
+  "base_commit": "5d619db746693ca88e3af88bc56e42f551419edd",
+  "compiled_sources_sha256": "382fb8efb3aa18626e9b1f9848b33b3e8d76387f4967c2e90a52abb1cef8312e",
+  "runs": [
+    {
+      "workload": "dhrystone",
+      "baseline": {
+        "latency": {
+          "code_hit": {
+            "count": 52067,
+            "total": 156201,
+            "front": 52067,
+            "backend": 52067,
+            "return": 52067,
+            "max": 3
+          },
+          "code_miss": {
+            "count": 49,
+            "total": 566,
+            "front": 76,
+            "backend": 441,
+            "return": 49,
+            "max": 16
+          },
+          "code_bypass": {
+            "count": 0,
+            "total": 0,
+            "front": 0,
+            "backend": 0,
+            "return": 0,
+            "max": 0
+          },
+          "data_read": {
+            "count": 37616,
+            "total": 305786,
+            "front": 42474,
+            "backend": 225696,
+            "return": 37616,
+            "max": 14
+          },
+          "data_write": {
+            "count": 21124,
+            "total": 157715,
+            "front": 30971,
+            "backend": 105620,
+            "return": 21124,
+            "max": 13
+          }
+        },
+        "PROFILE_ACCOUNTING_PASS": {
+          "cycles": "1018179",
+          "external_wait": "620269",
+          "transfers": "110856"
+        },
+        "PROFILE_SIGNATURE": {
+          "gpr": "4800560000007c00000700000000600d",
+          "flags": "0016",
+          "memory": "3d5537bf66334dce",
+          "ideal_owner": "0"
+        },
+        "RAM_BUFFER_RESULT": {
+          "enabled": "0",
+          "hits": "0",
+          "misses": "0",
+          "fills": "0",
+          "updates": "0"
+        },
+        "CHECKIT_DIRECTED_PASS": {
+          "workload": "dhrystone",
+          "p03": "1",
+          "cycles": "1018179",
+          "retired": "38656",
+          "reads": "89732",
+          "writes": "21124",
+          "code_fetches": "156768",
+          "external_wait": "620269",
+          "queue_empty": "59835",
+          "sdram_reads": "37812",
+          "sdram_writes": "21124",
+          "hits": "52067",
+          "misses": "49",
+          "fills": "49",
+          "physical_reads": "37812",
+          "invalidations": "0"
+        }
+      },
+      "candidate": {
+        "latency": {
+          "code_hit": {
+            "count": 52067,
+            "total": 156201,
+            "front": 52067,
+            "backend": 52067,
+            "return": 52067,
+            "max": 3
+          },
+          "code_miss": {
+            "count": 49,
+            "total": 556,
+            "front": 66,
+            "backend": 441,
+            "return": 49,
+            "max": 16
+          },
+          "code_bypass": {
+            "count": 0,
+            "total": 0,
+            "front": 0,
+            "backend": 0,
+            "return": 0,
+            "max": 0
+          },
+          "data_read": {
+            "count": 37616,
+            "total": 116865,
+            "front": 37616,
+            "backend": 41633,
+            "return": 37616,
+            "max": 15
+          },
+          "data_write": {
+            "count": 21124,
+            "total": 154548,
+            "front": 27804,
+            "backend": 105620,
+            "return": 21124,
+            "max": 13
+          }
+        },
+        "PROFILE_ACCOUNTING_PASS": {
+          "cycles": "826081",
+          "external_wait": "428171",
+          "transfers": "110856"
+        },
+        "PROFILE_SIGNATURE": {
+          "gpr": "4800560000007c00000700000000600d",
+          "flags": "0016",
+          "memory": "3d5537bf66334dce",
+          "ideal_owner": "0"
+        },
+        "RAM_BUFFER_RESULT": {
+          "enabled": "1",
+          "hits": "36960",
+          "misses": "656",
+          "fills": "656",
+          "updates": "19161"
+        },
+        "CHECKIT_DIRECTED_PASS": {
+          "workload": "dhrystone",
+          "p03": "1",
+          "cycles": "826081",
+          "retired": "38656",
+          "reads": "89732",
+          "writes": "21124",
+          "code_fetches": "156758",
+          "external_wait": "428171",
+          "queue_empty": "59825",
+          "sdram_reads": "852",
+          "sdram_writes": "21124",
+          "hits": "52067",
+          "misses": "49",
+          "fills": "49",
+          "physical_reads": "37812",
+          "invalidations": "0"
+        }
+      },
+      "throughput_gain_percent": 23.25413609561291,
+      "fewer_cycles_percent": 18.866820077805567,
+      "architectural_signature_and_retirement_write_counts_match": true,
+      "logs_sha256": {
+        "dhrystone-data-off.log": "91302a8df35a0e7180463a9e69acb947410f194249792f664888234615796a6c",
+        "dhrystone-p03-1.log": "9a9bdbc6d63744dccd614281e766cc0b6b07afdfb63bafbae3fa135fd0c9abf0"
+      }
+    },
+    {
+      "workload": "whetstone",
+      "baseline": {
+        "latency": {
+          "code_hit": {
+            "count": 74273,
+            "total": 222819,
+            "front": 74273,
+            "backend": 74273,
+            "return": 74273,
+            "max": 3
+          },
+          "code_miss": {
+            "count": 52,
+            "total": 582,
+            "front": 62,
+            "backend": 468,
+            "return": 52,
+            "max": 16
+          },
+          "code_bypass": {
+            "count": 0,
+            "total": 0,
+            "front": 0,
+            "backend": 0,
+            "return": 0,
+            "max": 0
+          },
+          "data_read": {
+            "count": 19072,
+            "total": 155553,
+            "front": 22049,
+            "backend": 114432,
+            "return": 19072,
+            "max": 14
+          },
+          "data_write": {
+            "count": 16516,
+            "total": 117276,
+            "front": 18180,
+            "backend": 82580,
+            "return": 16516,
+            "max": 13
+          }
+        },
+        "PROFILE_ACCOUNTING_PASS": {
+          "cycles": "778897",
+          "external_wait": "496231",
+          "transfers": "109913"
+        },
+        "PROFILE_SIGNATURE": {
+          "gpr": "4800630000007c000031fffe0000600d",
+          "flags": "0016",
+          "memory": "3bee53bc61d7964a",
+          "ideal_owner": "0"
+        },
+        "RAM_BUFFER_RESULT": {
+          "enabled": "0",
+          "hits": "0",
+          "misses": "0",
+          "fills": "0",
+          "updates": "0"
+        },
+        "CHECKIT_DIRECTED_PASS": {
+          "workload": "whetstone",
+          "p03": "1",
+          "cycles": "778897",
+          "retired": "44486",
+          "reads": "93397",
+          "writes": "16516",
+          "code_fetches": "223402",
+          "external_wait": "496231",
+          "queue_empty": "89433",
+          "sdram_reads": "19280",
+          "sdram_writes": "16516",
+          "hits": "74273",
+          "misses": "52",
+          "fills": "52",
+          "physical_reads": "19280",
+          "invalidations": "0"
+        }
+      },
+      "candidate": {
+        "latency": {
+          "code_hit": {
+            "count": 74273,
+            "total": 222819,
+            "front": 74273,
+            "backend": 74273,
+            "return": 74273,
+            "max": 3
+          },
+          "code_miss": {
+            "count": 52,
+            "total": 580,
+            "front": 60,
+            "backend": 468,
+            "return": 52,
+            "max": 15
+          },
+          "code_bypass": {
+            "count": 0,
+            "total": 0,
+            "front": 0,
+            "backend": 0,
+            "return": 0,
+            "max": 0
+          },
+          "data_read": {
+            "count": 19072,
+            "total": 58841,
+            "front": 19072,
+            "backend": 20697,
+            "return": 19072,
+            "max": 14
+          },
+          "data_write": {
+            "count": 16516,
+            "total": 117959,
+            "front": 18863,
+            "backend": 82580,
+            "return": 16516,
+            "max": 13
+          }
+        },
+        "PROFILE_ACCOUNTING_PASS": {
+          "cycles": "682866",
+          "external_wait": "400200",
+          "transfers": "109913"
+        },
+        "PROFILE_SIGNATURE": {
+          "gpr": "4800630000007c000031fffe0000600d",
+          "flags": "0016",
+          "memory": "3bee53bc61d7964a",
+          "ideal_owner": "0"
+        },
+        "RAM_BUFFER_RESULT": {
+          "enabled": "1",
+          "hits": "18808",
+          "misses": "264",
+          "fills": "264",
+          "updates": "14972"
+        },
+        "CHECKIT_DIRECTED_PASS": {
+          "workload": "whetstone",
+          "p03": "1",
+          "cycles": "682866",
+          "retired": "44486",
+          "reads": "93397",
+          "writes": "16516",
+          "code_fetches": "223400",
+          "external_wait": "400200",
+          "queue_empty": "89441",
+          "sdram_reads": "472",
+          "sdram_writes": "16516",
+          "hits": "74273",
+          "misses": "52",
+          "fills": "52",
+          "physical_reads": "19280",
+          "invalidations": "0"
+        }
+      },
+      "throughput_gain_percent": 14.062934748545096,
+      "fewer_cycles_percent": 12.329101280400357,
+      "architectural_signature_and_retirement_write_counts_match": true,
+      "logs_sha256": {
+        "whetstone-data-off.log": "a082ddc45bba5e00fc993bd6c4df1b637b3c159205c6dbe4d02dd9a3bcf869b2",
+        "whetstone-p03-1.log": "0f05b6beac71d44bb7f6fe0d1da04fa4efe36d2bc0b6c9b9e05229b79b55d0f6"
+      }
+    },
+    {
+      "workload": "working_set",
+      "baseline": {
+        "latency": {
+          "code_hit": {
+            "count": 66452,
+            "total": 199356,
+            "front": 66452,
+            "backend": 66452,
+            "return": 66452,
+            "max": 3
+          },
+          "code_miss": {
+            "count": 19996,
+            "total": 225361,
+            "front": 25401,
+            "backend": 179964,
+            "return": 19996,
+            "max": 17
+          },
+          "code_bypass": {
+            "count": 0,
+            "total": 0,
+            "front": 0,
+            "backend": 0,
+            "return": 0,
+            "max": 0
+          },
+          "data_read": {
+            "count": 19403,
+            "total": 160152,
+            "front": 24331,
+            "backend": 116418,
+            "return": 19403,
+            "max": 14
+          },
+          "data_write": {
+            "count": 19791,
+            "total": 144840,
+            "front": 26094,
+            "backend": 98955,
+            "return": 19791,
+            "max": 13
+          }
+        },
+        "PROFILE_ACCOUNTING_PASS": {
+          "cycles": "1014656",
+          "external_wait": "729710",
+          "transfers": "125642"
+        },
+        "PROFILE_SIGNATURE": {
+          "gpr": "4800740000007c00000b00020000600d",
+          "flags": "0016",
+          "memory": "59258436c35aa1ce",
+          "ideal_owner": "0"
+        },
+        "RAM_BUFFER_RESULT": {
+          "enabled": "0",
+          "hits": "0",
+          "misses": "0",
+          "fills": "0",
+          "updates": "0"
+        },
+        "CHECKIT_DIRECTED_PASS": {
+          "workload": "working_set",
+          "p03": "1",
+          "cycles": "1014656",
+          "retired": "56886",
+          "reads": "105851",
+          "writes": "19791",
+          "code_fetches": "424718",
+          "external_wait": "729710",
+          "queue_empty": "174572",
+          "sdram_reads": "99387",
+          "sdram_writes": "19791",
+          "hits": "66452",
+          "misses": "19996",
+          "fills": "19996",
+          "physical_reads": "99387",
+          "invalidations": "0"
+        }
+      },
+      "candidate": {
+        "latency": {
+          "code_hit": {
+            "count": 66452,
+            "total": 199356,
+            "front": 66452,
+            "backend": 66452,
+            "return": 66452,
+            "max": 3
+          },
+          "code_miss": {
+            "count": 19996,
+            "total": 225184,
+            "front": 25224,
+            "backend": 179964,
+            "return": 19996,
+            "max": 17
+          },
+          "code_bypass": {
+            "count": 0,
+            "total": 0,
+            "front": 0,
+            "backend": 0,
+            "return": 0,
+            "max": 0
+          },
+          "data_read": {
+            "count": 19403,
+            "total": 60627,
+            "front": 19403,
+            "backend": 21821,
+            "return": 19403,
+            "max": 13
+          },
+          "data_write": {
+            "count": 19791,
+            "total": 143701,
+            "front": 24955,
+            "backend": 98955,
+            "return": 19791,
+            "max": 13
+          }
+        },
+        "PROFILE_ACCOUNTING_PASS": {
+          "cycles": "913639",
+          "external_wait": "628869",
+          "transfers": "125642"
+        },
+        "PROFILE_SIGNATURE": {
+          "gpr": "4800740000007c00000b00020000600d",
+          "flags": "0016",
+          "memory": "59258436c35aa1ce",
+          "ideal_owner": "0"
+        },
+        "RAM_BUFFER_RESULT": {
+          "enabled": "1",
+          "hits": "19011",
+          "misses": "392",
+          "fills": "392",
+          "updates": "18247"
+        },
+        "CHECKIT_DIRECTED_PASS": {
+          "workload": "working_set",
+          "p03": "1",
+          "cycles": "913639",
+          "retired": "56886",
+          "reads": "105851",
+          "writes": "19791",
+          "code_fetches": "424541",
+          "external_wait": "628869",
+          "queue_empty": "173361",
+          "sdram_reads": "80376",
+          "sdram_writes": "19791",
+          "hits": "66452",
+          "misses": "19996",
+          "fills": "19996",
+          "physical_reads": "99387",
+          "invalidations": "0"
+        }
+      },
+      "throughput_gain_percent": 11.056555160189085,
+      "fewer_cycles_percent": 9.95578797148985,
+      "architectural_signature_and_retirement_write_counts_match": true,
+      "logs_sha256": {
+        "working_set-data-off.log": "5c83071c83ab4234aff6deb3711186585d3b36540210f983d1384c2bd8ee08f8",
+        "working_set-p03-1.log": "258a717f806c18e7f75094a20e9ec52de64b94c6e31540cecbb5167d67bc9a70"
+      }
+    },
+    {
+      "workload": "dhrystone21",
+      "baseline": {
+        "latency": {
+          "code_hit": {
+            "count": 105354,
+            "total": 316062,
+            "front": 105354,
+            "backend": 105354,
+            "return": 105354,
+            "max": 3
+          },
+          "code_miss": {
+            "count": 1626,
+            "total": 18419,
+            "front": 2159,
+            "backend": 14634,
+            "return": 1626,
+            "max": 16
+          },
+          "code_bypass": {
+            "count": 0,
+            "total": 0,
+            "front": 0,
+            "backend": 0,
+            "return": 0,
+            "max": 0
+          },
+          "data_read": {
+            "count": 20428,
+            "total": 169845,
+            "front": 26849,
+            "backend": 122568,
+            "return": 20428,
+            "max": 14
+          },
+          "data_write": {
+            "count": 20125,
+            "total": 147580,
+            "front": 26830,
+            "backend": 100625,
+            "return": 20125,
+            "max": 13
+          }
+        },
+        "PROFILE_ACCOUNTING_PASS": {
+          "cycles": "1003290",
+          "external_wait": "651907",
+          "transfers": "147533"
+        },
+        "PROFILE_SIGNATURE": {
+          "gpr": "4800512000007c00000500000000600d",
+          "flags": "0016",
+          "memory": "ef78ab197813f369",
+          "ideal_owner": "0"
+        },
+        "RAM_BUFFER_RESULT": {
+          "enabled": "0",
+          "hits": "0",
+          "misses": "0",
+          "fills": "0",
+          "updates": "0"
+        },
+        "CHECKIT_DIRECTED_PASS": {
+          "workload": "dhrystone21",
+          "p03": "1",
+          "cycles": "1003290",
+          "retired": "59249",
+          "reads": "127408",
+          "writes": "20125",
+          "code_fetches": "334482",
+          "external_wait": "651907",
+          "queue_empty": "169927",
+          "sdram_reads": "26932",
+          "sdram_writes": "20125",
+          "hits": "105354",
+          "misses": "1626",
+          "fills": "1626",
+          "physical_reads": "26932",
+          "invalidations": "0"
+        }
+      },
+      "candidate": {
+        "latency": {
+          "code_hit": {
+            "count": 105354,
+            "total": 316062,
+            "front": 105354,
+            "backend": 105354,
+            "return": 105354,
+            "max": 3
+          },
+          "code_miss": {
+            "count": 1626,
+            "total": 18317,
+            "front": 2057,
+            "backend": 14634,
+            "return": 1626,
+            "max": 17
+          },
+          "code_bypass": {
+            "count": 0,
+            "total": 0,
+            "front": 0,
+            "backend": 0,
+            "return": 0,
+            "max": 0
+          },
+          "data_read": {
+            "count": 20428,
+            "total": 63564,
+            "front": 20428,
+            "backend": 22708,
+            "return": 20428,
+            "max": 14
+          },
+          "data_write": {
+            "count": 20125,
+            "total": 148419,
+            "front": 27669,
+            "backend": 100625,
+            "return": 20125,
+            "max": 13
+          }
+        },
+        "PROFILE_ACCOUNTING_PASS": {
+          "cycles": "897746",
+          "external_wait": "546363",
+          "transfers": "147533"
+        },
+        "PROFILE_SIGNATURE": {
+          "gpr": "4800512000007c00000500000000600d",
+          "flags": "0016",
+          "memory": "ef78ab197813f369",
+          "ideal_owner": "0"
+        },
+        "RAM_BUFFER_RESULT": {
+          "enabled": "1",
+          "hits": "20052",
+          "misses": "376",
+          "fills": "376",
+          "updates": "9680"
+        },
+        "CHECKIT_DIRECTED_PASS": {
+          "workload": "dhrystone21",
+          "p03": "1",
+          "cycles": "897746",
+          "retired": "59249",
+          "reads": "127408",
+          "writes": "20125",
+          "code_fetches": "334380",
+          "external_wait": "546363",
+          "queue_empty": "169821",
+          "sdram_reads": "6880",
+          "sdram_writes": "20125",
+          "hits": "105354",
+          "misses": "1626",
+          "fills": "1626",
+          "physical_reads": "26932",
+          "invalidations": "0"
+        }
+      },
+      "throughput_gain_percent": 11.7565547493389,
+      "fewer_cycles_percent": 10.519789891257759,
+      "architectural_signature_and_retirement_write_counts_match": true,
+      "logs_sha256": {
+        "dhrystone21-data-off.log": "f6b4ccb1784048d10eaa3bb09b4199ab351003d1a56dc8a83fb613a02bbb8df6",
+        "dhrystone21-p03-1.log": "f3f999ca694da8576c3e1eaafcb706a01905db333d75ca913cf873edcf354ba0"
+      }
+    }
+  ]
+}

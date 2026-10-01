@@ -9,9 +9,10 @@ and separates open findings from that resolved boot failure.
 
 ## PERF01 — MiSTer CPU and machine benchmark throughput
 
-Added 2026-10-01. Status: numeric reference accepted; current-source directed
-memory-path attribution completed; commercial CheckIt/hardware attribution
-pending. CheckIt 3.03C reports 3584 Dhrystones / 71.9K Whetstones on MiSTer,
+Added 2026-10-01. Status: numeric reference accepted; directed memory-path
+attribution and a coherent 1 KiB RAM-read buffer implemented and checked;
+commercial CheckIt/hardware acceptance pending. CheckIt 3.03C reports 3584
+Dhrystones / 71.9K Whetstones on MiSTer,
 versus 4143 / 70.9K for the **original native 86Box 286 at 25 MHz**. The supplied
 native screenshot is not SPK286-in-86Box. The new standalone CHECKNUM frontend
 reproduces 4143 / 70.9 on that native reference; the user accepted it on MiSTer
@@ -36,8 +37,8 @@ H15 concerns descriptor-cache publication during task switches. Those caches
 hold segment translation/protection state; a benchmark improvement from H15 is
 not claimed. Start with the existing [memory throughput](AT_MEMORY_THROUGHPUT.md)
 and [bus latency](optimization/BUS_LATENCY_50MHZ.md) evidence when profiling
-PCAT. The directed measurements below are complete; hardware attribution and
-optimization remain open. The numeric DOS reference is ready.
+PCAT. The directed measurements and first optimization below are complete;
+hardware attribution and acceptance remain open. The numeric DOS reference is ready.
 
 ### Current-source memory-path investigation — 2026-10-01
 
@@ -47,7 +48,8 @@ source hashes, options, final architectural signatures and comparison results.
 These are four **synthetic firmware kernels**, not execution of the commercial
 CheckIt benchmark. The existing fixture named `whetstone` uses fixed-point
 operations; it does not reproduce CheckIt's software floating-point library.
-No production RTL, CPU option, clock, disk image or RBF was changed.
+No production RTL, CPU option, clock, disk image or RBF was changed during this
+baseline investigation. The implementation below is a subsequent milestone.
 
 #### Source findings
 
@@ -160,20 +162,109 @@ the exact loss in commercial CheckIt. The loaded hardware RBF remains unattested
 the receipt records the local RBF hash and matching flow options only. No timing
 closure or historical cycle accuracy is inferred from these simulations.
 
+### Coherent RAM-read buffer implementation — 2026-10-01
+
+Base: PCAT `5d619db`; SPK286 and 86Box sources are unchanged. The production
+configuration enables `SPK286_AT_RAM_READ_BUFFER`, retaining the normal 50 MHz
+CPU and `SPK286_AT_NO_DEBUG`. Commenting out this assignment selects the physical
+bypass for comparison. No OSD choice or CPU timing-policy change is introduced.
+
+The pipeline is shared memory port → P03 code buffer → new RAM-read buffer →
+SDRAM owner. The new buffer holds 512 direct-mapped words (1 KiB of data), indexed
+and tagged with the canonical 25-bit backend address. A synchronous lookup
+returns a hit one clock after acceptance; a miss reads the complete aligned RAM
+word. Odd-byte requests still use their original CPU byte lane. Tags and data
+share a 512×31-bit M10K RAM; only validity and transaction control are reset.
+
+Only ordinary CPU RAM reads of cycle class 5 are eligible. Low RAM below A0000
+and canonical extended/shifted/EMS RAM from 100000 through 11DFFFF can be cached;
+the machine's existing mapper remains responsible for installed-memory bounds,
+A20 and aliases. Canonical backend FF0000 is RAM, not a second BIOS alias. Video,
+option ROM, UMB, BIOS, I/O, instruction fills, refresh and DMA/loader reads bypass
+the buffer. The P03 code buffer remains independent.
+
+CPU, DMA and loader writes all reach physical SDRAM before completion. Matching
+cached words are updated with their accepted byte enables; writes neither
+allocate a missing line nor evict an unrelated tag. The common owner serializes
+these operations, so no writer can race a pending cache fill. P03 still
+invalidates matching instruction lines. CPU cancellation flushes validity even
+while idle or under another owner; accepted physical transfers drain, preserving
+DMA/loader writes and suppressing cancelled fills. Four-word instruction bursts
+forward every beat and complete only on the final READY.
+
+#### Directed acceptance and performance
+
+The [measurement receipt](evidence/perf01-ram-buffer-20261001/summary.json) and
+[A/B comparison](evidence/perf01-ram-buffer-20261001/ram-buffer-comparison.json)
+retain source hashes and final architectural signatures. With the same CPU,
+options, 512-byte code buffer, SDRAM pin model and physical refresh:
+
+| Synthetic kernel | Buffer off, clocks | Buffer on, clocks | Throughput gain |
+| --- | ---: | ---: | ---: |
+| Integer mix | 1,018,179 | 826,081 | +23.25% |
+| Fixed-point mix | 778,897 | 682,866 | +14.06% |
+| Working set | 1,014,656 | 913,639 | +11.06% |
+| Dhrystone-shaped fixture | 1,003,290 | 897,746 | +11.76% |
+
+All four pairs agree on complete GPR/FLAGS, the full backing-RAM hash,
+instruction retirement and CPU write counts. Every baseline reproduces the
+earlier pre-buffer elapsed clock count. These kernels are not commercial CheckIt
+and do not predict its software floating-point score. DMA/HPS/IRQ contention is
+absent from the performance runs and covered separately where indicated below.
+
+Directed checks passed:
+
+- Isolated unit in Icarus and Verilator: word and odd-byte hits; CPU/DMA/loader
+  byte/full writes; no write allocation; tag collisions and high physical tags;
+  excluded regions/classes; refresh/code/DMA bypass; disable/re-enable; idle and
+  active cancellation; stalled CPU and loader writes; cancelled read fills;
+  complete normal/cancelled four-word bursts; identical back-to-back requests.
+- Memory port + P03 + new buffer in Verilator: data updates and code-line
+  invalidation under CPU/DMA/loader writes, refresh and DMA-read bypass, and a
+  stalled loader write across CPU cancellation. Strict standalone RTL lint and
+  simulation assertions pass. The sole lint waiver is the intentional split
+  between asynchronous control reset and synchronous RAM enables.
+- Quartus 17.0.2 isolated Analysis & Synthesis: 0 errors, 0 warnings; a
+  512×31-bit simple-dual-port M10K RAM inferred (15,872 block-memory bits).
+  This is module mapping, not full-board fitting or timing closure.
+- Quartus production Analysis & Elaboration passes with 0 errors and 155
+  warnings, using the real project with the cache macro enabled. Full fitting,
+  STA and new RBF generation remain for the
+  user's hardware build.
+
+The isolated unit passes in both simulators. Icarus stalls in a zero-time delta
+scheduling loop when the existing memory-port/P03 combinational handshake chain
+is cascaded with the new stage; that pipeline is checked with Verilator, the
+same simulator used for the physical CPU workloads. No pipeline Icarus pass is
+claimed. No full SPK286 regression was run for this milestone.
+
+Reproduction in Ubuntu WSL:
+
+```sh
+PCAT_BUILD_DIR="$PWD/build/ram-buffer-unit" bash scripts/test_at_ram_read_buffer.sh
+PCAT_BUILD_DIR="$PWD/build/ram-buffer-perf" bash scripts/test_at_ram_read_buffer_perf.sh
+PCAT_BUILD_DIR="$PWD/build/ram-buffer-map" bash scripts/check_at_ram_read_buffer_quartus.sh
+AT_CDC_CHECK_OUTPUT="$PWD/build/ram-buffer-frontend" bash scripts/check_at_cdc_quartus.sh
+```
+
+The existing RBF is untouched. Synthesize `PCAT-286.qpf` with the enabled macro,
+record the resulting RBF hash, and run the same `CHECKNUM.EXE` on MiSTer before
+claiming hardware improvement. Also check normal boot and DMA software with the
+new RBF. Hardware acceptance is the remaining part of this milestone.
+
 #### Next bounded performance work
 
 1. Capture completed CHECKNUM scores and request/wait counts in matched SPK286
    and hardware configurations, with the loaded RBF recorded. Use the same
    benchmark region to check how closely these kernel findings transfer.
-2. Measure a PCAT RAM-read buffer/cache below the existing ownership boundary,
-   with writes still committed to SDRAM and CPU/DMA/loader coherence covered.
-   Ordinary RAM is the initial eligible region; devices and EGA retain their
-   access semantics. Compare against the unchanged baseline before enabling it.
+2. Validate the implemented RAM-read buffer on MiSTer against the earlier
+   CHECKNUM reference, recording full synthesis/timing results and normal boot
+   and DMA behavior. Retain the off/on configuration for matched comparisons.
 3. Independently evaluate reducing registered hit/response turnaround and
    retaining SDRAM rows between safe accesses. Preserve acceptance, cancellation,
    LOCK, byte enables, ordering and refresh; check FPGA timing for each candidate.
 
-Reproduction in the Ubuntu WSL checkout:
+The earlier attribution tools remain available in the Ubuntu WSL checkout:
 
 ```sh
 PCAT_BUILD_DIR="$PWD/build/perf01-pcat" PCAT_PROFILE=1 bash scripts/test_checkit_profile.sh
@@ -182,6 +273,9 @@ python3 scripts/profile_at_ideal_bus.py build/perf01-pcat
 
 The first command covers four directed kernels with physical/P03 and owner
 controls; the second checks the always-READY boundary against those baselines.
+They use the current production options, now including the RAM-read buffer;
+the historical attribution tables above predate it. Use the dedicated A/B
+runner above to compare the new buffer against its physical bypass.
 This is performance attribution, not a full SPK286 regression. Full local logs
 and generated harnesses for this run are in `build/perf01-pcat-20261001/`.
 

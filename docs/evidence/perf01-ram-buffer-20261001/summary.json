@@ -1,0 +1,74 @@
+{
+  "date": "2026-10-01",
+  "base_commit": "5d619db746693ca88e3af88bc56e42f551419edd",
+  "scope": "Coherent 1 KiB PCAT RAM data-read buffer; directed tests only, no full CPU regression.",
+  "clock_mhz": 50,
+  "debug_enabled": false,
+  "cpu_rtl_changed": false,
+  "sdram_controller_changed": false,
+  "sources_sha256": {
+    "PCAT-286.sv": "e369865acad71827a24c9dcb7a836ed96e0fab2eecc3fef1765bfbcde31b4be4",
+    "config.tcl": "59127b225082afe97769d17bd7b5a857b335001c1088aa1095c6a461f802ea26",
+    "rtl/spk286_integration/spk286_integration.qip": "a8e226c491a999b2c4d2d587a5a66c7d3586494f121c3d113a634e44898e3153",
+    "rtl/spk286_integration/spk286_at_sdram_data_buffer.sv": "31fa89ca835429b328ea91ceeca0b770a54bd0a622c27b0e318e788780ae52c6",
+    "sim/spk286_integration/spk286_at_sdram_data_buffer_tb.sv": "1f2e988694060103641ffc37cc155b71eb964a162fc1bbc25ac5dc7d934a70a1",
+    "scripts/test_at_ram_read_buffer.sh": "a7ae1bd9bd356268b24715987d169e7fbccab7936ca2b5b12f2a0249169cfe3b",
+    "scripts/test_at_ram_read_buffer_perf.sh": "57eca56b7b0ffb3507eeb96a425b6df27200aced5c76eea0117d7ce023fd6607",
+    "scripts/report_at_ram_read_buffer.py": "337bbf9f4e09b967e0fa285dc7a7d94988ee9f43bb4adbfabf805f84b2c31921",
+    "scripts/check_at_ram_read_buffer_quartus.sh": "a015165ee5f68940762a1284aa4bd503361409ef0fff28d92af2b927d94177db"
+  },
+  "tools": {
+    "verilator": "Verilator 5.020 2024-01-01 rev (Debian 5.020-1)",
+    "iverilog": "Icarus Verilog version 12.0 (stable) ()"
+  },
+  "unit_and_pipeline_checks": [
+    {
+      "check": "iverilog-unit",
+      "result": "RAM_BUFFER_UNIT_PASS hits=11 misses=14 fills=13 updates=3 reads=32 writes=9",
+      "raw_log_sha256": "7faa4d36d2d0d6cdc7a45c029e852a36a2885f09556a8390c4a5dc45c8194150"
+    },
+    {
+      "check": "verilator-unit",
+      "result": "RAM_BUFFER_UNIT_PASS hits=11 misses=14 fills=13 updates=3 reads=32 writes=9",
+      "raw_log_sha256": "d77de7ba9fd12b057eb0b4321d55bb46286442e8f3cf198478b05d7f07cae29a"
+    },
+    {
+      "check": "verilator-pipeline",
+      "result": "RAM_BUFFER_PIPELINE_PASS CPU_DMA_LOADER_COHERENCE refresh_burst_reset",
+      "raw_log_sha256": "d2381da9d2ca32eca170f5f98775421eb4417d5de5cb4fec4ceace8e76ab918e"
+    }
+  ],
+  "strict_lint": {
+    "result": "PASS",
+    "waiver": "SYNCASYNCNET: async control reset and synchronous RAM enable",
+    "raw_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "pipeline_iverilog": "Not passed: zero-time delta scheduling loop in cascaded memory-port/P03 chain. Verilator pipeline passes.",
+  "performance": {
+    "result": "PASS: four architectural signatures, four throughput gains",
+    "comparison": "ram-buffer-comparison.json",
+    "compiled_sources_sha256": "382fb8efb3aa18626e9b1f9848b33b3e8d76387f4967c2e90a52abb1cef8312e",
+    "scope": "Four synthetic kernels; physical KFSDRAM pin model with refresh; no IRQ/DMA/HPS contention."
+  },
+  "quartus_isolated_mapping": {
+    "status": "Info: Quartus Prime Analysis & Synthesis was successful. 0 errors, 0 warnings",
+    "ram_inference": "; altsyncram:words_q_rtl_0|altsyncram_b0s1:auto_generated|ALTSYNCRAM ; M10K block ; Simple Dual Port ; 512          ; 31           ; 512          ; 31           ; 15872 ; None ;",
+    "report_sha256": "e002b0b3ca557b7f8757d64bcafff39d246ec04235395a4b4dfddf613374fbab",
+    "docker_image": "sha256:1fba8b9347973365e9f7851d73f7cb035e38fefb827cbf0ed2ea291b48bdf6dd",
+    "scope": "Only new module, no fitter or timing closure."
+  },
+  "quartus_production_frontend": {
+    "status": "Info: Quartus Prime Analysis & Elaboration was successful. 0 errors, 155 warnings",
+    "project": "PCAT_AT_PROJECT_PASS revision=PCAT-286 sdc=sys_top.sdc SYSTEM.sdc output=output_files macros=AT_PROFILE SPK286_AT_CDC SPK286_P05_PARALLEL_LIMIT_CHECK SPK286_P01_FAST_MEMORY_START SPK286_P02_FETCH_CHAIN SPK286_P06_EARLY_MEMORY_ADDRESS SPK286_AT_RAM_READ_BUFFER SPK286_AT_NO_DEBUG ENABLE_SB=1 ENABLE_OPL2=1 ENABLE_CMS=1 ENABLE_TANDY_AUDIO=1 ENABLE_MIDI=1",
+    "raw_log_sha256": "b62296b477bcb0d2fd90668306bcfa6bc9ba2b102383ff1037871b6ad841fb83",
+    "scope": "Full production Analysis & Elaboration only, no fitter/STA/RBF."
+  },
+  "local_artifacts": [
+    "build/perf01-ram-unit-receipt-20261001",
+    "build/perf01-ram-buffer-final-20261001",
+    "build/perf01-ram-inference-20261001",
+    "build/perf01-ram-quartus-20261001"
+  ],
+  "hardware_acceptance": "Pending new full build, RBF provenance and matched MiSTer CHECKNUM scores/boot/DMA checks.",
+  "existing_rbf_unchanged_sha256": "59a899efb6f2b328ee3aa4c72a7bc616a5716384b7b14d4aae173b74a3c3732d"
+}

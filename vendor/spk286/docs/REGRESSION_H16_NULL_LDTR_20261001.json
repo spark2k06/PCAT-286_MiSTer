@@ -1,0 +1,1207 @@
+{
+  "schema_version": 1,
+  "story": "H16",
+  "date_utc": "2026-10-01T10:50:11.229479+00:00",
+  "status": "PASS_DIRECTED_H16_SCOPE",
+  "baseline_spk286": "fcc67f0",
+  "baseline_pcat": "4f92ca0",
+  "primary_source": {
+    "manual": "Intel 80286/80287 PRM 210498-005 (1987)",
+    "sections": [
+      "6.6.2",
+      "7.2.3",
+      "10.3",
+      "B-12",
+      "B-13",
+      "B-66"
+    ],
+    "pdf_sha256": "ad487ba99b48cd9f61b14c0fe912a04c7cdb4c7c14a18419aa9faf62d8962460",
+    "task_null_rpl_rule": "Specification-derived combination of field/null definition and permitted disabled task LDT; no physical four-selector task-load capture."
+  },
+  "full_project_regression_run": false,
+  "new_os_or_hardware_run": false,
+  "physical_protected_mode_ldtr_captures_available": false,
+  "directed": {
+    "simulators": [
+      "verilator",
+      "iverilog"
+    ],
+    "rom_programs": 80,
+    "executions_each_simulator": 160,
+    "checks_each_simulator": 1336,
+    "timing_policies": [
+      0,
+      2
+    ],
+    "upstream": {
+      "null_ldtr": {
+        "sha256": "b1d5ec021c507de8cc0652a63d975f78108edebb04c44fbaa5c50fda96b3f3d1",
+        "results": [
+          "NULL_LDTR PASS: cases=160 checks=1336 modes=baseline,Max",
+          "NULL_LDTR PASS: cases=160 checks=1336 modes=baseline,Max"
+        ]
+      },
+      "task_switch_service": {
+        "sha256": "f3d250a29fe1dd171fa4e2593c55d3af2ca03c504578630d898c408dab118c08",
+        "results": [
+          "TASK_SWITCH_SERVICE PASS: 102 checks",
+          "TASK_SWITCH_SERVICE PASS: 102 checks"
+        ]
+      },
+      "system_access": {
+        "sha256": "f48c301603f30057f352079fed1e753534c9ac2a7591d136a9ead709322486d0",
+        "results": [
+          "SYSTEM_ACCESS PASS: 9144 checks / 2112 cases",
+          "SYSTEM_ACCESS PASS: 9144 checks / 2112 cases"
+        ]
+      },
+      "protected_system": {
+        "sha256": "b8c8ccc44cc66c13d525446ec9050b19af2335c652354faf3f510b947ed5e1cf",
+        "results": [
+          "PROTECTED_SYSTEM PASS: 538 checks, READY stalls=25056",
+          "PROTECTED_SYSTEM PASS: 538 checks, READY stalls=25056"
+        ]
+      },
+      "protected_task_ldt": {
+        "sha256": "5d3d8745b17dafd4ee3f6bb3108a52ea1514a6320ed8ee6a2f2025d9834d3c19",
+        "results": [
+          "PROTECTED_TASK_LDT PASS: 27 checks, cycles=284",
+          "PROTECTED_TASK_LDT PASS: 27 checks, cycles=284"
+        ]
+      },
+      "protected_task_iret": {
+        "sha256": "e6e81afdf77faf15dcd678f1a5b8d6f66282ca83ca9e2e2b5ece8b811d3f4e68",
+        "results": [
+          "PROTECTED_TASK_IRET PASS: 10 checks, cycles=733",
+          "PROTECTED_TASK_IRET PASS: 10 checks, cycles=733"
+        ]
+      }
+    },
+    "vendor": {
+      "null_ldtr": {
+        "sha256": "863e5da0436bf4893d8410eb13b5f75eb7229ef577bca5ccb5f48348b17b010b",
+        "results": [
+          "NULL_LDTR PASS: cases=160 checks=1336 modes=baseline,Max",
+          "NULL_LDTR PASS: cases=160 checks=1336 modes=baseline,Max"
+        ]
+      },
+      "task_switch_service": {
+        "sha256": "6e2c634d9e3e690850f66f10ec269d70712077c044e17e5dac1c70bd4625bd4d",
+        "results": [
+          "TASK_SWITCH_SERVICE PASS: 102 checks",
+          "TASK_SWITCH_SERVICE PASS: 102 checks"
+        ]
+      },
+      "system_access": {
+        "sha256": "1129c3068678f970363f31e420a6e0d30409b137b36214591713d743d4a5e8d0",
+        "results": [
+          "SYSTEM_ACCESS PASS: 9144 checks / 2112 cases",
+          "SYSTEM_ACCESS PASS: 9144 checks / 2112 cases"
+        ]
+      },
+      "protected_task_ldt": {
+        "sha256": "f1b0d3d087d4794bcfb32523f0c870c5ba4157502f9f2645994ca736ae31686c",
+        "results": [
+          "PROTECTED_TASK_LDT PASS: 27 checks, cycles=280",
+          "PROTECTED_TASK_LDT PASS: 27 checks, cycles=280"
+        ]
+      }
+    },
+    "vendor_defines": [
+      "SPK286_P01_FAST_MEMORY_START",
+      "SPK286_P02_FETCH_CHAIN",
+      "SPK286_P05_PARALLEL_LIMIT_CHECK"
+    ],
+    "static": {
+      "upstream": {
+        "lint": {
+          "sha256": "292fa3306e28c4c2d76bc819f1ddd895ea02fe1b6b003b60be6e146055bcab67",
+          "results": [
+            "LINT PASS"
+          ]
+        },
+        "mapped_synthesis": {
+          "sha256": "4b7b026682c5449ad4d8c3de2a34ef10b5b50c066c3f30825e8ad5fdeec615cb",
+          "results": [
+            "SYNTH_CHECK PASS: /mnt/d/GitHub/SPK286/build/h16-20261001/reports/yosys_synth_check.log"
+          ]
+        }
+      },
+      "vendor": {
+        "lint": {
+          "sha256": "292fa3306e28c4c2d76bc819f1ddd895ea02fe1b6b003b60be6e146055bcab67",
+          "results": [
+            "LINT PASS"
+          ]
+        },
+        "mapped_synthesis": {
+          "sha256": "40723af8662ca89c69ca7400652b56a93b3cd261e8ff5ab9ea7957dfbfc09302",
+          "results": [
+            "SYNTH_CHECK PASS: /mnt/d/GitHub/PCAT-286_MiSTer/build/h16-20261001/reports/yosys_synth_check.log"
+          ]
+        }
+      }
+    },
+    "python_tests": 352,
+    "python_log_sha256": "17a12fd4291c7931353b14b3f806e6e55bdb24710412f4794050a0e70fb7ddd2",
+    "mutations": {
+      "validation": "PASS",
+      "mutants": 4,
+      "results": [
+        {
+          "name": "pristine",
+          "returncode": 0,
+          "rejected": false,
+          "log_sha256": "1aa67ee40613723fe8c44209729594f63bb0a5a5e4597811623986d2b90c25e8"
+        },
+        {
+          "name": "pristine-service",
+          "returncode": 0,
+          "rejected": false,
+          "log_sha256": "cb6602087ebcaa15e9b02aaed4dce97aa048156648009e86410dab8ca25447ea"
+        },
+        {
+          "name": "exact-zero-task-null",
+          "returncode": 1,
+          "rejected": true,
+          "log_sha256": "5757d9bdbb837130c73d9537741a4d193148286559db41e21fb319b401843803"
+        },
+        {
+          "name": "canonicalize-explicit-null",
+          "returncode": 1,
+          "rejected": true,
+          "log_sha256": "7a5e7137efda5bfff59a68e367760112958df4536b19a6175aa12a86c59d79c6"
+        },
+        {
+          "name": "retain-error-rpl",
+          "returncode": 1,
+          "rejected": true,
+          "log_sha256": "23c55bb6888a421cf4472f5abde5efd7bb9b92feb9ccfb8f43775535337f8e0f"
+        },
+        {
+          "name": "usable-null-task-cache",
+          "returncode": 1,
+          "rejected": true,
+          "log_sha256": "c824df0774873cea20ce3677caf1d434e876ca922263bcac59d828631c0d7923"
+        }
+      ],
+      "source_sha256": {
+        "microcode/generated/spk286_microcode_pkg.sv": "fa46ce895abf5dbc813273c2b3b436afa111fbcac519ea571fed806f0d7b5314",
+        "microcode/generated/spk286_microcode_rom.sv": "871aab512360fad8ab966028edf796ba49abe559b0d957dab54a9568e8e321e6",
+        "rtl/spk286_protected_pkg.sv": "1e4d70a8c9c068402af7441a792e58a1e9e5545d6ba2edb40c236fd93547877f",
+        "rtl/spk286_tss_pkg.sv": "04d2c46e1ed5be52f7822b9d948da11860c6ec4d419b2c1cfddf6a834ea09592",
+        "rtl/spk286.sv": "bad16a31f5273a6fecd93ba571475f42368e2c2df88b9e19a5a836498cf6eb34",
+        "rtl/spk286_adjust.sv": "dfa7b1ffcfa3278d0ae9baf58c9a63f8190cb4146bd385194d296b78ae3ceb58",
+        "rtl/spk286_alu.sv": "103cd07b5a3ae79e96b2bb42aa0eb411ba1b4ee6261f7e5f9cfbc5a41f21d232",
+        "rtl/spk286_alu_decode.sv": "633b8daad1036370e5b9070d86c64a8a610b026113dc373998eb91030e2cc2a2",
+        "rtl/spk286_biu.sv": "0c17999947f7d3ed4e044e10893516d9dfd1ed30a3b4af1578dcc6cfc8202d33",
+        "rtl/spk286_condition.sv": "2885a31a13ad49c64460a329b640d4329725c7c8ce82cc0b983148563e9431a9",
+        "rtl/spk286_control_decode.sv": "d56e5de2a0f89f017fc96bb91a85e872dd4b8478d8858f61a7bdc540664860df",
+        "rtl/spk286_decoder.sv": "bd435f92a3ca2540b9de6f3d71e8a6b880ee7a01a5adfac3af5b2f855589f21b",
+        "rtl/spk286_descriptor.sv": "cf6ab285f3be15332eb32868571f879c66b5b3c7d250fd5ea1d05b909c36ea5d",
+        "rtl/spk286_effective_address.sv": "cb2ec2959b616f92594353a36ecea7e0af18774b32d4cd9a7e547fd28516d988",
+        "rtl/spk286_events.sv": "fb5253389daf3e69338a9aed2e3dfcb0d2352a4ac1e48b07baea3c68ea60fa9d",
+        "rtl/spk286_fetch.sv": "0ba8ba6bdd311cb5589a9e249038089558879d0d3ae7d3a158803e57ef02a6e1",
+        "rtl/spk286_flags_decode.sv": "81527f7053df20cdb32a4a56c499bfaa3abea65e1e956530c1f15ea3b2d032ed",
+        "rtl/spk286_instruction_context.sv": "1a17b502e71e13d8520bd3f31cf42f69685a4d49155ae3c0f02c9882729b3aa7",
+        "rtl/spk286_loadall_service.sv": "f32239d7b48abbfad8d5798d2b62aa84fb5ba6a54b748342240afa9e42f6d617",
+        "rtl/spk286_micro_executor.sv": "85561a95cc3c0d0b20eb10896424d26c55991ddce558a5263837e849d57c92d0",
+        "rtl/spk286_microsequencer.sv": "fa4e62a44d7710adc7b10df8e88f4f02c4b9d61afc511b0afb7de188ed220004",
+        "rtl/spk286_modrm.sv": "621ab5d58c2f8877559d151d0e270f0062ac069cd781e3c7ac9a8565c3d7193c",
+        "rtl/spk286_muldiv.sv": "0816c915198cd2433aec9a74695b90ad398f9a29a39eef8b1e7858810192682f",
+        "rtl/spk286_operand.sv": "0b89f38624875de0450fc8b3accaaadb75f81c29f54fa4249a58c8f0d5c96885",
+        "rtl/spk286_operand_decode.sv": "1121b175eb793a1309cdb5c6f7c2145de1ec8c90d9d99a9139726986752e091a",
+        "rtl/spk286_prefetch_queue.sv": "629649f09e4a1641c0ae7cd5aa619a8744fe6ab9548bfdc677284d78c535ed34",
+        "rtl/spk286_protected_state.sv": "fff4a24b02ab9499c64fd22037c4746f69726e34a7ded03d96b8baefef387014",
+        "rtl/spk286_registers.sv": "c395b673525c79b206b8555c4b71b42e037914b5851f2513e018985fcaa245df",
+        "rtl/spk286_segments.sv": "099b8210c1f2eaf3252db7ac0eadb1481d038f73c72972141761d396b8544a4a",
+        "rtl/spk286_selector.sv": "cd003eaccbb361fece41fa4fff352015d4d2e2723ed7656bfdf4457b40af4c33",
+        "rtl/spk286_shift.sv": "722482adde5777f89947ec03572f183436db4dfa8f6e599ab972f5eb55f108fc",
+        "rtl/spk286_stack.sv": "30c94c57730dd333ba4533193b805891a9eb5ce772bf9e263e608224662be577",
+        "rtl/spk286_stack_range.sv": "e59f5f231422eca0f8ea0016b4fa65b714a66d0d694eb8b38c44683f68f60fea",
+        "rtl/spk286_task_segment_service.sv": "083823336285dcf44cbe586ea31d78f861cae60a9ad66a45c6b3d0322d51d620",
+        "rtl/spk286_task_switch_service.sv": "73eb067716965144ac9dd3ea63632913758710395b6f0908cbe5561470c922e5",
+        "rtl/spk286_timing_policy.sv": "479b333fca7ef32b409b6f12cb7bfa3d016d6d4259bc09495959794bdf95e4d3",
+        "rtl/spk286_timing_trace.sv": "37e8e3ffdc726558cb80dc08f62e6b849d30a9d1cd58d5bc15779670eff0daf1",
+        "rtl/spk286_tss_descriptor_service.sv": "b48f687c7e77b6383709ceaf8362b0846902e1da9905234b0a95321ddafc4ed0",
+        "rtl/spk286_tss_service.sv": "e720c9ad15449983febda2b3a8c4171f169a74f94586b9cc1ca4a14fd23acdda"
+      }
+    },
+    "vendor_anchor_tests": 3,
+    "vendor_anchor_log_sha256": "2976d235984f62ed4e5f7e9e2f846f850ee53ba748046052583815f93062d042"
+  },
+  "physical": {
+    "scope": "Real-mode CALL/JMP/IRET controls; no protected-mode LLDT/TSS physical oracle",
+    "opcodes": [
+      "9A",
+      "EA",
+      "CF"
+    ],
+    "executed": 15000,
+    "passed": 15000,
+    "failed": 0,
+    "skipped": 0,
+    "log_sha256": "040412a85a764f43c274bd6a73cde844b205e43d31b87d9af638906b05db243c"
+  },
+  "source_sha256": {
+    "rtl/spk286_task_switch_service.sv": "73eb067716965144ac9dd3ea63632913758710395b6f0908cbe5561470c922e5",
+    "rtl/spk286_micro_executor.sv": "85561a95cc3c0d0b20eb10896424d26c55991ddce558a5263837e849d57c92d0",
+    "sim/programs/task_late_fault.asm": "398c31842fafe1e82f7c11d922f89285cd8c4e57ca97a68ee708cfbab5f9ec9d",
+    "sim/unit/spk286_null_ldtr_tb.sv": "ac0aa1f333297af8c1ffbd34e5bcfa9b16a2a62a6a0af10ad83032920644a66d",
+    "sim/unit/spk286_task_switch_service_tb.sv": "09c18e36f7a50c06a1b3b512b80d9bce4c964992ec41899c3060a3fad33caa76",
+    "tools/null_ldtr_vectors.py": "31af3e713c360f4207ba485b793aa0b614049e46c3ad8561addc8864b17d88dd",
+    "tools/audit_null_ldtr.py": "b6bcfe1d8ad104028cf6f922a188ec6543164cb471573fbf6cdee93edb76daac",
+    "tests/test_mutation_anchors.py": "1cba014afada99c294c4d90d16d787a934cc7ebd35ef8c28d2101f22c55b7920",
+    "scripts/test_units.sh": "30485a0aa9dfb420d7768f568516baf5978b6227b31068ed59960595b07681d4"
+  },
+  "rom_sha256": {
+    "task-s0-e0-l0000": "bb3812641abffee97d57ff1424d8dff98888e7078405be29c2c4a4da80ff18e8",
+    "task-s0-e0-l0001": "383e97ffb059f456f91afe7cba021d422c6fa117352dea35d90ce316833d8673",
+    "task-s0-e0-l0002": "2ec2470d3f792c4bd8bc8b2567dcb07a18f96d66d992482a37166d2bee90097a",
+    "task-s0-e0-l0003": "4a01a93a9295219c8c02a4be6af3a756ad0b4b68f9af5cc0f9bb673a0d7da20a",
+    "task-s1-e0-l0004": "3cfb6826409075706efa5b614851ae633c6d49879311c41ef47304fad32bdb20",
+    "task-s1-e0-l0005": "c4342b52d610af7a47ec4a8f1b0137f6328a3fabe7e6bd2ae47aa62a1cf16f56",
+    "task-s1-e0-l0006": "88de5479999fae9dcf9badc9a2924095ebfbf6c52f2e3eba1452f6d2004eb10a",
+    "task-s1-e0-l0007": "18948c31032fe1548aec5372b8c5eeff4e49d5e9d71f2f44222eb4cb0867f7a7",
+    "task-s2-e0-l0000": "f18d057f25e03efcb11999d4c054c821485f9900bf3b26cd9d8590a76913b388",
+    "task-s2-e0-l0001": "bac515ae14287a851f410ed34acc5ac2975be06e26e4bacdcdf6f278f250ae7e",
+    "task-s2-e0-l0002": "8aa5443a3bbc617e34a1630e82231aaf7229db8ab6991b44b4d99b8a11fb24ad",
+    "task-s2-e0-l0003": "9d0b9bed51e335af43f7aff11250ee3f56ee344f4071d74ce7c0cb6e80f05016",
+    "task-s3-e0-l0000": "6468a41c02ef3174d8ba17cecb5ddc28199dca9f3ad5ba0d9f0bb77055dcf5c1",
+    "task-s3-e0-l0001": "e3dd4a1266e13d000e7a26a75e2070050c9088bf33aeec6d8e1d1d7814f2ac1f",
+    "task-s3-e0-l0002": "89e8af387e03a7563df2d0708a86d25809df33d5e89433790cfdf2bdae9de742",
+    "task-s3-e0-l0003": "0b81a8646f2fab87c378759c45517568eafeff75e047ebfaa105ffd527b08309",
+    "task-s4-e0-l0050": "8b4a11fef79c53b2bf20d1e5a11441c2cd3e64ad5b2bb67b198c10844b3d0059",
+    "task-s5-e0-l0050": "5abee293f0b9e216af18ac8ab5fac6ae2061e6c0858d0835dfcd941b66200322",
+    "task-s0-e1-l0000": "163a90b45516ed137cca684ec38721b469dbcf32fe38cdb8bf64981ece7ae804",
+    "task-s0-e1-l0001": "17c89c5f6fee974f9e89d949148107c11ae852ed10b7afa904cd2aa2c92daff6",
+    "task-s0-e1-l0002": "06433b040a34d6d3824065f5d59acc5157f926f0d25fbbcc17be9b6d4d745f90",
+    "task-s0-e1-l0003": "207d114ba10c57cc4134ce6c950a78d58ed59b8afd759514b1a766087b3665f5",
+    "task-s1-e1-l0004": "c5d79ce84c700028acdb580477c9d9c55052b7afa7302527f647d8ff763e7010",
+    "task-s1-e1-l0005": "9703f4ec6dbcc879c53d7035fdc894c38885de5d468d88ed1dba7de40a9ba4be",
+    "task-s1-e1-l0006": "7ee87d1e547c9b4de924bfdd3d1e82fbce5ad3355bcfe365774037189a7d2ef7",
+    "task-s1-e1-l0007": "6410478221d7c7d23553736f56cdf8408f66a23d920e62ebd9b9cd6b2a511c4e",
+    "task-s2-e1-l0000": "aef13767fa442649c10f447f3033b6883c65fbce05f9b15f094eb50a27bdaa3d",
+    "task-s2-e1-l0001": "caf9a946c8254079baca90ca3166223aba2a7ed798af51a2fa1d4658049dff82",
+    "task-s2-e1-l0002": "02a8f74691a1301ac3e9418dd787b721b63043bf6e1337c04ac78447793e0c95",
+    "task-s2-e1-l0003": "930f84dbdd8fc47e49f8af755bd00608fbe323ee25c3e252c705462664e1e3b8",
+    "task-s3-e1-l0000": "6a2b083ca3e318075c39231b33fa45aed13b96de4e10467c380454993563f45c",
+    "task-s3-e1-l0001": "915890c677b7dc483b2540d95a124c2782efc17fcf0f12a9d7ae688e79391b3a",
+    "task-s3-e1-l0002": "980167daac21bf93457ec2323388a555e61aa5976b3d60f3dab1cc1153629248",
+    "task-s3-e1-l0003": "7e6ca898098f0e1f8b38040d1568c62f2fa0f7a88ccc4e4c0e2b536e5bc8f04c",
+    "task-s4-e1-l0050": "ba42131081c151aec5266e61c223febcb163837ab32067cdb58805e6f3c63402",
+    "task-s5-e1-l0050": "bf02f5ac235b308eae926c97e64e51ecf6b7cbcabcd117d1ca751f35d1261c4a",
+    "task-s0-e2-l0000": "e470d8ad9b0f4be6771eb08d6659100be9cc7cc0b305e5a874f7b56458b1fa08",
+    "task-s0-e2-l0001": "c68600e424604117bb0ab183401b0d49e2e01389218dc0fbf803d8835b823d77",
+    "task-s0-e2-l0002": "8ccbea2341136cc76ebbd1d42028b3aed8355b0d33d9e833975ebe28ff06f93a",
+    "task-s0-e2-l0003": "9766625f537a84ec5da4405fc2ed69406a268d3c2472cd1160a9e8a9558bb799",
+    "task-s1-e2-l0004": "e8d00a9761cef0d8a99579dad69b68f82c24b0e9f9baebb2bcde2c4bafe256b0",
+    "task-s1-e2-l0005": "1d67a9dabb6abcc9345409e03a0251b154157369773f5e4b26afec3f90ce645f",
+    "task-s1-e2-l0006": "a9e0c06afb4d16b08cab1e92083c7d09ec5f845ae98242cfc4e65814091778e8",
+    "task-s1-e2-l0007": "5728d8d0f800159ed470c1a312564eb1b7bdc9262709f9d16e6530941ebdb56a",
+    "task-s2-e2-l0000": "e3f6cd1f66336ec92e105f92af19ad0b1f6c9b8a7ae0ae0c978d13d0c1a10d5a",
+    "task-s2-e2-l0001": "604dc4795894d4aecccab8c0121af9e9eadd6bde1597993ef872757d90eba9a3",
+    "task-s2-e2-l0002": "8a753b22d3f92a144553b2f3b1740b2e47b35faf50585b91f93f524595d7c760",
+    "task-s2-e2-l0003": "95a6d3dbfeb8578be94010b7d4b93a407056b5f9f599ab7ef5d4fd4f40fbd1c8",
+    "task-s3-e2-l0000": "1989062ec9edb40b1dc58f9a0dada7eaa527350666d45aeb40e23ca7695399b5",
+    "task-s3-e2-l0001": "efb913b52750c895c06a71e284ecfc92d70df98b4ab370f0e6a6943aa7faf038",
+    "task-s3-e2-l0002": "3d67377749d5f26f2d8aa7fea69f3eaae832b2fa67b394a1ad39b862cd0eefbd",
+    "task-s3-e2-l0003": "e5fba1655dd1bfd7d99afc21e000d83a70541e43f084344e5091fc328eafc018",
+    "task-s4-e2-l0050": "12428f4f188f683c35eab2dc4a4a97c07e58c4ce87dbfd55e2838482b22f3024",
+    "task-s5-e2-l0050": "9e5323b3d774081e9fc3ca23d694508570b6d36f318f58a688d4f7a5b3099a03",
+    "task-s0-e3-l0000": "9aafac45765deb196ad354a013ff31a5f4c7eb4d7285c9e6b35c48648b0548ea",
+    "task-s0-e3-l0001": "205a46825e9991e886ec141d176a26a70452df4e9040c98e0408f18961a7b72e",
+    "task-s0-e3-l0002": "b0e4d18c87270913187f20f8290f2b05f5fc256d78c760101f5b4c2c86156f04",
+    "task-s0-e3-l0003": "1b10f521a4d09be0c7706c3c7068a3272a497cda9429072725f6c204c19ebab6",
+    "task-s1-e3-l0004": "c0acbe227917144904355a4490dc1e812963fe52caade8a8278000c6dbdc49f5",
+    "task-s1-e3-l0005": "158e214970f04e8acf16675d219a3c24f2a638d443b680f91357784c661a84c4",
+    "task-s1-e3-l0006": "a3891d47c77bfd24ef8a34728bfe364688f27178f71543724e5c8a5113ef33ce",
+    "task-s1-e3-l0007": "b5bfb4d5b21cbd1966b72aa1323a8ee9ce775abad061618be753b0896cf8a02d",
+    "task-s2-e3-l0000": "5c269499167f104c72970dec14f812c413729516264b0e7b0478e6ad7913045e",
+    "task-s2-e3-l0001": "b73afdc39948e64a3f6dde9530e2d3fd11afb5db239ec8085cf5c8c0ee446707",
+    "task-s2-e3-l0002": "f4b58a917613f40c7ad21695341f796694c41b1899dad3e80db2b509ebbd5b6b",
+    "task-s2-e3-l0003": "de1ed8c7e5e6e19058eb8401be8f046c2bc36c74f133817647ed4995f28f6c0c",
+    "task-s3-e3-l0000": "e5304c3d916f97e1f92bfa4b0ea11d61ed162ec1a6448a49ad273db66982a5b3",
+    "task-s3-e3-l0001": "3912aee8fe3afda1c33e015a8abd5d0eed2062d017c8a7e67c055a031d65cbf1",
+    "task-s3-e3-l0002": "ac1f6a9b79ae6bbdd6089ddf1b89d43ca6fe4521a15f602a296cb04849f0103e",
+    "task-s3-e3-l0003": "4530e97686d9fddd75d164e0581f1cdb25913cf3729bf25cfd454c46adcbf372",
+    "task-s4-e3-l0050": "402c4a8304f74d80848414ad4b53a6a6d8ee653eb03a7cabbc3e2e456dd8c0fe",
+    "task-s5-e3-l0050": "5c8bb0a9d1891bd8252c94dbb15d346500aa95a83ecb6842c65c0d468c3ac6e7",
+    "lldt-l0000": "fab7e0311676ce31d06508f1d17f05d1bca1b11b005c5f518fa1743d0d40cc01",
+    "lldt-l0001": "00be0a53bef66018659c5936d04edb515d30b9e415161d9963c6e3ba50634b03",
+    "lldt-l0002": "cf5727378e21bfe2bb572bbe8974d2d1ea9a5da5c660b564d004d74068cbf192",
+    "lldt-l0003": "2af967d93c5c49db88aa5f376be7645f4be9fbe5715611fc0a73bfca8ffb22dc",
+    "lldt-l0004": "1222a29627f55923b25b2f6ec1a03499cc743b9fac9673bcf38748c33b0172c8",
+    "lldt-l0005": "ddb333db13a2ccdbdff3485e57348d1814a29d66a14c9f8e3304ecd21a3205c7",
+    "lldt-l0006": "30d88851ff1d24cd3fb1d497c57fa9942078d338ec920ecad098386f06400d16",
+    "lldt-l0007": "a471b0dd112a9b42848c82d703bdaca4629983f7c8ff716512154ff1db605d9e"
+  },
+  "unchanged_default_H15_roms": 80,
+  "box": {
+    "source": "b8ec886a8ae72b073d40d8c9bf4c808b0ead4b7a",
+    "helper_commit": "cfb9f52cd",
+    "spk_cpu_options": [
+      "P02_FETCH_CHAIN",
+      "P05_PARALLEL_LIMIT_CHECK"
+    ],
+    "after_executable_sha256": "07392d78cc648e4005d1d3c9802ddf28028a12a99f47dd4e948ec48329e4e7e7",
+    "native_conflicts": [
+      "Native LLDT/task paths read entry zero unconditionally and omit illegal LDTR.TI validation.",
+      "Other task handling differences, including native CALL stack state, are retained in raw records; no blanket match is claimed."
+    ],
+    "cases": [
+      {
+        "case": "lldt-l0001",
+        "rom_sha256": "00be0a53bef66018659c5936d04edb515d30b9e415161d9963c6e3ba50634b03",
+        "before": {
+          "native": {
+            "binary_sha256": "c890a8f64e66302b9f0fe2492eb22e9e4fb6fbc987d5ea0d625aaa28c15058a2",
+            "complete": true,
+            "words": [
+              17487,
+              0,
+              48879,
+              72,
+              64,
+              56,
+              3836,
+              32,
+              80,
+              65529,
+              0,
+              0,
+              0
+            ],
+            "lldt_checkpoint": [
+              1,
+              19524
+            ],
+            "ram_sha256": "dd90b19fa7bd639be869968981159d3cf2b4ee02b1c72802d55dc54ec6b7925f"
+          },
+          "spk": {
+            "binary_sha256": "80437addbceff98dcdcb8a28c6ecd4be80e5a6dc287af71f5eedd18645af0931",
+            "complete": true,
+            "words": [
+              17487,
+              0,
+              48879,
+              72,
+              64,
+              56,
+              3840,
+              32,
+              80,
+              65529,
+              0,
+              0,
+              0
+            ],
+            "lldt_checkpoint": [
+              0,
+              19524
+            ],
+            "ram_sha256": "2409ca83ab695d6792fca34201dcc64e0106ecc00f765587423abc201c925742"
+          }
+        },
+        "after": {
+          "native": {
+            "binary_sha256": "762553e131ee9f9525ed85a313a6ab3e3b1bc6532575386e9b0474b924ec846e",
+            "complete": true,
+            "words": [
+              17487,
+              0,
+              48879,
+              72,
+              64,
+              56,
+              3836,
+              32,
+              80,
+              65529,
+              0,
+              0,
+              0
+            ],
+            "lldt_checkpoint": [
+              1,
+              19524
+            ],
+            "ram_sha256": "dd90b19fa7bd639be869968981159d3cf2b4ee02b1c72802d55dc54ec6b7925f"
+          },
+          "spk": {
+            "binary_sha256": "07392d78cc648e4005d1d3c9802ddf28028a12a99f47dd4e948ec48329e4e7e7",
+            "complete": true,
+            "words": [
+              17487,
+              0,
+              48879,
+              72,
+              64,
+              56,
+              3840,
+              32,
+              80,
+              65529,
+              0,
+              0,
+              0
+            ],
+            "lldt_checkpoint": [
+              1,
+              19524
+            ],
+            "ram_sha256": "f9aa44ac44e5ce53b38b00990489378a1e50c8a00385c9a861bd25b8f41142e2"
+          }
+        }
+      },
+      {
+        "case": "lldt-l0005",
+        "rom_sha256": "ddb333db13a2ccdbdff3485e57348d1814a29d66a14c9f8e3304ecd21a3205c7",
+        "before": {
+          "native": {
+            "binary_sha256": "c890a8f64e66302b9f0fe2492eb22e9e4fb6fbc987d5ea0d625aaa28c15058a2",
+            "complete": true,
+            "words": [
+              17487,
+              0,
+              48879,
+              72,
+              64,
+              56,
+              3836,
+              32,
+              80,
+              65529,
+              105,
+              8,
+              0
+            ],
+            "lldt_checkpoint": [
+              5,
+              19524
+            ],
+            "ram_sha256": "82b8d1465e1e3edf60a87b6cc9e628371842e5205f8e69eb9e472b817f015b47"
+          },
+          "spk": {
+            "binary_sha256": "80437addbceff98dcdcb8a28c6ecd4be80e5a6dc287af71f5eedd18645af0931",
+            "complete": true,
+            "words": [
+              17487,
+              13,
+              5,
+              96,
+              96,
+              16,
+              3832,
+              24,
+              80,
+              65521,
+              4,
+              77,
+              8
+            ],
+            "lldt_checkpoint": [
+              0,
+              0
+            ],
+            "ram_sha256": "0fd9ce858c86abf83d9e7dbebaf3421dc10fec1e946aa79ae4de61f49518526f"
+          }
+        },
+        "after": {
+          "native": {
+            "binary_sha256": "762553e131ee9f9525ed85a313a6ab3e3b1bc6532575386e9b0474b924ec846e",
+            "complete": true,
+            "words": [
+              17487,
+              0,
+              48879,
+              72,
+              64,
+              56,
+              3836,
+              32,
+              80,
+              65529,
+              105,
+              8,
+              0
+            ],
+            "lldt_checkpoint": [
+              5,
+              19524
+            ],
+            "ram_sha256": "82b8d1465e1e3edf60a87b6cc9e628371842e5205f8e69eb9e472b817f015b47"
+          },
+          "spk": {
+            "binary_sha256": "07392d78cc648e4005d1d3c9802ddf28028a12a99f47dd4e948ec48329e4e7e7",
+            "complete": true,
+            "words": [
+              17487,
+              13,
+              5,
+              96,
+              96,
+              16,
+              3832,
+              24,
+              80,
+              65521,
+              4,
+              77,
+              8
+            ],
+            "lldt_checkpoint": [
+              0,
+              0
+            ],
+            "ram_sha256": "0fd9ce858c86abf83d9e7dbebaf3421dc10fec1e946aa79ae4de61f49518526f"
+          }
+        }
+      },
+      {
+        "case": "task-s0-e0-l0000",
+        "rom_sha256": "bb3812641abffee97d57ff1424d8dff98888e7078405be29c2c4a4da80ff18e8",
+        "before": {
+          "native": {
+            "binary_sha256": "c890a8f64e66302b9f0fe2492eb22e9e4fb6fbc987d5ea0d625aaa28c15058a2",
+            "complete": true,
+            "words": [
+              17487,
+              0,
+              48879,
+              72,
+              64,
+              56,
+              3836,
+              32,
+              0,
+              65529,
+              0,
+              0,
+              0
+            ],
+            "lldt_checkpoint": [
+              0,
+              0
+            ],
+            "ram_sha256": "cb38e0e7c3fdf7ffcd4a25d9bf21cb635557721cd27a58a0ac995bd5bb3801bb"
+          },
+          "spk": {
+            "binary_sha256": "80437addbceff98dcdcb8a28c6ecd4be80e5a6dc287af71f5eedd18645af0931",
+            "complete": true,
+            "words": [
+              17487,
+              0,
+              48879,
+              72,
+              64,
+              56,
+              3840,
+              32,
+              0,
+              65529,
+              0,
+              0,
+              0
+            ],
+            "lldt_checkpoint": [
+              0,
+              0
+            ],
+            "ram_sha256": "2319b8a53825f660d639fa74a008c0e89471f9cdc1d098df19ebd8a221386c39"
+          }
+        },
+        "after": {
+          "native": {
+            "binary_sha256": "762553e131ee9f9525ed85a313a6ab3e3b1bc6532575386e9b0474b924ec846e",
+            "complete": true,
+            "words": [
+              17487,
+              0,
+              48879,
+              72,
+              64,
+              56,
+              3836,
+              32,
+              0,
+              65529,
+              0,
+              0,
+              0
+            ],
+            "lldt_checkpoint": [
+              0,
+              0
+            ],
+            "ram_sha256": "cb38e0e7c3fdf7ffcd4a25d9bf21cb635557721cd27a58a0ac995bd5bb3801bb"
+          },
+          "spk": {
+            "binary_sha256": "07392d78cc648e4005d1d3c9802ddf28028a12a99f47dd4e948ec48329e4e7e7",
+            "complete": true,
+            "words": [
+              17487,
+              0,
+              48879,
+              72,
+              64,
+              56,
+              3840,
+              32,
+              0,
+              65529,
+              0,
+              0,
+              0
+            ],
+            "lldt_checkpoint": [
+              0,
+              0
+            ],
+            "ram_sha256": "2319b8a53825f660d639fa74a008c0e89471f9cdc1d098df19ebd8a221386c39"
+          }
+        }
+      },
+      {
+        "case": "task-s0-e0-l0001",
+        "rom_sha256": "383e97ffb059f456f91afe7cba021d422c6fa117352dea35d90ce316833d8673",
+        "before": {
+          "native": {
+            "binary_sha256": "c890a8f64e66302b9f0fe2492eb22e9e4fb6fbc987d5ea0d625aaa28c15058a2",
+            "complete": true,
+            "words": [
+              17487,
+              0,
+              48879,
+              72,
+              64,
+              56,
+              3836,
+              32,
+              1,
+              65529,
+              0,
+              0,
+              0
+            ],
+            "lldt_checkpoint": [
+              0,
+              0
+            ],
+            "ram_sha256": "bd8e0b4fded66caff5dfd2d9648e390aa6bf0df454dbd9d1e02bff4753a2d35b"
+          },
+          "spk": {
+            "binary_sha256": "80437addbceff98dcdcb8a28c6ecd4be80e5a6dc287af71f5eedd18645af0931",
+            "complete": true,
+            "words": [
+              17487,
+              255,
+              48879,
+              96,
+              96,
+              104,
+              3838,
+              40,
+              0,
+              65529,
+              0,
+              0,
+              0
+            ],
+            "lldt_checkpoint": [
+              0,
+              0
+            ],
+            "ram_sha256": "587db2e9174a113be0df84b751bfa7092fad314cd8ed5ec6460069afd8eb5627"
+          }
+        },
+        "after": {
+          "native": {
+            "binary_sha256": "762553e131ee9f9525ed85a313a6ab3e3b1bc6532575386e9b0474b924ec846e",
+            "complete": true,
+            "words": [
+              17487,
+              0,
+              48879,
+              72,
+              64,
+              56,
+              3836,
+              32,
+              1,
+              65529,
+              0,
+              0,
+              0
+            ],
+            "lldt_checkpoint": [
+              0,
+              0
+            ],
+            "ram_sha256": "bd8e0b4fded66caff5dfd2d9648e390aa6bf0df454dbd9d1e02bff4753a2d35b"
+          },
+          "spk": {
+            "binary_sha256": "07392d78cc648e4005d1d3c9802ddf28028a12a99f47dd4e948ec48329e4e7e7",
+            "complete": true,
+            "words": [
+              17487,
+              0,
+              48879,
+              72,
+              64,
+              56,
+              3840,
+              32,
+              1,
+              65529,
+              0,
+              0,
+              0
+            ],
+            "lldt_checkpoint": [
+              0,
+              0
+            ],
+            "ram_sha256": "4311811217371b9427341f6e33414568807f9ef2a9d1b20dcdfa7a6cf22d7cba"
+          }
+        }
+      },
+      {
+        "case": "task-s1-e0-l0005",
+        "rom_sha256": "c4342b52d610af7a47ec4a8f1b0137f6328a3fabe7e6bd2ae47aa62a1cf16f56",
+        "before": {
+          "native": {
+            "binary_sha256": "c890a8f64e66302b9f0fe2492eb22e9e4fb6fbc987d5ea0d625aaa28c15058a2",
+            "complete": true,
+            "words": [
+              17487,
+              0,
+              48879,
+              72,
+              64,
+              56,
+              3836,
+              32,
+              5,
+              65529,
+              0,
+              0,
+              0
+            ],
+            "lldt_checkpoint": [
+              0,
+              0
+            ],
+            "ram_sha256": "92af8aaab04b0d042b2f3232f80524ba01066041b1fd9131b0bfa30b2adb2956"
+          },
+          "spk": {
+            "binary_sha256": "80437addbceff98dcdcb8a28c6ecd4be80e5a6dc287af71f5eedd18645af0931",
+            "complete": true,
+            "words": [
+              17487,
+              255,
+              48879,
+              96,
+              96,
+              104,
+              3838,
+              40,
+              0,
+              65529,
+              0,
+              0,
+              0
+            ],
+            "lldt_checkpoint": [
+              0,
+              0
+            ],
+            "ram_sha256": "e897fc62ace391dd67bf6283c2828ccd8722ad8dfbc3c5f56a4b7c6b8335c625"
+          }
+        },
+        "after": {
+          "native": {
+            "binary_sha256": "762553e131ee9f9525ed85a313a6ab3e3b1bc6532575386e9b0474b924ec846e",
+            "complete": true,
+            "words": [
+              17487,
+              0,
+              48879,
+              72,
+              64,
+              56,
+              3836,
+              32,
+              5,
+              65529,
+              0,
+              0,
+              0
+            ],
+            "lldt_checkpoint": [
+              0,
+              0
+            ],
+            "ram_sha256": "92af8aaab04b0d042b2f3232f80524ba01066041b1fd9131b0bfa30b2adb2956"
+          },
+          "spk": {
+            "binary_sha256": "07392d78cc648e4005d1d3c9802ddf28028a12a99f47dd4e948ec48329e4e7e7",
+            "complete": true,
+            "words": [
+              17487,
+              255,
+              48879,
+              96,
+              96,
+              104,
+              3838,
+              40,
+              0,
+              65529,
+              0,
+              0,
+              0
+            ],
+            "lldt_checkpoint": [
+              0,
+              0
+            ],
+            "ram_sha256": "e897fc62ace391dd67bf6283c2828ccd8722ad8dfbc3c5f56a4b7c6b8335c625"
+          }
+        }
+      },
+      {
+        "case": "task-s2-e0-l0001",
+        "rom_sha256": "bac515ae14287a851f410ed34acc5ac2975be06e26e4bacdcdf6f278f250ae7e",
+        "before": {
+          "native": {
+            "binary_sha256": "c890a8f64e66302b9f0fe2492eb22e9e4fb6fbc987d5ea0d625aaa28c15058a2",
+            "complete": true,
+            "words": [
+              17487,
+              255,
+              48879,
+              96,
+              96,
+              104,
+              3836,
+              40,
+              0,
+              65529,
+              0,
+              0,
+              0
+            ],
+            "lldt_checkpoint": [
+              0,
+              0
+            ],
+            "ram_sha256": "849bf1c43443eb83b941977062bf0fa8ab9b55c64289e38aa4e8cd38de320d76"
+          },
+          "spk": {
+            "binary_sha256": "80437addbceff98dcdcb8a28c6ecd4be80e5a6dc287af71f5eedd18645af0931",
+            "complete": true,
+            "words": [
+              17487,
+              255,
+              48879,
+              96,
+              96,
+              104,
+              3838,
+              40,
+              0,
+              65529,
+              0,
+              0,
+              0
+            ],
+            "lldt_checkpoint": [
+              0,
+              0
+            ],
+            "ram_sha256": "f20655703a26ff3bda69603e6245a1a8ea121e4768e48a2edac6e7d589100434"
+          }
+        },
+        "after": {
+          "native": {
+            "binary_sha256": "762553e131ee9f9525ed85a313a6ab3e3b1bc6532575386e9b0474b924ec846e",
+            "complete": true,
+            "words": [
+              17487,
+              255,
+              48879,
+              96,
+              96,
+              104,
+              3836,
+              40,
+              0,
+              65529,
+              0,
+              0,
+              0
+            ],
+            "lldt_checkpoint": [
+              0,
+              0
+            ],
+            "ram_sha256": "849bf1c43443eb83b941977062bf0fa8ab9b55c64289e38aa4e8cd38de320d76"
+          },
+          "spk": {
+            "binary_sha256": "07392d78cc648e4005d1d3c9802ddf28028a12a99f47dd4e948ec48329e4e7e7",
+            "complete": true,
+            "words": [
+              17487,
+              255,
+              48879,
+              96,
+              96,
+              104,
+              3838,
+              40,
+              0,
+              65529,
+              0,
+              0,
+              0
+            ],
+            "lldt_checkpoint": [
+              0,
+              0
+            ],
+            "ram_sha256": "7820beb81b6d2579a1b023fe392c1978582f3a5111542087941b7ac0e2022399"
+          }
+        }
+      },
+      {
+        "case": "task-s3-e0-l0001",
+        "rom_sha256": "e3dd4a1266e13d000e7a26a75e2070050c9088bf33aeec6d8e1d1d7814f2ac1f",
+        "before": {
+          "native": {
+            "binary_sha256": "c890a8f64e66302b9f0fe2492eb22e9e4fb6fbc987d5ea0d625aaa28c15058a2",
+            "complete": true,
+            "words": [
+              17487,
+              255,
+              48879,
+              96,
+              96,
+              104,
+              3836,
+              40,
+              0,
+              65529,
+              0,
+              0,
+              0
+            ],
+            "lldt_checkpoint": [
+              0,
+              0
+            ],
+            "ram_sha256": "9148da8fc0b41cff09e60eae5c5bab009cdeb891ff1310945cb7d25bdd9636e4"
+          },
+          "spk": {
+            "binary_sha256": "80437addbceff98dcdcb8a28c6ecd4be80e5a6dc287af71f5eedd18645af0931",
+            "complete": true,
+            "words": [
+              17487,
+              255,
+              48879,
+              96,
+              96,
+              104,
+              3838,
+              40,
+              0,
+              65529,
+              0,
+              0,
+              0
+            ],
+            "lldt_checkpoint": [
+              0,
+              0
+            ],
+            "ram_sha256": "47dfb1c36aaa5ecc760ccaee1f92390c2990d00231c01adf6ef8139b8a0fe6b1"
+          }
+        },
+        "after": {
+          "native": {
+            "binary_sha256": "762553e131ee9f9525ed85a313a6ab3e3b1bc6532575386e9b0474b924ec846e",
+            "complete": true,
+            "words": [
+              17487,
+              255,
+              48879,
+              96,
+              96,
+              104,
+              3836,
+              40,
+              0,
+              65529,
+              0,
+              0,
+              0
+            ],
+            "lldt_checkpoint": [
+              0,
+              0
+            ],
+            "ram_sha256": "9148da8fc0b41cff09e60eae5c5bab009cdeb891ff1310945cb7d25bdd9636e4"
+          },
+          "spk": {
+            "binary_sha256": "07392d78cc648e4005d1d3c9802ddf28028a12a99f47dd4e948ec48329e4e7e7",
+            "complete": true,
+            "words": [
+              17487,
+              255,
+              48879,
+              96,
+              96,
+              104,
+              3838,
+              40,
+              0,
+              65529,
+              0,
+              0,
+              0
+            ],
+            "lldt_checkpoint": [
+              0,
+              0
+            ],
+            "ram_sha256": "6d40e9808a42aed2b0e994110ca2fd46c6f65100b86918834bd1ab35204ab293"
+          }
+        }
+      },
+      {
+        "case": "task-s4-e0-l0050",
+        "rom_sha256": "8b4a11fef79c53b2bf20d1e5a11441c2cd3e64ad5b2bb67b198c10844b3d0059",
+        "before": {
+          "native": {
+            "binary_sha256": "c890a8f64e66302b9f0fe2492eb22e9e4fb6fbc987d5ea0d625aaa28c15058a2",
+            "complete": true,
+            "words": [
+              17487,
+              0,
+              48879,
+              72,
+              64,
+              56,
+              3836,
+              32,
+              80,
+              65529,
+              0,
+              0,
+              0
+            ],
+            "lldt_checkpoint": [
+              0,
+              0
+            ],
+            "ram_sha256": "f64ecf6c7d6c7e942bf383a846ed0b07ea8570d0a8982b7717e44531fa218b4c"
+          },
+          "spk": {
+            "binary_sha256": "80437addbceff98dcdcb8a28c6ecd4be80e5a6dc287af71f5eedd18645af0931",
+            "complete": true,
+            "words": [
+              17487,
+              0,
+              48879,
+              72,
+              64,
+              56,
+              3840,
+              32,
+              80,
+              65529,
+              0,
+              0,
+              0
+            ],
+            "lldt_checkpoint": [
+              0,
+              0
+            ],
+            "ram_sha256": "c4be1492f9cc5eab396ca0ac70f690ddbfa51f2e18fbb26f3ca95f8bd03d6b34"
+          }
+        },
+        "after": {
+          "native": {
+            "binary_sha256": "762553e131ee9f9525ed85a313a6ab3e3b1bc6532575386e9b0474b924ec846e",
+            "complete": true,
+            "words": [
+              17487,
+              0,
+              48879,
+              72,
+              64,
+              56,
+              3836,
+              32,
+              80,
+              65529,
+              0,
+              0,
+              0
+            ],
+            "lldt_checkpoint": [
+              0,
+              0
+            ],
+            "ram_sha256": "f64ecf6c7d6c7e942bf383a846ed0b07ea8570d0a8982b7717e44531fa218b4c"
+          },
+          "spk": {
+            "binary_sha256": "07392d78cc648e4005d1d3c9802ddf28028a12a99f47dd4e948ec48329e4e7e7",
+            "complete": true,
+            "words": [
+              17487,
+              0,
+              48879,
+              72,
+              64,
+              56,
+              3840,
+              32,
+              80,
+              65529,
+              0,
+              0,
+              0
+            ],
+            "lldt_checkpoint": [
+              0,
+              0
+            ],
+            "ram_sha256": "c4be1492f9cc5eab396ca0ac70f690ddbfa51f2e18fbb26f3ca95f8bd03d6b34"
+          }
+        }
+      }
+    ]
+  },
+  "before_reproductions": {
+    "before.log": {
+      "sha256": "19bf7062bdf122a4368c7c9e6ccd536af60de2a3ce33c01ef2c48e7ba31475f1",
+      "fatal": [
+        "FATAL: sim/unit/spk286_null_ldtr_tb.sv:24: normalized LDTR/LDT-segment error case=/mnt/d/GitHub/SPK286/build/h16-20261001/null-ldtr-vectors/task-s0-e0-l0001.hex mode=0 LDTR=0001/0 TR=0020 CS:IP=0030:005d"
+      ]
+    },
+    "direct-before.log": {
+      "sha256": "d831720dfb8b7102b771e3c9c85f10903389e87608af9095e611577788a83f56",
+      "fatal": [
+        "FATAL: sim/unit/spk286_null_ldtr_tb.sv:24: SLDT preserves explicit null RPL case=/mnt/d/GitHub/SPK286/build/h16-20261001/null-ldtr-vectors/lldt-l0001.hex mode=0 LDTR=0000/0 TR=0018 CS:IP=0008:005b"
+      ]
+    }
+  },
+  "downstream_fetch_wrap_sha256": "84ecc45dee9b859819f55e6e74a7214baacc018065775167b411521d4aa06266",
+  "attempt_notes": [
+    "The error-RPL mutant survived the CPU-only observer because the executor already normalizes that code. Final audit uses the service bench for it and rejects all four mutants.",
+    "Final vendor anchor check found an inherited stale RETF allocation variable. The two audit strings now match the current architectural allocation variable; all three anchor tests pass."
+  ],
+  "vendor_audit_far_sha256": "2e7a68f4ec37dea58ea9a1dddb5a6b7d5262589b7f962eddab99b2d9c4c7f588"
+}

@@ -424,7 +424,7 @@ module spk286_task_switch_service (
                 if (state_loaded) state_q <= ST_LDTR_CHECK;
             end else if (state_q == ST_LDTR_CHECK) begin
                     incoming_ldtr_selector_q <= task_loaded_ldtr;
-                    if (task_loaded_ldtr == 16'h0000) begin
+                    if (task_loaded_ldtr[15:2] == 14'd0) begin
                         incoming_ldtr_limit_q <= 16'h0000;
                         incoming_ldtr_base_q <= 24'h000000;
                         incoming_ldtr_access_q <= 8'h00;
@@ -435,7 +435,7 @@ module spk286_task_switch_service (
                     end else if (task_loaded_ldtr[2] || task_loaded_ldtr[15:3] == 13'd0 ||
                                  ({1'b0, task_loaded_ldtr[15:3], 3'b000} + 17'd7 > {1'b0, gdtr_limit})) begin
                         fault_vector_q <= 8'd10;
-                        fault_error_code_q <= task_loaded_ldtr;
+                        fault_error_code_q <= task_loaded_ldtr & 16'hFFFC;
                         state_q <= ST_FAULT;
                     end else begin
                         incoming_ldtr_descriptor_address_q <= gdtr_base +
@@ -455,11 +455,11 @@ module spk286_task_switch_service (
                 if (!incoming_ldtr_valid || !incoming_ldtr_reserved_valid ||
                     incoming_ldtr_class != spk286_protected_pkg::DESC_LDT) begin
                     fault_vector_q <= 8'd10;
-                    fault_error_code_q <= incoming_ldtr_selector_q;
+                    fault_error_code_q <= incoming_ldtr_selector_q & 16'hFFFC;
                     state_q <= ST_FAULT;
                 end else if (!incoming_ldtr_present) begin
                     fault_vector_q <= 8'd10;
-                    fault_error_code_q <= incoming_ldtr_selector_q;
+                    fault_error_code_q <= incoming_ldtr_selector_q & 16'hFFFC;
                     state_q <= ST_FAULT;
                 end else begin
                     incoming_ldtr_limit_q <= incoming_ldtr_limit;

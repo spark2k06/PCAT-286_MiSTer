@@ -535,6 +535,16 @@ Compare LLDT and task-loaded LDTR for 0000..0007, assert when no table fetch is
 allowed, and include incoming CS/SS that require the LDT. Preserve the
 distinction between null GDT selector and LDT entry zero.
 
+**2026-10-01 follow-up: closed in the documented null-field scope.** Task loads
+now recognize INDEX=0/TI=0 independently of RPL, and LLDT/SLDT preserve the raw
+visible selector. Null LDTs perform no entry-zero descriptor read; CS/SS requiring
+the disabled LDT fault, while entry zero of a valid LDT remains usable. The
+service's raw selector error now removes RPL, matching the CPU executor's already
+normalized error. Both simulators and the vendor pass 80 ROMs in baseline/Max
+plus affected banks, with native/SPK before/after observations. The general Intel
+field definition and the task example are distinct evidence; no physical PM
+capture is claimed. See [H16 contract and receipt](PROTECTED_MODE_H16_NULL_LDTR_20261001.md).
+
 ### H17 — JMP task-switch NT policy and stale documentation (P, P2)
 
 `spk286_tss_service.sv:169` intentionally preserves incoming NT on JMP, to run
@@ -678,9 +688,10 @@ close the remaining protected-mode findings.
 
 The map below records the original review scope. As of the 2026-10-01
 H03/H10/H12/H13 block, scoped H18 and H11 corrections, closed findings are H01,
-H03, H04, H06, H07, H08, H09, H10, H11, H12, H13, H14, H15, H18, H21 and H22.
+H03, H04, H06, H07, H08, H09, H10, H11, H12, H13, H14, H15, H16, H18, H21 and H22.
 The concrete ESC first-word finding in H19 is also closed. Remaining work is
-H02 (partial), H05, H16, H17, H19 (remaining matrix) and H20.
+H02 (partial), H05, H17, H19 (remaining matrix) and H20. The downstream PERF01
+benchmark investigation is recorded separately in PCAT's hardware follow-ups.
 See the marked follow-ups and
 [block validation](PROTECTED_MODE_BLOCK_20261001.md) for closure evidence;
 the original work packages do not reopen completed findings.

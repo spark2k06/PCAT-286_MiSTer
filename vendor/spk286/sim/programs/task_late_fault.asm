@@ -15,6 +15,21 @@ org 0
 %ifndef INCOMING_LDTR
 %define INCOMING_LDTR 0x50
 %endif
+%ifndef INCOMING_CS
+%define INCOMING_CS 0x30
+%endif
+%ifndef INCOMING_SS
+%define INCOMING_SS 0x38
+%endif
+%ifndef LDT_ZERO_CODE
+%define LDT_ZERO_CODE 0
+%endif
+%ifndef LDT_ZERO_STACK
+%define LDT_ZERO_STACK 0
+%endif
+%ifndef BOOT_LLDT
+%define BOOT_LLDT -1
+%endif
 %ifndef ABSENT
 %define ABSENT 1
 %endif
@@ -65,6 +80,12 @@ protected_start:
     ltr ax
     mov ax, 0x50
     lldt ax
+%if BOOT_LLDT >= 0
+    mov ax, BOOT_LLDT
+    lldt ax
+    sldt [0x301a]
+    mov word [0x301c], 0x4c44
+%endif
     mov word [0x3000], 0x5255 ; RUN
     mov ax, 0x1111
 %if ENTRY = 0
@@ -114,7 +135,7 @@ report:
     sldt [0x3010]
     smsw [0x3012]
 %if !TASK_HANDLER
-%if FAULT_STAGE != 0
+%if FAULT_STAGE != 0 || BOOT_LLDT >= 4
     mov ax, [ss:bp]
     mov [0x3014], ax ; error
     mov ax, [ss:bp+2]
@@ -178,7 +199,7 @@ tables:
 %elif FAULT_STAGE = 1
     tss incoming, 0x40, 0x30, 0x38, 0x48, 0x60 ; data instead of LDT
 %else
-    tss incoming, 0x40, 0x30, 0x38, 0x48, INCOMING_LDTR
+    tss incoming, 0x40, INCOMING_CS, INCOMING_SS, 0x48, INCOMING_LDTR
 %endif
     times 0x400-($-tables) db 0
     tss task_handler, 0x60, 8, 0x68, 0x60, 0
@@ -195,7 +216,13 @@ tables:
     times 0x900-($-tables) db 0
     dw 0, 0x20, 0x8500, 0 ; IDT[20] entry task gate
     times 0xa00-($-tables) db 0
+%if LDT_ZERO_CODE
+    descriptor 0xf0000, 0xffff, 0x9a
+%elif LDT_ZERO_STACK
+    descriptor 0x5000, 0x1fff, 0x92
+%else
     descriptor 0x6000, 0x1fff, 0x92
+%endif
     descriptor 0x7000, 0x1fff, 0x92
 tables_end:
     times 0xfff0-($-$$) db 0xff

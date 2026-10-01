@@ -29,6 +29,7 @@ module spk286_task_switch_service_tb;
     wire [31:0] cache_access; wire [15:0] cache_classes;
     wire [3:0] cache_present, cache_protected, cache_tables; wire [7:0] cache_dpl, cache_rpl;
     logic [7:0] memory [0:65535]; integer checks = 0; integer image_address; integer wait_deadline; logic [15:0] image_value;
+    integer gdt_zero_reads=0;
 
     spk286_task_switch_service dut (.*);
 
@@ -51,7 +52,10 @@ module spk286_task_switch_service_tb;
                 if (memory_write) begin
                     memory[memory_address[15:0]] = memory_write_data[7:0];
                     if (!memory_byte) memory[memory_address[15:0]+1] = memory_write_data[15:8];
-                end else memory_read_data = {memory[memory_address[15:0]+1], memory[memory_address[15:0]]};
+                end else begin
+                    memory_read_data = {memory[memory_address[15:0]+1], memory[memory_address[15:0]]};
+                    if (memory_address>=24'h100 && memory_address<24'h108) gdt_zero_reads++;
+                end
                 memory_done = 1'b1;
             end
             #1; clk = 1'b1; #1; clk = 1'b0; #1; memory_done = 1'b0; end
@@ -73,6 +77,7 @@ module spk286_task_switch_service_tb;
         integer descriptor_address;
         begin
             for (integer i=0; i<65536; i=i+1) memory[i]=8'h00;
+            gdt_zero_reads=0;
             gdtr_limit = case_gdtr_limit;
             memory[16'h0025] = current_access;
             memory[16'h0035] = target_access;
@@ -128,8 +133,8 @@ module spk286_task_switch_service_tb;
             reset=1'b0; start=1'b1; tick(1'b0); start=1'b0;
             run_to_end();
             if (expected_fault_vector == 8'h00) begin
-                if (case_ldtr_selector == 16'h0000)
-                    check(complete && commit_valid && loaded_ldtr == 16'h0000 &&
+                if (case_ldtr_selector[15:2] == 14'd0)
+                    check(complete && commit_valid && loaded_ldtr == case_ldtr_selector &&
                           loaded_ldtr_base == 24'h000000 && loaded_ldtr_limit == 16'h0000 &&
                           loaded_ldtr_class == 4'd0 && !loaded_ldtr_valid && !loaded_ldtr_present,
                           message);
@@ -142,10 +147,11 @@ module spk286_task_switch_service_tb;
                       "valid incoming LDTR commits only after TSS save and target busy update");
             end else begin
                 check(fault && fault_vector == expected_fault_vector &&
-                      fault_error_code == case_ldtr_selector &&
+                      fault_error_code == (case_ldtr_selector & 16'hFFFC) &&
                       memory[16'h100E]==8'h34 && memory[16'h0035]==8'h83,
                       message);
             end
+            if (case_ldtr_selector<8) check(gdt_zero_reads==0,"null or TI LDTR does not fetch GDT entry zero");
         end
     endtask
 
@@ -221,6 +227,18 @@ module spk286_task_switch_service_tb;
         // selector, type, presence and reserved-form failures are atomic.
         run_ldtr_case(16'h0000, 16'h007F, 24'h000000, 16'h0000, 8'h00, 16'h0000,
                       8'h00, "null incoming LDTR clears the hidden cache");
+        for (integer rpl=1;rpl<4;rpl++)
+            run_ldtr_case(16'(rpl), 16'h007F, 0, 0, 0, 0, 0,
+                          "null LDTR accepts nonzero RPL and preserves visible selector");
+        for (integer rpl=0;rpl<4;rpl++)
+            run_ldtr_case(16'(4+rpl), 16'h007F, 0, 0, 0, 0, 8'd10,
+                          "TI LDTR rejects entry zero with normalized #TS error");
+        for (integer rpl=1;rpl<4;rpl++) begin
+            run_ldtr_case(16'('h40+rpl), 16'h007F, 24'h660000, 16'h001F, 8'h82, 0, 0,
+                          "valid non-null LDT preserves RPL without a privilege check");
+            run_ldtr_case(16'('h40+rpl), 16'h007F, 0, 16'h001F, 8'h02, 0, 8'd10,
+                          "absent non-null LDT error clears selector RPL");
+        end
         run_ldtr_case(16'h0040, 16'h007F, 24'h660000, 16'h001F, 8'h82, 16'h0000,
                       8'h00, "present LDT descriptor loads the incoming LDTR cache");
         run_ldtr_case(16'h0078, 16'h007F, 24'h770000, 16'h002B, 8'h82, 16'h0000,

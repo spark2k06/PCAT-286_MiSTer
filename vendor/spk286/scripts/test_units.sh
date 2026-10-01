@@ -49,6 +49,7 @@ tests+=(spk286_system_table_range)
 tests+=(spk286_outer_return_sp)
 tests+=(spk286_register_execution)
 tests+=(spk286_task_late_publication)
+tests+=(spk286_null_ldtr)
 tests+=(spk286_immediate_execution spk286_immediate_throughput)
 if [[ "$unit" != all ]]; then tests=("$unit"); fi
 
@@ -58,6 +59,10 @@ for name in "${tests[@]}"; do
     if [[ "$name" == spk286_task_late_publication ]]; then
         python3 -m tools.task_late_vectors --output "$BUILD_DIR/task-late-vectors"
         run_args=("+task_vectors=$BUILD_DIR/task-late-vectors/vectors.txt")
+    fi
+    if [[ "$name" == spk286_null_ldtr ]]; then
+        python3 -m tools.null_ldtr_vectors --output "$BUILD_DIR/null-ldtr-vectors"
+        run_args=("+ldtr_vectors=$BUILD_DIR/null-ldtr-vectors/vectors.txt")
     fi
     if [[ "$name" == spk286_test_instructions ]]; then
         python3 -m tools.test_instruction_vectors --output "$BUILD_DIR/test-vectors.txt"

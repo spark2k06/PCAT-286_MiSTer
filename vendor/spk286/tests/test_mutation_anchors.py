@@ -8,6 +8,12 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class MutationAnchorTests(unittest.TestCase):
+    def test_null_ldtr_mutation_anchors(self):
+        for label,module,old,new in importlib.import_module('tools.audit_null_ldtr').PROBES:
+            with self.subTest(mutation=label):
+                self.assertEqual((ROOT/'rtl'/(module+'.sv')).read_text().count(old),1)
+                self.assertNotEqual(old,new)
+
     def test_task_publication_mutation_anchors(self):
         for label,module,old,new in importlib.import_module('tools.audit_task_late').PROBES:
             with self.subTest(mutation=label):

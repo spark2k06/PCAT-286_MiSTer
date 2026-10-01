@@ -1007,7 +1007,7 @@ module spk286_micro_executor (
                                        (descriptor_operand_done && descriptor_phase_q == 3'd3 && descriptor_load_ldtr && descriptor_success_live);
     assign protected_tr_commit_en = task_commit_tr_write ||
                                     (descriptor_operand_done && descriptor_phase_q == 3'd4 && descriptor_load_tr && descriptor_success_q);
-    assign protected_ldtr_commit_selector = task_commit_ldtr_write ? task_loaded_ldtr : descriptor_null_commit ? 16'd0 : tmp0_q;
+    assign protected_ldtr_commit_selector = task_commit_ldtr_write ? task_loaded_ldtr : tmp0_q;
     assign protected_tr_commit_selector = task_commit_tr_write ? task_loaded_tr_selector : tmp0_q;
     assign protected_ldtr_commit_base = task_commit_ldtr_write ? task_loaded_ldtr_base : descriptor_base;
     assign protected_tr_commit_base = task_commit_tr_write ? task_loaded_tr_base : descriptor_base;

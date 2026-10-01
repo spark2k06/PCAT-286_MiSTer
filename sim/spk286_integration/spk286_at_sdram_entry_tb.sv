@@ -1,8 +1,23 @@
 `timescale 1ns/1ps
 // Registered SDRAM admission: stable payload, burst ordering and reset/drain.
-module spk286_at_sdram_entry_tb;
+module spk286_at_sdram_entry_tb #(
+    parameter integer CHIP_CLK_ADVANCE_NS = 0
+);
     logic clk = 0, reset = 1;
     always #10 clk = ~clk;
+    wire chip_clk;
+    generate
+        if (CHIP_CLK_ADVANCE_NS == 0) begin : same_phase
+            assign chip_clk = clk;
+        end else begin : advanced_phase
+            logic phase_clk = 0;
+            initial begin
+                #(10-CHIP_CLK_ADVANCE_NS) phase_clk = 1;
+                forever #10 phase_clk = ~phase_clk;
+            end
+            assign chip_clk = phase_clk;
+        end
+    endgenerate
     logic request_valid = 0, request_command_valid = 0, request_owner_refresh = 0;
     logic request_write = 0, request_code_fetch = 0, request_burst = 0;
     logic [3:0] request_cycle_class = 4'h5;
@@ -22,7 +37,7 @@ module spk286_at_sdram_entry_tb;
     spk286_at_mister_sdram_owner #(.SDRAM_INIT_WAIT(16'd8),
         .SDRAM_REFRESH_CYCLE(16'd20), .SDRAM_FORCE_REFRESH(16'd100)) dut (.*);
     spk286_sdram_pin_model #(.MEM_WORDS(4096)) ram (
-        .clk(clk), .reset(reset), .address(sdram_address), .cke(sdram_cke),
+        .clk(chip_clk), .reset(reset), .address(sdram_address), .cke(sdram_cke),
         .cs_n(sdram_cs), .ras_n(sdram_ras), .cas_n(sdram_cas), .we_n(sdram_we),
         .ba(sdram_ba), .dq_from_controller(sdram_dq_out), .controller_dq_oe(!sdram_dq_io),
         .dqm({sdram_udqm,sdram_ldqm}), .dq_to_controller(sdram_dq_in),

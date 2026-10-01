@@ -66,13 +66,23 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("run", type=Path)
     parser.add_argument("--output", type=Path)
+    parser.add_argument("--fresh-build", action="store_true",
+                        help="Read timing/ from a completed build_at_no_debug run")
     args = parser.parse_args()
     run = args.run.resolve()
-    reports = run / "reports"
+    reports = run / ("timing" if args.fresh_build else "reports")
     counts = (reports / "path_counts.txt").read_text().splitlines()
     overlay = run / "overlay/SYSTEM.sdc"
+    if args.fresh_build and not all((run / name).is_file() for name in
+                                    ("compile-started.txt", "bitstreams.sha256", "timing.log")):
+        raise ValueError("Fresh-build receipt is incomplete")
+    verified = run / "original-artifacts-verified.log"
+    if not args.fresh_build and not verified.is_file():
+        raise ValueError("Reference-fit artifact verification receipt is missing")
     result = {"schema": 1, "run_directory": str(run),
-              "scope": ("reference fitted netlist, frozen SYSTEM.sdc overlay, no compilation"
+              "scope": ("new compiled fitted netlist, frozen source snapshot, no SDC overlay"
+                        if args.fresh_build else
+                        "reference fitted netlist, frozen SYSTEM.sdc overlay, no compilation"
                         if overlay.exists() else
                         "existing fitted netlist, snapshot constraints, no compilation"),
               "system_sdc_overlay_sha256": sha256(overlay) if overlay.exists() else None,
@@ -81,7 +91,7 @@ def main():
               "snapshot_manifest_sha256": sha256(run / "manifest.json"),
               "container_image": (run / "container-image.txt").read_text().strip(),
               "original_artifacts_verification":
-                  (run / "original-artifacts-verified.log").read_text().splitlines(),
+                  verified.read_text().splitlines() if verified.exists() else [],
               "corners": {}, "corner_metadata": {}, "report_hashes": {}}
     for line in counts:
         corner, group, kind, count, worst = line.split()

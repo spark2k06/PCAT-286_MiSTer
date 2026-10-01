@@ -456,7 +456,19 @@ module emu_at
 
     assign sdram_dq_in = SDRAM_DQ;
     assign SDRAM_DQ = ~sdram_dq_io ? sdram_dq_out : 16'hzzzz;
-    assign SDRAM_CLK = CLK_50M;
+    // Forward the real 50 MHz clock through the dedicated DDR output cells.
+    // High on rising edges, low on falling edges: no divide or phase shift.
+    // A global clock routed as ordinary output data adds avoidable pin skew.
+    altddio_out #(
+        .extend_oe_disable("OFF"), .intended_device_family("Cyclone V"),
+        .invert_output("OFF"), .lpm_hint("UNUSED"),
+        .lpm_type("altddio_out"), .oe_reg("UNREGISTERED"),
+        .power_up_high("OFF"), .width(1)
+    ) sdram_clock_ddr (
+        .datain_h(1'b1), .datain_l(1'b0), .outclock(CLK_50M),
+        .dataout(SDRAM_CLK), .aclr(1'b0), .aset(1'b0), .oe(1'b1),
+        .outclocken(1'b1), .sclr(1'b0), .sset(1'b0)
+    );
     assign SDRAM_A   = sdram_address;
     assign SDRAM_CKE = sdram_cke;
     assign SDRAM_BA  = sdram_ba;

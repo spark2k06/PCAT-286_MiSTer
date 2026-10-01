@@ -191,7 +191,7 @@ module spk286 (
     logic address_override, implicit_lock;
     logic [15:0] address_offset;
     logic operand_request, operand_write, operand_select_rm, operand_done, operand_byte;
-    logic [15:0] operand_write_data, operand_read_data;
+    logic [15:0] operand_write_data, operand_read_data, executor_operand_read_data;
     logic operand_gpr_write_en, operand_gpr_write_byte;
     logic [2:0] operand_gpr_write_index;
     logic [15:0] operand_gpr_write_data;
@@ -842,6 +842,11 @@ module spk286 (
         .retired(raw_retired), .fault(microcode_fault)
     );
 
+    // These serialized protected services always select a memory operand.
+    // Bypass the general register/byte mux on their response data, retaining
+    // the operand service's existing admission/completion handshake.
+    assign executor_operand_read_data = (protected_descriptor_access || protected_tss_access || protected_event_access) ?
+                                        memory_read_data : operand_read_data;
     spk286_micro_executor micro_executor (
         .clk(clk), .reset(reset), .cancel(semantic_cancel), .start(service_start),
         .operation_valid(operation_valid), .operation(micro_word), .operation_done(executor_done), .operation_retire(operation_retire), .dispatch_request(dispatch_request),
@@ -855,7 +860,7 @@ module spk286 (
         .push_enabled(event_active || push_enabled), .push_return_ip(!event_active && push_return_ip), .branch_taken(branch_taken), .decrement_count(decrement_count),
         .redirect_request(internal_redirect), .redirect_target(internal_target), .redirect_ready(1'b1),
         .operand_write_data(operand_write_data), .operand_done(operand_done),
-        .operand_gpr_write_byte(operand_gpr_write_byte), .operand_read_data(operand_read_data), .operand_gpr_write_en(operand_gpr_write_en),
+        .operand_gpr_write_byte(operand_gpr_write_byte), .operand_read_data(executor_operand_read_data), .operand_gpr_write_en(operand_gpr_write_en),
         .operand_gpr_write_index(operand_gpr_write_index), .operand_gpr_write_data(operand_gpr_write_data),
         .gpr_write_byte(internal_gpr_write_byte), .destination(destination_q), .gpr_write_en(internal_gpr_write_en),
         .gpr_write_index(internal_gpr_write_index), .gpr_write_data(internal_gpr_write_data),

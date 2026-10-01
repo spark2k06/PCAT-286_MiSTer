@@ -84,4 +84,3 @@ The original root RBF is preserved. The downstream PCAT receipt retains the
 complete fitted audit, source snapshot identity and directed proof hashes;
 the standalone formal receipt is
 [retained here](../evidence/call-stack-arithmetic-20261001/formal-receipt.json).
-

@@ -1,0 +1,98 @@
+{
+  "format": 1,
+  "reference": "CheckIt 3.03C 04/08/91",
+  "inputs": {
+    "CHECKIT.EXE": "41e261db4393763ca632522f2e1c7a66e4ff7f52cc68ba05a582a894ffd02402",
+    "CHECKIT.OVL": "ac9e11e77693500dd092dcf54bb68c7206ccd5cecc6a7130ae049f669b933be0"
+  },
+  "frontend_sha256": "c064ae20530a0b37b48991dc06131a7bae16f64bc2315c35ca7a923662cffc58",
+  "output": "CHECKNUM.EXE",
+  "output_bytes": 318272,
+  "output_sha256": "38324ad68abe13f143ff76dfcdee45f424ff25ce78f67883214ce6b82fa637e6",
+  "frontend_image_offset": 7658,
+  "frontend_bytes": 155,
+  "frontend_relocation_offsets": [
+    20,
+    53,
+    77,
+    120
+  ],
+  "retained_modules": [
+    {
+      "number": 6,
+      "source": "CHECKIT.EXE",
+      "file_offset": 68736,
+      "image_offset": 58432,
+      "bytes": 256,
+      "sha256": "032d48c3121924b2df3e0b5910bbc0cf22fe00622f1cd5a961d36f9396d3aa7c"
+    },
+    {
+      "number": 19,
+      "source": "CHECKIT.OVL",
+      "file_offset": 52576,
+      "image_offset": 58688,
+      "bytes": 15760,
+      "sha256": "5623816c4e3069001094f8bf7a245697d861b6f792a68b60ef693cecfc129f13"
+    },
+    {
+      "number": 32,
+      "source": "CHECKIT.EXE",
+      "file_offset": 135472,
+      "image_offset": 87488,
+      "bytes": 198352,
+      "sha256": "1a0ba215f762cf1fd0c6351a49af80a2b576390f7990ba2e3c6912632c944a62"
+    }
+  ],
+  "relocations": 6050,
+  "patches": [
+    {
+      "image_offset": 7658,
+      "original_hex": "558bec81ec9200b80000ba8c2f52509af000912683c4040bc07403e914048e06c0b526a10000a3a8d526a10400a3aad526a10200a3acd526a10c00a3aed5c706240100018e06c2b526803e100021750626c60610000026803e620021750626c6066200009a19124e058e06c4b526a3640cff760aff7608ff76069a4402420d83c4060bc0740cb80100509a7002912683c4028d8670ff16508e06c6",
+      "replacement_hex": "5589e581eca0009a0c00c10e89c38ec226ff770626ff770426ff770226ff371e687265168d4680509a6004912683c41089c18d5680e850007247168d8660ff509a0c002e0f83c40489c31e8edacd3907cd3d1fcd3836a2b983ec0889e3cd391fcd3d1e688365168d4680509a6004912683c41089c18d5680e80d00720431c0eb03b8010089ec5dcb1e161fbb0100b440cd211f720539c87401f9c3",
+      "reason": "Numeric main frontend after original CRT initialization"
+    },
+    {
+      "image_offset": 257106,
+      "original_hex": "25352e30662044",
+      "replacement_hex": "252e30660d0a00",
+      "reason": "Original Dhrystone precision, numeric output only"
+    },
+    {
+      "image_offset": 257123,
+      "original_hex": "25392e31664b20",
+      "replacement_hex": "252e31660d0a00",
+      "reason": "Original Whetstone precision in thousands, numeric output only"
+    },
+    {
+      "image_offset": 28544,
+      "original_hex": "558bec",
+      "replacement_hex": "31c0cb",
+      "reason": "Disable untimed GUI progress updates"
+    },
+    {
+      "image_offset": 28752,
+      "original_hex": "558bec",
+      "replacement_hex": "31c0cb",
+      "reason": "Disable untimed GUI progress updates"
+    },
+    {
+      "image_offset": 17637,
+      "original_hex": "558bec",
+      "replacement_hex": "31c0cb",
+      "reason": "Disable untimed GUI abort-dialog polling"
+    },
+    {
+      "image_offset": 185438,
+      "original_hex": "dbe351b914",
+      "replacement_hex": "31c0e93800",
+      "reason": "Always select original software FP, including hosts with an NPU"
+    }
+  ],
+  "timer_sha256": "8c11bf332f6edd2294adb3913332b10833747164c746e8a1ced0b24a688458e0",
+  "output_lines": [
+    "Dhrystones/second, zero decimals",
+    "Thousands of Whetstones/second, one decimal"
+  ],
+  "npu": "software FP forced",
+  "external_runtime_files": []
+}

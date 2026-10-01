@@ -7,11 +7,15 @@ The user accepted OS/2 startup on MiSTer after the EGA corrections. See
 This document preserves useful observations from the earlier investigation
 and separates open findings from that resolved boot failure.
 
-## PERF01 — MiSTer versus SPK286-in-86Box benchmark gap
+## PERF01 — MiSTer CPU and machine benchmark throughput
 
-Added 2026-10-01. Status: pending measurement. The user reports lower benchmark
-scores on MiSTer than with the same CPU core integrated in 86Box. Benchmark
-names, scores, active RBF and matching configurations have not yet been supplied.
+Added 2026-10-01. Status: numeric reference accepted; performance attribution
+pending. CheckIt 3.03C reports 3584 Dhrystones / 71.9K Whetstones on MiSTer,
+versus 4143 / 70.9K for the **original native 86Box 286 at 25 MHz**. The supplied
+native screenshot is not SPK286-in-86Box. The new standalone CHECKNUM frontend
+reproduces 4143 / 70.9 on that native reference; the user accepted it on MiSTer
+with 3584 / 72.2. See [the acceptance record](CHECKNUM_REFERENCE_20261001.md).
+Active hardware RBF provenance and matching settings remain to be recorded.
 This is a whole-machine performance story; no CPU functional cause is established.
 
 Acceptance plan for later work:
@@ -31,7 +35,7 @@ H15 concerns descriptor-cache publication during task switches. Those caches
 hold segment translation/protection state; a benchmark improvement from H15 is
 not claimed. Start with the existing [memory throughput](AT_MEMORY_THROUGHPUT.md)
 and [bus latency](optimization/BUS_LATENCY_50MHZ.md) evidence when profiling
-PCAT. Measurement and optimization remain a future task.
+PCAT. Profiling and optimization remain open; the numeric DOS reference is ready.
 
 ## 1. PIC special mask mode: pending functional review
 

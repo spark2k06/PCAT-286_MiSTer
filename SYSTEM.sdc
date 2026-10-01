@@ -91,6 +91,13 @@ at_mailbox ega_request_payload $AT_CPU {*u_video|video_bus_address_q[*] *u_video
 at_mailbox ega_reply_payload $AT_VIDEO {*u_video|io_read_data_sync1_q[*]} 10.0
 at_sync ega_memory_select $AT_CPU {*u_video|memory_select_video1_q *u_video|memory_write_video1_q}
 
+# The machine-reset/ROM-hold level is generated in the 50 MHz system domain,
+# including when the optional CPU /2 observer is selected. The video adapter
+# uses prebios_video_sync1_q -> prebios_video_sync2_q and consumes stage two
+# only. Cut its asynchronous arrival at stage one; keep stage one -> stage
+# two and every other CPU/video path timed.
+at_sync prebios_video [at_clock FPGA_CLK2_50] {*u_video|prebios_video_sync1_q}
+
 # VRAM mode registers are held by the acknowledged EGA I/O transaction.
 # The frontend samples the payload only on its synchronized cfg_toggle edge.
 at_sync ega_config_toggle $AT_VIDEO {*u_video|u_vram|cfg_toggle_sync1}

@@ -7,6 +7,32 @@ The user accepted OS/2 startup on MiSTer after the EGA corrections. See
 This document preserves useful observations from the earlier investigation
 and separates open findings from that resolved boot failure.
 
+## PERF01 — MiSTer versus SPK286-in-86Box benchmark gap
+
+Added 2026-10-01. Status: pending measurement. The user reports lower benchmark
+scores on MiSTer than with the same CPU core integrated in 86Box. Benchmark
+names, scores, active RBF and matching configurations have not yet been supplied.
+This is a whole-machine performance story; no CPU functional cause is established.
+
+Acceptance plan for later work:
+
+1. Record the benchmark executable/hash, disk, BIOS, memory size, video,
+   CPU frequency, timing policy, active CPU options and RBF/build hash for both
+   machines. Distinguish original native 86Box from SPK286-in-86Box explicitly.
+2. Repeat the same workload after the current protected-mode work is accepted,
+   retaining complete scores and repeat-run variation.
+3. Compare emulated CPU cycles per workload, accepted memory/I/O transactions,
+   READY waits, prefetch starvation, bridge/SDRAM service time, refresh/DMA and
+   video accesses. Host wall time and 86Box's speed percentage are separate data.
+4. Attribute any gap using directed measurements before changing RTL. Preserve
+   architectural results and real bus dependencies in every timing policy.
+
+H15 concerns descriptor-cache publication during task switches. Those caches
+hold segment translation/protection state; a benchmark improvement from H15 is
+not claimed. Start with the existing [memory throughput](AT_MEMORY_THROUGHPUT.md)
+and [bus latency](optimization/BUS_LATENCY_50MHZ.md) evidence when profiling
+PCAT. Measurement and optimization remain a future task.
+
 ## 1. PIC special mask mode: pending functional review
 
 Status: concrete source discrepancy; no focused reproduction or correction

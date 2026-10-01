@@ -35,7 +35,8 @@ The proof uses actual RTL against c554585. It guards all unrelated CPU
 RTL and all original sequencer state updates, microcode constants,
 branches and asynchronous ROM contents. It proves the predicted PC
 equals the previous committed next-state function for every two-state
-control/state combination at 10-bit/1024 and 4-bit/10 dimensions. A
+control/state combination at the actual 10-bit/743-word sequencer depth,
+as well as 10-bit/1024 and 4-bit/10 generic dimensions. A
 second proof compares the actual initialized synchronous ROM with the
 committed asynchronous contents after one clock, for arbitrary addresses.
 Cancel omission and a changed first ROM word are rejected as negative
@@ -59,6 +60,16 @@ No full CPU regression or MiSTer test was run. The first downstream fit
 is pending, so this is a functionally verified implementation checkpoint,
 not a claim of physical 50 MHz closure or higher CheckIT scores.
 
+## Proof depth clarification
+
+The original formal evidence checked a full 1024-address sequencer and
+the 4-bit/10-word generic case. The physical ROM has 1024 storage addresses,
+but the real sequencer's MC_DEPTH is 743. The checker now derives that
+depth from the actual generated package and proves 10-bit/743 as well.
+The additional actual-depth-formal evidence preserves the original logs
+and repeats both negative controls. This is a verification-scope correction;
+no CPU, ROM image, control transition or cycle behavior changed.
+
 ## PCAT integration
 
 Upstream commit: `88f9fef18bca1b7354a88596ebcb17a813cf1fb5`. P07 is enabled in config.tcl and discovered
@@ -74,3 +85,17 @@ physical-owner CheckIT fixtures is identical to the previous CPU. The
 first preparation attempt lacked the new generated vendor file and failed
 before Quartus compilation; it supplies no timing evidence. The corrected
 fresh snapshot is sync-microcode-real-core-output-fit-02-20261001.
+
+## Compiled ROM check
+
+The mapped primitive is a 1024x9 M10K ROM, with no additional registered
+data output. Its actual initialization file matches all 743 valid control
+words and all 281 invalid addresses against the frozen independent CPU
+encoding contract. The checker rejects a changed first word and an added
+output register. Evidence includes the losslessly compressed original MIF
+and primitive-parameter receipt in compiled-rom. This checks mapping and
+contents; the full physical setup/hold audit is still pending.
+
+The additional proof at the real 743-word sequencer depth is recorded in
+upstream 792f652 and copied under actual-depth-formal. The initial generic
+1024/10-word proofs remain preserved. No RTL changed in that audit update.

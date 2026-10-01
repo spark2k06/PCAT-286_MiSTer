@@ -667,10 +667,10 @@ module spk286_micro_executor (
     assign descriptor_cs_access_valid = descriptor_valid && descriptor_reserved_valid &&
                                        descriptor_unused_segment && descriptor_class == spk286_protected_pkg::DESC_CODE &&
                                        (event_gate_candidate_valid_q ?
-                                        ((descriptor_unused_conforming && descriptor_unused_dpl <= protected_cpl) ||
-                                         (!descriptor_unused_conforming &&
-                                          ((descriptor_unused_dpl == protected_cpl && descriptor_unused_rpl <= protected_cpl) ||
-                                           (descriptor_unused_dpl < protected_cpl && descriptor_unused_rpl == descriptor_unused_dpl)))) :
+                                        // Gate targets ignore selector RPL. Both conforming
+                                        // and non-conforming code require DPL <= source CPL;
+                                        // the candidate publication chooses the resulting CPL.
+                                        (descriptor_unused_dpl <= protected_cpl) :
                                         ((descriptor_unused_conforming && descriptor_unused_dpl <= protected_cpl) ||
                                          (!descriptor_unused_conforming && descriptor_unused_dpl == protected_cpl &&
                                           descriptor_unused_rpl <= protected_cpl)));

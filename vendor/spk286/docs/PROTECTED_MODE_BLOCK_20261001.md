@@ -38,3 +38,37 @@ a silicon oracle for protected-mode gates.
 
 Reproduce with `bash scripts/test_units.sh both spk286_return_flags`.
 Logs and the failing baseline are retained in `build/pm-block-20261001/h03-*`.
+
+## H10 — Interrupt/trap gate target selector RPL
+
+**Implemented and directed validation passed.** Intel 80286 PRM chapter 9
+and INT pseudocode distinguish the software gate-DPL check, target-code DPL,
+and the resulting CPL. Gate target selector RPL is ignored. Native 86Box
+`pmodeint` corroborates the distinction. Direct transfers retain their own
+selector checks.
+
+Before correction, changing only the target RPL from zero to one makes the
+new bank fail on a valid CPL0 ordinary gate. The gate-specific code predicate
+now requires target DPL <= source CPL independently of target RPL. Existing
+publication normalizes CS RPL to the resulting CPL; conforming code retains
+the source CPL. No microcode or event-order policy changed.
+
+| Directed validation | Result |
+|---|---|
+| `spk286_gate_target_rpl`, both simulators | 1476 cases / 9240 checks each |
+| Same bank with PCAT P01/P02/P05, both | Same totals, passed |
+| Ordinary gate NT bank, both | 158 cases / 944 checks each |
+| Protected outer event bank, both | 6 checks each, passed |
+| Task-gate event/privilege/outer bank, both | 144 cases / 448 checks each |
+| Normal and PCAT-option RTL lint | Passed |
+
+The matrix varies all four target RPLs, source CPL0..3, all reachable target
+DPLs, conforming/nonconforming code, interrupt/trap gates, software INT,
+INTR with two-phase INTA and NMI, all timing policies and READY stalls.
+It verifies saved frame state, live FLAGS, resulting CPL and ordinary IRET.
+Negative software gate-DPL controls reject while external delivery ignores
+gate DPL. Delivery of a fault raised during gate validation is H11; these
+negative controls inspect the first fault, not a claimed working #DF path.
+
+Reproduce with `bash scripts/test_units.sh both spk286_gate_target_rpl`.
+Logs and the failing baseline are retained in `build/pm-block-20261001/h10-*`.

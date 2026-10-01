@@ -376,6 +376,13 @@ bits in an otherwise valid gate; delivery must have the same architectural
 result. Independently test software INT's gate DPL check and hardware interrupt
 delivery, same/inward privilege transfers and conforming targets.
 
+**2026-10-01 implementation follow-up: H10 corrected.** Ordinary gate target
+validation ignores selector RPL while retaining target DPL <= source CPL and
+the independent software gate-DPL check. The new 1476-case bank passes in
+both simulators, also with PCAT P01/P02/P05, across software INT, INTR, NMI,
+conforming code, inward/same-level delivery and subsequent IRET. Existing
+event and task-gate controls pass. See [block validation](PROTECTED_MODE_BLOCK_20261001.md).
+
 ### H11 — Fault during exception delivery becomes shutdown (S, P0)
 
 `rtl/spk286_events.sv:43/130`, `entry_failure`, sends any fault during an active

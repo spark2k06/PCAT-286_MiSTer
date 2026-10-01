@@ -56,9 +56,10 @@ Icarus and Verilator: microcode execution, 96 event streams, call gates,
 LOADALL integration above 1 MiB and CPU double faults. Their expected
 results are unchanged. Evidence: docs/evidence/sync-microcode-20261001.
 
-No full CPU regression or MiSTer test was run. The first downstream fit
-is pending, so this is a functionally verified implementation checkpoint,
-not a claim of physical 50 MHz closure or higher CheckIT scores.
+No full CPU regression or MiSTer test was run. The completed first downstream
+fit is recorded in `P05_SYNC_MICROCODE_FIT_20261001.md`. CPU setup and hold
+are positive in all four corners; other machine paths remain negative.
+This is not a claim of full physical 50 MHz closure or higher CheckIT scores.
 
 ## Proof depth clarification
 
@@ -94,7 +95,8 @@ words and all 281 invalid addresses against the frozen independent CPU
 encoding contract. The checker rejects a changed first word and an added
 output register. Evidence includes the losslessly compressed original MIF
 and primitive-parameter receipt in compiled-rom. This checks mapping and
-contents; the full physical setup/hold audit is still pending.
+contents; the full physical setup/hold audit is recorded in
+`P05_SYNC_MICROCODE_FIT_20261001.md` with remaining machine failures explicit.
 
 The additional proof at the real 743-word sequencer depth is recorded in
 upstream 792f652 and copied under actual-depth-formal. The initial generic

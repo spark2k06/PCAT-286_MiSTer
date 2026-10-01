@@ -35,3 +35,25 @@ The source and validation receipts are in
 predicate/SDRAM-budget fit by this decoder RTL only. Its timing results are
 recorded separately when complete. No full regression or MiSTer run is
 claimed, and two-state equivalence does not claim arbitrary X equivalence.
+
+## Isolated fresh fit
+
+The compiled input manifests differ from the preceding predicate fit in the
+decoder RTL only. This is a fitted A/B checkpoint, with the same real 20 ns
+clock and corrected SDRAM input/output budget.
+
+| Corner | Global setup | CPU setup | Global hold | SDRAM output setup |
+| --- | ---: | ---: | ---: | ---: |
+| 7_slow_1100mv_100c | -2.484 | -2.484 | -3.086 | +3.898 |
+| 7_slow_1100mv_-40c | -2.169 | -2.169 | -3.071 | +4.585 |
+| MIN_fast_1100mv_100c | +1.993 | +7.741 | -2.515 | +9.040 |
+| MIN_fast_1100mv_-40c | +2.335 | +9.686 | -2.590 | +10.555 |
+
+The slow setup improves from -4.341/-3.878 ns to -2.484/-2.169 ns.
+The worst CPU paths now originate in SP/allocation arithmetic and travel
+through the outer-return range predicate and ordinary operand completion.
+The code-buffer setup is positive (+0.118/+0.105 ns), but has little margin.
+The direct forwarded-clock SDRAM hold failure remains. No 50 MHz closure
+or hardware validation is claimed. All eight CheckIT physical-owner fixtures
+retain exactly the preceding owner-entry cycle/stall/signature counters; see
+the predicate evidence cycle receipt.

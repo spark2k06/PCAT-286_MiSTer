@@ -1186,12 +1186,22 @@ module spk286_micro_executor (
     assign call_parameter_last_word = call_gate_parameter_count_q - 5'd1;
     assign call_parameter_last_byte = {1'b0, stack_pointer} +
                                       {11'd0, call_parameter_last_word, 1'b1};
+    logic [16:0] iret_outer_sum_bits, iret_outer_carry_bits, iret_outer_last_byte;
+    // Carry-save reduction of SP + allocation + 3, followed by one wide adder.
+    // Keep the original 17-bit wrapping arithmetic, including arbitrary state.
+    assign iret_outer_sum_bits = {1'b0, return_stack_pointer} ^
+                                 {1'b0, allocation_valid_q ? allocation_q : 16'd0} ^ 17'd3;
+    assign iret_outer_carry_bits = (({1'b0, return_stack_pointer} &
+                                    {1'b0, allocation_valid_q ? allocation_q : 16'd0}) |
+                                   (({1'b0, return_stack_pointer} |
+                                     {1'b0, allocation_valid_q ? allocation_q : 16'd0}) & 17'd3)) << 1;
+    assign iret_outer_last_byte = iret_outer_sum_bits + iret_outer_carry_bits;
     assign iret_outer_range_fault = iret_outer_frame_operation && iret_outer_required &&
                                     iret_outer_phase_q == 2'd0 &&
                                     (stack_segment_access[2] ?
                                       ({1'b0, return_stack_pointer} <= {1'b0, stack_segment_limit} ||
-                                       ({1'b0, return_stack_pointer} + {1'b0, allocation_valid_q ? allocation_q : 16'd0} + 17'd3 > 17'h0FFFF)) :
-                                      ({1'b0, return_stack_pointer} + {1'b0, allocation_valid_q ? allocation_q : 16'd0} + 17'd3 >
+                                       (iret_outer_last_byte > 17'h0FFFF)) :
+                                      (iret_outer_last_byte >
                                        {1'b0, stack_segment_limit}));
     // Restoring outer SS:SP does not access the new stack. RETF validates
     // the source frame and target descriptor; a subsequent stack access

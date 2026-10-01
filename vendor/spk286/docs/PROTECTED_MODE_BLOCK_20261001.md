@@ -2,7 +2,8 @@
 
 Baseline: `b5a82d8`, 2026-10-01. The user authorized this four-story block,
 directed validation and separate milestone commits in SPK286 and PCAT.
-The whole-project regression will run after the block.
+The whole-project regression passed after the block. Directed and complete
+validation are recorded below and in the machine-readable regression receipt.
 
 ## H03 — POPF and ordinary IRET FLAGS privilege masks
 
@@ -200,3 +201,51 @@ H02 is partial (explicit LOCK and protected zero-count REP precedence).
 H05, H11, H15, H16, H17, H18, H19 and H20 remain open. The four changes do
 not resolve uncertain physical policies, general boundary/partial-execution
 coverage, double-fault delivery or late task-cache publication.
+
+## Final regression and integration build
+
+**PASS**, 2026-10-01. The final whole-project run started at 04:32:25 UTC
+and finished at 05:28:28 UTC. The production CPU revision is `e85dbe4`;
+the inherited test-expectation repair is `af5ad50` (PCAT `6c8e970`).
+
+| Milestone | SPK286 commit | PCAT commit |
+|---|---|---|
+| H03 FLAGS privileges | `4ac5cf1` | `ae34522` |
+| H10 gate target RPL | `173b9b3` | `9809992` |
+| H12 fault vector/error metadata | `b778bae` | `4fb2eba` |
+| H13 descriptor fault priority | `e85dbe4` | `0d5dd2a` |
+
+| Final validation | Result |
+|---|---|
+| All registered RTL banks | 123 Icarus / 122 Verilator passed |
+| Established expand-down full matrix policy | Icarus; 2183 checks passed |
+| Compiler and entire Python suite | 105 and 340 tests passed |
+| Microcode consistency/audit, lint, both reset smokes, state vectors and corpus smokes | Passed |
+| Portable Yosys module checks and fully mapped CPU synthesis/check | Passed |
+| Complete required physical cohort, with independent raw-source/identity validation | 1,386,996 evaluable cases passed across 307 files; zero failures/unexpected omissions |
+| Supplemental SALC, independently validated identities | 1000 passed |
+| Actual event mutation audit | 22 injected faults rejected; 2 pristine controls passed |
+| Exact PCAT vendor with P01/P02/P05, both simulators | Four new CPU banks and task segment service passed; lint passed |
+
+The physical cohort retains the original three revocations and the one
+previously documented incomplete E7 capture. That capture is not evaluable;
+it is not a passing case or a waived failure. Real-mode physical data does
+not establish protected-mode silicon behavior or historical cycle accuracy.
+
+The Release SPK286-backed 86Box executable is rebuilt and installed at
+`D:/GitHub/86Box_dev/build/spk286/86Box-linux`, consuming the PCAT vendor
+with P02 fetch chaining and P05 parallel limit checks. SHA-256:
+`9a96129f53ec4d8ea9080a4f0256feb6f52e6174f79e1542236377106e45f3f2`.
+Build log: `D:/GitHub/86Box_dev/build/spk286/pm-block-20261001-build.log`.
+No new OS boot or MiSTer hardware run is part of this block's validation.
+The prior downstream real-mode fetch IP-wrap correction is preserved.
+
+[Regression receipt](REGRESSION_PROTECTED_BLOCK_20261001.json) records
+commands, identities, source hashes, commit pairs, vendor options, timestamps
+and retained first-failure logs. Detailed artifacts are under
+`build/pm-block-20261001/`.
+
+The recommended next functional story is H18's CPU-side ESC/WAIT and #NM
+behavior in the no-coprocessor profile, followed by H11 in its own delivery
+block. The user explicitly excludes 80287 arithmetic and external 287
+integration from H18.

@@ -545,6 +545,11 @@ Specify the EM/MP/TS truth table, instruction restart address, no unintended
 operand/port access, CLTS recovery and retry, with absent-NPX behavior defined.
 Keep external 287 BUSY/error/operand transfer support a separately scoped task.
 
+**2026-10-01 scope clarification:** the user explicitly does not want an
+80287 implementation. H18 is limited to CPU-side ESC/WAIT and #NM behavior
+in the no-coprocessor profile. Arithmetic execution and an external 287
+interface are outside this story. Software emulation can handle the CPU traps.
+
 ### H19 — Remaining boundary and restart matrix (C, P1/P2)
 
 The SGDT and RETF regressions cover important boundaries, but cannot certify all
@@ -619,6 +624,13 @@ before/after evidence and the integration result. This correction does not
 close the remaining protected-mode findings.
 
 ## 5. Coverage map and future work packages
+
+The map below records the original review scope. As of the 2026-10-01
+H03/H10/H12/H13 block, closed findings are H01, H03, H04, H06, H07, H08,
+H09, H10, H12, H13, H14, H21 and H22. Remaining work is H02 (partial),
+H05, H11, H15, H16, H17, H18, H19 and H20. See the marked follow-ups and
+[block validation](PROTECTED_MODE_BLOCK_20261001.md) for closure evidence;
+the original work packages do not reopen completed findings.
 
 | Domain | Existing support / reviewed areas | Remaining closure |
 |---|---|---|

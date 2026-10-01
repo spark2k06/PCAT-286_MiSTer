@@ -267,11 +267,13 @@ module spk286_micro_executor (
     assign check_stack_word = allowed && operation == spk286_microcode_pkg::MC_CHECK_STACK_TMP0 && temporary_valid_q[0];
     assign check_rm32 = allowed && operation == spk286_microcode_pkg::MC_CHECK_RM32;
     assign check_bounds = allowed && operation == spk286_microcode_pkg::MC_CHECK_BOUNDS && auxiliary_valid_q && &temporary_valid_q[1:0];
-    assign range_fault = string_range_fault || (check_push2 && stack_pointer[0] && stack_pointer<16'd4) ||
+    logic stack_range_fault;
+    assign stack_range_fault = (check_push2 && stack_pointer[0] && stack_pointer<16'd4) ||
                          (check_pop2 && stack_pointer[0] && stack_pointer>=16'hFFFD) || (check_push8 && push8_invalid) || (check_pop8 && pop8_invalid) ||
-                         (check_stack_word && tmp0_q == 16'hFFFF) ||
-                         (check_rm32 && effective_offset[0] && effective_offset > 16'hFFFC) || iret_outer_range_fault ||
+                         (check_stack_word && tmp0_q == 16'hFFFF) || iret_outer_range_fault ||
                          call_stack_range_fault;
+    assign range_fault = string_range_fault || stack_range_fault ||
+                         (check_rm32 && effective_offset[0] && effective_offset > 16'hFFFC);
     assign bounds_fault = check_bounds && ($signed(tmp1_q) < $signed(auxiliary_q) || $signed(tmp1_q) > $signed(tmp0_q));
     assign set_frame_address = allowed && operation == spk286_microcode_pkg::MC_SET_STACK_ADDRESS_TMP0 && temporary_valid_q[0];
     assign read_frame_address = allowed && operation == spk286_microcode_pkg::MC_READ_STACK_ADDRESS_TMP0 && frame_address_valid_q;
@@ -454,7 +456,7 @@ module spk286_micro_executor (
     logic call_gate_outer_required, call_tss_active_q, call_tss_active_state_q, call_tss_operand_done;
     logic call_tss_pre_fault, call_stack_ready_q, call_stack_range_fault;
     logic [1:0] call_tss_phase_q;
-    logic [15:0] call_stack_sp_q, call_stack_ss_q, call_gate_selector_q, call_tss_phase_offset;
+    logic [15:0] call_stack_sp_q, call_stack_ss_q, call_tss_phase_offset;
     logic [1:0] call_gate_target_dpl_q;
     logic [4:0] call_gate_parameter_count_q;
     logic call_ss_candidate_valid_q;
@@ -911,7 +913,7 @@ module spk286_micro_executor (
                                             descriptor_unused_accessed) ||
                                            (descriptor_operand_done && descriptor_phase_q == 3'd4 && descriptor_success_q));
     assign descriptor_null_commit = descriptor_begin && descriptor_selector_null && !descriptor_pre_fault && !system_privilege_fault && descriptor_load_ldtr;
-    assign system_fault = task_service_fault || system_mode_fault || system_privilege_fault || io_privilege_fault || halt_privilege_fault || arpl_fault || clts_fault || call_tss_pre_fault || (call_stack_range_fault && protected_msw[0]) ||
+    assign system_fault = task_service_fault || system_mode_fault || system_privilege_fault || io_privilege_fault || halt_privilege_fault || arpl_fault || clts_fault || call_tss_pre_fault || (stack_range_fault && protected_msw[0]) ||
                           descriptor_pre_fault || descriptor_post_fault ||
                           event_gate_pre_fault || event_gate_post_fault;
     assign system_fault_vector = task_service_fault ? task_service_fault_vector : system_mode_fault ? 8'd6 : (system_privilege_fault || io_privilege_fault || halt_privilege_fault) ? 8'd13 :
@@ -920,9 +922,13 @@ module spk286_micro_executor (
                                  clts_privilege_fault ? 8'd13 :
                                  !protected_msw[0] ? 8'd6 :
                                  call_tss_pre_fault ? 8'd10 :
-                                 call_stack_range_fault ? 8'd12 :
+                                 stack_range_fault ? 8'd12 :
                                  event_gate_pre_fault ? 8'd13 :
                                  event_gate_post_fault ? (!event_gate_present && event_gate_valid ? 8'd11 : 8'd13) :
+                                 // A new SS obtained from the TSS has #TS access
+                                 // faults, unlike an explicit MOV/POP/return SS.
+                                 call_ss_validation_operation ?
+                                   (!descriptor_pre_fault && !descriptor_present && descriptor_valid ? 8'd12 : 8'd10) :
                                  descriptor_pre_fault ? 8'd13 :
                                  jmp_gate_cs_validation_operation ?
                                    (!descriptor_present && descriptor_call_gate_cs_access_valid ? 8'd11 : 8'd13) :
@@ -950,7 +956,9 @@ module spk286_micro_executor (
                                        ((task_service_fault_error_code & 16'hFFFC) |
                                         (task_fault_external ? 16'h0001 : 16'h0000)) :
                                      (system_mode_fault || system_privilege_fault || io_privilege_fault) ? 16'd0 :
-                                     (call_tss_pre_fault || (call_stack_range_fault && protected_msw[0])) ? call_gate_selector_q :
+                                     call_tss_pre_fault ? ((protected_tr_selector & 16'hFFFC) |
+                                                          (task_fault_external ? 16'h0001 : 16'h0000)) :
+                                     (stack_range_fault && protected_msw[0]) ? 16'd0 :
                                      (event_gate_pre_fault || event_gate_post_fault) ?
                                        (event_gate_entry_offset | 16'h0002 | (task_fault_external ? 16'h0001 : 16'h0000)) :
                                      descriptor_cs_offset_fault ? 16'd0 :
@@ -1536,7 +1544,6 @@ module spk286_micro_executor (
             task_gate_target_active_q <= 1'b0;
             task_gate_target_selector_q <= 16'h0000;
             task_gate_nested_call_q <= 1'b0;
-            call_gate_selector_q <= 16'h0000;
             call_gate_target_dpl_q <= 2'd0;
             call_gate_parameter_count_q <= 5'd0;
             call_tss_active_state_q <= 1'b0; call_tss_phase_q <= 2'd0;
@@ -1650,7 +1657,6 @@ module spk286_micro_executor (
                     // inter-level event frame.  The event path never copies
                     // call-gate parameters, so its count remains zero.
                     call_gate_candidate_valid_q <= 1'b1;
-                    call_gate_selector_q <= tmp1_q;
                     call_gate_parameter_count_q <= 5'd0;
                 end
             end
@@ -1658,7 +1664,6 @@ module spk286_micro_executor (
                 (call_gate_validation_operation || jmp_gate_target_begin) &&
                 descriptor_call_gate_success_live) begin
                 call_gate_candidate_valid_q <= 1'b1;
-                call_gate_selector_q <= tmp1_q;
                 call_gate_parameter_count_q <= descriptor_unused_gate_parameter_count;
                 tmp0_q <= descriptor_unused_gate_offset;
                 tmp1_q <= descriptor_unused_gate_selector;

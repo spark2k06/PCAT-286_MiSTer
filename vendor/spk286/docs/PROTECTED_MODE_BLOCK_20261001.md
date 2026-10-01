@@ -72,3 +72,55 @@ negative controls inspect the first fault, not a claimed working #DF path.
 
 Reproduce with `bash scripts/test_units.sh both spk286_gate_target_rpl`.
 Logs and the failing baseline are retained in `build/pm-block-20261001/h10-*`.
+
+## H12 — Stack vectors and selector error provenance
+
+**Implemented and directed validation passed.** The handwritten fault ledger
+uses Intel 80286 PRM 9.6, B-1, CALL B-24/B-25 and INT/IRET algorithms:
+
+| Fault site | Vector | Error provenance |
+|---|---|---|
+| Invalid source return frame or stack-word range | #SS | Literal zero |
+| Multiword operand wrap through SS | #SS | Literal zero |
+| Missing/short current TSS while obtaining an inward stack | #TS | Current TR selector, RPL cleared, EXT from event origin |
+| Null/out-of-table/type/privilege invalid new SS from TSS | #TS | New SS selector, RPL cleared, EXT from origin |
+| Otherwise valid absent new SS | #SS | New SS selector, RPL cleared, EXT from origin |
+| Insufficient new stack or source parameter range | #SS | Literal zero |
+| Absent call gate | #NP | Gate selector, RPL cleared |
+| Absent IDT gate | #NP | IDT entry offset with IDT bit and origin EXT |
+| Absent target code / invalid code type | #NP / #GP | Target CS selector, RPL cleared, origin EXT |
+| Target offset out of range | #GP | Literal zero |
+
+Before correction the new bank reports #TS(`0030`) for a short current TSS
+whose TR is `0028`: it incorrectly names the call gate. The CPU now separates
+stack-range faults, uses the current TR for TSS prechecks, classifies TSS-derived
+SS access faults as #TS, and assigns zero to stack capacity/range failures.
+The obsolete saved gate-selector register was removed after all uses disappeared.
+EXT recognizes INTR/NMI, single-step and NPX #NM/#9 delivery; ordinary
+instruction-generated protection faults and software INT use EXT=0. This does
+not implement H11's delivery-failure/#DF state machine.
+
+| Directed validation | Result |
+|---|---|
+| `spk286_fault_metadata`, both simulators | 996 cases / 3300 checks each |
+| Same bank with PCAT P01/P02/P05, both | Same totals, passed |
+| Odd stack bank, both; strengthened to require #SS on failed returns | 216 cases / 951 checks each |
+| Protected return/retry, both | 27 cases / 81 checks each |
+| Call-gate Accessed bank, both | 144 cases / 420 checks each |
+| POP segment restart, both | 36 cases / 96 checks each |
+| Task-gate error and fault banks, both | 7 checks; 13 cases / 49 checks, passed |
+| Normal and PCAT-option RTL lint | Passed |
+| Entire Python suite | 340 passed |
+| Actual event mutation audit | 22 injected faults rejected; 2 pristine controls passed |
+
+The matrix varies selector RPL, GDT/LDT error provenance, software CALL/INT,
+INTR, NMI, instruction #GP and single-step, return and SS-override boundaries,
+all timing policies and READY stalls. It captures the first fault and checks
+that source FLAGS/CS/SP remain intact and no frame write occurs. NPX delivery
+classification follows the explicit manual rule; executable ESC/WAIT support
+is still H18. Mixed-invalid descriptor priority remains H13.
+
+The event-audit's historical real-mode IRET mutation anchor was adapted to
+H03's shared mask; its actual mutant still fails the unchanged frame assertion.
+No expected architectural result was weakened. Logs are under
+`build/pm-block-20261001/h12-*`.

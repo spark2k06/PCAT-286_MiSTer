@@ -422,6 +422,16 @@ Test equal descriptors at selectors with different RPL bits to detect accidental
 copying of RPL into the error code. Do not reuse a gate selector for unrelated
 TSS/stack failures.
 
+**2026-10-01 implementation follow-up: H12 corrected.** Explicit stack-frame
+and SS operand-range faults route to #SS(0). Current-TSS failures name TR,
+TSS-derived SS access failures use #TS with the new SS selector, absent valid
+SS uses #SS(selector), and capacity/parameter faults have a literal zero code.
+Selector RPL bits are cleared and EXT now distinguishes external events from
+instruction-generated exceptions. A 996-case first-fault ledger passes in
+both simulators, also with PCAT options. H14 negative returns now require #SS.
+Mixed-invalid predicate priority remains H13; #DF delivery remains H11. See
+[block validation](PROTECTED_MODE_BLOCK_20261001.md).
+
 ### H13 — Type/privilege versus presence fault priority (S, P0)
 
 The recent direct-call fix correctly separates access validity from presence.

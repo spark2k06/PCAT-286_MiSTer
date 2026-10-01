@@ -156,6 +156,11 @@ module spk286_micro_executor (
     output logic [23:0] task_switch_target_descriptor_address,
     input logic task_service_busy, task_service_complete, task_service_fault,
     input logic task_service_commit_ready,
+    input logic task_cache_commit,
+    input logic [1:0] task_cache_commit_index,
+    output logic protected_task_load,
+    output logic task_state_loaded,
+    output logic protected_segment_commit_valid,
     input logic task_fault_external,
     input logic [7:0] task_service_fault_vector,
     input logic [15:0] task_service_fault_error_code,
@@ -1018,7 +1023,7 @@ module spk286_micro_executor (
                                        descriptor_class;
     assign protected_ldtr_commit_present = task_commit_ldtr_write ? task_loaded_ldtr_present : descriptor_null_commit ? 1'b0 : descriptor_present;
     assign protected_tr_commit_present = task_commit_tr_write ? 1'b1 : descriptor_present;
-    assign protected_ldtr_commit_valid = task_commit_ldtr_write ? task_loaded_ldtr_valid : !descriptor_null_commit;
+    assign protected_ldtr_commit_valid = task_commit_tr_write ? 1'b0 : task_commit_ldtr_write ? task_loaded_ldtr_valid : !descriptor_null_commit;
     assign protected_tr_commit_valid = 1'b1;
     assign protected_segment_commit_en = task_commit_segment_write || task_commit_segment_write2 ||
                                          (context_commit && protected_msw[0] && cs_candidate_valid_q) ||
@@ -1028,7 +1033,7 @@ module spk286_micro_executor (
                                          (descriptor_operand_done && descriptor_phase_q == 3'd4 && segment_reload_operation && descriptor_success_q);
     assign segment_pop_sp_commit = protected_return_cursor_q && segment_pop_opcode &&
                                    segment_reload_operation && protected_segment_commit_en;
-    assign protected_segment_commit_index = task_commit_segment_write ? 2'd0 : task_commit_segment_write2 ? 2'd2 :
+    assign protected_segment_commit_index = task_commit_segment_write ? task_cache_commit_index : task_commit_segment_write2 ? 2'd2 :
                                            (context_commit && protected_msw[0] && cs_candidate_valid_q) ? 2'd1 : segment_index;
     assign protected_segment_commit_selector = task_commit_segment_write || task_commit_segment_write2 ?
                                               task_cache_selectors[task_primary_cache_index * 16 +: 16] :
@@ -1068,7 +1073,7 @@ module spk286_micro_executor (
                                           task_cache_rpl[task_primary_cache_index * 2 +: 2] :
                                           (context_commit && protected_msw[0] && cs_candidate_valid_q) ? cs_candidate_rpl_q :
                                           (descriptor_selector_null ? tmp0_q[1:0] : descriptor_unused_rpl);
-    assign protected_segment_commit_en2 = task_commit_segment_write || task_commit_segment_write2 ? 1'b1 :
+    assign protected_segment_commit_en2 = task_commit_segment_write || task_commit_segment_write2 ? 1'b0 :
                                          context_commit && protected_msw[0] &&
                                          (iret_ss_candidate_valid_q || call_ss_candidate_valid_q);
     assign protected_segment_commit_index2 = task_commit_segment_write ? 2'd1 : task_commit_segment_write2 ? 2'd3 : 2'd2;
@@ -1217,21 +1222,20 @@ module spk286_micro_executor (
     assign task_commit_flags_write = task_commit_active_q && task_commit_phase_q == 4'd8;
     // The early redirect publishes IP for late faults. Once CS is validated,
     // flush again so no byte fetched with the outgoing CS base can execute.
-    assign task_commit_redirect = task_commit_flags_write || task_commit_segment_write;
+    assign task_commit_redirect = task_commit_flags_write || (task_commit_segment_write && task_cache_commit_index == 2'd1);
     assign task_commit_tr_write = task_commit_active_q && task_commit_phase_q == 4'd9;
     // Publish the incoming selector with TR, then refresh the hidden LDTR
     // once its descriptor is validated. Do not wait for segment success:
     // a later CS/SS/ES/DS fault must retain the already validated LDT.
     assign task_commit_ldtr_write = task_commit_tr_write ||
                                    (task_commit_active_q && task_commit_phase_q == 4'd10 && task_loaded_ldtr_valid);
-    // General registers/FLAGS/TR/LDTR publish as soon as the TSS image has
-    // loaded.  Segment hidden caches publish only after the late descriptor
-    // validation has completed; otherwise an in-flight validation would
-    // briefly overwrite CS/SS with unvalidated zero candidates.
-    assign task_commit_segment_write = task_commit_active_q && task_commit_phase_q == 4'd10 && task_service_complete_q;
-    assign task_commit_segment_write2 = task_commit_active_q && task_commit_phase_q == 4'd11 && task_service_complete_q;
-    assign task_commit_done = task_commit_segment_write2;
-    assign task_primary_cache_index = task_commit_segment_write ? 3'd0 : 3'd2;
+    assign protected_task_load = task_commit_tr_write;
+    assign task_state_loaded = task_commit_active_q && task_commit_phase_q == 4'd10;
+    assign task_commit_segment_write = task_state_loaded && task_cache_commit;
+    assign task_commit_segment_write2 = 1'b0;
+    assign protected_segment_commit_valid = !task_commit_segment_write || task_cache_present[task_cache_commit_index];
+    assign task_commit_done = task_state_loaded && task_service_complete_q;
+    assign task_primary_cache_index = {1'b0, task_cache_commit_index};
     assign task_secondary_cache_index = task_commit_segment_write ? 3'd1 : 3'd3;
     assign redirect_request = (redirect_operation && branch_taken) || context_commit || task_commit_redirect;
     assign redirect_target = task_commit_redirect ? task_loaded_ip : (context_commit ? tmp0_q : target_q);

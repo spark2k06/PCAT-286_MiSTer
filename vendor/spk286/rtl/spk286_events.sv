@@ -9,7 +9,7 @@ module spk286_events (
     input logic instruction_start, opcode_dispatch, instruction_active, retired,
     input logic [7:0] opcode,
     input logic [15:0] ip, cs, flags,
-    input logic fault_request,
+    input logic fault_request, fault_new_task,
     input logic [7:0] fault_vector,
     input logic fault_error_valid,
     input logic [15:0] fault_error_code,
@@ -134,8 +134,8 @@ module spk286_events (
                 delivery_context_live_q <= 1'b0;
                 shutdown_nmi_q <= shutdown && selected_kind == KIND_NMI;
                 event_needs_ack <= selected_kind == KIND_INTR;
-                event_ip <= (repeat_boundary || (selected_kind == KIND_FAULT && instruction_active)) ? instruction_ip : ip;
-                event_cs <= (repeat_boundary || (selected_kind == KIND_FAULT && instruction_active)) ? instruction_cs_q : cs;
+                event_ip <= (repeat_boundary || (selected_kind == KIND_FAULT && instruction_active && !fault_new_task)) ? instruction_ip : ip;
+                event_cs <= (repeat_boundary || (selected_kind == KIND_FAULT && instruction_active && !fault_new_task)) ? instruction_cs_q : cs;
                 event_flags <= flags;
                 event_error_valid <= selected_kind == KIND_FAULT && fault_error_valid;
                 event_error_code <= (selected_kind == KIND_FAULT && fault_error_valid) ? fault_error_code : 16'd0;

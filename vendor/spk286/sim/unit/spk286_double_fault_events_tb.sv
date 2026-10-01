@@ -2,6 +2,7 @@
 // Independent first-exception table from Intel 286 PRM 9.6.2/B-8.
 // This bank drives the event-controller interface, never forced CPU state.
 module spk286_double_fault_events_tb;
+    logic fault_new_task=1'b0;
     logic clk=0,reset=1,cancel=0,enable=1,protected_mode=1,delivery_commit=0;
     logic intr=0,nmi=0,ss_load=0,repeat_boundary=0,repeat_stepped=0;
     logic instruction_start=0,opcode_dispatch=0,instruction_active=1,retired=0;

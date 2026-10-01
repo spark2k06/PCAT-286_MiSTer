@@ -512,6 +512,17 @@ delivery through a task gate. Inspect visible selectors, hidden validity,
 TR/LDTR, BUSY/backlink, saved outgoing state and handler context. Reuse previous
 PM5 evidence without treating its old transactional model as the oracle.
 
+**2026-10-01 follow-up: closed.** Incoming selectors and cache invalidation
+now precede LDTR validation; SS, CS and the data caches publish by successful
+stage. Late exceptions use incoming CS:IP and earlier cache/Accessed effects
+survive. Eighty executable reset-ROM cases cover CALL/JMP/INT/nested IRET in
+both simulators, with private native/SPK 86Box before/after observations.
+The native interpreter itself differs from Intel's ordered late context;
+that conflict is recorded, not copied into the acceptance expectations.
+See [H15 contract and receipt](PROTECTED_MODE_H15_TASK_PUBLICATION_20261001.md).
+ES-before-DS remains an implementation policy; physical PM evidence and H16
+are separate. This supersedes PM5's grouped cache-publication model.
+
 ### H16 — Null incoming LDTR with nonzero RPL (C, P2)
 
 `spk286_task_switch_service.sv:416` recognizes only `0000` as a null incoming
@@ -667,9 +678,9 @@ close the remaining protected-mode findings.
 
 The map below records the original review scope. As of the 2026-10-01
 H03/H10/H12/H13 block, scoped H18 and H11 corrections, closed findings are H01,
-H03, H04, H06, H07, H08, H09, H10, H11, H12, H13, H14, H18, H21 and H22.
+H03, H04, H06, H07, H08, H09, H10, H11, H12, H13, H14, H15, H18, H21 and H22.
 The concrete ESC first-word finding in H19 is also closed. Remaining work is
-H02 (partial), H05, H15, H16, H17, H19 (remaining matrix) and H20.
+H02 (partial), H05, H16, H17, H19 (remaining matrix) and H20.
 See the marked follow-ups and
 [block validation](PROTECTED_MODE_BLOCK_20261001.md) for closure evidence;
 the original work packages do not reopen completed findings.

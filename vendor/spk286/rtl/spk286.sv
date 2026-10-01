@@ -191,6 +191,7 @@ module spk286 (
     logic address_override, implicit_lock;
     logic [15:0] address_offset;
     logic operand_request, operand_write, operand_select_rm, operand_done, operand_byte;
+    logic unlimited_memory_done, executor_operand_done;
     logic [15:0] operand_write_data, operand_read_data, executor_operand_read_data;
     logic operand_gpr_write_en, operand_gpr_write_byte;
     logic [2:0] operand_gpr_write_index;
@@ -847,6 +848,11 @@ module spk286 (
     // the operand service's existing admission/completion handshake.
     assign executor_operand_read_data = (protected_descriptor_access || protected_tss_access || protected_event_access) ?
                                         memory_read_data : operand_read_data;
+    // These three active services unconditionally select a memory request at
+    // offset zero with limit FFFF, and cannot raise ordinary access faults.
+    // Remove that redundant late qualification from descriptor/event responses.
+    assign executor_operand_done = (protected_descriptor_access || protected_tss_access || protected_event_access) ?
+                                   unlimited_memory_done : operand_done;
     spk286_micro_executor micro_executor (
         .clk(clk), .reset(reset), .cancel(semantic_cancel), .start(service_start),
         .operation_valid(operation_valid), .operation(micro_word), .operation_done(executor_done), .operation_retire(operation_retire), .dispatch_request(dispatch_request),
@@ -859,7 +865,7 @@ module spk286 (
         .architectural_ip(debug_ip), .stack_pointer(register_state[64 +: 16]), .count_value(register_state[16 +: 16]),
         .push_enabled(event_active || push_enabled), .push_return_ip(!event_active && push_return_ip), .branch_taken(branch_taken), .decrement_count(decrement_count),
         .redirect_request(internal_redirect), .redirect_target(internal_target), .redirect_ready(1'b1),
-        .operand_write_data(operand_write_data), .operand_done(operand_done),
+        .operand_write_data(operand_write_data), .operand_done(executor_operand_done),
         .operand_gpr_write_byte(operand_gpr_write_byte), .operand_read_data(executor_operand_read_data), .operand_gpr_write_en(operand_gpr_write_en),
         .operand_gpr_write_index(operand_gpr_write_index), .operand_gpr_write_data(operand_gpr_write_data),
         .gpr_write_byte(internal_gpr_write_byte), .destination(destination_q), .gpr_write_en(internal_gpr_write_en),
@@ -1013,7 +1019,7 @@ module spk286 (
     spk286_operand operand (
         .clk(clk), .reset(reset), .cancel(semantic_cancel), .request_valid(operand_request && !protected_access_fault),
         .request_byte(operand_byte), .request_write(operand_write), .request_check(operand_check), .select_rm(operand_select_rm), .write_data(operand_write_data),
-        .done(operand_done), .read_data(operand_read_data), .register_state(register_state),
+        .done(operand_done), .unlimited_memory_done(unlimited_memory_done), .read_data(operand_read_data), .register_state(register_state),
         .reg_index(operand_reg), .rm_index(operand_rm), .register_direct(operand_register_direct && !protected_descriptor_access && !protected_tss_access && !protected_call_stack_access && !protected_event_access && !address_override && !stack_request && !vector_request && !io_transfer),
         .physical_address(operand_physical_address),
         .offset((protected_event_access || protected_descriptor_access || protected_tss_access || protected_call_stack_access) ? 16'd0 : service_offset), .segment_limit((protected_event_access || protected_descriptor_access || protected_tss_access || protected_call_stack_access) ? 16'hFFFF : (vector_request ? 16'hFFFF : segment_limit)),

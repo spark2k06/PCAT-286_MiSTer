@@ -650,10 +650,12 @@ module spk286_micro_executor (
         .dpl(descriptor_unused_dpl), .gate_target_selector(descriptor_unused_gate_selector),
         .gate_offset(descriptor_unused_gate_offset), .gate_parameter_count(descriptor_unused_gate_parameter_count)
     );
-    assign descriptor_success_live = descriptor_valid && descriptor_reserved_valid && descriptor_present &&
+    logic descriptor_system_access_valid;
+    assign descriptor_system_access_valid = descriptor_valid && descriptor_reserved_valid &&
                                      ((descriptor_load_ldtr && descriptor_class == spk286_protected_pkg::DESC_LDT) ||
                                       (descriptor_load_tr && descriptor_class == spk286_protected_pkg::DESC_TSS_AVAIL &&
                                        descriptor_limit >= spk286_tss_pkg::TSS_MIN_LIMIT));
+    assign descriptor_success_live = descriptor_system_access_valid && descriptor_present;
     // A TSS named by a task gate is authorized by the gate itself.  This
     // applies to both far CALL/JMP task gates and IDT task gates; the target
     // TSS DPL/RPL must not be re-applied as a direct-transfer check.
@@ -662,10 +664,12 @@ module spk286_micro_executor (
                                               event_gate_class_q == spk286_protected_pkg::DESC_TASK_GATE) ||
                                              (descriptor_unused_dpl >= protected_cpl &&
                                               descriptor_unused_dpl >= descriptor_unused_rpl);
-    assign task_descriptor_success_live = descriptor_valid && descriptor_reserved_valid && descriptor_present &&
+    logic task_descriptor_access_valid;
+    assign task_descriptor_access_valid = descriptor_valid && descriptor_reserved_valid &&
                                           !descriptor_selector_ti &&
                                           descriptor_class == spk286_protected_pkg::DESC_TSS_AVAIL &&
                                           task_descriptor_privilege_valid;
+    assign task_descriptor_success_live = task_descriptor_access_valid && descriptor_present;
     assign descriptor_cs_access_valid = descriptor_valid && descriptor_reserved_valid &&
                                        descriptor_unused_segment && descriptor_class == spk286_protected_pkg::DESC_CODE &&
                                        (event_gate_candidate_valid_q ?
@@ -677,11 +681,13 @@ module spk286_micro_executor (
                                          (!descriptor_unused_conforming && descriptor_unused_dpl == protected_cpl &&
                                           descriptor_unused_rpl <= protected_cpl)));
     assign descriptor_cs_success_live = descriptor_cs_access_valid && descriptor_present;
-    assign descriptor_iret_cs_success_live = descriptor_valid && descriptor_reserved_valid && descriptor_present &&
+    logic descriptor_iret_cs_access_valid;
+    assign descriptor_iret_cs_access_valid = descriptor_valid && descriptor_reserved_valid &&
                                              descriptor_unused_segment && descriptor_class == spk286_protected_pkg::DESC_CODE &&
                                              descriptor_unused_rpl >= protected_cpl &&
                                              ((descriptor_unused_conforming && descriptor_unused_dpl <= descriptor_unused_rpl) ||
                                               (!descriptor_unused_conforming && descriptor_unused_dpl == descriptor_unused_rpl));
+    assign descriptor_iret_cs_success_live = descriptor_iret_cs_access_valid && descriptor_present;
     assign descriptor_call_gate_access_valid = descriptor_valid && descriptor_reserved_valid &&
                                               descriptor_class == spk286_protected_pkg::DESC_CALL_GATE &&
                                               descriptor_unused_dpl >= protected_cpl &&
@@ -689,10 +695,12 @@ module spk286_micro_executor (
     assign descriptor_call_gate_success_live = descriptor_call_gate_access_valid && descriptor_present;
     assign jmp_gate_target_begin = descriptor_operand_done && descriptor_phase_q == 3'd3 &&
                                     jmp_gate_probe_operation && descriptor_call_gate_success_live;
-    assign task_gate_success_live = descriptor_valid && descriptor_reserved_valid && descriptor_present &&
+    logic task_gate_access_valid;
+    assign task_gate_access_valid = descriptor_valid && descriptor_reserved_valid &&
                                     descriptor_class == spk286_protected_pkg::DESC_TASK_GATE &&
                                     descriptor_unused_dpl >= protected_cpl &&
                                     descriptor_unused_dpl >= descriptor_unused_rpl;
+    assign task_gate_success_live = task_gate_access_valid && descriptor_present;
     assign task_gate_target_begin = descriptor_operand_done && descriptor_phase_q == 3'd3 &&
                                     !task_gate_target_active_q &&
                                     (call_gate_validation_operation || cs_validation_operation) &&
@@ -730,20 +738,24 @@ module spk286_micro_executor (
                                                 descriptor_class == spk286_protected_pkg::DESC_TSS_AVAIL ||
                                                 descriptor_class == spk286_protected_pkg::DESC_TSS_BUSY ||
                                                 descriptor_class == spk286_protected_pkg::DESC_LDT)));
-    assign descriptor_iret_ss_success_live = descriptor_valid && descriptor_reserved_valid && descriptor_present &&
+    logic descriptor_iret_ss_access_valid;
+    assign descriptor_iret_ss_access_valid = descriptor_valid && descriptor_reserved_valid &&
                                              descriptor_unused_segment &&
                                              (descriptor_class == spk286_protected_pkg::DESC_DATA ||
                                               descriptor_class == spk286_protected_pkg::DESC_EXPAND_DOWN) &&
                                              descriptor_unused_writable &&
                                              descriptor_unused_dpl == tmp1_q[1:0] &&
                                              descriptor_unused_rpl == tmp1_q[1:0];
-    assign descriptor_call_ss_success_live = descriptor_valid && descriptor_reserved_valid && descriptor_present &&
+    assign descriptor_iret_ss_success_live = descriptor_iret_ss_access_valid && descriptor_present;
+    logic descriptor_call_ss_access_valid;
+    assign descriptor_call_ss_access_valid = descriptor_valid && descriptor_reserved_valid &&
                                              descriptor_unused_segment &&
                                              (descriptor_class == spk286_protected_pkg::DESC_DATA ||
                                               descriptor_class == spk286_protected_pkg::DESC_EXPAND_DOWN) &&
                                              descriptor_unused_writable &&
                                              descriptor_unused_dpl == call_gate_target_dpl_q &&
                                              descriptor_unused_rpl == call_gate_target_dpl_q;
+    assign descriptor_call_ss_success_live = descriptor_call_ss_access_valid && descriptor_present;
     assign call_gate_outer_required = protected_msw[0] && call_gate_candidate_valid_q && cs_candidate_valid_q &&
                                      (call_gate_target_dpl_q < protected_cpl) &&
                                      !(cs_candidate_class_q == spk286_protected_pkg::DESC_CODE && cs_candidate_access_q[2]);
@@ -754,10 +766,8 @@ module spk286_micro_executor (
                                  ({1'b0, call_tss_phase_offset} + 17'd3 > {1'b0, protected_tr_limit}));
     assign call_tss_active_q = call_tss_active_state_q;
     assign call_tss_operand_done = call_tss_active_q && operand_done;
-    assign descriptor_segment_success_live = descriptor_segment_null_commit ||
-                                             (iret_cs_validation_operation ? descriptor_iret_cs_success_live :
-                                              (cs_validation_operation ? descriptor_cs_success_live :
-                                              (descriptor_valid && descriptor_reserved_valid && descriptor_present &&
+    logic descriptor_segment_access_valid;
+    assign descriptor_segment_access_valid = (descriptor_valid && descriptor_reserved_valid &&
                                                (segment_index == 2'd2 ?
                                                 ((descriptor_class == spk286_protected_pkg::DESC_DATA ||
                                                   descriptor_class == spk286_protected_pkg::DESC_EXPAND_DOWN) &&
@@ -767,7 +777,11 @@ module spk286_micro_executor (
                                                 (descriptor_unused_segment &&
                                                  (descriptor_unused_conforming ||
                                                   descriptor_unused_dpl >= descriptor_effective_privilege) &&
-                                                 (descriptor_class != spk286_protected_pkg::DESC_CODE || descriptor_unused_readable))))));
+                                                 (descriptor_class != spk286_protected_pkg::DESC_CODE || descriptor_unused_readable))));
+    assign descriptor_segment_success_live = descriptor_segment_null_commit ||
+                                             (iret_cs_validation_operation ? descriptor_iret_cs_success_live :
+                                              cs_validation_operation ? descriptor_cs_success_live :
+                                              (descriptor_segment_access_valid && descriptor_present));
     assign descriptor_result_data = descriptor_load_access ? {descriptor_access_rights, 8'h00} : descriptor_limit;
     assign descriptor_result_write = descriptor_active_q && descriptor_operand_done && descriptor_phase_q == 3'd3 &&
                                      descriptor_inspect_operation && descriptor_inspect_success_live;
@@ -818,11 +832,13 @@ module spk286_micro_executor (
         .dpl(event_gate_dpl), .gate_target_selector(event_gate_target_selector),
         .gate_offset(event_gate_target_offset), .gate_parameter_count(event_gate_parameter_count)
     );
-    assign event_gate_success_live = event_gate_valid && event_gate_reserved_valid && event_gate_present &&
+    logic event_gate_access_valid;
+    assign event_gate_access_valid = event_gate_valid && event_gate_reserved_valid &&
                                      ((event_gate_class == spk286_protected_pkg::DESC_INT_GATE) ||
                                       (event_gate_class == spk286_protected_pkg::DESC_TRAP_GATE) ||
                                       (event_gate_class == spk286_protected_pkg::DESC_TASK_GATE)) &&
                                      (!event_software || event_gate_dpl >= protected_cpl);
+    assign event_gate_success_live = event_gate_access_valid && event_gate_present;
     assign event_gate_post_fault = event_gate_operand_done && event_gate_phase_q == 3'd3 && !event_gate_success_live;
     assign event_gate_operation_done = (event_gate_operation && !protected_msw[0]) ||
                                        event_gate_pre_fault || event_gate_post_fault ||
@@ -916,6 +932,13 @@ module spk286_micro_executor (
     assign system_fault = task_service_fault || system_mode_fault || system_privilege_fault || io_privilege_fault || halt_privilege_fault || arpl_fault || clts_fault || call_tss_pre_fault || (stack_range_fault && protected_msw[0]) ||
                           descriptor_pre_fault || descriptor_post_fault ||
                           event_gate_pre_fault || event_gate_post_fault;
+    // Type/privilege checks precede presence for each transfer class.
+    logic descriptor_transfer_access_valid;
+    assign descriptor_transfer_access_valid = task_gate_target_active_q ? task_descriptor_access_valid :
+                                              descriptor_class == spk286_protected_pkg::DESC_CALL_GATE ? descriptor_call_gate_access_valid :
+                                              descriptor_class == spk286_protected_pkg::DESC_TASK_GATE ? task_gate_access_valid :
+                                              descriptor_class == spk286_protected_pkg::DESC_CODE ? descriptor_cs_access_valid :
+                                              task_descriptor_access_valid;
     assign system_fault_vector = task_service_fault ? task_service_fault_vector : system_mode_fault ? 8'd6 : (system_privilege_fault || io_privilege_fault || halt_privilege_fault) ? 8'd13 :
                                  arpl_fault ? 8'd6 :
                                  clts_lock_fault ? 8'd6 :
@@ -924,11 +947,11 @@ module spk286_micro_executor (
                                  call_tss_pre_fault ? 8'd10 :
                                  stack_range_fault ? 8'd12 :
                                  event_gate_pre_fault ? 8'd13 :
-                                 event_gate_post_fault ? (!event_gate_present && event_gate_valid ? 8'd11 : 8'd13) :
+                                 event_gate_post_fault ? (!event_gate_present && event_gate_access_valid ? 8'd11 : 8'd13) :
                                  // A new SS obtained from the TSS has #TS access
                                  // faults, unlike an explicit MOV/POP/return SS.
                                  call_ss_validation_operation ?
-                                   (!descriptor_pre_fault && !descriptor_present && descriptor_valid ? 8'd12 : 8'd10) :
+                                   (!descriptor_pre_fault && !descriptor_present && descriptor_call_ss_access_valid ? 8'd12 : 8'd10) :
                                  descriptor_pre_fault ? 8'd13 :
                                  jmp_gate_cs_validation_operation ?
                                    (!descriptor_present && descriptor_call_gate_cs_access_valid ? 8'd11 : 8'd13) :
@@ -940,18 +963,20 @@ module spk286_micro_executor (
                                  ((call_gate_validation_operation || cs_validation_operation) &&
                                   descriptor_unused_segment) ?
                                     (!descriptor_present && descriptor_cs_access_valid ? 8'd11 : 8'd13) :
-                                  call_gate_validation_operation || call_gate_cs_validation_operation ?
-                                    (!descriptor_present && descriptor_valid ? 8'd11 : 8'd13) :
+                                  call_gate_validation_operation ?
+                                    (!descriptor_present && descriptor_transfer_access_valid ? 8'd11 : 8'd13) :
+                                  call_gate_cs_validation_operation ?
+                                    (!descriptor_present && descriptor_call_gate_cs_access_valid ? 8'd11 : 8'd13) :
                                   iret_ss_validation_operation ?
-                                    (!descriptor_present && descriptor_valid ? 8'd12 : 8'd13) :
+                                    (!descriptor_present && descriptor_iret_ss_access_valid ? 8'd12 : 8'd13) :
                                  iret_cs_validation_operation ?
-                                   (!descriptor_present && descriptor_valid ? 8'd11 : 8'd13) :
+                                   (!descriptor_present && descriptor_iret_cs_access_valid ? 8'd11 : 8'd13) :
                                  cs_validation_operation ?
-                                   (!descriptor_present && descriptor_valid ? 8'd11 : 8'd13) :
+                                   (!descriptor_present && descriptor_transfer_access_valid ? 8'd11 : 8'd13) :
                                  segment_reload_operation ?
-                                   (!descriptor_present && descriptor_valid ?
+                                   (!descriptor_present && descriptor_segment_access_valid ?
                                     (segment_index == 2'd2 ? 8'd12 : 8'd11) : 8'd13) :
-                                 (!descriptor_present && descriptor_valid ? 8'd11 : 8'd13);
+                                 (!descriptor_present && descriptor_system_access_valid ? 8'd11 : 8'd13);
     assign system_fault_error_code = task_service_fault ?
                                        ((task_service_fault_error_code & 16'hFFFC) |
                                         (task_fault_external ? 16'h0001 : 16'h0000)) :

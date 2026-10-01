@@ -450,6 +450,14 @@ Acceptance must deliberately make two conditions invalid at once: wrong type
 plus P=0, wrong DPL plus P=0, short table plus bad access byte, bad CS plus bad
 SS. Record expected vector/error/state independently for each instruction family.
 
+**2026-10-01 implementation follow-up: H13 corrected.** Separate type/privilege
+access predicates now precede presence classification in segment, gate, return,
+system and TSS-derived SS paths. Task validation preserves SS -> CS -> ES/DS
+ordering while prioritizing invalid access within each segment; valid absent
+CS remains #NP. The 1356-case CPU bank passes in both simulators and with PCAT
+options, plus 82 new task-service cases and existing related banks. Hidden-cache
+publication remains H15. See [block validation](PROTECTED_MODE_BLOCK_20261001.md).
+
 ### H14 — Odd stack pointers rejected in protected frame checks (S, P1)
 
 `iret_outer_range_fault` rejects `return_stack_pointer[0]` and

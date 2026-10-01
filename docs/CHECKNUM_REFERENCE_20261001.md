@@ -33,6 +33,8 @@ two hash-pinned files in the user's supplied CheckIt installation.
 | Same native 86Box 6.0 machine, CHECKNUM | 4143 | 70.9 | [Redirected DOS output](evidence/checknum-20261001/native-checknum.txt) |
 | Same native machine with a 287 configured, CHECKNUM forces software FP | 4143 | 70.9 | [Redirected DOS output](evidence/checknum-20261001/native-287-checknum.txt) |
 | MiSTer PCAT, CHECKNUM | 3584 | 72.2 | [User acceptance](evidence/checknum-20261001/mister-checknum.png) |
+| MiSTer PCAT after the coherent 1 KiB RAM-read buffer, original CheckIt | 4042 | 78.7 | [User screenshot](evidence/perf01-ram-buffer-20261001/mister-checkit.png) |
+| MiSTer PCAT after the coherent 1 KiB RAM-read buffer, CHECKNUM | 4143 | 78.1 | [User screenshot](evidence/perf01-ram-buffer-20261001/mister-checknum.png) |
 
 The native controls use independent copies of
 `D:\ISOs\MiSTer\286_win3.1.vhd`, MR BIOS `mr286`, EGA, 2048 KiB RAM,
@@ -107,7 +109,7 @@ that comparing the native CPU alone with MiSTer alone cannot isolate the cause.
 Complete the paired SPK286 run and record matching hardware frequency/options
 before attributing the hardware difference to a particular CPU or bridge path.
 
-### Hardware comparison
+### Initial hardware comparison
 
 Against the native 25 MHz reference, the observed hardware integer score is
 86.51% (13.49% lower). The numeric hardware Whetstone score is 101.83%
@@ -126,3 +128,20 @@ and settings. Record guest cycles per measured region and bus/fetch waits.
 This separates the standalone CPU contribution from the PCAT memory/bridge
 contribution before selecting a performance optimization. H15/H16 descriptor
 state changes are not established causes of this benchmark gap.
+
+### Hardware update after the RAM-read buffer
+
+The user subsequently built and tested PCAT implementation `add2392`, which
+adds a coherent 1 KiB RAM data-read buffer without changing SPK286. CHECKNUM
+increased from 3584 / 72.2 to **4143 / 78.1**, gains of **15.60% / 8.17%**.
+The integer result equals the native 25 MHz reference; software math is 10.16%
+higher. Original CheckIt separately increased from 3584 / 71.9 to 4042 / 78.7.
+These are separate observed runs; they do not establish a variation range or
+general cycle equivalence. The exact reason for the new CheckIt/CHECKNUM
+integer difference has not been isolated.
+
+See the [PERF01 hardware record](HARDWARE_FOLLOWUPS_20260930.md) and
+[artifact receipt](evidence/perf01-ram-buffer-20261001/hardware-observation.json)
+for the screenshots, local RBF/report hashes and remaining timing/acceptance
+scope. Complete SPK286-in-86Box and matched repeated hardware controls remain
+useful for attributing the remaining cost.

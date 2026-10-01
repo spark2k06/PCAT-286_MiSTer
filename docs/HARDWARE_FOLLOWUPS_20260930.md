@@ -11,13 +11,15 @@ and separates open findings from that resolved boot failure.
 
 Added 2026-10-01. Status: numeric reference accepted; directed memory-path
 attribution and a coherent 1 KiB RAM-read buffer implemented and checked;
-commercial CheckIt/hardware acceptance pending. CheckIt 3.03C reports 3584
+hardware CheckIt/CHECKNUM improvement observed; repeat-run and timing acceptance
+remain open. The initial CheckIt 3.03C report was 3584
 Dhrystones / 71.9K Whetstones on MiSTer,
 versus 4143 / 70.9K for the **original native 86Box 286 at 25 MHz**. The supplied
 native screenshot is not SPK286-in-86Box. The new standalone CHECKNUM frontend
 reproduces 4143 / 70.9 on that native reference; the user accepted it on MiSTer
 with 3584 / 72.2. See [the acceptance record](CHECKNUM_REFERENCE_20261001.md).
-Active hardware RBF provenance and matching settings remain to be recorded.
+The subsequent hardware results and local RBF/report hashes are recorded below;
+the exact loaded RBF hash and matching runtime settings remain to be attested.
 This is a whole-machine performance story; no CPU functional cause is established.
 
 Acceptance plan for later work:
@@ -38,7 +40,7 @@ hold segment translation/protection state; a benchmark improvement from H15 is
 not claimed. Start with the existing [memory throughput](AT_MEMORY_THROUGHPUT.md)
 and [bus latency](optimization/BUS_LATENCY_50MHZ.md) evidence when profiling
 PCAT. The directed measurements and first optimization below are complete;
-hardware attribution and acceptance remain open. The numeric DOS reference is ready.
+further hardware attribution and acceptance remain open. The numeric DOS reference is ready.
 
 ### Current-source memory-path investigation — 2026-10-01
 
@@ -247,19 +249,58 @@ PCAT_BUILD_DIR="$PWD/build/ram-buffer-map" bash scripts/check_at_ram_read_buffer
 AT_CDC_CHECK_OUTPUT="$PWD/build/ram-buffer-frontend" bash scripts/check_at_cdc_quartus.sh
 ```
 
-The existing RBF is untouched. Synthesize `PCAT-286.qpf` with the enabled macro,
-record the resulting RBF hash, and run the same `CHECKNUM.EXE` on MiSTer before
-claiming hardware improvement. Also check normal boot and DMA software with the
-new RBF. Hardware acceptance is the remaining part of this milestone.
+The implementation milestone did not generate or overwrite the existing RBF.
+The user subsequently built and tested the new variant, as recorded below.
+
+#### User hardware performance observation — 2026-10-01
+
+After building the RAM-read-buffer variant, the user supplied
+[original CheckIt](evidence/perf01-ram-buffer-20261001/mister-checkit.png) and
+[CHECKNUM](evidence/perf01-ram-buffer-20261001/mister-checknum.png) screenshots:
+
+| Program | Earlier MiSTer result | New MiSTer result | Observed gain |
+| --- | --- | --- | --- |
+| Original CheckIt, Dhrystones/s | 3584 | 4042 | +12.78% |
+| Original CheckIt, K Whetstones/s | 71.9 | 78.7 | +9.46% |
+| CHECKNUM, Dhrystones/s | 3584 | 4143 | +15.60% |
+| CHECKNUM, K Whetstones/s | 72.2 | 78.1 | +8.17% |
+
+Use each program's own earlier measurement; mixing 71.9 from CheckIt with
+72.2 from CHECKNUM would change the reported gain. The two new screenshots
+differ by 2.50% in integer score and about 0.76% in math score. Their same
+benchmark routines have the original BIOS-tick calibration/quantization, while
+frontend and run conditions can differ. These screenshots alone do not isolate
+that variation; repeat-run sampling is still pending.
+
+The new CHECKNUM integer score equals the original native 86Box 286 at 25 MHz
+reference (4143). Its 78.1K software-math score is 10.16% above that reference's
+70.9K. This is agreement for a particular benchmark, not general CPU cycle
+equivalence. CheckIt's CPU estimate remains approximately unchanged: 35.02 MHz
+before and 35.01 MHz now, despite higher benchmark scores.
+
+The [hardware receipt](evidence/perf01-ram-buffer-20261001/hardware-observation.json)
+records the screenshot hashes and local full-build artifacts. The current local
+RBF is 4,115,792 bytes, dated 2026-10-01 16:06:41 Europe/Madrid, SHA256
+`f3f79bf56a2b7a09f2df020a3215668b4c21f657483fd0ae72d7bf1341aac9b7`.
+The successful flow report includes P01/P02/P05/P06, the RAM-read-buffer macro
+and NO_DEBUG; it targets 50 MHz. This local-file correspondence does not
+independently attest the exact hash of the RBF loaded on MiSTer or all runtime
+settings. No new synthesis or regression was run when recording the result.
+
+The full-build reports still show negative setup slack: `FPGA_CLK2_50` reaches
+-4.479 ns in the slow -40 C corner, with reported Fmax 40.85 MHz; SDRAM and
+video also have negative setup entries. The observed benchmark improvement
+does not establish timing closure. Detailed path attribution, repeat-run
+scores and normal boot/DMA coverage remain open under PERF01.
 
 #### Next bounded performance work
 
 1. Capture completed CHECKNUM scores and request/wait counts in matched SPK286
    and hardware configurations, with the loaded RBF recorded. Use the same
    benchmark region to check how closely these kernel findings transfer.
-2. Validate the implemented RAM-read buffer on MiSTer against the earlier
-   CHECKNUM reference, recording full synthesis/timing results and normal boot
-   and DMA behavior. Retain the off/on configuration for matched comparisons.
+2. Extend the observed RAM-read-buffer hardware improvement with repeat-run
+   CHECKNUM results, timing/path review and normal boot/DMA coverage. Retain
+   the off/on configuration for matched comparisons.
 3. Independently evaluate reducing registered hit/response turnaround and
    retaining SDRAM rows between safe accesses. Preserve acceptance, cancellation,
    LOCK, byte enables, ordering and refresh; check FPGA timing for each candidate.

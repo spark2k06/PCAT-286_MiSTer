@@ -79,6 +79,36 @@ No full SPK286 regression or synthesis is part of this frontend milestone.
 
 ## PERF01 interpretation and next measurement
 
+### Bounded SPK286-in-86Box control
+
+A private SPK286 25 MHz run reached CHECKNUM after the slow BIOS/DOS boot and
+completed the integer measurement. A coherent guest-RAM snapshot contains
+`3854\r\n` in both the frontend's formatted-output stack buffer and the DOS
+output buffer. The earlier floating result was 3854.269884686137, consistent
+with the integer formatting. That numeric line is absent from the original
+source disk. See [the partial capture](evidence/checknum-20261001/spk25-partial.json).
+
+The two-score run did **not** complete within the 1,200-second host-time limit.
+The redirected DOS file remains size zero in its on-disk directory while open;
+there is no `ALL_DONE` marker, final Whetstone output or accepted normal exit.
+BIOS ticks and floating-point working state advanced during the measurement.
+The owned emulator instance was closed after saving the snapshot. This is a
+partial integer observation, not a completed benchmark pair or regression pass.
+
+Settings: SPK286 binary SHA256
+`07392d78cc648e4005d1d3c9802ddf28028a12a99f47dd4e948ec48329e4e7e7`,
+25 MHz, P02/P05, normalized timing request 0, MR BIOS, EGA, 2048 KiB RAM.
+The 86Box wrapper steps one CPU clock per guest cycle and keeps external READY
+asserted. PCAT also requests timing policy 0; P01/P06 concern its machine-side
+memory bridge, not additional standalone CPU macros.
+
+The captured integer score is 93.02% of the native 25 MHz result. It suggests
+that comparing the native CPU alone with MiSTer alone cannot isolate the cause.
+Complete the paired SPK286 run and record matching hardware frequency/options
+before attributing the hardware difference to a particular CPU or bridge path.
+
+### Hardware comparison
+
 Against the native 25 MHz reference, the observed hardware integer score is
 86.51% (13.49% lower). The numeric hardware Whetstone score is 101.83%
 (1.83% higher). These results establish a workload-dependent gap; they do not

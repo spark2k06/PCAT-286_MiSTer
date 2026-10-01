@@ -53,3 +53,23 @@ or arbitrary X propagation. No MiSTer run was performed. The downstream
 fresh fit `build/descriptor-predicate-sdram-budget-fit-20261001` includes these
 changes and the corrected external SDRAM budget; its result is recorded
 separately when available. This document does not assert 50 MHz closure.
+
+## Fresh fit with corrected SDRAM budget
+
+| Corner | Global setup | Global hold | Owner setup | SDRAM output setup | SDRAM output hold |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| 7_slow_1100mv_100c | -4.341 | -3.086 | +0.958 | +4.268 | -3.086 |
+| 7_slow_1100mv_-40c | -3.878 | -3.071 | +0.927 | +4.903 | -3.071 |
+| MIN_fast_1100mv_100c | +2.220 | -2.515 | +7.362 | +9.173 | -2.515 |
+| MIN_fast_1100mv_-40c | +2.484 | -2.590 | +7.742 | +10.710 | -2.590 |
+
+This is a failing timing checkpoint, not closure. The descriptor predicates
+alone did not remove the late fault path. The external SDRAM hold failures
+persist in a new fit with ALL_PATHS hold repair, rather than only in an SDC
+overlay. The forwarded clock uses a global clock as output data: the worst
+warm slow hold path has +5.044 ns skew, including 4.935 ns global-to-output
+routing on the clock pin. The next experiment must change real clock/output
+implementation and preserve the external delay budget.
+
+Complete fitted audit and bitstream identity are retained in the evidence directory.
+No hardware run or full CPU regression was performed.

@@ -1,7 +1,7 @@
 // Functional micro-operation service. Physical fetch/READY belongs to the BIU.
 `timescale 1ns/1ps
 
-module spk286_micro_executor (
+module spk286_micro_executor #(parameter bit USE_PARALLEL_SYSTEM_LIMIT = 1'b0) (
     input  logic clk,
     input  logic reset,
     input  logic cancel,
@@ -17,7 +17,7 @@ module spk286_micro_executor (
     input  logic lock_prefix,
     input logic [15:0] target_read_data, effective_offset, address_base,
     input logic [15:0] segment_limit,
-    input logic segment_expand_down,
+    input logic segment_expand_down, parallel_system_limit_fault,
     input logic [15:0] stack_segment_limit,
     /* Only the expand-down bit is consumed by the current stack-range
        predicate; the remaining access bits stay in the segment cache. */
@@ -384,7 +384,7 @@ module spk286_micro_executor (
     // Table operands span six bytes. Expand-down segments admit offsets
     // above their limit, with the same non-wrapping 16-bit upper boundary.
     assign system_limit_fault = system_table_operation && !operand_register_direct &&
-                                (segment_expand_down ?
+                                (USE_PARALLEL_SYSTEM_LIMIT ? parallel_system_limit_fault : segment_expand_down ?
                                  (effective_offset <= segment_limit ||
                                   {1'b0, effective_offset} + 17'd5 > 17'h0FFFF) :
                                  ({1'b0, effective_offset} + 17'd5 > {1'b0, segment_limit}));

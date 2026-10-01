@@ -480,6 +480,9 @@ module spk286_micro_executor (
     logic [1:0] call_ss_dpl_q, call_ss_rpl_q;
     logic call_ss_present_q, call_ss_table_q;
     logic [16:0] call_gate_frame_bytes;
+    logic [5:0] call_gate_frame_words;
+    logic [4:0] call_parameter_last_word;
+    logic [16:0] call_parameter_last_byte;
     logic iret_cs_validation_operation, iret_ss_validation_operation;
     logic iret_outer_frame_operation, iret_outer_required;
     logic iret_outer_pop, iret_outer_pop_done, iret_outer_range_fault;
@@ -1165,9 +1168,17 @@ module spk286_micro_executor (
                                  temporary_valid_q[1] && (tmp1_q[1:0] > protected_cpl);
     assign iret_outer_pop = iret_outer_frame_operation && iret_outer_required && iret_outer_phase_q < 2'd2;
     assign iret_outer_pop_done = iret_outer_pop && operand_done;
-    assign call_gate_frame_bytes = 17'd8 + {11'd0, call_gate_parameter_count_q, 1'b0} +
-                                   (event_gate_candidate_valid_q ? 17'd2 : 17'd0) +
-                                   ((event_gate_candidate_valid_q && event_error_valid) ? 17'd2 : 17'd0);
+    // Count in words before widening: 4 base words, up to 31 parameters,
+    // and up to 2 event words. Keep the final byte arithmetic at 17 bits.
+    assign call_gate_frame_words = {1'b0, call_gate_parameter_count_q} +
+                                   (event_gate_candidate_valid_q ?
+                                    (event_error_valid ? 6'd6 : 6'd5) : 6'd4);
+    assign call_gate_frame_bytes = {10'd0, call_gate_frame_words, 1'b0};
+    // For N != 0, 2*N-1 is {N-1, 1}. The wrapped N=0 value is unused;
+    // the parameter-range predicate below retains its explicit N!=0 guard.
+    assign call_parameter_last_word = call_gate_parameter_count_q - 5'd1;
+    assign call_parameter_last_byte = {1'b0, stack_pointer} +
+                                      {11'd0, call_parameter_last_word, 1'b1};
     assign iret_outer_range_fault = iret_outer_frame_operation && iret_outer_required &&
                                     iret_outer_phase_q == 2'd0 &&
                                     (stack_segment_access[2] ?
@@ -1179,20 +1190,20 @@ module spk286_micro_executor (
     // the source frame and target descriptor; a subsequent stack access
     // checks its own range. In particular, an empty stack may have
     // SP=limit+1, and RETF's immediate adjustment wraps at 16 bits.
+    // The explicit SP<frame test handles subtraction underflow. Compare
+    // SP with limit+frame directly; that sum fits in 17 bits (frame<=74).
     assign call_stack_range_fault = check_call_frame && (protected_msw[0] || !event_active) &&
                                    (call_gate_outer_required ?
                                     (!call_stack_ready_q ||
                                      {1'b0, call_stack_sp_q} < call_gate_frame_bytes ||
                                      (call_ss_access_q[2] ?
-                                      ({1'b0, call_stack_sp_q} - call_gate_frame_bytes <= {1'b0, call_ss_limit_q} ||
-                                       ({1'b0, call_stack_sp_q} - call_gate_frame_bytes > 17'h0FFFF)) :
-                                      ({1'b0, call_stack_sp_q} - 17'd2 > {1'b0, call_ss_limit_q})) ||
+                                      ({1'b0, call_stack_sp_q} <= {1'b0, call_ss_limit_q} + call_gate_frame_bytes) :
+                                      ({1'b0, call_stack_sp_q} > {1'b0, call_ss_limit_q} + 17'd2)) ||
                                      (call_gate_parameter_count_q != 5'd0 &&
                                       (stack_segment_access[2] ?
                                        ({1'b0, stack_pointer} <= {1'b0, stack_segment_limit} ||
-                                        ({1'b0, stack_pointer} + {11'd0, call_gate_parameter_count_q, 1'b0} - 17'd1 > 17'h0FFFF)) :
-                                       ({1'b0, stack_pointer} + {11'd0, call_gate_parameter_count_q, 1'b0} - 17'd1 >
-                                        {1'b0, stack_segment_limit}))) ) :
+                                        call_parameter_last_byte[16]) :
+                                       (call_parameter_last_byte > {1'b0, stack_segment_limit}))) ) :
                                     (stack_pointer[0] && stack_pointer < 16'd4));
     assign call_gate_stack_switch_begin = call_gate_stack_switch_operation && call_gate_outer_required &&
                                           !call_gate_stack_switch_active_q;

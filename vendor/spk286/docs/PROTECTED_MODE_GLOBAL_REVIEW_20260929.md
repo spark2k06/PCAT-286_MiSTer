@@ -583,6 +583,14 @@ Native 86Box's no-FPU path is also syntax-only and is insufficient as its oracle
 The [H18 evidence](PROTECTED_MODE_H18_NPX_20261001.md) and receipt retain
 every failed identity. No exclusion or failure waiver closes this finding.
 
+**2026-10-01 implemented follow-up:** the ESC microprogram now performs the
+existing pure `CHECK_RM16` after #NM/address decoding. All 5,000 D8 physical
+captures, including the unchanged 33 former failures, pass. Both simulators
+also pass 3,849 boundary/lifecycle cases and the inherited 9,079-case H18
+matrix. See [H19 ESC contract and receipt](PROTECTED_MODE_H19_ESC_BOUNDARY_20261001.md).
+Only this concrete ESC first-word finding is closed; the other H19 boundary
+and partial-execution cases above remain pending.
+
 ### H20 — Event ordering policies and diagnostics (P/C, P1/P2)
 
 Existing open evidence policies (`failed-iret-nmi`, `sti-old-if`, `fault-tf`,

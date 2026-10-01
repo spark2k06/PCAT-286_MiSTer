@@ -1,5 +1,9 @@
 # H18: CPU-side ESC/WAIT traps in the no-NPX profile
 
+Historical H18 receipt: the negative D8 results and binary below describe that
+milestone. The subsequent [H19 ESC boundary fix](PROTECTED_MODE_H19_ESC_BOUNDARY_20261001.md)
+resolves all 33 retained failures; current D8 execution should pass.
+
 Date: 2026-10-01. Baseline: SPK286 `3657489`.
 
 ## Scope and architectural contract

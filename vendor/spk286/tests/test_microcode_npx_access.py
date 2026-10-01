@@ -45,15 +45,16 @@ def expected_npx_image(old):
 
 
 class NpxAccessMicrocodeTests(unittest.TestCase):
-    def test_current_image_changes_only_esc_check_and_adds_wait(self):
+    def test_frozen_h18_image_changes_only_esc_check_and_adds_wait(self):
         old = json.loads((ROOT / 'tests/fixtures/microcode_iopl_access.json').read_text())
         words, entries, labels, branches = expected_npx_image(old)
-        program = compile_sources({p.name: p.read_text() for p in (ROOT / 'microcode/source').glob('*.mc')})
+        frozen = json.loads((ROOT / 'tests/fixtures/microcode_npx_access.json').read_text())
+        program = compile_sources({'format26.mc': canonical_source(frozen['words'], frozen['entries'],
+                    frozen['labels'], {int(k): v for k, v in frozen['branch_targets'].items()})})
         self.assertEqual([encode(op) for op in program.operations], words)
         self.assertEqual(program.entries, entries)
         self.assertEqual(program.labels, labels)
         self.assertEqual(program.branch_targets, branches)
-        frozen = json.loads((ROOT / 'tests/fixtures/microcode_npx_access.json').read_text())
         self.assertEqual(frozen['words'], words)
         self.assertEqual(frozen['entries'], entries)
         generated = generate(program)

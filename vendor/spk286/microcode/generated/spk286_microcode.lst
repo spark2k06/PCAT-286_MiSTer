@@ -1,4 +1,4 @@
-SPK286 microcode compiler 26.0; format 26; encoding 26
+SPK286 microcode compiler 27.0; format 27; encoding 27
 0000  MOV_R16_IMM16:
 0000  BA  FETCH_MOV_DST16_IMM16  # data_move.mc:5
 0001  MOV_R16_IMM16.writeback:
@@ -805,91 +805,92 @@ SPK286 microcode compiler 26.0; format 26; encoding 26
 02A2  STRING_OUTPUT_WORD.done:
 02A2  3  END  # zzzzzzzzzzzzz_io.mc:78
 02A3  ESC_NO_COPROCESSOR:
-02A3  C4  CHECK_NPX_ESC  # zzzzzzzzzzzzzzzz_esc.mc:7
-02A4  4  DECODE_MODRM  # zzzzzzzzzzzzzzzz_esc.mc:8
-02A5  3  END  # zzzzzzzzzzzzzzzz_esc.mc:9
-02A6  WAIT_NO_COPROCESSOR:
-02A6  C5  CHECK_NPX_WAIT  # zzzzzzzzzzzzzzzz_esc.mc:12
-02A7  3  END  # zzzzzzzzzzzzzzzz_esc.mc:13
-02A8  SYSTEM_GROUP_0F01:
-02A8  4  DECODE_MODRM  # zzzzzzzzzzzzzzzzz_system_tables.mc:5
-02A9  47  DISPATCH DECODED  # zzzzzzzzzzzzzzzzz_system_tables.mc:6
-02AA  SYSTEM_STORE_GDTR:
-02AA  88  SYSTEM_STORE_GDTR  # zzzzzzzzzzzzzzzzz_system_tables.mc:9
-02AB  3  END  # zzzzzzzzzzzzzzzzz_system_tables.mc:10
-02AC  SYSTEM_STORE_IDTR:
-02AC  89  SYSTEM_STORE_IDTR  # zzzzzzzzzzzzzzzzz_system_tables.mc:13
-02AD  3  END  # zzzzzzzzzzzzzzzzz_system_tables.mc:14
-02AE  SYSTEM_LOAD_GDTR:
-02AE  8A  SYSTEM_LOAD_GDTR  # zzzzzzzzzzzzzzzzz_system_tables.mc:17
-02AF  3  END  # zzzzzzzzzzzzzzzzz_system_tables.mc:18
-02B0  SYSTEM_LOAD_IDTR:
-02B0  8B  SYSTEM_LOAD_IDTR  # zzzzzzzzzzzzzzzzz_system_tables.mc:21
-02B1  3  END  # zzzzzzzzzzzzzzzzz_system_tables.mc:22
-02B2  SYSTEM_STORE_MSW:
-02B2  8C  SYSTEM_STORE_MSW  # zzzzzzzzzzzzzzzzz_system_tables.mc:25
-02B3  3  END  # zzzzzzzzzzzzzzzzz_system_tables.mc:26
-02B4  SYSTEM_LOAD_MSW:
-02B4  8D  SYSTEM_LOAD_MSW  # zzzzzzzzzzzzzzzzz_system_tables.mc:29
-02B5  3  END  # zzzzzzzzzzzzzzzzz_system_tables.mc:30
-02B6  SYSTEM_GROUP_0F00:
-02B6  4  DECODE_MODRM  # zzzzzzzzzzzzzzzzz_system_tables.mc:33
-02B7  47  DISPATCH DECODED  # zzzzzzzzzzzzzzzzz_system_tables.mc:34
-02B8  SYSTEM_STORE_LDTR:
-02B8  C1  CHECK_PROTECTED_MODE  # zzzzzzzzzzzzzzzzz_system_tables.mc:37
-02B9  8E  SYSTEM_STORE_LDTR  # zzzzzzzzzzzzzzzzz_system_tables.mc:38
-02BA  3  END  # zzzzzzzzzzzzzzzzz_system_tables.mc:39
-02BB  SYSTEM_STORE_TR:
-02BB  C1  CHECK_PROTECTED_MODE  # zzzzzzzzzzzzzzzzz_system_tables.mc:42
-02BC  8F  SYSTEM_STORE_TR  # zzzzzzzzzzzzzzzzz_system_tables.mc:43
-02BD  3  END  # zzzzzzzzzzzzzzzzz_system_tables.mc:44
-02BE  SYSTEM_LOAD_LDTR:
-02BE  C2  CHECK_SYSTEM_PRIVILEGE  # zzzzzzzzzzzzzzzzz_system_tables.mc:47
-02BF  6  READ_RM16 -> TMP0  # zzzzzzzzzzzzzzzzz_system_tables.mc:48
-02C0  90  SYSTEM_LOAD_LDTR  # zzzzzzzzzzzzzzzzz_system_tables.mc:49
-02C1  3  END  # zzzzzzzzzzzzzzzzz_system_tables.mc:50
-02C2  SYSTEM_LOAD_TR:
-02C2  C2  CHECK_SYSTEM_PRIVILEGE  # zzzzzzzzzzzzzzzzz_system_tables.mc:53
-02C3  6  READ_RM16 -> TMP0  # zzzzzzzzzzzzzzzzz_system_tables.mc:54
-02C4  91  SYSTEM_LOAD_TR  # zzzzzzzzzzzzzzzzz_system_tables.mc:55
-02C5  3  END  # zzzzzzzzzzzzzzzzz_system_tables.mc:56
-02C6  SYSTEM_VERIFY_READ:
-02C6  C1  CHECK_PROTECTED_MODE  # zzzzzzzzzzzzzzzzz_system_tables.mc:59
-02C7  6  READ_RM16 -> TMP0  # zzzzzzzzzzzzzzzzz_system_tables.mc:60
-02C8  92  SYSTEM_VERIFY_READ  # zzzzzzzzzzzzzzzzz_system_tables.mc:61
-02C9  3  END  # zzzzzzzzzzzzzzzzz_system_tables.mc:62
-02CA  SYSTEM_VERIFY_WRITE:
-02CA  C1  CHECK_PROTECTED_MODE  # zzzzzzzzzzzzzzzzz_system_tables.mc:65
-02CB  6  READ_RM16 -> TMP0  # zzzzzzzzzzzzzzzzz_system_tables.mc:66
-02CC  93  SYSTEM_VERIFY_WRITE  # zzzzzzzzzzzzzzzzz_system_tables.mc:67
-02CD  3  END  # zzzzzzzzzzzzzzzzz_system_tables.mc:68
-02CE  SYSTEM_LOAD_ACCESS:
-02CE  4  DECODE_MODRM  # zzzzzzzzzzzzzzzzz_system_tables.mc:71
-02CF  C1  CHECK_PROTECTED_MODE  # zzzzzzzzzzzzzzzzz_system_tables.mc:72
-02D0  6  READ_RM16 -> TMP0  # zzzzzzzzzzzzzzzzz_system_tables.mc:73
-02D1  94  SYSTEM_LOAD_ACCESS  # zzzzzzzzzzzzzzzzz_system_tables.mc:74
-02D2  3  END  # zzzzzzzzzzzzzzzzz_system_tables.mc:75
-02D3  SYSTEM_LOAD_LIMIT:
-02D3  4  DECODE_MODRM  # zzzzzzzzzzzzzzzzz_system_tables.mc:78
-02D4  C1  CHECK_PROTECTED_MODE  # zzzzzzzzzzzzzzzzz_system_tables.mc:79
-02D5  6  READ_RM16 -> TMP0  # zzzzzzzzzzzzzzzzz_system_tables.mc:80
-02D6  95  SYSTEM_LOAD_LIMIT  # zzzzzzzzzzzzzzzzz_system_tables.mc:81
-02D7  3  END  # zzzzzzzzzzzzzzzzz_system_tables.mc:82
-02D8  SYSTEM_ARPL:
-02D8  4  DECODE_MODRM  # zzzzzzzzzzzzzzzzz_system_tables.mc:85
-02D9  A6  SYSTEM_ARPL_CHECK  # zzzzzzzzzzzzzzzzz_system_tables.mc:86
-02DA  6  READ_RM16 -> TMP0  # zzzzzzzzzzzzzzzzz_system_tables.mc:87
-02DB  9  READ_REG16 -> TMP1  # zzzzzzzzzzzzzzzzz_system_tables.mc:88
-02DC  A7  SYSTEM_ARPL  # zzzzzzzzzzzzzzzzz_system_tables.mc:89
-02DD  3  END  # zzzzzzzzzzzzzzzzz_system_tables.mc:90
-02DE  SYSTEM_CLTS:
-02DE  A8  SYSTEM_CLTS  # zzzzzzzzzzzzzzzzz_system_tables.mc:93
-02DF  3  END  # zzzzzzzzzzzzzzzzz_system_tables.mc:94
-02E0  LOADALL:
-02E0  AB  LOADALL  # zzzzzzzzzzzzzzzzzzzz_loadall.mc:6
-02E1  3  END  # zzzzzzzzzzzzzzzzzzzz_loadall.mc:7
-02E2  LOAD_CARRY_BYTE:
-02E2  1E  READ_FLAGS -> TMP0  # zzzzzzzzzzzzzzzzzzzzz_salc.mc:6
-02E3  AC  CARRY_FILL8 TMP0  # zzzzzzzzzzzzzzzzzzzzz_salc.mc:7
-02E4  36  TMP0 -> DST8  # zzzzzzzzzzzzzzzzzzzzz_salc.mc:8
-02E5  3  END  # zzzzzzzzzzzzzzzzzzzzz_salc.mc:9
+02A3  C4  CHECK_NPX_ESC  # zzzzzzzzzzzzzzzz_esc.mc:8
+02A4  4  DECODE_MODRM  # zzzzzzzzzzzzzzzz_esc.mc:9
+02A5  13  CHECK_RM16  # zzzzzzzzzzzzzzzz_esc.mc:10
+02A6  3  END  # zzzzzzzzzzzzzzzz_esc.mc:11
+02A7  WAIT_NO_COPROCESSOR:
+02A7  C5  CHECK_NPX_WAIT  # zzzzzzzzzzzzzzzz_esc.mc:14
+02A8  3  END  # zzzzzzzzzzzzzzzz_esc.mc:15
+02A9  SYSTEM_GROUP_0F01:
+02A9  4  DECODE_MODRM  # zzzzzzzzzzzzzzzzz_system_tables.mc:5
+02AA  47  DISPATCH DECODED  # zzzzzzzzzzzzzzzzz_system_tables.mc:6
+02AB  SYSTEM_STORE_GDTR:
+02AB  88  SYSTEM_STORE_GDTR  # zzzzzzzzzzzzzzzzz_system_tables.mc:9
+02AC  3  END  # zzzzzzzzzzzzzzzzz_system_tables.mc:10
+02AD  SYSTEM_STORE_IDTR:
+02AD  89  SYSTEM_STORE_IDTR  # zzzzzzzzzzzzzzzzz_system_tables.mc:13
+02AE  3  END  # zzzzzzzzzzzzzzzzz_system_tables.mc:14
+02AF  SYSTEM_LOAD_GDTR:
+02AF  8A  SYSTEM_LOAD_GDTR  # zzzzzzzzzzzzzzzzz_system_tables.mc:17
+02B0  3  END  # zzzzzzzzzzzzzzzzz_system_tables.mc:18
+02B1  SYSTEM_LOAD_IDTR:
+02B1  8B  SYSTEM_LOAD_IDTR  # zzzzzzzzzzzzzzzzz_system_tables.mc:21
+02B2  3  END  # zzzzzzzzzzzzzzzzz_system_tables.mc:22
+02B3  SYSTEM_STORE_MSW:
+02B3  8C  SYSTEM_STORE_MSW  # zzzzzzzzzzzzzzzzz_system_tables.mc:25
+02B4  3  END  # zzzzzzzzzzzzzzzzz_system_tables.mc:26
+02B5  SYSTEM_LOAD_MSW:
+02B5  8D  SYSTEM_LOAD_MSW  # zzzzzzzzzzzzzzzzz_system_tables.mc:29
+02B6  3  END  # zzzzzzzzzzzzzzzzz_system_tables.mc:30
+02B7  SYSTEM_GROUP_0F00:
+02B7  4  DECODE_MODRM  # zzzzzzzzzzzzzzzzz_system_tables.mc:33
+02B8  47  DISPATCH DECODED  # zzzzzzzzzzzzzzzzz_system_tables.mc:34
+02B9  SYSTEM_STORE_LDTR:
+02B9  C1  CHECK_PROTECTED_MODE  # zzzzzzzzzzzzzzzzz_system_tables.mc:37
+02BA  8E  SYSTEM_STORE_LDTR  # zzzzzzzzzzzzzzzzz_system_tables.mc:38
+02BB  3  END  # zzzzzzzzzzzzzzzzz_system_tables.mc:39
+02BC  SYSTEM_STORE_TR:
+02BC  C1  CHECK_PROTECTED_MODE  # zzzzzzzzzzzzzzzzz_system_tables.mc:42
+02BD  8F  SYSTEM_STORE_TR  # zzzzzzzzzzzzzzzzz_system_tables.mc:43
+02BE  3  END  # zzzzzzzzzzzzzzzzz_system_tables.mc:44
+02BF  SYSTEM_LOAD_LDTR:
+02BF  C2  CHECK_SYSTEM_PRIVILEGE  # zzzzzzzzzzzzzzzzz_system_tables.mc:47
+02C0  6  READ_RM16 -> TMP0  # zzzzzzzzzzzzzzzzz_system_tables.mc:48
+02C1  90  SYSTEM_LOAD_LDTR  # zzzzzzzzzzzzzzzzz_system_tables.mc:49
+02C2  3  END  # zzzzzzzzzzzzzzzzz_system_tables.mc:50
+02C3  SYSTEM_LOAD_TR:
+02C3  C2  CHECK_SYSTEM_PRIVILEGE  # zzzzzzzzzzzzzzzzz_system_tables.mc:53
+02C4  6  READ_RM16 -> TMP0  # zzzzzzzzzzzzzzzzz_system_tables.mc:54
+02C5  91  SYSTEM_LOAD_TR  # zzzzzzzzzzzzzzzzz_system_tables.mc:55
+02C6  3  END  # zzzzzzzzzzzzzzzzz_system_tables.mc:56
+02C7  SYSTEM_VERIFY_READ:
+02C7  C1  CHECK_PROTECTED_MODE  # zzzzzzzzzzzzzzzzz_system_tables.mc:59
+02C8  6  READ_RM16 -> TMP0  # zzzzzzzzzzzzzzzzz_system_tables.mc:60
+02C9  92  SYSTEM_VERIFY_READ  # zzzzzzzzzzzzzzzzz_system_tables.mc:61
+02CA  3  END  # zzzzzzzzzzzzzzzzz_system_tables.mc:62
+02CB  SYSTEM_VERIFY_WRITE:
+02CB  C1  CHECK_PROTECTED_MODE  # zzzzzzzzzzzzzzzzz_system_tables.mc:65
+02CC  6  READ_RM16 -> TMP0  # zzzzzzzzzzzzzzzzz_system_tables.mc:66
+02CD  93  SYSTEM_VERIFY_WRITE  # zzzzzzzzzzzzzzzzz_system_tables.mc:67
+02CE  3  END  # zzzzzzzzzzzzzzzzz_system_tables.mc:68
+02CF  SYSTEM_LOAD_ACCESS:
+02CF  4  DECODE_MODRM  # zzzzzzzzzzzzzzzzz_system_tables.mc:71
+02D0  C1  CHECK_PROTECTED_MODE  # zzzzzzzzzzzzzzzzz_system_tables.mc:72
+02D1  6  READ_RM16 -> TMP0  # zzzzzzzzzzzzzzzzz_system_tables.mc:73
+02D2  94  SYSTEM_LOAD_ACCESS  # zzzzzzzzzzzzzzzzz_system_tables.mc:74
+02D3  3  END  # zzzzzzzzzzzzzzzzz_system_tables.mc:75
+02D4  SYSTEM_LOAD_LIMIT:
+02D4  4  DECODE_MODRM  # zzzzzzzzzzzzzzzzz_system_tables.mc:78
+02D5  C1  CHECK_PROTECTED_MODE  # zzzzzzzzzzzzzzzzz_system_tables.mc:79
+02D6  6  READ_RM16 -> TMP0  # zzzzzzzzzzzzzzzzz_system_tables.mc:80
+02D7  95  SYSTEM_LOAD_LIMIT  # zzzzzzzzzzzzzzzzz_system_tables.mc:81
+02D8  3  END  # zzzzzzzzzzzzzzzzz_system_tables.mc:82
+02D9  SYSTEM_ARPL:
+02D9  4  DECODE_MODRM  # zzzzzzzzzzzzzzzzz_system_tables.mc:85
+02DA  A6  SYSTEM_ARPL_CHECK  # zzzzzzzzzzzzzzzzz_system_tables.mc:86
+02DB  6  READ_RM16 -> TMP0  # zzzzzzzzzzzzzzzzz_system_tables.mc:87
+02DC  9  READ_REG16 -> TMP1  # zzzzzzzzzzzzzzzzz_system_tables.mc:88
+02DD  A7  SYSTEM_ARPL  # zzzzzzzzzzzzzzzzz_system_tables.mc:89
+02DE  3  END  # zzzzzzzzzzzzzzzzz_system_tables.mc:90
+02DF  SYSTEM_CLTS:
+02DF  A8  SYSTEM_CLTS  # zzzzzzzzzzzzzzzzz_system_tables.mc:93
+02E0  3  END  # zzzzzzzzzzzzzzzzz_system_tables.mc:94
+02E1  LOADALL:
+02E1  AB  LOADALL  # zzzzzzzzzzzzzzzzzzzz_loadall.mc:6
+02E2  3  END  # zzzzzzzzzzzzzzzzzzzz_loadall.mc:7
+02E3  LOAD_CARRY_BYTE:
+02E3  1E  READ_FLAGS -> TMP0  # zzzzzzzzzzzzzzzzzzzzz_salc.mc:6
+02E4  AC  CARRY_FILL8 TMP0  # zzzzzzzzzzzzzzzzzzzzz_salc.mc:7
+02E5  36  TMP0 -> DST8  # zzzzzzzzzzzzzzzzzzzzz_salc.mc:8
+02E6  3  END  # zzzzzzzzzzzzzzzzzzzzz_salc.mc:9

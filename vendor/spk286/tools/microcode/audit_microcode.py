@@ -1,4 +1,4 @@
-"""Audit encodings 1 through 26 using emitted RTL and canonical DSL reconstruction.
+"""Audit encodings 1 through 27 using emitted RTL and canonical DSL reconstruction.
 
 This is an offline checker for the existing generated case-ROM template, not a
 general Verilog parser or a new production ROM format. Entry/label sidecars are
@@ -270,6 +270,8 @@ def canonical_source(words, entries, labels=None, branch_targets=None):
         version = 25
     if any(w in (196, 197) for w in words):
         version = 26
+    if any(tuple(words[pc:pc+4]) == (196, 4, 19, 3) for pc in entries.values()):
+        version = 27
     lines = [f"microcode_format {version}"]
     for address, word in enumerate(words[:used]):
         if address in by_address:
@@ -343,7 +345,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--output", type=Path, default=ROOT / "build/microcode-audit")
     parser.add_argument("--contract", type=Path,
-                        default=ROOT / "tests/fixtures/microcode_npx_access.json")
+                        default=ROOT / "tests/fixtures/microcode_esc_boundary.json")
     args = parser.parse_args()
     audit(args.output, args.contract)
 

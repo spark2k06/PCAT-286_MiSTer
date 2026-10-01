@@ -34,9 +34,10 @@ module spk286_operand (
     assign register_index = select_rm ? rm_index : reg_index;
     assign is_memory = select_rm && !register_direct;
     assign within_limit = segment_expand_down ?
-                          ({1'b0, offset} > {1'b0, segment_limit} &&
-                           ({1'b0, offset} + (request_byte ? 17'd0 : 17'd1) <= 17'h0FFFF)) :
-                          (({1'b0, offset} + (request_byte ? 17'd0 : 17'd1)) <= {1'b0, segment_limit});
+                          (offset > segment_limit &&
+                           (request_byte || offset != 16'hFFFF)) :
+                          (offset < segment_limit ||
+                           (request_byte && offset == segment_limit));
     assign allowed = request_valid && !reset && !cancel && !blocked;
     assign memory_request = allowed && is_memory && !pending_q && within_limit && !request_check;
     assign memory_write = request_write;

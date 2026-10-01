@@ -428,7 +428,7 @@ module spk286_micro_executor (
     logic descriptor_result_write;
     logic [15:0] descriptor_result_data;
     logic descriptor_read_begin, descriptor_pre_fault, descriptor_post_fault;
-    logic [63:0] descriptor_raw_q, descriptor_raw_candidate;
+    logic descriptor_low_valid, descriptor_low_reserved_valid, descriptor_high_word_valid;
     logic [15:0] descriptor_limit;
     logic [23:0] descriptor_base;
     logic [7:0] descriptor_access_rights;
@@ -513,7 +513,7 @@ module spk286_micro_executor (
     logic [15:0] event_gate_target_selector_q, event_gate_target_offset_q;
     logic [3:0] event_gate_class_q;
     logic [15:0] event_gate_entry_offset;
-    logic [63:0] event_gate_raw_q, event_gate_raw_candidate;
+    logic event_gate_low_valid, event_gate_low_reserved_valid, event_gate_high_word_valid;
     /* verilator lint_off UNUSEDSIGNAL */
     logic [15:0] event_gate_limit;
     logic [7:0] event_gate_access_rights;
@@ -653,13 +653,18 @@ module spk286_micro_executor (
                                            descriptor_selector_null && !descriptor_pre_fault && segment_index != 2'd2;
     assign descriptor_read_begin = descriptor_begin && !descriptor_pre_fault && !system_privilege_fault && !descriptor_verify_negative && !descriptor_inspect_negative &&
                                    !descriptor_segment_null_commit && !descriptor_selector_null;
-    assign descriptor_raw_q = {descriptor_word3_q, descriptor_word2_q, descriptor_word1_q, descriptor_word0_q};
-    assign descriptor_raw_candidate = (descriptor_operand_done && descriptor_phase_q == 3'd3) ?
-                                     {operand_read_data, descriptor_word2_q, descriptor_word1_q, descriptor_word0_q} : descriptor_raw_q;
+    // Only the reserved-form check uses word 3. Reduce both possible words
+    // before the late operand-done select, rather than muxing sixteen bits
+    // and then reducing them. Code/data segments ignore this word on a 286.
+    assign descriptor_high_word_valid = descriptor_unused_segment ||
+                                       ((descriptor_operand_done && descriptor_phase_q == 3'd3) ?
+                                        (operand_read_data == 16'h0000) : (descriptor_word3_q == 16'h0000));
+    assign descriptor_valid = descriptor_low_valid && descriptor_high_word_valid;
+    assign descriptor_reserved_valid = descriptor_low_reserved_valid && descriptor_high_word_valid;
     spk286_descriptor descriptor_parser (
-        .raw_descriptor(descriptor_raw_candidate), .limit(descriptor_limit), .base(descriptor_base),
+        .raw_descriptor({16'h0000, descriptor_word2_q, descriptor_word1_q, descriptor_word0_q}), .limit(descriptor_limit), .base(descriptor_base),
         .access_rights(descriptor_access_rights), .descriptor_class(descriptor_class),
-        .descriptor_valid(descriptor_valid), .reserved_form_valid(descriptor_reserved_valid),
+        .descriptor_valid(descriptor_low_valid), .reserved_form_valid(descriptor_low_reserved_valid),
         .present(descriptor_present), .segment(descriptor_unused_segment), .executable(descriptor_unused_executable),
         .conforming(descriptor_unused_conforming), .expand_down(descriptor_unused_expand_down),
         .readable(descriptor_unused_readable), .writable(descriptor_unused_writable), .accessed(descriptor_unused_accessed),
@@ -835,13 +840,15 @@ module spk286_micro_executor (
                                     ({1'b0, event_gate_entry_offset} + 17'd7 > {1'b0, protected_idtr_limit});
     assign event_gate_pre_fault = event_gate_limit_fault;
     assign event_gate_operand_done = event_gate_active_q && operand_done;
-    assign event_gate_raw_q = {event_gate_word3_q, event_gate_word2_q, event_gate_word1_q, event_gate_word0_q};
-    assign event_gate_raw_candidate = (event_gate_operand_done && event_gate_phase_q == 3'd3) ?
-                                      {operand_read_data, event_gate_word2_q, event_gate_word1_q, event_gate_word0_q} : event_gate_raw_q;
+    assign event_gate_high_word_valid = event_gate_unused_segment ||
+                                       ((event_gate_operand_done && event_gate_phase_q == 3'd3) ?
+                                        (operand_read_data == 16'h0000) : (event_gate_word3_q == 16'h0000));
+    assign event_gate_valid = event_gate_low_valid && event_gate_high_word_valid;
+    assign event_gate_reserved_valid = event_gate_low_reserved_valid && event_gate_high_word_valid;
     spk286_descriptor event_gate_parser (
-        .raw_descriptor(event_gate_raw_candidate), .limit(event_gate_limit), .base(event_gate_unused_base),
+        .raw_descriptor({16'h0000, event_gate_word2_q, event_gate_word1_q, event_gate_word0_q}), .limit(event_gate_limit), .base(event_gate_unused_base),
         .access_rights(event_gate_access_rights), .descriptor_class(event_gate_class),
-        .descriptor_valid(event_gate_valid), .reserved_form_valid(event_gate_reserved_valid),
+        .descriptor_valid(event_gate_low_valid), .reserved_form_valid(event_gate_low_reserved_valid),
         .present(event_gate_present), .segment(event_gate_unused_segment), .executable(event_gate_unused_executable),
         .conforming(event_gate_unused_conforming), .expand_down(event_gate_unused_expand_down),
         .readable(event_gate_unused_readable), .writable(event_gate_unused_writable), .accessed(event_gate_unused_accessed),

@@ -1112,9 +1112,19 @@ module spk286 (
     // family carry one 16-bit error word.  Non-selector protected faults use
     // the architecturally defined zero word until their individual source
     // classification is extended.
-    assign fault_error_valid = protected_msw[0] &&
-                                (fault_vector == 8'd8 || fault_vector == 8'd10 || fault_vector == 8'd11 ||
-                                 fault_vector == 8'd12 || fault_vector == 8'd13);
+    // Classify each source before the late vector-priority mux. Preserve
+    // exactly the same priority, including simultaneous diagnostic faults.
+    logic loadall_fault_has_error, system_fault_has_error;
+    assign loadall_fault_has_error = loadall_fault_vector == 8'd8 || loadall_fault_vector == 8'd10 ||
+                                    loadall_fault_vector == 8'd11 || loadall_fault_vector == 8'd12 || loadall_fault_vector == 8'd13;
+    assign system_fault_has_error = system_fault_vector == 8'd8 || system_fault_vector == 8'd10 ||
+                                   system_fault_vector == 8'd11 || system_fault_vector == 8'd12 || system_fault_vector == 8'd13;
+    assign fault_error_valid = protected_msw[0] && !(invalid_form || invalid_opcode_fault) &&
+                              (loadall_fault ? loadall_fault_has_error :
+                               system_fault ? system_fault_has_error :
+                               (protected_access_ss_fault ||
+                                ((system_limit_fault || range_fault) && protected_msw[0] && service_segment == 2'd2) ||
+                                protected_access_fault || protected_fetch_fault || (!bounds_fault && !arithmetic_fault)));
     assign fault_error_code = system_fault ? system_fault_error_code :
                               loadall_fault ? loadall_fault_error_code : 16'd0;
     assign software_taken = software_request && (opcode_q != 8'hCE || debug_flags[11]);

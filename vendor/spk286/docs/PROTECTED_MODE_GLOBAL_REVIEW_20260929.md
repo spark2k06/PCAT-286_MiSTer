@@ -198,6 +198,14 @@ Test every CPL/IOPL pair with inverse old/new IF/NT/IOPL, same/outer IRET,
 real-mode controls, and a failing return. Use the pre-return privilege when
 deciding which FLAGS fields may change; verify exact fault-state preservation.
 
+**2026-10-01 implementation follow-up: H03 corrected.** POPF and ordinary IRET
+now share the 286 privilege mask: restore NT, permit IOPL only at CPL0, and
+permit IF only when executing CPL <= old IOPL. Outer returns use the source
+privilege context. The new 5892-case bank passes in both simulators, also with
+PCAT P01/P02/P05 options; failed returns preserve FLAGS/CPL/SP. Existing
+ordinary/nested return banks and all 10000 physical real-mode 9D/CF cases
+pass. See [block validation](PROTECTED_MODE_BLOCK_20261001.md).
+
 ### H04 — NT on interrupt/trap-gate entry (S, P0)
 
 The `clear_event_flags` masks at micro-executor line 1441 clear TF and, for an

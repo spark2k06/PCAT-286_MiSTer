@@ -1,8 +1,8 @@
 # P19: remaining MiSTer versus reduced 86Box platform cost
 
 Date: 2026-10-02. Status: **PIT channel 1 cadence correction adopted after
-directed checks; old-cadence CHECKNUM attribution controls running; combined
-P18/P19 candidate authorized for synthesis; hardware validation pending**.
+directed checks; old-cadence and combined CHECKNUM attribution controls complete;
+combined P18/P19 RBF generated; full regression and hardware validation pending**.
 
 The user requested investigation of modules missing from the PCAT timing
 adapter while P18's real math benchmark continues. Compare matching P17
@@ -191,6 +191,21 @@ numbers now reproduce the user's hardware observation exactly. This strengthens
 the platform-cost attribution for this workload; it does not establish a
 cycle-accurate AT model or solve every peripheral/electrical difference.
 Host exit timeouts followed by SIGTERM are explicitly classified separately
-from completed guest success. The combined posted/PIT candidate's math result
-is still pending. Immutable evidence: `refresh-checknum-complete/` under the
+from completed guest success. Immutable evidence: `refresh-checknum-complete/` under the
 P18/P19 evidence directory; earlier partial receipts remain unchanged.
+
+## Completed combined posted/PIT result
+
+The combined adapter finished with **6906 Dhrystones/s / 121.6K Whetstones/s**,
+guest RC0 and `ALL_DONE`. This is +21.89% / +13.96% versus the old requester
+with P17 memory, and matches the completed posting-only model's rates. The
+PIT cadence's much smaller ownership cost does not change CHECKNUM's rounded
+output here. CPU objects/options, initial disk, CHECKNUM, CMOS/configuration
+and cache capacities match. Posting and the PIT-driven requester are the
+explicit platform changes; profiler-header differences are retained and are
+not described as an identical-binary control.
+
+The combined model reaches 89.58% / 91.22% of immediate-memory SPK286 at
+7709 / 133.3K. Its physical counterpart still needs MiSTer acceptance, and
+50 MHz setup closure remains user-deferred. See the [combined RBF receipt](P18_P19_COMBINED_RBF_20261002.md)
+and immutable `combined-checknum-complete/` evidence.

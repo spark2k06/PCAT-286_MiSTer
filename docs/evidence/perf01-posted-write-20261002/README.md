@@ -63,6 +63,13 @@ RC0/ALL_DONE; CPU objects/options and initial disk/CMOS/configuration match.
 The old-requester result reproduces both P17 MiSTer numbers exactly. The
 explicit host teardown classification does not replace guest completion.
 
+`combined-checknum-complete/` retains the completed **6906 / 121.6K** P18/P19
+model, guest RC0/ALL_DONE, exact model/profiler sources, CPU-object identities,
+initial CMOS/configuration and comparison with the completed old-policy control.
+The comparison preserves the deliberate model/profiler differences for posting
+and actual PIT OUT1. Hardware acceptance remains pending; host teardown timeout
+is classified separately. Its byte inventory leaves earlier receipts intact.
+
 ## Reproduction
 
 `combined-rbf/` retains the verified P18/P19 bitstream identity, frozen build

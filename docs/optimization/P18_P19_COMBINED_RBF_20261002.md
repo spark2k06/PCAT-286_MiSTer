@@ -92,9 +92,26 @@ the first integer result **6906**. Thus it is +21.89% over the old-policy
 5666 observation, reaching 89.58% of immediate-memory SPK286's 7709 reference.
 The old-policy controls subsequently completed with **6138 / 113.6K** versus
 **5666 / 106.7K**, both RC0/ALL_DONE, reproducing both P17 MiSTer rates exactly.
-The combined candidate's 6906 remains a partial formatter capture; its guest
-math/exit tests continue. No corrected-policy Whetstone rate or MiSTer gain
-is inferred before those observations arrive.
+The combined candidate subsequently completed with **6906 / 121.6K**, guest
+RC0 and `ALL_DONE`. CPU objects/options, initial disk, CHECKNUM, configuration,
+CMOS and cache capacities match the old-policy run. The model and profiler
+header intentionally differ to enable posting and observe actual PIT OUT1;
+their exact hashes and source bytes are retained. The native SDRAM refresh
+remains enabled. Host exit timeout/SIGTERM is recorded separately from guest
+success. This is a completed platform-model result; MiSTer acceptance is pending.
+
+| CHECKNUM reference | Dhrystones/s | K Whetstones/s |
+| --- | ---: | ---: |
+| Old AT policy, reproducing P17 MiSTer | 5,666 | 106.7 |
+| Combined posted writes and PIT OUT1 | 6,906 | 121.6 |
+| Same SPK286, immediate-memory reference | 7,709 | 133.3 |
+| Native 86Box 286, separate CPU model | 8,287 | 144.9 |
+
+The combined model gains **21.89% / 13.96%** over the old AT policy. It reaches
+**89.58% / 91.22%** of the same-CPU immediate-memory reference. Reaching that
+reference would require a further **11.63% / 9.62%** rate increase. These are
+empirical workload references, not a promise that all physical platform cost
+can be eliminated. The native 286's separate CPU timing model is a later target.
 
 ## Reproduction and retained evidence
 

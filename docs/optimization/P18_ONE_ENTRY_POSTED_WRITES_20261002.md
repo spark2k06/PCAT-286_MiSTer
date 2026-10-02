@@ -2,8 +2,9 @@
 
 Date: 2026-10-02. Production baseline: PCAT `89b9b4f`, including P17.
 Status: **adopted after private prototype and full-machine gates pass; first
-matched Dhrystone output is 6138 -> 6906 (+12.51%); complete CHECKNUM math
-measurement and hardware validation pending**.
+matched Dhrystone output is 6138 -> 6906 (+12.51%); candidate CHECKNUM completes
+with 6906 / 121.6K and RC0/ALL_DONE; paired final comparison and hardware
+validation pending**.
 
 The user retained P17 and explicitly deferred timing closure. This experiment
 addresses write service without changing CPU RTL, cache capacity, SDRAM timing
@@ -145,3 +146,11 @@ adds missing AT refresh/HOLD arbitration to a private adapter. Its controls do
 not alter the ongoing matched posting runs or any production timing policy.
 
 See the [evidence inventory](../evidence/perf01-posted-write-20261002/README.md).
+
+### Candidate completion
+
+The guest writes `6906` and `121.6` to TICKRUN.TXT, followed by suite RC0 and
+ALL_DONE. This reaches 89.58% / 91.22% of the SPK286 immediate-memory reference
+(7709 / 133.3K). The old P17 recorded route is 6138 / 113.6K; the slower matched
+control and strict final identities comparison are still being collected.
+No PIT-correction gain is included in these numbers.

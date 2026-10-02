@@ -42,6 +42,10 @@ generated fixture, exact production requester/arbiter and source identities.
 All signatures, retired work and physical stores match. See [P19](../../optimization/P19_AT_REFRESH_PLATFORM_ATTRIBUTION_20261002.md).
 These groups each have independent byte inventories; `prototype/` is unchanged.
 
+`pit-correction/` retains the P19 candidate, real PIT and composed CPU checks,
+original fixture failures and corrected fixtures. Its own byte inventory keeps
+these additions separate from the original fixed 32-clock attribution.
+
 ## Reproduction
 
 Use the prototype checkpoint's production P17 sources, before adoption, with

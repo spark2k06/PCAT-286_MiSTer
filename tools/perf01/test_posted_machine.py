@@ -28,6 +28,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('work', type=Path)
     parser.add_argument('output', type=Path)
+    parser.add_argument('--pit-refresh', action='store_true',
+                        help='Program real PIT channel 1 before the original IRQ diagnostic')
     args = parser.parse_args()
     work, out = args.work.resolve(), args.output.resolve()
     assert not out.exists(), 'Preserve prior checks'
@@ -117,10 +119,27 @@ def main():
     sources = [work/name for name in names] + [bench]
     flags = ['-D'+m for m in re.findall(r'VERILOG_MACRO "(SPK286_P\d\d_[A-Z0-9_]+|SPK286_AT_RAM_READ_BUFFER)"', (work/'config.tcl').read_text())]
     rom = out/'entry.rom'
+    firmware = work/'tests/firmware/pcat286_event_diag.asm'
+    if args.pit_refresh:
+        firmware = out/'entry-pit.asm'
+        original = (work/'tests/firmware/pcat286_event_diag.asm').read_text()
+        marker = '    ; Program PIT channel 0, mode 2, divisor 0020h.'
+        assert original.count(marker) == 1
+        firmware.write_text(original.replace(marker, '''    ; Match BIOS initialization of the AT refresh timer.
+    mov dx, 0x0043
+    mov al, 0x74
+    out dx, al
+    mov dx, 0x0041
+    mov al, 18
+    out dx, al
+    xor al, al
+    out dx, al
+
+'''+marker))
     run(['nasm', '-DENTRY_MEMORY_PROBE=1', '-f', 'bin', '-o', str(rom),
-         str(work/'tests/firmware/pcat286_event_diag.asm')], work, out/'nasm.log')
+         str(firmware)], work, out/'nasm.log')
     identities = {str(p): sha(p) for p in sources + [rom, work/'config.tcl',
-                 work/'tests/firmware/pcat286_event_diag.asm', ROOT/'tools/perf01/test_posted_machine.py']}
+                 firmware, work/'tests/firmware/pcat286_event_diag.asm', ROOT/'tools/perf01/test_posted_machine.py']}
     commands = []
     for div2 in (0, 1):
         directory = out/f'div{div2}'

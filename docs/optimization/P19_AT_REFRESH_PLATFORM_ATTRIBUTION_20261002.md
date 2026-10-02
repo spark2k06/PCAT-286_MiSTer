@@ -1,7 +1,8 @@
 # P19: remaining MiSTer versus reduced 86Box platform cost
 
-Date: 2026-10-02. Status: **private physical-data attribution passes; matched
-real CHECKNUM refresh controls running; production refresh policy unchanged**.
+Date: 2026-10-02. Status: **PIT channel 1 cadence correction adopted after
+directed checks; old-cadence CHECKNUM attribution controls running; combined
+P18/P19 candidate authorized for synthesis; hardware validation pending**.
 
 The user requested investigation of modules missing from the PCAT timing
 adapter while P18's real math benchmark continues. Compare matching P17
@@ -102,8 +103,45 @@ only if a remaining difference or trace supplies evidence for it.
 Do not disable native SDRAM refresh or adopt the 32-clock cadence as historical
 AT timing on the basis of throughput alone. A cadence correction needs the
 board's intended refresh semantics, device-visible behavior and directed tests.
-No production change, full regression, synthesis/fitter or hardware acceptance
-is claimed for this investigation.
+The original attribution did not alter production. The following correction
+is adopted separately; full regression and hardware acceptance remain pending.
+
+## PIT-driven AT refresh correction
+
+The [IBM AT technical reference, September 1985](https://www.minuszerodegrees.net/manuals/IBM_5170_Technical_Reference_6280070_SEP85.pdf)
+describes channel 1 OUT as the refresh request source, normally every 15 us.
+The old requester waits 32 system clocks after completion: its minimum interval
+is 0.64 us at 50 MHz plus service. It is a functional arbitration stimulus,
+not the BIOS-programmed AT cadence. Native 86Box's `pit_refresh_timer_at` also
+reacts to rising OUT1 by toggling port 61h bit 4; it adds no explicit CPU HOLD
+service, so the reduced model still cannot establish exact historical timings.
+
+The new requester samples actual `pit_counter_out[1]`, retaining one pending
+event across lock/arbitration delays. Repeated events coalesce while ownership
+is occupied. Accepted operations drain even if refresh is disabled. Completion
+increments the row exactly once. The machine's port 61h implementation, arbiter,
+DMA priorities, CPU HOLD/HLDA, caches and physical KFSDRAM AUTO REFRESH remain
+unchanged. No new user configuration switch is introduced.
+
+Directed validation uses the real KF8253, fractional 1,193,182 Hz PIT clock and
+BIOS-style channel 1 mode 2 divisor 18. Icarus and Verilator each pass 27 checks:
+13 rising edges equal 13 completions, nine measured periods are 752-756 system
+clocks (about 15.1 us). Tests include stable high OUT, no unprogrammed periodic
+events, deferred grant, pending-event coalescing, disable/drain and global reset.
+The requester passes strict Verilator lint. The existing A4 DMA/PIT test passes
+both simulators with its original single refresh, DMA data and IRQ checks.
+
+The real CPU machine diagnostic programs channel 1 before its original channel
+0 IRQ test. Common and divided CPU clocks both pass A20 aliasing, ROM sinks,
+IRQ/IRET, original POST sequence and 14 retained / 14 physically drained writes;
+both observe two real PIT refresh transfers. No success assertion is removed.
+
+Two initial test-fixture failures are retained: a missing combinational settle
+caused duplicate PIT register acceptance, and a repeating accelerated A4 pulse
+violated that fixture's single-refresh premise. The corrected fixtures settle
+acceptance before sampling and emit one delayed A4 event. The RTL is unchanged
+by these repairs. The user requests an RBF containing this correction and P18,
+with 50 MHz timing closure still deferred.
 
 Evidence: [P18 follow-up inventory](../evidence/perf01-posted-write-20261002/README.md),
 particularly the immutable `refresh/` group. This extends the missing-ownership

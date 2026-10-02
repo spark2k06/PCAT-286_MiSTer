@@ -1120,6 +1120,7 @@ module spk286_at_machine #(
         .clk                    (clk),
         .reset                  (reset),
         .refresh_enable         (refresh_enable),
+        .timer_1_out            (pit_counter_out[1]),
         .refresh_grant          (refresh_grant),
         .refresh_accept         (refresh_memory_accept &&
                                  refresh_memory_valid),

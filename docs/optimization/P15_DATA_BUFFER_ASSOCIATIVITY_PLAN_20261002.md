@@ -31,8 +31,68 @@ diagnostic outputs. The previous full fit had two M10Ks for data/tag storage;
 the new geometry also fits two. Whole-design placed cost is being measured
 separately in a pre-build frozen Quartus run. A fresh unchanged CHECKNUM run
 uses the same initial disk/configuration/CMOS and actual 50 MHz CPU. Its
-completed scores and fitted resources are pending at this implementation hito.
-No full regression or hardware acceptance is claimed.
+completed private-model scores are pending. The final fit and user-confirmed
+MiSTer benchmark are recorded below. No full regression is part of this milestone.
+
+## Completed FPGA fit and first MiSTer observation
+
+The frozen compilation finished in **30:57**, with 0 errors and 854 warnings.
+All 1,203 pre-build source hashes remained unchanged. The candidate RBF is
+`D:/GitHub/PCAT-286_MiSTer/build/perf01-data2way-fit-20261002/work/output_files/PCAT-286.rbf`,
+4,131,340 bytes, SHA-256
+`aafb3dcf9b223cdce9dc62f5e4fb828810fb0c0b160d845ec4d9f33c9f4a8b67`.
+The production configuration uses 50 MHz CPU, no debug observer and the existing
+CPU access optimizations. The user confirmed this exact RBF and maximum CPU speed.
+[Fit and image evidence](../evidence/perf01-data2way-20261002/README.md) retains
+report/source hashes, resources, STA summaries and both hardware screenshots.
+
+| Whole design, fitted | P14 | P15 | Delta |
+| --- | ---: | ---: | ---: |
+| Equivalent ALMs / 41,910 | 30,552 | 30,587 (73%) | +35 |
+| Physical placement ALMs / 41,910 | 36,043 | 36,128 (86%) | +85 |
+| Registers | 37,733 | 38,022 | +289 |
+| M10Ks / 553 | 416 | 416 (75%) | 0 |
+| Payload/tag block-memory bits | 3,300,507 | 3,301,019 | +512 |
+| Allocated block-memory bits | 4,259,840 | 4,259,840 | 0 |
+| DSPs / PLLs | 39 / 3 | 39 / 3 | 0 |
+
+These are net whole-fit differences, not an isolated marginal logic cost.
+The fitted data-buffer entity rises from 606.0 to 948.8 equivalent ALMs
+(**+342.8**) and from 582 to 937 registers (**+355**); its M10Ks remain two.
+Physical synthesis/packing also changes other entities: the unchanged-source
+code-buffer entity falls from 2001.3 to 1701.5 equivalent ALMs. This compensates
+much of the data-buffer logic increase in the measured complete design.
+The P14 baseline was a completed user build with matched production hashes;
+the P15 build additionally has an independently retained pre-build manifest.
+
+| CPU/system 50 MHz corner | Setup ns | Hold ns |
+| --- | ---: | ---: |
+| Slow 100 C | **-0.194** | +0.251 |
+| Slow -40 C | +0.082 | +0.239 |
+| Fast 100 C | +2.579 | +0.134 |
+| Fast -40 C | +2.740 | +0.117 |
+
+CPU setup is therefore **not closed at 50 MHz** in the slow 100 C corner
+(TNS -0.660 ns). The deferred HDMI clock also has -0.188 ns setup in slow
+-40 C (TNS -0.452 ns). These are the only negative STA summary rows; hold
+summaries are positive. No new complete timing-constraint audit is claimed.
+This is a performance candidate with a remaining CPU timing follow-up.
+
+| User-confirmed maximum-speed MiSTer observation | P14 | P15 | Change |
+| --- | ---: | ---: | ---: |
+| CheckIT Dhrystones/s | 4,911 | 5,023 | +2.28% |
+| CheckIT K Whetstones/s | 95.1 | 95.6 | +0.53% |
+| CHECKNUM Dhrystones/s | 4,911 | 5,023 | +2.28% |
+| CHECKNUM K Whetstones/s | 99.1 | 96.4 | -2.72% |
+
+Both programs agree on the integer increase. The math observations differ;
+there is no repeat distribution or established math speedup from these images.
+Earlier CHECKNUM math observations at the same integer score also differed
+(P13 94.4K, P14 99.1K). The source images and explicit RBF/max-speed attestation
+are retained without treating that variation as a proven implementation effect.
+Windows/OS/2 or a full regression were not re-exercised for P15. The unchanged
+private 86Box/PCAT CHECKNUM is still running to completion for its separate
+controlled comparison against 5390 / 101.4K.
 
 ## Completed 4 KiB code-buffer CHECKNUM measurement
 

@@ -40,17 +40,28 @@ prioritizing PERF01 throughput.
 The frozen P13 private CHECKNUM repeat has now completed at 5390 / 101.4K
 with PCAT memory-control timing, up 12.20% / 14.45% over the old-capacity
 4804 / 88.6K control. [P15](optimization/P15_DATA_BUFFER_ASSOCIATIVITY_PLAN_20261002.md)
-records the completed guest/host-teardown qualification and proposes a
+records the completed guest/host-teardown qualification and the rationale for a
 same-capacity 1 KiB two-way data buffer. On the accepted candidate traffic,
 its shadow reduces data-read misses from 378,345 to 420 in Dhrystone and from
-1,931,287 to 190,075 in Whetstone. This is a proposed next step, not a measured
-two-way implementation or promised hardware gain.
+1,931,287 to 190,075 in Whetstone. Those shadow estimates alone do not establish
+a measured implementation gain.
 
 The user has subsequently authorized P15. Its 1 KiB two-way data buffer is
 implemented and has passed directed coherence/replacement/hit-latency checks,
 both memory-port/code/data pipeline capacities and isolated M10K inference.
-Unchanged CHECKNUM and a pre-build frozen full Quartus fit are running to measure
-gain and placed resource cost before drawing a performance conclusion.
+The pre-build frozen full fit has finished: +35 net equivalent ALMs, +85
+placement ALMs, +289 registers, no additional M10Ks (416/553 total). Its data
+entity adds 342.8 equivalent ALMs; other fitted logic compensates most of this
+in whole-design totals. CPU 50 MHz has -0.194 ns setup in slow 100 C, with
+positive hold; deferred HDMI has -0.188 ns setup in slow -40 C. CPU timing
+closure remains a follow-up; P15 must not be described as fully closed.
+
+The user tested the exact candidate RBF at maximum CPU speed. CheckIT reports
+5023 / 95.6K and CHECKNUM 5023 / 96.4K: both improve integer by 2.28% over 4911.
+Math is inconclusive across the separate observations; no repeated sample set
+or full compatibility regression is established. The private unchanged
+CHECKNUM is still running for a controlled model comparison. See P15 and its
+retained fit/hardware evidence for exact identities and limitations.
 
 Added 2026-10-01. Status: numeric reference accepted; directed memory-path
 attribution and a coherent 1 KiB RAM-read buffer implemented and checked;

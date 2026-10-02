@@ -1,0 +1,239 @@
+{
+  "commands": [
+    {
+      "name": "bridge-lint-0",
+      "command": [
+        "verilator",
+        "--lint-only",
+        "--assert",
+        "-Wall",
+        "-DSPK286_P01_FAST_MEMORY_START",
+        "-DSPK286_P06_EARLY_MEMORY_ADDRESS",
+        "--top-module",
+        "spk286_at_bus_bridge",
+        "-GCOMPLETE_ON_CPU_SAMPLE=1'b0",
+        "/mnt/d/GitHub/PCAT-286_MiSTer/build/perf01-entry-overlap-20261002/candidate/rtl/spk286_integration/spk286_at_bus_bridge.sv"
+      ],
+      "cwd": "/mnt/d/GitHub/PCAT-286_MiSTer/build/perf01-entry-overlap-20261002/candidate",
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "bridge-lint-1",
+      "command": [
+        "verilator",
+        "--lint-only",
+        "--assert",
+        "-Wall",
+        "-DSPK286_P01_FAST_MEMORY_START",
+        "-DSPK286_P06_EARLY_MEMORY_ADDRESS",
+        "--top-module",
+        "spk286_at_bus_bridge",
+        "-GCOMPLETE_ON_CPU_SAMPLE=1'b1",
+        "/mnt/d/GitHub/PCAT-286_MiSTer/build/perf01-entry-overlap-20261002/candidate/rtl/spk286_integration/spk286_at_bus_bridge.sv"
+      ],
+      "cwd": "/mnt/d/GitHub/PCAT-286_MiSTer/build/perf01-entry-overlap-20261002/candidate",
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "port-lint",
+      "command": [
+        "verilator",
+        "--lint-only",
+        "--assert",
+        "-Wall",
+        "--top-module",
+        "spk286_at_mister_memory_port",
+        "/mnt/d/GitHub/PCAT-286_MiSTer/build/perf01-entry-overlap-20261002/candidate/rtl/spk286_integration/spk286_at_mister_memory_port.sv"
+      ],
+      "cwd": "/mnt/d/GitHub/PCAT-286_MiSTer/build/perf01-entry-overlap-20261002/candidate",
+      "exit_code": 0,
+      "log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "name": "iverilog-port-build",
+      "command": [
+        "iverilog",
+        "-g2012",
+        "-s",
+        "spk286_at_mister_memory_port_tb",
+        "-o",
+        "/mnt/d/GitHub/PCAT-286_MiSTer/build/perf01-entry-overlap-20261002/validation/port_iv",
+        "/mnt/d/GitHub/PCAT-286_MiSTer/build/perf01-entry-overlap-20261002/candidate/rtl/spk286_integration/spk286_at_mister_memory_port.sv",
+        "/mnt/d/GitHub/PCAT-286_MiSTer/build/perf01-entry-overlap-20261002/validation/spk286_at_mister_memory_port_tb.sv"
+      ],
+      "cwd": "/mnt/d/GitHub/PCAT-286_MiSTer/build/perf01-entry-overlap-20261002/candidate",
+      "exit_code": 0,
+      "log_sha256": "5d65c5ca0626b0ff23a7939cee215bdfd8c65a23905ebca9d80bedb00ef486aa"
+    },
+    {
+      "name": "iverilog-port-run",
+      "command": [
+        "timeout",
+        "30s",
+        "vvp",
+        "/mnt/d/GitHub/PCAT-286_MiSTer/build/perf01-entry-overlap-20261002/validation/port_iv"
+      ],
+      "cwd": "/mnt/d/GitHub/PCAT-286_MiSTer/build/perf01-entry-overlap-20261002/candidate",
+      "exit_code": 0,
+      "log_sha256": "94e326265e39a7f248a072b3f7620ed30936968045d21a5175b96a7df477b273"
+    },
+    {
+      "name": "verilator-port-build",
+      "command": [
+        "verilator",
+        "--binary",
+        "--timing",
+        "--assert",
+        "-j",
+        "2",
+        "-Wno-fatal",
+        "--top-module",
+        "spk286_at_mister_memory_port_tb",
+        "--Mdir",
+        "/mnt/d/GitHub/PCAT-286_MiSTer/build/perf01-entry-overlap-20261002/validation/port-obj",
+        "-o",
+        "port_vlt",
+        "/mnt/d/GitHub/PCAT-286_MiSTer/build/perf01-entry-overlap-20261002/candidate/rtl/spk286_integration/spk286_at_mister_memory_port.sv",
+        "/mnt/d/GitHub/PCAT-286_MiSTer/build/perf01-entry-overlap-20261002/validation/spk286_at_mister_memory_port_tb.sv"
+      ],
+      "cwd": "/mnt/d/GitHub/PCAT-286_MiSTer/build/perf01-entry-overlap-20261002/candidate",
+      "exit_code": 0,
+      "log_sha256": "b1a80fa5bfcb8d5ef022ddcdcb719377ca66cefd73f69a6ad9f5680fef117322"
+    },
+    {
+      "name": "verilator-port-run",
+      "command": [
+        "timeout",
+        "30s",
+        "/mnt/d/GitHub/PCAT-286_MiSTer/build/perf01-entry-overlap-20261002/validation/port-obj/port_vlt"
+      ],
+      "cwd": "/mnt/d/GitHub/PCAT-286_MiSTer/build/perf01-entry-overlap-20261002/candidate",
+      "exit_code": 0,
+      "log_sha256": "646b1b3869f6cf762232a3681054207093a7a20594d0ad4c748484929a817c4c"
+    },
+    {
+      "name": "original-counter-control-build",
+      "command": [
+        "verilator",
+        "--binary",
+        "--timing",
+        "--assert",
+        "-j",
+        "2",
+        "-Wno-fatal",
+        "-DSPK286_P01_FAST_MEMORY_START",
+        "-DSPK286_P06_EARLY_MEMORY_ADDRESS",
+        "--top-module",
+        "spk286_at_bridge_cancel_pipeline_tb",
+        "--Mdir",
+        "/mnt/d/GitHub/PCAT-286_MiSTer/build/perf01-entry-overlap-20261002/validation/original-counter-control-obj",
+        "-o",
+        "cancel_vlt",
+        "/mnt/d/GitHub/PCAT-286_MiSTer/build/perf01-entry-overlap-20261002/baseline/rtl/spk286_integration/spk286_at_bus_bridge.sv",
+        "/mnt/d/GitHub/PCAT-286_MiSTer/build/perf01-entry-overlap-20261002/baseline/rtl/spk286_integration/spk286_at_mister_memory_port.sv",
+        "/mnt/d/GitHub/PCAT-286_MiSTer/build/perf01-entry-overlap-20261002/baseline/rtl/spk286_integration/spk286_at_sdram_read_buffer.sv",
+        "/mnt/d/GitHub/PCAT-286_MiSTer/build/perf01-entry-overlap-20261002/baseline/rtl/spk286_integration/spk286_at_sdram_data_buffer.sv",
+        "/mnt/d/GitHub/PCAT-286_MiSTer/build/perf01-entry-overlap-20261002/validation/original-counter-tb.sv"
+      ],
+      "cwd": "/mnt/d/GitHub/PCAT-286_MiSTer/build/perf01-entry-overlap-20261002/candidate",
+      "exit_code": 0,
+      "log_sha256": "ebec377cd83dbb46ad4ed6b064a4078e89f7e36fe96b279ee7c186272101cea1"
+    },
+    {
+      "name": "original-counter-control-run",
+      "command": [
+        "timeout",
+        "30s",
+        "/mnt/d/GitHub/PCAT-286_MiSTer/build/perf01-entry-overlap-20261002/validation/original-counter-control-obj/cancel_vlt"
+      ],
+      "cwd": "/mnt/d/GitHub/PCAT-286_MiSTer/build/perf01-entry-overlap-20261002/candidate",
+      "exit_code": -6,
+      "log_sha256": "531b3c59bcc925af269585505c93f9b9233491c9b8355ddcffde0008041a3ac1"
+    },
+    {
+      "name": "cancel-512-baseline-build",
+      "command": [
+        "verilator",
+        "--binary",
+        "--timing",
+        "--assert",
+        "-j",
+        "2",
+        "-Wno-fatal",
+        "-DSPK286_P01_FAST_MEMORY_START",
+        "-DSPK286_P06_EARLY_MEMORY_ADDRESS",
+        "--top-module",
+        "spk286_at_bridge_cancel_pipeline_tb",
+        "--Mdir",
+        "/mnt/d/GitHub/PCAT-286_MiSTer/build/perf01-entry-overlap-20261002/validation/cancel-512-baseline-obj",
+        "-o",
+        "cancel_vlt",
+        "/mnt/d/GitHub/PCAT-286_MiSTer/build/perf01-entry-overlap-20261002/baseline/rtl/spk286_integration/spk286_at_bus_bridge.sv",
+        "/mnt/d/GitHub/PCAT-286_MiSTer/build/perf01-entry-overlap-20261002/baseline/rtl/spk286_integration/spk286_at_mister_memory_port.sv",
+        "/mnt/d/GitHub/PCAT-286_MiSTer/build/perf01-entry-overlap-20261002/baseline/rtl/spk286_integration/spk286_at_sdram_read_buffer.sv",
+        "/mnt/d/GitHub/PCAT-286_MiSTer/build/perf01-entry-overlap-20261002/baseline/rtl/spk286_integration/spk286_at_sdram_data_buffer.sv",
+        "/mnt/d/GitHub/PCAT-286_MiSTer/build/perf01-entry-overlap-20261002/validation/spk286_at_bridge_cancel_pipeline_tb.sv"
+      ],
+      "cwd": "/mnt/d/GitHub/PCAT-286_MiSTer/build/perf01-entry-overlap-20261002/candidate",
+      "exit_code": 0,
+      "log_sha256": "723d713413bbd667b59bc7e775369d3b6d68728cc5e476964a1ba251b56d67d5"
+    },
+    {
+      "name": "cancel-512-baseline-run",
+      "command": [
+        "timeout",
+        "30s",
+        "/mnt/d/GitHub/PCAT-286_MiSTer/build/perf01-entry-overlap-20261002/validation/cancel-512-baseline-obj/cancel_vlt"
+      ],
+      "cwd": "/mnt/d/GitHub/PCAT-286_MiSTer/build/perf01-entry-overlap-20261002/candidate",
+      "exit_code": 0,
+      "log_sha256": "1907349c6f24b9d5805a088216277d2acadf6babcd81f9b3b12bfe078ba7a96d"
+    },
+    {
+      "name": "cancel-512-candidate-build",
+      "command": [
+        "verilator",
+        "--binary",
+        "--timing",
+        "--assert",
+        "-j",
+        "2",
+        "-Wno-fatal",
+        "-DSPK286_P01_FAST_MEMORY_START",
+        "-DSPK286_P06_EARLY_MEMORY_ADDRESS",
+        "--top-module",
+        "spk286_at_bridge_cancel_pipeline_tb",
+        "--Mdir",
+        "/mnt/d/GitHub/PCAT-286_MiSTer/build/perf01-entry-overlap-20261002/validation/cancel-512-candidate-obj",
+        "-o",
+        "cancel_vlt",
+        "/mnt/d/GitHub/PCAT-286_MiSTer/build/perf01-entry-overlap-20261002/candidate/rtl/spk286_integration/spk286_at_bus_bridge.sv",
+        "/mnt/d/GitHub/PCAT-286_MiSTer/build/perf01-entry-overlap-20261002/candidate/rtl/spk286_integration/spk286_at_mister_memory_port.sv",
+        "/mnt/d/GitHub/PCAT-286_MiSTer/build/perf01-entry-overlap-20261002/candidate/rtl/spk286_integration/spk286_at_sdram_read_buffer.sv",
+        "/mnt/d/GitHub/PCAT-286_MiSTer/build/perf01-entry-overlap-20261002/candidate/rtl/spk286_integration/spk286_at_sdram_data_buffer.sv",
+        "/mnt/d/GitHub/PCAT-286_MiSTer/build/perf01-entry-overlap-20261002/validation/spk286_at_bridge_cancel_pipeline_tb.sv"
+      ],
+      "cwd": "/mnt/d/GitHub/PCAT-286_MiSTer/build/perf01-entry-overlap-20261002/candidate",
+      "exit_code": 0,
+      "log_sha256": "0fc303c3e01fc62c5c02ccbb9aed5c2267845fe025851ceaa8ecd6a8f72cb14f"
+    },
+    {
+      "name": "cancel-512-candidate-run",
+      "command": [
+        "timeout",
+        "30s",
+        "/mnt/d/GitHub/PCAT-286_MiSTer/build/perf01-entry-overlap-20261002/validation/cancel-512-candidate-obj/cancel_vlt"
+      ],
+      "cwd": "/mnt/d/GitHub/PCAT-286_MiSTer/build/perf01-entry-overlap-20261002/candidate",
+      "exit_code": 0,
+      "log_sha256": "1907349c6f24b9d5805a088216277d2acadf6babcd81f9b3b12bfe078ba7a96d"
+    }
+  ],
+  "frozen_sources_unchanged": true,
+  "port_tb_sha256": "fe40a58f9ef84b5b2d6585584fd176305264aafcfdd1d7548dc6a56085fa3cc9",
+  "production_capacity_cancel_tb_sha256": "4dbc7fa0b41d0ac526d7d6620e128f4736b002ab1b9a847217c6630128ddd64c",
+  "full_regression": false,
+  "production_rtl_modified": false
+}

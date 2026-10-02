@@ -90,6 +90,23 @@ delivery of the P16 RBF; loaded hash/OSD setting were not separately captured.
 Screenshots and provenance are retained in P16. Repeated hardware measurements,
 broad compatibility and CPU closure remain pending; no full regression.
 
+The requested deeper throughput review is retained in
+[P17](optimization/P17_MEMORY_PATH_THROUGHPUT_REVIEW_20261002.md). P16's real
+integer phase already has code/data hit rates above 99.98%; the next private
+prototype overlaps bridge/port capture with backend command acceptance,
+reducing common hits from two wait clocks to one at unchanged cache capacity.
+Four fixed-work physical-data kernels gain **9.46–11.40%** with unchanged
+GPR/FLAGS/memory/retired/write signatures. Strict bridge/port lint and bounded
+ownership/cancellation checks pass. Real CHECKNUM has provisionally formatted
+**6138 Dhrystones (+8.33% versus P16 5666)**; math and complete guest receipts
+remain pending. Further ideal-write controls show 13.31–15.74% extra scope on
+those kernels after entry overlap, requiring an explicit posting/coherence/
+drain specification rather than assuming that ideal service is implementable.
+Open-row SDRAM is another unmeasured possibility; bounded write-address
+locality is not controller row-hit evidence. Production RTL is unchanged;
+whole-machine checks, fitted resource cost, setup/hold and MiSTer acceptance
+are gates before adoption. No full regression or new RBF is claimed.
+
 Added 2026-10-01. Status: numeric reference accepted; directed memory-path
 attribution and a coherent 1 KiB RAM-read buffer implemented and checked;
 hardware CheckIt/CHECKNUM improvement observed; repeated matched measurements

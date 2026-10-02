@@ -1,0 +1,109 @@
+--- baseline/rtl/spk286_integration/spk286_at_bus_bridge.sv
++++ candidate/rtl/spk286_integration/spk286_at_bus_bridge.sv
+@@ -147,6 +147,9 @@
+     wire early_memory_address = EARLY_MEMORY_ADDRESS && !reset &&
+                                 (state_q == STATE_IDLE) && cpu_bus_valid &&
+                                 memory_native_word_request && live_request_valid;
++    // Private prototype: accept from the initial address edge.
++    // The backend and bridge both retain the same request on that edge.
++    wire early_memory_command = early_memory_address && !COMPLETE_ON_CPU_SAMPLE;
+     wire [1:0] early_byte_enable = native_word_request ? 2'b11 :
+                                   cpu_address[0] ? 2'b10 : 2'b01;
+     wire [15:0] early_data = native_word_request ? cpu_data_out :
+@@ -227,7 +230,7 @@
+     assign at_valid          = early_memory_address || (state_q == STATE_ADDRESS) ||
+                                (state_q == STATE_COMMAND) ||
+                                (state_q == STATE_WAIT);
+-    assign at_command_valid  = (state_q == STATE_COMMAND);
++    assign at_command_valid  = early_memory_command || (state_q == STATE_COMMAND);
+     assign at_owner          = OWNER_CPU;
+     assign at_cycle_class    = early_memory_address ? cpu_bus_status : request_status_q;
+     assign at_address        = early_memory_address ? cpu_address : beat_address;
+@@ -238,7 +241,8 @@
+                                beat_byte_enable[1] ?
+                                {request_data_q[15:8], 8'h00} :
+                                {8'h00, request_data_q[7:0]};
+-    assign at_data_oe        = at_valid && request_write_q &&
++    assign at_data_oe        = early_memory_command ? cpu_data_oe :
++                               at_valid && request_write_q &&
+                                ((state_q == STATE_COMMAND) ||
+                                 (state_q == STATE_WAIT));
+     assign at_write          = at_valid && (early_memory_address ? cpu_bus_write : request_write_q);
+@@ -249,7 +253,7 @@
+     // released only when the CPU has observed cpu_ready and the bridge returns
+     // to IDLE on the following edge.
+     assign at_lock           = early_memory_address ? cpu_bus_lock : (state_q != STATE_IDLE) && request_lock_q;
+-    assign at_accepted       = (state_q == STATE_COMMAND) && at_accept;
++    assign at_accepted       = at_command_valid && at_accept;
+     assign at_completed      = completion_valid;
+     assign at_response_valid = (state_q == STATE_COMPLETE) || direct_memory_response;
+     assign cpu_ready         = (state_q == STATE_COMPLETE) || direct_memory_response;
+@@ -308,7 +312,8 @@
+                             // decoded RAM/ROM. The complete request is already
+                             // retained above; I/O, INTA, EGA and unmapped
+                             // accesses preserve the reference sequence.
+-                            state_q <= early_memory_address ? STATE_COMMAND :
++                            state_q <= early_memory_command && at_accept ? STATE_WAIT :
++                                       early_memory_address ? STATE_COMMAND :
+                                        fast_memory_request ? STATE_ADDRESS :
+                                        STATE_SNAPSHOT;
+                         else begin
+--- baseline/rtl/spk286_integration/spk286_at_mister_memory_port.sv
++++ candidate/rtl/spk286_integration/spk286_at_mister_memory_port.sv
+@@ -92,6 +92,9 @@
+ 
+     assign debug_state = {active_q, accepted_q, owner_q, cpu_cancelled_q};
+ 
++    wire cpu_entry_command = !active_q && !loader_valid &&
++                             cpu_candidate && cpu_command_valid && !reset;
++
+     assign selected_accept = active_q && !accepted_q && backend_accept &&
+                              backend_command_valid;
+     assign response_complete = active_q && accepted_q && backend_ready &&
+@@ -155,7 +158,21 @@
+             end else if (owner_q == OWNER_LOADER) begin
+                 loader_ready = response_complete;
+             end
+-        end else begin
++        end else if (cpu_entry_command) begin
++            // Private prototype: arbitration, address capture and backend
++            // command acceptance share one edge. Completion is still qualified
++            // by the retained active/accepted record on a later edge.
++            backend_valid         = 1'b1;
++            backend_command_valid = 1'b1;
++            backend_owner         = OWNER_CPU;
++            backend_write         = cpu_write;
++            backend_refresh       = 1'b0;
++            backend_code_fetch    = cpu_code_fetch;
++            backend_cycle_class   = cpu_cycle_class;
++            backend_address       = cpu_address;
++            backend_byte_enable   = cpu_byte_enable;
++            backend_data_out      = cpu_data_out;
++            cpu_accept            = backend_accept;
+         end
+     end
+ 
+@@ -189,6 +206,7 @@
+                     byte_enable_q <= loader_byte_enable;
+                     data_out_q    <= loader_data_out;
+                 end else if (cpu_candidate) begin
++                    accepted_q    <= cpu_entry_command && backend_accept;
+                     active_q      <= 1'b1;
+                     owner_q       <= OWNER_CPU;
+                     write_q       <= cpu_write;
+--- baseline/tools/perf01/memory_probe_smoke.cpp
++++ candidate/tools/perf01/memory_probe_smoke.cpp
+@@ -29,11 +29,11 @@
+     const auto require=[](bool condition,const char *message) { if(!condition) throw std::runtime_error(message); };
+     const unsigned miss=transfer("reset_alias_code_miss",0xff0000,0xf0000,13);
+     const unsigned hit=transfer("canonical_alias_code_hit",0xf0000,0xf0000,13);
+-    require(hit==2 && miss>hit,"Code miss/hit timing or alias mismatch");
++    require(hit==1 && miss>hit,"Code miss/hit timing or alias mismatch");
+     require(memory.stat_p03_misses==1 && memory.stat_p03_hits==1,"Code request duplication");
+     const unsigned read_miss=transfer("data_read_miss",0x1000,0x1000,5);
+     const unsigned read_hit=transfer("data_read_hit",0x1000,0x1000,5);
+-    require(read_hit==2 && read_miss>read_hit,"Data miss/hit timing mismatch");
++    require(read_hit==1 && read_miss>read_hit,"Data miss/hit timing mismatch");
+     require(memory.stat_data_buffer_misses==1 && memory.stat_data_buffer_hits==1,"Data request duplication");
+     transfer("upper_byte_write_update",0x1001,0x1001,6);
+     require(memory.stat_data_buffer_updates==1,"Upper-byte write did not update cached word");

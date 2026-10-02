@@ -2,8 +2,10 @@
 
 Date: 2026-10-02. Status: **RBF generated and verified; hardware acceptance and
 50 MHz timing closure pending**. A complete CPU and PCAT regression was
-subsequently requested and is running in `build/full-regression-posted-pit-20261002`;
-no completed result is claimed yet.
+subsequently requested and is running in
+`build/full-regression-posted-pit-active-20261002`, with only the active CPU
+options, as requested. The earlier two-profile run was interrupted for this
+scope correction and retained. No completed regression result is claimed yet.
 
 ## Artifact and inputs
 
@@ -88,7 +90,9 @@ hardware integer rate: **5666**, versus same-binary control **6138**. The new
 combined adapter drives corrected RTL from actual 86Box PIT OUT1 and produces
 the first integer result **6906**. Thus it is +21.89% over the old-policy
 5666 observation, reaching 89.58% of immediate-memory SPK286's 7709 reference.
-These two latest integers are still partial formatter captures; their guest
+The old-policy controls subsequently completed with **6138 / 113.6K** versus
+**5666 / 106.7K**, both RC0/ALL_DONE, reproducing both P17 MiSTer rates exactly.
+The combined candidate's 6906 remains a partial formatter capture; its guest
 math/exit tests continue. No corrected-policy Whetstone rate or MiSTer gain
 is inferred before those observations arrive.
 

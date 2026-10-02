@@ -57,6 +57,12 @@ observation, exact old requester/arbiter, generated top and identical-binary
 identities. The 5666 matches P17 MiSTer. The guest math/exit tests still run;
 this group makes no completed-suite or corrected-policy speed claim.
 
+`refresh-checknum-complete/` retains the completed same-binary 6138 / 113.6K
+control and 5666 / 106.7K old-requester measurements. Both guests have
+RC0/ALL_DONE; CPU objects/options and initial disk/CMOS/configuration match.
+The old-requester result reproduces both P17 MiSTer numbers exactly. The
+explicit host teardown classification does not replace guest completion.
+
 ## Reproduction
 
 `combined-rbf/` retains the verified P18/P19 bitstream identity, frozen build

@@ -172,3 +172,25 @@ It does not establish every peripheral or electrical difference as solved.
 The combined P18/PIT candidate is measured separately with actual 86Box PIT
 OUT1 driving the corrected RTL; that adapter keeps native SDRAM refresh and
 records HOLD/HLDA. Its guest values and peripherals still belong to 86Box.
+
+## Completed old-policy CHECKNUM confirmation
+
+Both matched controls completed CHECKNUM with guest RC0 and `ALL_DONE`.
+The strict comparison verifies the same binary, CPU objects/options, initial
+disk, CHECKNUM, configuration, initial CMOS and profiler header. AT-request
+enable alone differs; native SDRAM refresh remains active in both.
+
+| Same-binary control | Dhrystones/s | K Whetstones/s |
+| --- | ---: | ---: |
+| AT ownership requests disabled | 6,138 | 113.6 |
+| Original 32-clock AT requester enabled | 5,666 | 106.7 |
+| User's P17 MiSTer observation | 5,666 | 106.7 |
+
+The old requester reduces rates by 7.69% and 6.07%. Both real benchmark
+numbers now reproduce the user's hardware observation exactly. This strengthens
+the platform-cost attribution for this workload; it does not establish a
+cycle-accurate AT model or solve every peripheral/electrical difference.
+Host exit timeouts followed by SIGTERM are explicitly classified separately
+from completed guest success. The combined posted/PIT candidate's math result
+is still pending. Immutable evidence: `refresh-checknum-complete/` under the
+P18/P19 evidence directory; earlier partial receipts remain unchanged.

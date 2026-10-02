@@ -18,8 +18,9 @@ CHECKNUM observation of 3584 / 72.2K, it remains +10.10% / +6.23%.
 CheckIT displays 35.02 MHz as its software estimate; the fitted CPU clock
 remains 50 MHz. Do not substitute the benchmark estimate for the PLL period.
 
-The user also reports Windows 3.1 and OS/2 continue to operate normally with
-this build. This is useful hardware compatibility evidence for those runs,
+The user also reports Windows 3.1, OS/2, games and other applications continue
+to operate normally with this build. Game titles and additional workloads were
+not specified. This is useful hardware compatibility evidence for those runs,
 not a complete workload or CPU regression certificate.
 
 The decrease is recorded without assigning a cause. Matching workload,

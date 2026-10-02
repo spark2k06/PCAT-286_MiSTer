@@ -11,18 +11,25 @@ and separates open findings from that resolved boot failure.
 
 Added 2026-10-01. Status: numeric reference accepted; directed memory-path
 attribution and a coherent 1 KiB RAM-read buffer implemented and checked;
-hardware CheckIt/CHECKNUM improvement observed; repeat-run and timing acceptance
-remain open. The [current fitted 50 MHz audit](optimization/P05_50MHZ_AUDIT_20261001.md)
-identifies CPU protected-stack control, keyboard sequence packing and upstream
-SDRAM acceptance as physical limits. One first-stage video CDC constraint
-omission is corrected; real 50 MHz violations remain. The initial CheckIt 3.03C report was 3584
+hardware CheckIt/CHECKNUM improvement observed; repeated matched measurements
+and further throughput attribution remain open. The subsequent
+[all-corner 50 MHz closure](optimization/P08_50MHZ_TIMING_CLOSURE_20261002.md)
+has positive setup and hold. The user confirmed the selected RBF at maximum
+speed, reported normal Windows 3.1/OS/2/game operation, and supplied matching
+CheckIT/CHECKNUM results of 3946 Dhrystones / 76.7K Whetstones. See the
+[hardware observation record](optimization/P08_HARDWARE_CHECKIT_20261002.md).
+The small decrease from the best earlier observations is recorded without
+an established cause. The earlier
+[50 MHz audit](optimization/P05_50MHZ_AUDIT_20261001.md) describes physical
+limits addressed by the later closure. The initial CheckIt 3.03C report was 3584
 Dhrystones / 71.9K Whetstones on MiSTer,
 versus 4143 / 70.9K for the **original native 86Box 286 at 25 MHz**. The supplied
 native screenshot is not SPK286-in-86Box. The new standalone CHECKNUM frontend
 reproduces 4143 / 70.9 on that native reference; the user accepted it on MiSTer
 with 3584 / 72.2. See [the acceptance record](CHECKNUM_REFERENCE_20261001.md).
 The subsequent hardware results and local RBF/report hashes are recorded below;
-the exact loaded RBF hash and matching runtime settings remain to be attested.
+the 2026-10-02 selected-RBF identity and maximum-speed setting are user-attested.
+Other runtime settings and repeat-run variation remain to be matched.
 This is a whole-machine performance story; no CPU functional cause is established.
 
 Acceptance plan for later work:
@@ -407,22 +414,20 @@ For future observers:
 - Use the existing 86Box EGA backend to separate CPU and video behavior.
   Its functional success does not establish FPGA timing or SDRAM integration.
 
-## 3. NSSI 0.60 report: retain for triage
+## 3. NSSI 0.60 report: closed as MRBIOS-associated behavior
 
 [The supplied screenshot](evidence/hardware-followup-20260930/nssi-060-invalid-opcode-20260927.jpg)
 shows NSSI 0.60 reporting `Invalid Opcode` during `Determining bus type...`,
 then returning to the DOS prompt. The displayed dump begins `B564 F000`.
 The forum post shown in the image is dated 2026-09-27.
 
-This attachment was the only pending item in SPK286. It is retained here
-because it reports whole-machine behavior with no established CPU cause.
-There is no reproduction, precise build/configuration record or confirmed
-resolution attached to it. It must not be counted as a newly reproduced CPU
-failure, or silently classified as fixed by the EGA change.
-
-Before opening an implementation story, reproduce with a recorded RBF, BIOS,
-NSSI executable and configuration; capture the faulting bytes and context;
-then compare against native 86Box and SPK286 in 86Box where applicable.
+Closed on 2026-10-02 at the user's request. The user confirms the failure was
+associated with MRBIOS and also occurred in 86Box with the same BIOS.
+This supplies the cross-environment comparison missing from the original
+triage record. No SPK286 implementation story remains open for this report.
+No CPU, EGA or BIOS correction was applied for this closure. The original
+screenshot remains historical evidence; exact reproduction settings and the
+underlying MRBIOS/NSSI interaction were not independently captured in this run.
 
 ## Cleanup boundary
 

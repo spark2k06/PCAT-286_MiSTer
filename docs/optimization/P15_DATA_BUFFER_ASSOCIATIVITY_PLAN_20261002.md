@@ -1,7 +1,38 @@
-# P15 proposal: reduce data-buffer conflicts at the same 1 KiB capacity
+# P15: reduce data-buffer conflicts at the same 1 KiB capacity
 
-Date: 2026-10-02. PERF01 next-step recommendation; **not implemented**.
+Date: 2026-10-02. PERF01 two-way data-buffer candidate.
 The user retains P14 and defers HDMI closure while prioritizing throughput.
+The user has authorized implementation, measurement and resource comparison.
+
+## Implemented candidate and directed acceptance
+
+The production data buffer now has 256 sets and two ways, retaining 512 words
+and 1 KiB of payload. Parallel synchronous tag/data reads preserve the existing
+hit response. Invalid ways precede LRU replacement. Read hits/fills make their
+way most recently used; writes update a matching cached word only after physical
+completion and do not change read recency or allocate on a write miss.
+CPU options, clocks and the 4 KiB instruction buffer are unchanged.
+
+The [implementation evidence](../evidence/perf01-data2way-20261002/README.md)
+retains these completed directed checks:
+
+| Check | Result |
+| --- | --- |
+| Icarus/Verilator unit and strict Verilator lint | PASS |
+| Same-index coexistence, LRU reread, both ways' byte merges, CPU/DMA/loader writes | PASS |
+| Local hit response clock and CPU flush of both ways | PASS |
+| Common memory-port/code/data pipeline, 64 and 512 code lines | PASS |
+| Two words / one set minimum elaboration | PASS, Icarus |
+| Private 86Box memory-control adapter smoke | PASS, sampled data-hit wait remains two CPU clocks |
+| Isolated Quartus RAM inference | PASS, two 256 x 32-bit M10K memories |
+
+The isolated map reports 957 registers and 16,384 memory bits, including
+diagnostic outputs. The previous full fit had two M10Ks for data/tag storage;
+the new geometry also fits two. Whole-design placed cost is being measured
+separately in a pre-build frozen Quartus run. A fresh unchanged CHECKNUM run
+uses the same initial disk/configuration/CMOS and actual 50 MHz CPU. Its
+completed scores and fitted resources are pending at this implementation hito.
+No full regression or hardware acceptance is claimed.
 
 ## Completed 4 KiB code-buffer CHECKNUM measurement
 
@@ -57,7 +88,7 @@ counts in both phases. The two-way shadow removes approximately **99.89% /
 leaves much of Whetstone's conflict pressure. These are tag-model results on
 existing traffic, not an implemented speedup or a promised CHECKNUM score.
 
-The proposed production organization is **256 sets x 2 ways x 16-bit word**,
+The selected production organization is **256 sets x 2 ways x 16-bit word**,
 retaining 1 KiB of payload. Two distinct physical words sharing an index can
 coexist. Use one replacement bit per set and prefer an invalid way. Parallel
 synchronous way lookups must preserve the current hit-response latency.
@@ -80,7 +111,7 @@ logic. P14's cost reduction makes disciplined cost measurement a requirement.
 3. Run directed byte-scoreboard/conflict/replacement/cancellation checks and
    the common memory-port/code/data chain. Include two aliases mapping to one
    set, both lanes, invalid-way preference and evicted-word rereads. No full
-   regression is part of this proposed milestone.
+   regression is part of this milestone.
 4. Verify both tag/data arrays infer M10K; record map/fit ALMs, registers,
    M10Ks and CPU/system timing against the accepted P14 fit. Reject accidental
    register arrays or an added hit clock.

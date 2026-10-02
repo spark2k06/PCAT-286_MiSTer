@@ -46,6 +46,12 @@ its shadow reduces data-read misses from 378,345 to 420 in Dhrystone and from
 1,931,287 to 190,075 in Whetstone. This is a proposed next step, not a measured
 two-way implementation or promised hardware gain.
 
+The user has subsequently authorized P15. Its 1 KiB two-way data buffer is
+implemented and has passed directed coherence/replacement/hit-latency checks,
+both memory-port/code/data pipeline capacities and isolated M10K inference.
+Unchanged CHECKNUM and a pre-build frozen full Quartus fit are running to measure
+gain and placed resource cost before drawing a performance conclusion.
+
 Added 2026-10-01. Status: numeric reference accepted; directed memory-path
 attribution and a coherent 1 KiB RAM-read buffer implemented and checked;
 hardware CheckIt/CHECKNUM improvement observed; repeated matched measurements

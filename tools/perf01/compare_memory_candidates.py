@@ -22,6 +22,7 @@ def identity(arm):
             'build_manifest_sha256':sha(binary.parent/'build-manifest.json'),
             'code_buffer_lines':lines, 'code_buffer_bytes':lines*8,
             'data_buffer_words':manifest.get('data_buffer_words',512),
+            'data_buffer_ways':manifest.get('data_buffer_ways',1),
             'profiler_header_sha256':header,'original_backend_sha256':backend,
             'macros':manifest['macros']}
 

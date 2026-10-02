@@ -145,6 +145,7 @@ def main():
         'commands':commands, 'sources_sha256':before, 'cpu_objects_sha256':cpu_before, 'macros':macros,
         'code_buffer_lines':code_lines, 'production_code_buffer_lines':production_lines,
         'code_buffer_sync_tags':code_lines > 128, 'data_buffer_words':512,
+        'data_buffer_ways':2,
         'binary_sha256':digest(out/'86Box-memory-probe'),
         'note':'Private adapter only; CPU model and release objects reused unchanged. Guest memory values stay in 86Box.'}, indent=2)+'\n')
     print('MEMORY_PROBE_READY', out/'86Box-memory-probe', flush=True)

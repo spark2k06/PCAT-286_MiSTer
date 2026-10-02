@@ -104,9 +104,11 @@ module spk286_at_bus_bridge #(
     logic        request_lock_q;
     logic        request_two_beats_q;
     logic        request_native_word_q;
+    logic        request_native_memory_q;
     logic        beat_high_q;
     logic [7:0]  read_low_byte_q;
     logic        complete_sampled_q;
+    logic [15:0] cpu_data_in_q;
 
     logic request_status_valid;
     logic request_lane_valid;
@@ -208,6 +210,20 @@ module spk286_at_bus_bridge #(
                               (!request_is_read || request_is_inta ||
                                at_read_data_valid);
 
+    // RAM/ROM responses already come from a retained backend transaction.
+    // In the common clock domain, let the CPU consume that response on the
+    // same edge as the bridge. Byte requests still select their retained
+    // lane; split and peripheral cycles keep the registered completion path.
+    // The divided CPU clock keeps its explicit READY alignment/hold interval.
+    wire direct_memory_wait = !COMPLETE_ON_CPU_SAMPLE && !reset &&
+                              request_native_memory_q && !request_two_beats_q &&
+                              (state_q == STATE_WAIT);
+    wire direct_memory_response = direct_memory_wait && completion_valid;
+    wire [15:0] direct_memory_data = request_native_word_q ? at_read_data :
+                                     beat_byte_enable[1] ?
+                                     {at_read_data[15:8], 8'h00} :
+                                     {8'h00, at_read_data[7:0]};
+
     assign at_valid          = early_memory_address || (state_q == STATE_ADDRESS) ||
                                (state_q == STATE_COMMAND) ||
                                (state_q == STATE_WAIT);
@@ -235,8 +251,13 @@ module spk286_at_bus_bridge #(
     assign at_lock           = early_memory_address ? cpu_bus_lock : (state_q != STATE_IDLE) && request_lock_q;
     assign at_accepted       = (state_q == STATE_COMMAND) && at_accept;
     assign at_completed      = completion_valid;
-    assign at_response_valid = (state_q == STATE_COMPLETE);
-    assign cpu_ready         = (state_q == STATE_COMPLETE);
+    assign at_response_valid = (state_q == STATE_COMPLETE) || direct_memory_response;
+    assign cpu_ready         = (state_q == STATE_COMPLETE) || direct_memory_response;
+    // Select the retained lane path independently of READY/data-valid. The
+    // CPU consumes it only with cpu_ready, keeping completion qualification
+    // out of the 16-bit response-data mux.
+    assign cpu_data_in       = direct_memory_wait && request_is_read ?
+                               direct_memory_data : cpu_data_in_q;
     assign bridge_idle       = (state_q == STATE_IDLE) && !early_memory_address;
     assign debug_state       = state_q;
 
@@ -250,10 +271,11 @@ module spk286_at_bus_bridge #(
             request_lock_q     <= 1'b0;
             request_two_beats_q <= 1'b0;
             request_native_word_q <= 1'b0;
+            request_native_memory_q <= 1'b0;
             beat_high_q        <= 1'b0;
             read_low_byte_q    <= 8'd0;
             complete_sampled_q <= 1'b0;
-            cpu_data_in        <= 16'd0;
+            cpu_data_in_q      <= 16'd0;
             protocol_error     <= 1'b0;
         end else begin
             if (state_q != STATE_COMPLETE)
@@ -276,9 +298,11 @@ module spk286_at_bus_bridge #(
                                                 !cpu_bus_bhe_n;
                         request_native_word_q <= live_request_valid &&
                                                  native_word_request;
+                        request_native_memory_q <= live_request_valid &&
+                                                   memory_native_word_request;
                         beat_high_q          <= 1'b0;
                         read_low_byte_q      <= 8'd0;
-                        cpu_data_in          <= 16'd0;
+                         cpu_data_in_q        <= 16'd0;
                         if (live_request_valid)
                             // P01 removes two bookkeeping-only states for
                             // decoded RAM/ROM. The complete request is already
@@ -315,26 +339,32 @@ module spk286_at_bus_bridge #(
                     if (completion_valid) begin
                         if (request_is_read) begin
                             if (request_is_inta)
-                                cpu_data_in <= {8'h00, at_read_data[7:0]};
+                                cpu_data_in_q <= {8'h00, at_read_data[7:0]};
                             else if (request_native_word_q)
-                                cpu_data_in <= at_read_data;
+                                cpu_data_in_q <= at_read_data;
                             else if (beat_byte_enable[1]) begin
                                 if (request_two_beats_q)
-                                    cpu_data_in <= {at_read_data[15:8],
+                                    cpu_data_in_q <= {at_read_data[15:8],
                                                     read_low_byte_q};
                                 else
-                                    cpu_data_in <= {at_read_data[15:8], 8'h00};
+                                    cpu_data_in_q <= {at_read_data[15:8], 8'h00};
                             end else begin
                                 if (request_two_beats_q)
                                     read_low_byte_q <= at_read_data[7:0];
                                 else
-                                    cpu_data_in <= {8'h00, at_read_data[7:0]};
+                                    cpu_data_in_q <= {8'h00, at_read_data[7:0]};
                             end
                         end
 
                         if (request_two_beats_q && !beat_high_q) begin
                             beat_high_q <= 1'b1;
                             state_q <= STATE_ADDRESS;
+                        end else if (direct_memory_response) begin
+                            // READY is sampled now. The BIU presents its next
+                            // request after this edge, so only IDLE may capture
+                            // it on the next edge; recapturing here would replay
+                            // the request that just completed.
+                            state_q <= STATE_IDLE;
                         end else begin
                             // Never launch READY on the same parent edge that
                             // launches the divided CPU clock. Align it to the

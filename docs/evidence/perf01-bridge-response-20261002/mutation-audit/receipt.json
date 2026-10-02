@@ -1,0 +1,43 @@
+{
+  "status": "PASS",
+  "source_sha256": "65480d9dab30c7071bc31751fd475caa795e508c766a71bd89dd57c1f6258cc6",
+  "bench_sha256": "bb0f7425ad1b3a260edd7a8d1d1d81f090db80dcea15413433c6b3dbe818fae4",
+  "compiler_flags": [
+    "-DSPK286_P05_PARALLEL_LIMIT_CHECK",
+    "-DSPK286_P01_FAST_MEMORY_START",
+    "-DSPK286_P02_FETCH_CHAIN",
+    "-DSPK286_P06_EARLY_MEMORY_ADDRESS",
+    "-DSPK286_P07_SYNC_MICROCODE",
+    "-DSPK286_AT_RAM_READ_BUFFER"
+  ],
+  "mutants": [
+    {
+      "mutant": "peripheral-bypass",
+      "status": "REJECTED",
+      "expected_failure": "conservative response bypassed its register",
+      "returncode": 1,
+      "sha256": "dab7df3816d77751ef29aac60de81befcc47ec7477308c8c141d38734c038f5e"
+    },
+    {
+      "mutant": "missing-data-valid",
+      "status": "REJECTED",
+      "expected_failure": "read completed without data-valid",
+      "returncode": 1,
+      "sha256": "8594d66e0a499be8c4a7f9020e14c71194b494ba29f3e13ef5671f1281807312"
+    },
+    {
+      "mutant": "reset-response-leak",
+      "status": "REJECTED",
+      "expected_failure": "reset did not mask direct response",
+      "returncode": 1,
+      "sha256": "b03db3a813f406d1c70291198c0ee24509269a241e5f296e8c0e711467a8c3b6"
+    },
+    {
+      "mutant": "upper-byte-lane",
+      "status": "REJECTED",
+      "expected_failure": "CPU sampled wrong byte lanes/data",
+      "returncode": 1,
+      "sha256": "224a466ec136e01e17b797c0eaa3aeb6b77b4d45f4714fe37d0eb41c04a6b2a2"
+    }
+  ]
+}

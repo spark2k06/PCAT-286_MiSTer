@@ -1,0 +1,35 @@
+integration_cycle_binding=None
+def read_cycle_manifest(path):
+    entries={}
+    for line in path.read_text().splitlines():
+        match=re.fullmatch(r'([0-9a-f]{64})  (.+)',line)
+        if not match or match[2] in entries:
+            raise ValueError('Malformed or duplicate directed cycle source: '+str(path))
+        entries[match[2]]=match[1]
+    if not entries:raise ValueError('Empty directed cycle source manifest: '+str(path))
+    return entries
+cycle_hashes=read_cycle_manifest(cycle_sources)
+if args.integration_cycle_sources:
+    new_sources=args.integration_cycle_sources
+    new_hashes=read_cycle_manifest(new_sources)
+    if set(new_hashes)!=set(cycle_hashes):
+        raise ValueError('New cycle validation must cover the identical complete source set')
+    changed_cycle_inputs={name for name in cycle_hashes if cycle_hashes[name]!=new_hashes[name]}
+    allowed_integration_inputs={'rtl/spk286_integration/spk286_at_bus_bridge.sv',
+                                'rtl/spk286_integration/spk286_at_mister_sdram_owner.sv'}
+    if not changed_cycle_inputs or not changed_cycle_inputs.issubset(allowed_integration_inputs):
+        raise ValueError('Latency validation cannot replace CPU, harness, firmware or configuration proofs: '+
+                         str(sorted(changed_cycle_inputs)))
+    integration_cycle_binding={'manifest':str(new_sources),'sha256':sha(new_sources),
+                               'changed_inputs':sorted(changed_cycle_inputs),
+                               'scope':'Only bridge/owner rebound to new directed workload receipts; '
+                                       'all CPU, firmware, configuration and harness inputs unchanged'}
+    cycle_hashes=new_hashes
+validated_source_count=0
+for name,expected in cycle_hashes.items():
+    relative=Path(name)
+    if relative.is_absolute() or '..' in relative.parts:
+        raise ValueError('Expected repository-relative cycle source')
+    path=run/'work'/relative
+    if sha(path)!=expected:raise ValueError('Fitted source differs from directed cycle validation: '+name)
+    validated_source_count+=1

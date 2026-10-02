@@ -12,6 +12,8 @@ parser.add_argument('run',type=Path)
 parser.add_argument('--net-budget',type=float)
 parser.add_argument('--output',required=True)
 parser.add_argument('--summary-file',type=Path)
+parser.add_argument('--integration-cycle-sources',type=Path,
+                    help='New directed workload manifest for bridge/SDRAM-owner latency changes only')
 args=parser.parse_args()
 run=(args.run if args.run.exists() or args.run.is_absolute() else root/'build'/args.run).resolve()
 summary=json.loads((args.summary_file or run/'summary.json').read_text())
@@ -135,11 +137,38 @@ if executor_sha==offset_proof['candidate_source_sha256']:
     cycle_sources=root/'docs/evidence/stack-offset-arithmetic-20261002/compiled-cycle-sources.sha256'
 else:
     cycle_sources=root/'docs/evidence/sync-microcode-20261001/compiled-sources.sha256'
+integration_cycle_binding=None
+def read_cycle_manifest(path):
+    entries={}
+    for line in path.read_text().splitlines():
+        match=re.fullmatch(r'([0-9a-f]{64})  (.+)',line)
+        if not match or match[2] in entries:
+            raise ValueError('Malformed or duplicate directed cycle source: '+str(path))
+        entries[match[2]]=match[1]
+    if not entries:raise ValueError('Empty directed cycle source manifest: '+str(path))
+    return entries
+cycle_hashes=read_cycle_manifest(cycle_sources)
+if args.integration_cycle_sources:
+    new_sources=args.integration_cycle_sources
+    new_hashes=read_cycle_manifest(new_sources)
+    if set(new_hashes)!=set(cycle_hashes):
+        raise ValueError('New cycle validation must cover the identical complete source set')
+    changed_cycle_inputs={name for name in cycle_hashes if cycle_hashes[name]!=new_hashes[name]}
+    allowed_integration_inputs={'rtl/spk286_integration/spk286_at_bus_bridge.sv',
+                                'rtl/spk286_integration/spk286_at_mister_sdram_owner.sv'}
+    if not changed_cycle_inputs or not changed_cycle_inputs.issubset(allowed_integration_inputs):
+        raise ValueError('Latency validation cannot replace CPU, harness, firmware or configuration proofs: '+
+                         str(sorted(changed_cycle_inputs)))
+    integration_cycle_binding={'manifest':str(new_sources),'sha256':sha(new_sources),
+                               'changed_inputs':sorted(changed_cycle_inputs),
+                               'scope':'Only bridge/owner rebound to new directed workload receipts; '
+                                       'all CPU, firmware, configuration and harness inputs unchanged'}
+    cycle_hashes=new_hashes
 validated_source_count=0
-for line in cycle_sources.read_text().splitlines():
-    expected,name=line.split(maxsplit=1)
+for name,expected in cycle_hashes.items():
     relative=Path(name)
-    if relative.is_absolute():raise ValueError('Expected repository-relative cycle source')
+    if relative.is_absolute() or '..' in relative.parts:
+        raise ValueError('Expected repository-relative cycle source')
     path=run/'work'/relative
     if sha(path)!=expected:raise ValueError('Fitted source differs from directed cycle validation: '+name)
     validated_source_count+=1
@@ -191,6 +220,7 @@ result={'status':status,'run_directory':str(run.relative_to(root)),
     'manifest_sha256':sha(run/'manifest.json'),'frozen_source_files_verified':len(manifest['source_sha256']),
     'controlled_generated_sources':generated_sources,
     'directed_cycle_sources_verified':validated_source_count,'compiled_rom':compiled_rom,
+    'integration_cycle_binding':integration_cycle_binding,
     'original_constraints_guard':'All frozen SDC inputs match 45e95b4; only the explicitly checked additional video_stats net bound may differ',
     'corners':corners,'failures':failures,
     'scope':'Constrained FPGA fabric and conditional W9825 SDRAM flight/device budget; not certification of inherited platform I/O or HPS hard blocks',

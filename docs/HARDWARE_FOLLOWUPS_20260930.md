@@ -313,8 +313,14 @@ architectural state and write counts. With production buffers enabled, the
 cycle reduction is only 0.027–0.112% in the two CheckIT-shaped kernels and
 Dhrystone 2.1, versus 2.010% in the working-set kernel. The prototype remains
 an experiment: no timing fit or hardware validation was performed and the
-production owner is unchanged. Reducing the bridge return cycle is being
-evaluated separately, because it also benefits cache hits and writes.
+production owner is unchanged. The separate
+[bridge response candidate](optimization/P10_BRIDGE_RESPONSE_20261002.md)
+removes one return cycle for native RAM/ROM hits, misses and writes. Its four
+production-buffer kernels show 9.294–10.255% higher throughput with matching
+architectural state and write counts. Directed protocol, cancellation and
+corrected real-CPU warm-reset/IRQ tests pass. FPGA timing and hardware acceptance
+of this candidate are recorded separately; these synthetic results are not
+DOS CheckIT scores.
 
 1. Capture completed CHECKNUM scores and request/wait counts in matched SPK286
    and hardware configurations, with the loaded RBF recorded. Use the same

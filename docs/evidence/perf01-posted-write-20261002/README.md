@@ -52,6 +52,11 @@ Each guest has RC0/ALL_DONE. Host exit timeouts and SIGTERM are explicitly
 recorded. This group supersedes partial-score status, preserving the original
 `integer-partial/` observations unchanged.
 
+`refresh-checknum-partial/` retains the matched 6138 -> 5666 first integer
+observation, exact old requester/arbiter, generated top and identical-binary
+identities. The 5666 matches P17 MiSTer. The guest math/exit tests still run;
+this group makes no completed-suite or corrected-policy speed claim.
+
 ## Reproduction
 
 Use the prototype checkpoint's production P17 sources, before adoption, with

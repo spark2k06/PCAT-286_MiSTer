@@ -146,3 +146,21 @@ with 50 MHz timing closure still deferred.
 Evidence: [P18 follow-up inventory](../evidence/perf01-posted-write-20261002/README.md),
 particularly the immutable `refresh/` group. This extends the missing-ownership
 observations already documented in [P12](P12_REAL_CHECKNUM_MEMORY_ATTRIBUTION_20261002.md).
+
+## First real integer confirmation
+
+The two matched old-policy controls publish stable formatted CHECKNUM integer
+values: **6138 without AT requests, 5666 with production's 32-clock requester**.
+This is a 7.69% loss and exactly reproduces the user's P17 MiSTer Dhrystone
+observation. A read-only two-sample RAM capture identifies the formatter,
+owned PID, binary and initial disk; both controls use the same binary,
+initial CMOS, disk, configuration and CPU objects. Only AT-refresh enable varies.
+Their math tests continue, so this is partial integer evidence, not final
+DOS acceptance or a measured gain for the corrected PIT policy.
+
+The exact integer reproduction supplies strong evidence that omitted AT
+HOLD/refresh service accounts for the residual P17 integer hardware gap.
+It does not establish every peripheral or electrical difference as solved.
+The combined P18/PIT candidate is measured separately with actual 86Box PIT
+OUT1 driving the corrected RTL; that adapter keeps native SDRAM refresh and
+records HOLD/HLDA. Its guest values and peripherals still belong to 86Box.

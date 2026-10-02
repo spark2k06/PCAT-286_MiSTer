@@ -19,3 +19,9 @@ Full local builds, binaries and diagnostic scripts remain in the ignored
 `D:/GitHub/PCAT-286_MiSTer/build/perf01-real-memory-20261002/` directory.
 Complete CHECKNUM measurement and hardware/timing acceptance are pending at
 this implementation milestone.
+
+`resources-before/` captures the completed frozen P10 fitted reference before
+the user's candidate synthesis finishes. It retains map/fit summaries, the
+Fitter resource section and identities of the original full report, frozen
+source manifest and delivered RBF. Candidate resource totals and deltas require
+its completed Fitter; root `output_files` is not used as a historical baseline.

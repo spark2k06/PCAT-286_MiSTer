@@ -62,6 +62,32 @@ The private adapter follows the production instance's capacity by default;
 are reused unchanged. The frozen candidate executable and source/build hashes
 are under `build/perf01-real-memory-20261002/probe-code4k/`.
 
+## FPGA resource reference before candidate synthesis
+
+The completed P10 fitted design is preserved in
+[resources-before](../evidence/perf01-code4k-20261002/resources-before/resources.json),
+with original map/fit summaries, the Fitter resource table and SHA256 identities
+of the full report, frozen source manifest and delivered RBF. This is the
+predecessor with 512 bytes of instruction payload and 1 KiB of data payload.
+The candidate production RTL is commit `0399806`.
+
+| Fitted resource | P10 reference | P13 candidate | Delta |
+| --- | ---: | ---: | ---: |
+| Equivalent ALMs | 28,873 / 41,910 (69%) | Pending | Pending |
+| ALMs used in final placement | 34,740 / 41,910 (83%) | Pending | Pending |
+| Total registers | 37,171 | Pending | Pending |
+| M10K blocks | 414 / 553 (75%) | Pending | Pending |
+| Block memory bits | 3,267,227 / 5,662,720 (58%) | Pending | Pending |
+| Allocated block memory implementation bits | 4,239,360 (75%) | Pending | Pending |
+| DSP blocks | 39 / 112 (35%) | Pending | Pending |
+| PLLs | 3 / 6 (50%) | Pending | Pending |
+
+The instruction payload increases by 3.5 KiB. Tag mapping and logic change as
+well, so that byte difference is not an estimate of additional M10K/ALM usage.
+Compare the completed candidate Fitter with the same device, Quartus version
+and configuration. Mutable root `output_files` currently mixes an older fitted
+report with the ongoing candidate map; it is not the reference above.
+
 ## Measurement and physical acceptance
 
 The candidate is executing the unchanged CHECKNUM executable on the same

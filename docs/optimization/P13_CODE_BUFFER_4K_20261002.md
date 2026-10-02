@@ -96,6 +96,9 @@ the two old tag RAM copies disappear and the 512-entry tags map to logic.
 Synchronous source and a `ramstyle` attribute did not guarantee tag RAM
 inference. Whole-design deltas also include packing/duplication changes.
 The user requests reducing this cost while retaining the measured improvement.
+[P14](P14_CODE_BUFFER_RAM_MAPPING_20261002.md) corrects the inference templates
+and verifies RAM mapping, reduced synthesis cost and matching directed bus
+responses. Its final Fitter/timing/hardware results remain pending.
 
 ### User-reported hardware improvement
 
@@ -114,12 +117,13 @@ full timing/constraint audit. This candidate does not establish 50 MHz closure.
 
 ## Measurement and physical acceptance
 
-The candidate is executing the unchanged CHECKNUM executable on the same
+The frozen `0399806` candidate is executing the unchanged CHECKNUM executable on the same
 initial disk and calibrated CMOS as the old-capacity arm, at actual 50 MHz
 CPU / 8 MHz ISA. At this implementation commit, complete candidate scores are
 pending. No full CPU regression, FPGA fitter, timing closure or new RBF was
-run for this milestone. Synchronous arrays are intended for block-RAM inference;
-their actual mapping and 50 MHz timing still require Quartus evidence.
+run at the initial implementation milestone. The later user fit is recorded
+above; corrected RAM mapping is documented in P14. The corrected design's
+50 MHz timing still requires a new fit and STA.
 
 The first candidate measurement (`pcat-code4k`) was interrupted by the host
 runner's thread-stop timeout during Whetstone. Its guest did not reach RC0 or

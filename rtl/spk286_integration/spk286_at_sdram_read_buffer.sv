@@ -77,7 +77,6 @@ module spk286_at_sdram_read_buffer #(
     localparam integer TAG_LOW = 3 + $clog2(LINE_COUNT);
     localparam integer DATA_ADDRESS_BITS = $clog2(LINE_COUNT * 4);
     logic [LINE_COUNT-1:0] line_valid_q;
-    (* ramstyle = "M10K" *) logic [24:TAG_LOW] line_tag_q [0:LINE_COUNT-1];
     logic [24:TAG_LOW] lookup_tag_q;
     // Synchronous reads, no array reset. Large-buffer tags also use a
     // registered read instead of a combinational mux over every line.
@@ -138,11 +137,48 @@ module spk286_at_sdram_read_buffer #(
     wire [24:0] input_line_base = line_base(in_address);
     wire [INDEX_BITS-1:0] input_index = line_index(in_address);
     wire [1:0] request_word_index = request_address_q[2:1];
-    wire input_tag_hit = !SYNC_TAGS && line_valid_q[input_index] &&
-                         (line_tag_q[input_index] == in_address[24:TAG_LOW]);
-    wire request_tag_hit = line_valid_q[request_index_q] &&
-                           ((SYNC_TAGS ? lookup_tag_q : line_tag_q[request_index_q]) ==
-                            request_address_q[24:TAG_LOW]);
+    wire input_tag_hit;
+    wire request_tag_hit;
+    // Separate the memory declarations at elaboration. Quartus 17 otherwise
+    // sees the asynchronous tag reads in the parameter-masked expressions
+    // before simplifying them, and implements the large array in registers.
+    generate
+        if (SYNC_TAGS) begin : g_sync_tags
+            (* ramstyle = "M10K" *) logic [24:TAG_LOW] line_tag_q [0:LINE_COUNT-1];
+            always_ff @(posedge clk) begin
+                if (!reset) begin
+                    if (state_q == STATE_IDLE && in_accept) begin
+                        lookup_tag_q <= line_tag_q[input_index];
+                        // Bypass/write lookups discard this word. Keeping one
+                        // read enable for tags and data avoids a RAM-inference
+                        // dependency on the hit/target decode.
+                        hit_data_q <= line_data_q[DATA_ADDRESS_BITS'({input_index, in_address[2:1]})];
+                    end
+                    if (state_q == STATE_FILL && physical_inflight_q &&
+                        !current_cancelled && out_read_data_valid && out_ready &&
+                        fill_index_q == 2'd3)
+                        line_tag_q[request_index_q] <= request_line_base_q[24:TAG_LOW];
+                end
+            end
+            assign input_tag_hit = 1'b0;
+            assign request_tag_hit = line_valid_q[request_index_q] &&
+                                     (lookup_tag_q == request_address_q[24:TAG_LOW]);
+        end else begin : g_async_tags
+            (* ramstyle = "M10K" *) logic [24:TAG_LOW] line_tag_q [0:LINE_COUNT-1];
+            always_ff @(posedge clk) begin
+                if (!reset && state_q == STATE_IDLE && in_accept && cache_hit)
+                    hit_data_q <= line_data_q[DATA_ADDRESS_BITS'({input_index, in_address[2:1]})];
+                if (!reset && state_q == STATE_FILL && physical_inflight_q &&
+                    !current_cancelled && out_read_data_valid && out_ready &&
+                    fill_index_q == 2'd3)
+                    line_tag_q[request_index_q] <= request_line_base_q[24:TAG_LOW];
+            end
+            assign input_tag_hit = line_valid_q[input_index] &&
+                                   (line_tag_q[input_index] == in_address[24:TAG_LOW]);
+            assign request_tag_hit = line_valid_q[request_index_q] &&
+                                     (line_tag_q[request_index_q] == request_address_q[24:TAG_LOW]);
+        end
+    endgenerate
     // Backend lanes address {address[24:1], 0/1}, not address and address+1.
     // Both physical bytes are always in the same aligned eight-byte line,
     // including an upper-byte write supplied at the odd last-byte address.
@@ -170,18 +206,9 @@ module spk286_at_sdram_read_buffer #(
     // another lookup clock or dependence on live upstream metadata.
     always_ff @(posedge clk) begin
         if (!reset) begin
-            if (state_q == STATE_IDLE && in_accept) begin
-                if (SYNC_TAGS)
-                    lookup_tag_q <= line_tag_q[input_index];
-                if (cache_hit || (SYNC_TAGS && cache_candidate))
-                    hit_data_q <= line_data_q[DATA_ADDRESS_BITS'({input_index, in_address[2:1]})];
-            end
             if (state_q == STATE_FILL && physical_inflight_q &&
                 !current_cancelled && out_read_data_valid)
                 line_data_q[DATA_ADDRESS_BITS'({request_index_q, fill_index_q})] <= out_read_data;
-            if (state_q == STATE_FILL && physical_inflight_q && !current_cancelled &&
-                out_read_data_valid && out_ready && fill_index_q == 2'd3)
-                line_tag_q[request_index_q] <= request_line_base_q[24:TAG_LOW];
         end
     end
 

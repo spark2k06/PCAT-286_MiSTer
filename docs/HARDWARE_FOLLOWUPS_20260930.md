@@ -15,9 +15,7 @@ now records 4804 / 88.6K with production PCAT READY timing in 86Box, against
 are approximately 79.41% / 84.18%, much lower than the synthetic kernel. The
 [4 KiB synchronous-tag instruction candidate](optimization/P13_CODE_BUFFER_4K_20261002.md),
 commit `0399806`, has passed directed coherence/cancellation checks and is being
-measured separately with the 1 KiB data buffer retained. The user is synthesizing
-that fixed candidate; the next production change waits for their hardware
-result and the complete candidate measurement. FPGA timing and hardware
+measured separately with the 1 KiB data buffer retained. FPGA timing and hardware
 acceptance remain separate from this attribution and implementation evidence.
 
 The user subsequently reports 4911 / 94.4K in CHECKNUM on the 4 KiB candidate:
@@ -25,6 +23,13 @@ The user subsequently reports 4911 / 94.4K in CHECKNUM on the 4 KiB candidate:
 ALMs, 38,741 physically placed ALMs and 44,251 registers. Its code-buffer tags
 map to registers, making RAM-inference cost reduction the next requested step.
 The screenshots, fitted comparison and provenance limits are retained in P13.
+
+[P14](optimization/P14_CODE_BUFFER_RAM_MAPPING_20261002.md) now maps the tags
+to M10K while preserving 4 KiB capacity and directed cycle-visible responses.
+Full-project synthesis registers fall from 42,403 to 35,680; estimated ALMs
+needed fall from 34,101 to 31,317. These are map counts, not placed occupancy.
+The correction is ready for the user's final synthesis; new Fitter/STA and
+MiSTer throughput confirmation remain pending.
 
 Added 2026-10-01. Status: numeric reference accepted; directed memory-path
 attribution and a coherent 1 KiB RAM-read buffer implemented and checked;

@@ -4,7 +4,33 @@ The complete run is retained under
 `build/full-regression-posted-pit-active-20261002`. It freezes the PCAT sources
 and uses only P01/P02/P05/P06/P07 enabled from `config.tcl`. Initial failures
 and later replays are separate records; no initial result is overwritten.
-The complete regression is still running when this first receipt is recorded.
+The initial package receipt was recorded while the run was still executing.
+The full run has subsequently completed; its terminal result is retained below.
+
+## Completed run
+
+`completed/receipt.json` records **COMPLETED_WITH_OPEN_CHECKS**, with the raw
+result still **FAIL**. All 251 stages finish: 203 original PASS and 48 original
+FAIL. Of those failures, 37 have individually verified successful replays and
+11 entry points remain unaccepted. Original failures are never rewritten.
+
+All 129 original CPU banks are covered successfully, including 23 restored
+banks tested against the unchanged CPU in both simulators. The additional
+event-arbitration bank also passes. There are **1,392,996 evaluable physical
+cases passed**, zero failures and zero unexpected omissions. The exact one E7
+incomplete capture remains NOT EVALUABLE under the existing policy.
+
+Open checks comprise the unresolved MRBIOS keyboard-restart failure, historical
+compiler fixtures, an obsolete source-extraction proof harness, four absent
+Landmark ROM workloads and the disabled old CheckIT counterfactual. No new
+protected-mode CPU defect or aggregate hardware acceptance is established.
+
+`completed/logs.zip` preserves all original stage logs, replay logs and receipts,
+diagnostic attempts and the frozen runner bytes actually executed. Its entries
+are byte-verified against `completed/archive-inventory.json`; source identity,
+raw summary and physical-case summary are also retained separately.
+No proprietary BIOS ROM binary is included. See the
+[full report](../../optimization/P18_P19_FULL_REGRESSION_20261002.md).
 
 ## Restored verification package
 
@@ -19,7 +45,7 @@ architectural assertions are preserved. No production RTL is changed.
 The full suite also finds historical compiler fixtures and diagnostic-script
 issues. The package restoration is a verified coverage repair, not an overall
 regression PASS or hardware acceptance. Those results are recorded separately
-when the complete run finishes.
+in the completed receipt and report.
 
 ## Completed verification repairs
 

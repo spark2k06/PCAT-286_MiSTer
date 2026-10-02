@@ -1,11 +1,14 @@
 # P18/P19: combined posted-write and PIT-refresh candidate
 
 Date: 2026-10-02. Status: **RBF generated and verified; hardware acceptance and
-50 MHz timing closure pending**. A complete CPU and PCAT regression was
-subsequently requested and is running in
+50 MHz timing closure pending**. The complete CPU and PCAT regression has
+subsequently completed in
 `build/full-regression-posted-pit-active-20261002`, with only the active CPU
 options, as requested. The earlier two-profile run was interrupted for this
-scope correction and retained. No completed regression result is claimed yet.
+scope correction and retained. All 129 original CPU banks and evaluable
+physical cases pass with separately verified replays, but MRBIOS restart and
+verification/input gaps prevent aggregate acceptance. See the
+[full regression report](P18_P19_FULL_REGRESSION_20261002.md).
 
 ## Artifact and inputs
 

@@ -129,19 +129,27 @@ matching architectural signatures and exact physical write counts. The module
 passes strict lint, 495 physical/bridge/arbiter checks and 145 composed-cache
 checks. Isolated mapping estimates the entire enabled new block at 51 ALMs,
 59 registers and no RAM; no fitted whole-design delta is claimed. Matched real
-CHECKNUM integer formatter outputs are **6138 -> 6906 (+12.51%)**; complete DOS
-math/exit receipts remain pending. Bounded real-CPU machine checks pass at
+CHECKNUM outputs are **6138 / 113.6K -> 6906 / 121.6K (+12.51% / +7.04%)**,
+both with guest RC0/ALL_DONE. Bounded real-CPU machine checks pass at
 common/divided clocks, as do bridge dual-simulator checks and Quartus frontend
 elaboration (0 errors). P18 is adopted; the candidate completes CHECKNUM with
-6906 / 121.6K and RC0/ALL_DONE. MiSTer throughput remains pending.
+6906 / 121.6K and RC0/ALL_DONE.
 The separate [P19 platform attribution](optimization/P19_AT_REFRESH_PLATFORM_ATTRIBUTION_20261002.md)
 identifies missing AT refresh/HOLD/arbitration: production's 32-clock requester
 costs 7.18-9.88% in P17 physical-data kernels with unchanged signatures. That is
 comparable to the residual 7.69% / 6.07% hardware gap; real matched CHECKNUM
-controls are running. The PIT-driven cadence correction is adopted after
+controls complete at **5666 / 106.7K**, reproducing the previous MiSTer rates.
+The PIT-driven cadence correction is adopted after
 directed real-PIT, DMA and CPU checks. The user requests a combined P18/P19
-RBF; hardware validation and timing closure remain pending. No full regression
-is claimed for these milestones.
+RBF. The combined actual-PIT platform model completes at **6906 / 121.6K**,
+RC0/ALL_DONE, matching the subsequent user CHECKNUM screenshot exactly.
+CheckIT separately reports **6765 / 121.6K**. Exact exported-RBF/max-speed
+attribution still awaits confirmation; timing closure remains deferred.
+The [active-option full regression](optimization/P18_P19_FULL_REGRESSION_20261002.md)
+has completed: all 129 original CPU banks and 1,392,996 evaluable physical
+cases pass, including separately verified replays, while MRBIOS restart and
+verification/input gaps prevent aggregate acceptance. Original failed attempts
+and unsuccessful diagnostic controls remain retained.
 
 Added 2026-10-01. Status: numeric reference accepted; directed memory-path
 attribution and a coherent 1 KiB RAM-read buffer implemented and checked;

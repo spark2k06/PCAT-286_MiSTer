@@ -96,3 +96,12 @@ CPU / 8 MHz ISA. At this implementation commit, complete candidate scores are
 pending. No full CPU regression, FPGA fitter, timing closure or new RBF was
 run for this milestone. Synchronous arrays are intended for block-RAM inference;
 their actual mapping and 50 MHz timing still require Quartus evidence.
+
+The first candidate measurement (`pcat-code4k`) was interrupted by the host
+runner's thread-stop timeout during Whetstone. Its guest did not reach RC0 or
+`ALL_DONE`, so it is not an accepted two-score result. Its original failed-run
+receipt is retained under `build/perf01-real-memory-20261002/pcat-code4k/`.
+The sampler now takes CPU and RTL values in one coherent stop and records a
+transient stop timeout as a skipped sample, without accepting incoherent data.
+A fresh image/CMOS repeat (`pcat-code4k-repeat1`) uses the identical frozen
+candidate binary; only the host measurement script differs.

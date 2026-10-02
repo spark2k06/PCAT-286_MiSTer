@@ -9,6 +9,17 @@ and separates open findings from that resolved boot failure.
 
 ## PERF01 — MiSTer CPU and machine benchmark throughput
 
+2026-10-02 update: [real CHECKNUM memory-control attribution](optimization/P12_REAL_CHECKNUM_MEMORY_ATTRIBUTION_20261002.md)
+now records 4804 / 88.6K with production PCAT READY timing in 86Box, against
+7709 / 133.3K with immediate READY on the same CPU. Actual code-buffer hit rates
+are approximately 79.41% / 84.18%, much lower than the synthetic kernel. The
+[4 KiB synchronous-tag instruction candidate](optimization/P13_CODE_BUFFER_4K_20261002.md),
+commit `0399806`, has passed directed coherence/cancellation checks and is being
+measured separately with the 1 KiB data buffer retained. The user is synthesizing
+that fixed candidate; the next production change waits for their hardware
+result and the complete candidate measurement. FPGA timing and hardware
+acceptance remain separate from this attribution and implementation evidence.
+
 Added 2026-10-01. Status: numeric reference accepted; directed memory-path
 attribution and a coherent 1 KiB RAM-read buffer implemented and checked;
 hardware CheckIt/CHECKNUM improvement observed; repeated matched measurements

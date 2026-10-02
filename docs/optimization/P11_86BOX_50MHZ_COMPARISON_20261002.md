@@ -131,6 +131,12 @@ is `D:/GitHub/PCAT-286_MiSTer/build/perf01-86box-50-20261002`.
 
 ## Next attribution step
 
+Update: [P12](P12_REAL_CHECKNUM_MEMORY_ATTRIBUTION_20261002.md) completes real
+CHECKNUM with production PCAT memory-control timing: 4804 / 88.6K, versus the
+7709 / 133.3K immediate reference. Its much lower real code-buffer hit rate
+motivates [the 4 KiB candidate](P13_CODE_BUFFER_4K_20261002.md). The paragraphs
+below preserve the original attribution plan and synthetic baseline.
+
 The completed same-clock result supplies the standalone reference missing from
 earlier PERF01 comparisons. The user's priority is PCAT versus standalone
 SPK286; the smaller native-CPU difference is retained as a control.

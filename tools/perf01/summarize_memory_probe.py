@@ -3,6 +3,7 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
+import re
 
 
 def sha(path):
@@ -26,11 +27,21 @@ def difference(end, start):
     return result
 
 
-def summarize(arm):
+def summarize(arm, allow_host_teardown_issue=False):
     out = arm/'spk50'
     measurement = json.loads((out/'measurement.json').read_text())
     assert measurement['completion'] and measurement['guest_success'], 'Incomplete run is not a score'
-    assert measurement['emulator_returncode'] == 0, 'Require clean host exit for this attribution'
+    assert 'RC TICKRUN 0' in measurement['guest_status'] and 'ALL_DONE' in measurement['guest_status']
+    match = re.fullmatch(r'TICKS_BEGIN=(\d+)\s+(\d+)\s+(\d+\.\d+)\s+TICKS_END=(\d+)\s*',
+                         measurement['guest_output'])
+    assert match, 'Missing complete guest output'
+    assert int(match[2]) == measurement['dhrystones_per_second']
+    assert float(match[3]) == measurement['kwhetstones_per_second']
+    assert measurement['samples'], 'Missing coherent CPU configuration samples'
+    host_issue = measurement['emulator_returncode'] != 0
+    if host_issue:
+        assert allow_host_teardown_issue, 'Host exit problem requires explicit classification/opt-in'
+        assert measurement.get('host_teardown', '') not in ('', 'normal'), 'Unclassified host exit problem'
     assert all(s['cpu_hz_actual']==50000000 and s['isa_hz']==8000000 for s in measurement['samples'])
     profile = out/'memory-profile.json'
     final = json.loads(profile.read_text())
@@ -66,6 +77,9 @@ def summarize(arm):
             'kwhetstones_per_second':measurement['kwhetstones_per_second'],
             'guest_application_ticks':measurement['guest_application_ticks'],
             'host_elapsed_seconds':measurement['host_elapsed_seconds'],
+            'emulator_returncode':measurement['emulator_returncode'],
+            'host_teardown':measurement.get('host_teardown', 'normal'),
+            'reconstructed_receipt':measurement.get('reconstructed_receipt', False),
             'binary_sha256':measurement['binary_sha256'],
             'image_sha256_before':measurement['image_sha256_before'],
             'phase_counters':phases, 'traces':traces,
@@ -77,8 +91,11 @@ def main():
     p.add_argument('--ideal-arm', required=True, type=Path)
     p.add_argument('--pcat-arm', required=True, type=Path)
     p.add_argument('--output', required=True, type=Path)
+    p.add_argument('--allow-host-teardown-issue', action='store_true',
+                   help='Retain explicitly classified cleanup failures after complete guest RC0')
     a = p.parse_args()
-    ideal, pcat = summarize(a.ideal_arm.resolve()), summarize(a.pcat_arm.resolve())
+    ideal = summarize(a.ideal_arm.resolve(), a.allow_host_teardown_issue)
+    pcat = summarize(a.pcat_arm.resolve(), a.allow_host_teardown_issue)
     assert not ideal['pcat_timing'] and pcat['pcat_timing']
     assert ideal['image_sha256_before'] == pcat['image_sha256_before']
     hardware = {'dhrystones_per_second':4361, 'kwhetstones_per_second':83.7,

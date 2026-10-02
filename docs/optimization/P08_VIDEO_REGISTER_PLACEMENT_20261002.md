@@ -52,6 +52,15 @@ register assignments. A successful fit must bind every requested location
 and pass the original complete-design setup/hold requirements. Neither
 experimental layout is selected in production before this verification.
 
+The two sparse frozen snapshots match the baseline in all 848 RTL, sys,
+vendor, clock and budget inputs checked. Their QSF difference is exactly
+the appended 326/328 requested FF locations. Of the baseline's 1187
+snapshot inputs, 1185 are unchanged; the other changed file is the
+nonfunctional ROM checker already validated in commit `c7419eb`. Its exact
+committed version is checked separately. Newly added diagnostic tools are
+listed in `docs/evidence/video-sparse-placement-inputs-20261002/receipt.json`.
+The existing build-date generation is audited after compilation.
+
 ## Reproducible extraction and binding guard
 
 Run `report_at_video_register_placement.tcl` with `quartus_sta -t` against

@@ -145,3 +145,14 @@ See the [PERF01 hardware record](HARDWARE_FOLLOWUPS_20260930.md) and
 for the screenshots, local RBF/report hashes and remaining timing/acceptance
 scope. Complete SPK286-in-86Box and matched repeated hardware controls remain
 useful for attributing the remaining cost.
+
+### Completed 50 MHz comparison — 2026-10-02
+
+The [same-clock comparison](optimization/P11_86BOX_50MHZ_COMPARISON_20261002.md)
+completes both numeric tests: **7709 / 133.3K with SPK286 in 86Box**, and
+**8287 / 144.9K with the native 286**, at 50 MHz. Both use identical initial
+DOS disks/profiles and matching CPU sources/options for the hardware candidate.
+The native repeat is identical and the 25 MHz control reproduces 4143 / 70.9K.
+The primary comparison is now MiSTer's 4361 / 83.7K against standalone SPK286:
+**56.57% integer / 62.79% software-math throughput**. This supplies the completed
+standalone reference requested in the earlier observation above.

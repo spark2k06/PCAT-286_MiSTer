@@ -327,9 +327,23 @@ kernels. The generated candidate has worst setup -0.557 ns at 50 MHz, with
 hold positive in all four corners. Preserve the measured benefit while
 recovering timing closure; keep the previous timing-closed RBF as fallback.
 
-1. Capture completed CHECKNUM scores and request/wait counts in matched SPK286
-   and hardware configurations, with the loaded RBF recorded. Use the same
-   benchmark region to check how closely these kernel findings transfer.
+The [completed same-clock comparison](optimization/P11_86BOX_50MHZ_COMPARISON_20261002.md)
+now records **7709 / 133.3K for SPK286 in 86Box at 50 MHz**, with CPU sources
+and P02/P05/P07 matching the hardware candidate. Native 86Box at 50 MHz gives
+8287 / 144.9K, repeated identically; its 25 MHz control remains 4143 / 70.9K.
+Both 50 MHz CPU arms complete CHECKNUM with DOS RC0. The primary PERF01 target
+is the **PCAT versus standalone SPK286 integration gap**: hardware's 4361 / 83.7K
+is 56.57% / 62.79% of the same CPU with immediate memory service. Matching
+that reference would require +76.77% / +59.26% hardware throughput. The smaller
+native-CPU difference is an additional control. The report links ready-to-use
+50 MHz profiles, complete receipts and the scope of these comparisons.
+
+1. Capture request/wait counts and actual code/data-buffer behavior for CHECKNUM
+   in PCAT, with the loaded RBF recorded. Profile writes, hit turnaround,
+   capacity/conflict misses, prefetch and SDRAM service in the same benchmark
+   region. The 512-byte code buffer's high synthetic hit rate does not establish
+   the DOS application's hit rate. Use the completed standalone result as the
+   primary reference before attributing the gap to a physical SDRAM limit.
 2. Extend the observed RAM-read-buffer hardware improvement with repeat-run
    CHECKNUM results, timing/path review and normal boot/DMA coverage. Retain
    the off/on configuration for matched comparisons.

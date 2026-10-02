@@ -1,0 +1,102 @@
+{
+  "status": "DIRECTED_FIXTURE_VALIDATION_PASS",
+  "variants": [
+    {
+      "name": "baseline",
+      "bridge_sha256": "b77c8defc275e4291d3c0bf7c2c361f1dc73fafe8decda8ddae60053498be565",
+      "source_files_verified": 1195,
+      "cases": [
+        {
+          "state": 0,
+          "irq_handlers": 4,
+          "loop_iterations": 38,
+          "injection": "FORCE_WARM_RESET_INJECT cycle=10003 csip=f000:0106 bridge=0 mem=0/0 p03=0/0 owner=0 cpu_ready=0 class=d",
+          "log_sha256": "340e9319315674ac0b794d4a161de1cbcc088aa1b7ee06829ca5449d0c945341"
+        },
+        {
+          "state": 4,
+          "irq_handlers": 4,
+          "loop_iterations": 38,
+          "injection": "FORCE_WARM_RESET_INJECT cycle=10004 csip=f000:0106 bridge=4 mem=1/0 p03=0/0 owner=0 cpu_ready=0 class=d",
+          "log_sha256": "27ffc24e6b2894d7e8b29da3b71fa026c4876c4d020610fec40db90dc2864fb0"
+        },
+        {
+          "state": 5,
+          "irq_handlers": 4,
+          "loop_iterations": 38,
+          "injection": "FORCE_WARM_RESET_INJECT cycle=10000 csip=f000:0106 bridge=5 mem=1/1 p03=2/1 owner=1 cpu_ready=0 class=6",
+          "log_sha256": "c6c7ffeac2ace9a09b40e51cd0365bd3f95e2923d1f1b71b218d5598d03494a7"
+        },
+        {
+          "state": 6,
+          "irq_handlers": 4,
+          "loop_iterations": 38,
+          "injection": "FORCE_WARM_RESET_INJECT cycle=10002 csip=f000:0106 bridge=6 mem=0/0 p03=0/0 owner=0 cpu_ready=1 class=6",
+          "log_sha256": "7c57f077cb94876268f283e3134b2ae49e1287899b669826cc4946afc4bb601c"
+        },
+        {
+          "state": 8,
+          "irq_handlers": 4,
+          "loop_iterations": 38,
+          "injection": "FORCE_WARM_RESET_INJECT cycle=10002 csip=f000:0106 bridge=6 mem=0/0 p03=0/0 owner=0 cpu_ready=1 class=6",
+          "log_sha256": "1a0f1aebcd640789c66c735ee91851ea63dde0a2b892568fcb6e08008b397bcf"
+        }
+      ]
+    },
+    {
+      "name": "candidate",
+      "bridge_sha256": "65480d9dab30c7071bc31751fd475caa795e508c766a71bd89dd57c1f6258cc6",
+      "source_files_verified": 1195,
+      "cases": [
+        {
+          "state": 0,
+          "irq_handlers": 4,
+          "loop_iterations": 43,
+          "injection": "FORCE_WARM_RESET_INJECT cycle=10011 csip=f000:0100 bridge=0 mem=0/0 p03=0/0 owner=0 cpu_ready=0 class=f",
+          "log_sha256": "f3a2c54168480ef1e18fe279933c5d6ba0e005416ed14f042dc92ddfc4349b4b"
+        },
+        {
+          "state": 4,
+          "irq_handlers": 4,
+          "loop_iterations": 43,
+          "injection": "FORCE_WARM_RESET_INJECT cycle=10000 csip=f000:0100 bridge=4 mem=1/0 p03=0/0 owner=0 cpu_ready=0 class=d",
+          "log_sha256": "1e8fa3f770287c9296c2d82cd61caaa79189fa524b5b099d9815537d4e89c8ab"
+        },
+        {
+          "state": 5,
+          "irq_handlers": 4,
+          "loop_iterations": 43,
+          "injection": "FORCE_WARM_RESET_INJECT cycle=10001 csip=f000:0100 bridge=5 mem=1/1 p03=3/1 owner=1 cpu_ready=0 class=d",
+          "log_sha256": "bc606f548cb2525f0ca6dec52f7e97a1bc7194f95aef7fb3a15f7763602d6b04"
+        },
+        {
+          "state": 6,
+          "irq_handlers": 4,
+          "loop_iterations": 49,
+          "injection": "FORCE_WARM_RESET_INJECT cycle=11210 csip=f000:0106 bridge=6 mem=0/0 p03=0/0 owner=0 cpu_ready=1 class=0",
+          "log_sha256": "9c9eb4761facda4748e0e2f6182cd9a2fadc3b3f83d46e22f6837ca6624efb20"
+        },
+        {
+          "state": 8,
+          "irq_handlers": 4,
+          "loop_iterations": 43,
+          "injection": "FORCE_WARM_RESET_INJECT cycle=10010 csip=f000:0100 bridge=5 mem=1/1 p03=3/1 owner=1 cpu_ready=1 class=d",
+          "log_sha256": "08ba6d5c549aa7f637d303fe252f49562646189bf8be26a4a925729f32d6e98a"
+        }
+      ]
+    }
+  ],
+  "cause": "386 near conditional jump in unrestricted NASM fixture; old reset oracle accepted execution outside ROM",
+  "trace_sources": [
+    {
+      "variant": "baseline",
+      "file": "/mnt/d/GitHub/PCAT-286_MiSTer/build/perf01-response-warm-reset-baseline-trace.txt",
+      "sha256": "73405ab623b9b064df010802876b4f387a583c4bb96aee45c87912098fe58ab1"
+    },
+    {
+      "variant": "candidate",
+      "file": "/mnt/d/GitHub/PCAT-286_MiSTer/build/perf01-response-warm-reset-candidate-trace.txt",
+      "sha256": "1e5d90c47f96ced72092fe7568c49e3ffa12d7100251bb4bc39a51ce3a1b67b9"
+    }
+  ]
+}

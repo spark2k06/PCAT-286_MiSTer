@@ -71,9 +71,20 @@ synthesis. A private owner prototype overlaps ordinary write admission/launch,
 retaining physical completion and unchanged KFSDRAM commands/recovery. Directed
 physical byte/address scoreboards pass in Icarus and Verilator (22 writes/20
 reads in each variant), and private-adapter smoke reduces writes from 7 to 6
-wait clocks while preserving two-clock hits. Unchanged CHECKNUM is running on
-that private variant against the now-completed P15 control. Production RTL is
-still P15; no new synthesis or full regression has been launched for it.
+wait clocks while preserving two-clock hits. [P16](optimization/P16_WRITE_ADMISSION_PROTOTYPE_20261002.md)
+has now completed unchanged CHECKNUM RC0/ALL_DONE/final profile at
+**5666 / 102.9K (+2.55% / +0.49%)** versus P15's 5525 / 102.4K. Identical CPU
+objects/configuration/image/CMOS were verified; host monitor teardown required
+the classified SIGTERM after guest completion. The user requested an RBF after
+the early integer result. Commit `95f5b21` promotes the write-admission owner,
+with bounded physical burst/byte/refresh and composed cancellation checks PASS.
+Its 50 MHz observer-free full fit completed from 1205 unchanged frozen inputs:
+**+465 net equivalent ALMs, +314 placed ALMs, +149 registers, no extra M10Ks**.
+The owner including KFSDRAM itself adds 11.2 ALMs; much of the net change comes
+from physical synthesis of unchanged logic. CPU setup is -0.450 ns / -0.029 ns
+in the slow models, with positive hold in all four; this fit has positive HDMI
+setup/hold. The RBF is available under `build/perf01-write-admission-fit-20261002/`.
+Hardware performance/acceptance and CPU closure are pending; no full regression.
 
 Added 2026-10-01. Status: numeric reference accepted; directed memory-path
 attribution and a coherent 1 KiB RAM-read buffer implemented and checked;

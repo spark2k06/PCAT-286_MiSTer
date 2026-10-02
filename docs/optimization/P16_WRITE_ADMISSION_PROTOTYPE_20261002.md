@@ -1,10 +1,11 @@
 # P16: measure overlapping write admission and launch
 
 Date: 2026-10-02. PERF01 private candidate, authorized by the user.
-Status: directed physical/control checks pass; unchanged 86Box CHECKNUM running.
-After its integer result appeared, the user authorized an RBF while the math
-measurement continues. The write-admission candidate is now in production RTL;
-FPGA resources/timing and full guest completion remain pending. No full regression.
+Status: directed checks, unchanged 86Box CHECKNUM RC0 and frozen full fit complete.
+After the early integer result, the user authorized an RBF while math continued.
+The write-admission candidate is in production RTL; the RBF is available for
+MiSTer comparison. Hardware acceptance and CPU timing closure remain open.
+No full regression.
 
 ## Control and motivation
 
@@ -63,9 +64,9 @@ Arm: `build/perf01-write-admission-20261002/pcat-write-admission/spk50`.
 CPU 50 MHz, ISA 8 MHz, same initial disk/CHECKNUM/configuration/CMOS as P15.
 CHECKNUM began at 2026-10-02 14:02:39 Europe/Madrid. After the integer formatting
 phase, two read-only guest-RAM reads found the stable formatted output
-`5666\r\n` at physical byte address `0x4CB38`. This is **+2.55%** versus P15's
-5525, and is provisional until the full run ends with RC0. Reading did not stop
-the emulator or write to guest/host process memory. Whetstone continues.
+`5666\r\n` at physical byte address `0x4CB38`. This was provisionally **+2.55%**
+versus P15's 5525. Reading did not stop the emulator or write to guest/host
+process memory. The completed RC0 output below confirms that early integer value.
 
 The user then explicitly requested creating an RBF before math completion.
 The production owner has the private prototype's behavior, with its launch
@@ -80,16 +81,112 @@ Additional bounded checks before freezing the RBF candidate:
   after acceptance, physical completion before acknowledgement, and a bounded
   refresh-starvation assertion. The faster refresh parameters are test stimuli;
   production retains 100/400 clocks.
+- Same new pin/traffic test against the frozen P15 owner: PASS, the same 71
+  writes and 70 reads, 44 refresh commands and 1313 clocks. The candidate's
+  shorter run issues three fewer scheduled refresh commands; both satisfy the
+  same starvation bound and data checks. These cycle totals are the directed
+  mixed workload, not an additional CHECKNUM speedup or a vendor timing sign-off.
 - Existing finite SDRAM read-window and both DQM wiring checks: PASS, including
   their intentional clock-skew failure controls.
 - Composed bridge/buffer cancellation and coherence check: PASS.
 
-1. Require guest RC0/ALL_DONE/final profile and retain any classified host teardown.
-2. Compare rates and per-transfer waits against the completed 5525 / 102.4K P15
-   control with CPU object/configuration identities enforced.
-3. Freeze and synthesize the user-authorized candidate to report its resources
-   and all timing corners; retain the initial and final source identities.
-4. Commit each completed milestone. A full regression is a separate task.
+## Completed unchanged CHECKNUM comparison
+
+[Receipts, final profiles and trace fingerprints](../evidence/perf01-write-admission-20261002/README.md)
+retain matched initial disk, CHECKNUM, configuration, CMOS, CPU backend, compiled
+CPU objects, profiler and CPU macros. CPU 50 MHz and 86Box ISA 8 MHz are verified
+in coherent process samples. Code/data capacities and controller timings match.
+
+| Private PCAT memory-control model | Dhrystones/s | K Whetstones/s | Application BIOS ticks |
+| --- | ---: | ---: | ---: |
+| P15 control | 5525 | 102.4 | 256 |
+| P16 write admission | 5666 | 102.9 | 251 |
+| Displayed rate gain | +2.55% | +0.49% | Adaptive work, not a fixed-work comparison |
+
+The guest finished with `RC TICKRUN 0` and `ALL_DONE`, published a final profile,
+and the runner completed at 15:10:00 Europe/Madrid. Host elapsed time was
+4041.267 s; it includes boot, sampling and host teardown and is not the guest
+benchmark's time. Monitor exit timed out after guest completion; the owned
+emulator exited after SIGTERM (return -15), explicitly classified as
+`exit_timeout_then_sigterm`, like the completed P15 control. No clean host exit
+is claimed. The strict comparison explicitly accepts that classified teardown.
+
+| Mean memory wait clocks | P15 Dhrystone | P16 Dhrystone | P15 Whetstone | P16 Whetstone |
+| --- | ---: | ---: | ---: | ---: |
+| Code fetch | 2.00110 | 2.00112 | 2.11925 | 2.11882 |
+| Data read | 2.00059 | 2.00061 | 2.10415 | 2.10527 |
+| Data write | 7.24954 | 6.16845 | 7.26504 | 6.22776 |
+
+P16 accepted 2,732,949 / 8,888,367 physical writes in the two function phases.
+Actual data misses (418 / 189,982) match the unchanged two-way shadow exactly.
+One fixed launch clock is removed per write; mean differences also include
+changed adaptive work, interrupt placement and refresh interference. Bus waits
+overlap CPU execution and cannot be added to internal instruction clocks.
+
+Each function trace retains 250,000 accepted operations including calibration
+and interrupts. Those bounded footprints are not full working sets. There is
+one completed guest run per build; the small math gain is not a repeated result.
+86Box owns values/peripherals; DMA/loader/abstract AT refresh and electrical
+board behavior remain outside the adapter. Hardware performance remains pending.
+
+## Completed frozen FPGA fit and available RBF
+
+[Fitted evidence](../evidence/perf01-write-admission-20261002/fitted/fit-observation.json)
+compares the P15 and P16 pre-build manifests and verifies both sets of final
+artifacts. Only the SDRAM owner differs in the 1203 common inputs; P16 adds
+the directed bench and its launcher for 1205 inputs. No frozen source changed
+during compilation, no QSF assignments were appended, and BUILD_DATE is 261002.
+
+Full Quartus flow: **32:11, 0 errors, 854 warnings**, 2026-10-02 14:40:25 to
+15:12:42 Europe/Madrid including launcher overhead. Quartus 17.0.2 in the same
+recorded Docker image targets Cyclone V 5CSEBA6U23I7. CPU remains 50 MHz,
+all established CPU options active, `SPK286_AT_NO_DEBUG` enabled and DIV2 disabled.
+
+| Final whole-design resources | P15 | P16 | Delta |
+| --- | ---: | ---: | ---: |
+| Equivalent ALMs needed | 30,587 (73%) | 31,052 (74%) | +465 |
+| Physically placed ALMs | 36,128 (86%) | 36,442 (87%) | +314 |
+| Registers | 38,022 | 38,171 | +149 |
+| M10Ks | 416/553 (75%) | 416/553 (75%) | 0 |
+| Payload/tag memory bits | 3,301,019 | 3,301,019 | 0 |
+| Allocated block memory bits | 4,259,840 | 4,259,840 | 0 |
+| DSPs / PLLs | 39 / 3 | 39 / 3 | 0 / 0 |
+
+The +465 is the actual net full fit cost (+1.11 percentage points of equivalent
+ALM capacity), not 465 ALMs of new owner logic. Owner including KFSDRAM rises
+from 122.6 to 133.8 equivalent ALMs (+11.2) and 178 to 182 registers (+4).
+The unchanged code-buffer entity rises from 1701.5 to 1977.9 ALMs (+276.4)
+and 831 to 891 registers through physical synthesis/packing changes; the data
+entity changes from 948.8 to 954.2 ALMs. Do not sum the owner and its nested
+KFSDRAM entity, or infer architectural resource changes from those fit variations.
+
+| CPU/system FPGA_CLK2_50 model | Setup ns | Hold ns |
+| --- | ---: | ---: |
+| Slow 100 C | -0.450 | +0.250 |
+| Slow -40 C | -0.029 | +0.237 |
+| Fast 100 C | +2.569 | +0.134 |
+| Fast -40 C | +2.734 | +0.119 |
+
+P16 **does not close all CPU/system 50 MHz setup corners**. P15's worst setup
+was -0.194 ns; P16's worst is -0.450 ns, with TNS -6.195 ns (slow 100 C).
+Slow -40 C TNS is -0.080 ns. Hold stays positive. These are the only negative
+rows in the final STA summary. In this fit, HDMI setup/hold are positive in
+all models (minimum +0.855 / +0.157 ns), with unchanged video/HDMI sources.
+No new full constraint/electrical audit or vendor SDRAM timing sign-off is claimed.
+
+Candidate: `D:/GitHub/PCAT-286_MiSTer/build/perf01-write-admission-fit-20261002/work/output_files/PCAT-286.rbf`
+(4,147,800 bytes; SHA256
+`fc5b0694b00e529ac49ad2e5461086c8c176bfc84c2a854d8be2cded0e981cf2`).
+This is the candidate to test at maximum CPU speed against the user's P15
+CHECKNUM 5023 / 96.4K observation. No hardware gain is yet established.
+
+Implementation: `95f5b21`. Complete guest comparison: `b4e73bf`.
+
+1. Completed: guest RC0/ALL_DONE/final profile and classified host teardown retained.
+2. Completed: rates and per-transfer waits compared against P15 with identities enforced.
+3. Completed: user-authorized frozen full fit, resources/timing and RBF retained.
+4. Await matched MiSTer measurement; CPU closure and any resource reduction are
+   subsequent work. A full regression remains a separate task.
 
 Open-row SDRAM policy, refresh-cadence evaluation and a faster common-hit path
 are later investigations. No such controller-policy change is in this prototype.

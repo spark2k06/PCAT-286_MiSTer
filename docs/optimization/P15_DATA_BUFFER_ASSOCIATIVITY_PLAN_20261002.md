@@ -227,7 +227,12 @@ hit responses and physical RAM writes. P15's completed averages are 2.00110 /
 2.11925 wait clocks for code, 2.00059 / 2.10415 for data reads and 7.24954 /
 7.26504 for writes. The user has authorized a private write-admission prototype
 and a real 86Box measurement **before** another resource synthesis. Production
-RTL remains P15 during that experiment. Later options include eliminating
+RTL remained P15 during the initial experiment. [P16](P16_WRITE_ADMISSION_PROTOTYPE_20261002.md)
+subsequently completed 5666 / 102.9K versus 5525 / 102.4K (+2.55% / +0.49%). The user
+requested an RBF after the early integer output. Commit `95f5b21` adds the directed-tested
+write-admission owner. Its frozen full fit adds 465 net equivalent ALMs, 149
+registers and no M10Ks; worst CPU setup is -0.450 ns with positive hold. A candidate
+RBF is available for hardware comparison. Later options include eliminating
 avoidable common-hit pipeline cycles, reusing open SDRAM rows (KFSDRAM currently
 precharges after each transfer) and evaluating larger code capacity from
 measured traffic. Every reduction must retain physical ownership, coherence,

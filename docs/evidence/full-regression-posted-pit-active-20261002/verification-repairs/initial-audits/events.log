@@ -1,0 +1,22 @@
+MICROCODE CHECK PASS: 123 entries, 743 words, 10-bit addresses, 8-bit control
+HOST_TIMEOUT_BUDGET original=90 replay=600
+EVENT_MUTATION pristine-spk286_event_instructions: passed status=0
+HOST_TIMEOUT_BUDGET original=90 replay=600
+EVENT_MUTATION pristine-spk286_event_lifecycle: passed status=0
+HOST_TIMEOUT_BUDGET original=90 replay=600
+Traceback (most recent call last):
+  File "/mnt/d/GitHub/PCAT-286_MiSTer/build/full-regression-posted-pit-active-20261002/work/tools/perf01/run_with_host_budget.py", line 34, in <module>
+    main()
+  File "/mnt/d/GitHub/PCAT-286_MiSTer/build/full-regression-posted-pit-active-20261002/work/tools/perf01/run_with_host_budget.py", line 31, in main
+    runpy.run_module(a.module, run_name='__main__')
+  File "<frozen runpy>", line 229, in run_module
+  File "<frozen runpy>", line 88, in _run_code
+  File "/mnt/d/GitHub/PCAT-286_MiSTer/build/full-regression-posted-pit-active-20261002/work/vendor/spk286/tools/audit_events.py", line 106, in <module>
+    if __name__=='__main__':main()
+                            ^^^^^^
+  File "/mnt/d/GitHub/PCAT-286_MiSTer/build/full-regression-posted-pit-active-20261002/work/vendor/spk286/tools/audit_events.py", line 98, in main
+    for name,module,bench,old,new,reason in PROBES:execute(name,bench,(module,old,new),reason)
+                                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/d/GitHub/PCAT-286_MiSTer/build/full-regression-posted-pit-active-20261002/work/vendor/spk286/tools/audit_events.py", line 93, in execute
+    raise RuntimeError(f'{name}: intended assertion did not reject the mutant; see {directory}/run.log')
+RuntimeError: owed-trap-priority: intended assertion did not reject the mutant; see /mnt/d/GitHub/PCAT-286_MiSTer/build/full-regression-posted-pit-active-20261002/audits/events/event-audit/owed-trap-priority/run.log

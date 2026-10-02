@@ -36,3 +36,7 @@ hashes match after the tests. Expected results are unchanged.
 Evidence: `docs/evidence/rtc-bcd-lookup-20261002`. No complete CPU regression
 or hardware test was performed. The physical improvement requires a new
 frozen-source fit; functional proof alone does not establish timing closure.
+
+The three fresh fitted comparisons are now recorded in
+`P08_RTC_ROUTE_FIT_COMPARISON_20261002.md`. None closes every machine path;
+the failed experimental route constraints are not selected in production.

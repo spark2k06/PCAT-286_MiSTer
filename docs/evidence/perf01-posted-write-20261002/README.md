@@ -59,6 +59,12 @@ this group makes no completed-suite or corrected-policy speed claim.
 
 ## Reproduction
 
+`combined-rbf/` retains the verified P18/P19 bitstream identity, frozen build
+manifest, fitted resource summaries and detailed timing/path reports. The
+4,091,384-byte RBF is exported under `build/perf01-posted-pit-rbf-20261002`.
+Hardware acceptance and 50 MHz setup closure remain pending. A full CPU and
+PCAT regression was subsequently requested and is recorded separately.
+
 Use the prototype checkpoint's production P17 sources, before adoption, with
 Ubuntu WSL, Verilator, NASM and the existing Quartus container:
 

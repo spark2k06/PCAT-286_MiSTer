@@ -318,7 +318,9 @@ user build artifact was overwritten.
 The observed performance gain justifies retaining entry overlap at this small
 local area cost. Timing closure, repeated hardware measurements and broader
 compatibility remain open. The posted-write and open-row ideas above remain
-future experiments; neither is implemented by this observation.
+future experiments; neither is implemented by this observation. The user then
+retained P17, deferred timing closure and authorized the
+[one-entry posted-write experiment P18](P18_ONE_ENTRY_POSTED_WRITES_20261002.md).
 
 Reproduction and observations are in the
 [evidence inventory](../evidence/perf01-entry-overlap-20261002/README.md).

@@ -122,6 +122,16 @@ compatibility. User reports, screenshot provenance and a private fitted-path
 extraction are preserved in P17; no new synthesis or full regression was run
 for this analysis.
 
+The user retained P17 and deferred timing closure. The next authorized step is
+[P18 one-entry posted writes](optimization/P18_ONE_ENTRY_POSTED_WRITES_20261002.md).
+Its private physical-data kernels gain 13.18–15.45% over the P17 control with
+matching architectural signatures and exact physical write counts. The module
+passes strict lint, 495 physical/bridge/arbiter checks and 145 composed-cache
+checks. Isolated mapping estimates the entire enabled new block at 51 ALMs,
+59 registers and no RAM; no fitted whole-design delta is claimed. Matched real
+CHECKNUM arms are running. Production adoption, bounded machine/divided-clock
+checks and MiSTer throughput remain pending; no full regression.
+
 Added 2026-10-01. Status: numeric reference accepted; directed memory-path
 attribution and a coherent 1 KiB RAM-read buffer implemented and checked;
 hardware CheckIt/CHECKNUM improvement observed; repeated matched measurements

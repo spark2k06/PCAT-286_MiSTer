@@ -113,6 +113,21 @@ reference would require a further **11.63% / 9.62%** rate increase. These are
 empirical workload references, not a promise that all physical platform cost
 can be eliminated. The native 286's separate CPU timing model is a later target.
 
+### Subsequent user hardware observation
+
+The user supplied MiSTer screenshots reporting **6765 / 121.6K** in CheckIT
+and **6906 / 121.6K** in CHECKNUM. The latter matches both rates from the
+completed combined simulation exactly: +21.89% / +13.96% over P17 hardware,
+and 89.58% / 91.22% of the same-SPK286 immediate-memory reference. Compare
+CHECKNUM with CHECKNUM; the separate CheckIT integer observation is 2.04%
+lower and is retained, not substituted for the matched measurement.
+
+The screenshots and their byte hashes are retained under
+`docs/evidence/perf01-posted-write-20261002/hardware-combined`. Exact attribution
+to the exported bitstream and maximum CPU speed was requested from the user
+and remains pending. This observation does not establish timing closure or
+aggregate regression acceptance.
+
 ## Reproduction and retained evidence
 
 Use fresh run directories and the committed `scripts/build_at_no_debug.sh`

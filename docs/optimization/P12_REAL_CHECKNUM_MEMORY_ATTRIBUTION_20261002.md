@@ -235,3 +235,27 @@ MiSTer test of that fixed candidate and its completed 86Box measurement. Data
 conflicts, hit turnaround and physical writes remain measured opportunities;
 their potential gains require separate A/B evidence. No full regression or
 FPGA fitter/timing closure was run for this attribution milestone.
+
+## Later AT ownership confirmation (P19)
+
+The memory-only model's omitted AT refresh/HOLD service is now observable in
+real CHECKNUM. [P19](P19_AT_REFRESH_PLATFORM_ATTRIBUTION_20261002.md) adds the
+unchanged production 32-clock requester and arbiter to identical P17 controls:
+the first integer outputs are 6138 without that service and **5666 with it**,
+exactly the P17 MiSTer observation. The math/guest-exit controls are still in
+progress; the initial integer capture is retained separately as partial evidence.
+This does not retroactively change this document's original P10 rates or traces.
+
+The corrected AT requester follows real PIT channel 1 OUT rising edges. A
+BIOS-programmed divisor 18 at 1.193182 MHz gives about 15.1 us, whereas the old
+32-clock functional requester waits only 0.64 us plus service at 50 MHz.
+Physical SDRAM AUTO REFRESH remains independent and active. CPU HOLD/HLDA,
+arbiter priority and posted-write drain ordering remain explicit in the model.
+The new private adapter samples the real 86Box PIT OUT1; its integer result is
+pending. ISA speed remains 8 MHz in these matched runs, and this refresh cost
+must not be mistaken for an ISA frequency difference or host CPU capacity.
+
+Exact AT cycle accounting remains open: service occupancy, CPU boundary/HLDA
+latency, wait-state policy and PIT/PIC/DMA behavior need measured traces for a
+cycle-accurate platform. Corrected functionality and a matched throughput
+observation do not establish complete cycle accuracy.

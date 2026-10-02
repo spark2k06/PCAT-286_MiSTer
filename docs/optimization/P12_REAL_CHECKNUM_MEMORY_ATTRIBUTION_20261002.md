@@ -107,6 +107,57 @@ slot. The 8 MHz setting above belongs to 86Box; it must not be presented as
 matched PCAT peripheral timing. A later I/O comparison would need the actual
 device transaction counts and waits in both implementations.
 
+### Requirements for future cycle accuracy
+
+This is a future specification task. PERF01 currently measures throughput of
+the implemented SPK286/PCAT path. Matching nominal MHz, CHECKNUM scores or
+architectural results does not establish historical cycle accuracy. Positive
+FPGA setup/hold establishes compliance with the selected physical timing
+constraints; it does not establish the guest-visible timing of an original AT.
+
+First define the reference: CPU model/stepping, board/chipset, CPU and bus
+clocks, RAM wait states, device configuration and any buffering/cache policy.
+Specify whether each frequency denotes a physical clock input, a modeled CPU
+cycle or a nominal software setting, including the relationship between them.
+The present 50 MHz comparison counts SPK286 model clocks; BIOS/CheckIT
+calibration loops do not define this future reference contract. The native
+86Box 286 remains a useful comparison, with its own timing model requiring
+validation against the chosen hardware reference.
+
+| Area | Required future specification and evidence |
+| --- | --- |
+| CPU execution | Instruction timing under specified operand/addressing conditions, prefetch refill/consumption and overlap with execution; include taken branches, strings and event entry/return. |
+| AT bus | Reference Ts/Tc/Ti sequencing, READY sampling and wait insertion, byte/word/unaligned transfers, I/O recovery and interrupt acknowledge. |
+| Ownership and events | HOLD/HLDA, LOCK, DMA and refresh arbitration, interrupt recognition and reset/shutdown timing relative to the selected clocks. |
+| Devices | Per-device acceptance/completion latency, relevant peripheral clocks and interrupt/DMA cadence; distinguish ISA width from frequency. |
+| Memory buffers | Define which fetch/data transactions and latencies the reference exposes, including writes and self-modifying code; internal hits must obey that observable contract. |
+
+The current bridge explicitly documents a functional transaction boundary and
+defers historical Ts/Tc and an 82288/82289 pin-level implementation:
+[bridge source](../../rtl/spk286_integration/spk286_at_bus_bridge.sv).
+The present co-simulation retains actual PCAT RAM-controller state timing,
+while I/O, INTA and devices remain in 86Box and DMA/AT-refresh arbitration is
+absent. It cannot supply acceptance for those omitted timing requirements.
+
+Keeping a 50 MHz FPGA clock may be possible through clock enables and wait
+states once the reference cadence and phase resolution are specified. CPU
+execution, prefetch, bus ownership and peripheral time must advance consistently.
+Adding a fixed delay at instruction retirement alone would not reconstruct
+their overlap or the ordering of observable events. Optimizations may remain
+internally where they preserve the specified observations; each such claim
+needs directed evidence rather than assuming functional equivalence preserves
+historical timing.
+
+Future acceptance should compare timestamped CPU/bus/event traces against the
+defined reference, identify the first divergent transaction and verify both
+architectural results and elapsed reference cycles. Start with directed
+instruction, READY, I/O, interrupt, DMA and refresh cases, then real workloads.
+Use the Intel manuals already catalogued in
+[SPK286 source notes](../../vendor/spk286/docs/SOURCE_NOTES.md) together with
+the chosen board/device documentation and hardware measurements. Aggregate
+benchmarks remain a performance check and cannot replace those trace comparisons.
+No timing-policy, clock, RTL or configuration change is introduced by this note.
+
 ## Real application phase counters
 
 Frontend signature and relative far-call addresses identify both function

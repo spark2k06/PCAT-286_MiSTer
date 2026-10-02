@@ -2,8 +2,9 @@
 
 Date: 2026-10-02. PERF01 private candidate, authorized by the user.
 Status: directed physical/control checks pass; unchanged 86Box CHECKNUM running.
-No production RTL change, new synthesis or full regression at this milestone.
-The user requested simulation in 86Box before measuring another FPGA fit.
+After its integer result appeared, the user authorized an RBF while the math
+measurement continues. The write-admission candidate is now in production RTL;
+FPGA resources/timing and full guest completion remain pending. No full regression.
 
 ## Control and motivation
 
@@ -60,15 +61,34 @@ CPU objects and binaries were reused without modification.
 Candidate binary: `build/perf01-write-admission-20261002/probe/86Box-memory-probe`.
 Arm: `build/perf01-write-admission-20261002/pcat-write-admission/spk50`.
 CPU 50 MHz, ISA 8 MHz, same initial disk/CHECKNUM/configuration/CMOS as P15.
-CHECKNUM began at 2026-10-02 14:02:39 Europe/Madrid. Its complete scores are
-pending; no partial score or FPGA cost is claimed.
+CHECKNUM began at 2026-10-02 14:02:39 Europe/Madrid. After the integer formatting
+phase, two read-only guest-RAM reads found the stable formatted output
+`5666\r\n` at physical byte address `0x4CB38`. This is **+2.55%** versus P15's
+5525, and is provisional until the full run ends with RC0. Reading did not stop
+the emulator or write to guest/host process memory. Whetstone continues.
+
+The user then explicitly requested creating an RBF before math completion.
+The production owner has the private prototype's behavior, with its launch
+comment corrected and the combinational signal written as `logic` plus `assign`.
+No other production RTL/configuration or controller timing parameter changes.
+
+Additional bounded checks before freezing the RBF candidate:
+
+- Physical BL1/CL2 pin model: PASS, 71 accepted/completed writes, 70 reads,
+  41 periodic refresh commands over 1224 clocks. Includes a four-word read
+  followed by byte writes, alternating banks/rows, poisoning upstream payload
+  after acceptance, physical completion before acknowledgement, and a bounded
+  refresh-starvation assertion. The faster refresh parameters are test stimuli;
+  production retains 100/400 clocks.
+- Existing finite SDRAM read-window and both DQM wiring checks: PASS, including
+  their intentional clock-skew failure controls.
+- Composed bridge/buffer cancellation and coherence check: PASS.
 
 1. Require guest RC0/ALL_DONE/final profile and retain any classified host teardown.
 2. Compare rates and per-transfer waits against the completed 5525 / 102.4K P15
    control with CPU object/configuration identities enforced.
-3. If the measured gain justifies continuation, promote a reviewable candidate,
-   repeat the bounded composed coherence/cancellation checks, then freeze and
-   synthesize it to report resources and all timing corners.
+3. Freeze and synthesize the user-authorized candidate to report its resources
+   and all timing corners; retain the initial and final source identities.
 4. Commit each completed milestone. A full regression is a separate task.
 
 Open-row SDRAM policy, refresh-cadence evaluation and a faster common-hit path

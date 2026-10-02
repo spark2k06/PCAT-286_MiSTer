@@ -318,9 +318,14 @@ production owner is unchanged. The separate
 removes one return cycle for native RAM/ROM hits, misses and writes. Its four
 production-buffer kernels show 9.294–10.255% higher throughput with matching
 architectural state and write counts. Directed protocol, cancellation and
-corrected real-CPU warm-reset/IRQ tests pass. FPGA timing and hardware acceptance
-of this candidate are recorded separately; these synthetic results are not
-DOS CheckIT scores.
+corrected real-CPU warm-reset/IRQ tests pass. The user subsequently reported
+4361 Dhrystones (+10.517% versus 3946), CheckIT 84.1K Whetstones (+9.648%)
+and CHECKNUM 83.7K (+9.126%) on MiSTer; the previous result was 76.7K.
+The [screenshots and attribution limits](evidence/perf01-bridge-hardware-20261002/README.md)
+are retained. These hardware measurements are separate from the synthetic
+kernels. The generated candidate has worst setup -0.557 ns at 50 MHz, with
+hold positive in all four corners. Preserve the measured benefit while
+recovering timing closure; keep the previous timing-closed RBF as fallback.
 
 1. Capture completed CHECKNUM scores and request/wait counts in matched SPK286
    and hardware configurations, with the loaded RBF recorded. Use the same

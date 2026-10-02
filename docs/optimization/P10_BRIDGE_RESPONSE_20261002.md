@@ -62,6 +62,26 @@ code hits consequently wait two bus clocks instead of three. This is a
 20 ns reduction per eligible transfer at 50 MHz; total workload time also
 depends on instruction overlap, prefetch and refresh phase.
 
+### Aligning a future DOS comparison with 86Box
+
+For the current 50 MHz MiSTer configuration, the corresponding nominal-clock
+reference is the same SPK286 revision and options at 50 MHz in 86Box. The local
+86Box Intel 286 CPU table stops at 25 MHz; this is the highest listed profile,
+not a limit imposed by the SPK286 simulation. Adding a test profile must retain
+the intended ISA/peripheral clock configuration rather than doubling every
+clock. No 86Box profile is changed by this bridge milestone.
+
+The local `86Box_dev/src/cpu/spk286_host.c` consumes one configured CPU cycle
+per `spk286_model_tick()`. Its backend in `spk286_backend.cpp` drives READY high
+and supplies 86Box memory data without the PCAT bridge, code/data buffers and
+physical SDRAM latency. Equal nominal clocks therefore give an ideal-memory
+CPU reference, not an identical machine. A residual score gap includes these
+integration costs; matching their bus behavior would require a separate model.
+Keep BIOS, RAM, video, guest image and benchmark configuration matched, and
+record the actual CPU backend. The original 86Box C 286 is a separate timing
+model. CheckIT's estimated MHz must not be substituted for the configured
+clock or used to tune the reference until benchmark scores agree.
+
 ## Directed validation
 
 - The same synchronous-consumer response bench passes with baseline and
@@ -107,7 +127,68 @@ Configuration remains 50 MHz, NO_DEBUG, P01/P02/P05/P06/P07 and the RAM read
 buffer enabled. The SDRAM owner remains the timing-closed reference version.
 The known-good fallback is `build/50mhz-closed-20261002/PCAT-286.rbf`.
 
-Fitted timing and the generated candidate RBF identity will be recorded when
-the current compile completes. No hardware performance result or full CPU
-regression is claimed for this candidate. The user will compare CHECKNUM and
-normal software on MiSTer against the fallback's 3946 / 76.7K observation.
+### Generated RBF and measured timing
+
+The fresh full compile completed in 29:14 with zero errors and 856 warnings;
+the additional detailed STA completed in 3:31 with zero errors and 51 warnings.
+Delivered artifact: `build/perf01-bridge-candidate-20261002/PCAT-286.rbf`,
+4,097,400 bytes, SHA-256:
+
+```text
+3cbcbaaba667c48c4ef28c45f484c61563cee660e9fd21e8267a77cd013a3b7e
+```
+
+It is byte-identical to the fresh output under the frozen candidate workspace.
+The prior timing-closed RBF is retained unchanged. **This candidate does not
+close timing at 50 MHz.** Global measured margins are:
+
+| Corner | Setup | Hold |
+| --- | ---: | ---: |
+| Slow 100 C | -0.557 ns | +0.189 ns |
+| Slow -40 C | -0.301 ns | +0.084 ns |
+| Fast 100 C | +2.302 ns | +0.133 ns |
+| Fast -40 C | +2.612 ns | +0.087 ns |
+
+CPU-domain Fmax is 48.65 MHz at Slow 100 C and 49.26 MHz at Slow -40 C.
+The delivered RBF still runs the configured 50 MHz clock; STA does not lower
+that clock. All global hold margins are positive. The conditional external
+SDRAM budget and inherited platform/HPS scope remain those of the previous
+closure audit; no constraints or exceptions were relaxed for this result.
+
+The worst Slow 100 C path runs from `event_gate_candidate_valid_q` through
+operand/stack control to `gpr_q[75]`: 17 logic levels, 19.799 ns data delay,
+approximately 70% routing. At Slow -40 C the worst path starts in the
+microcode ROM and ends at `gpr_q[64]`. These paths do not traverse the new
+bridge response. The bridge-to-CPU group retains +5.439/+5.411 ns in the two
+slow corners. HDMI scaled/PLL clock groups also have setup violations.
+The failing paths are existing CPU/video logic with changed fitted routing;
+this observation does not prove that a future placement alone will fix them.
+
+Equivalent logic uses 28,873 ALMs (69%), physically placed ALMs 34,740 (83%),
+and registers 37,171. M10K usage remains 414/553 (75%); DSP/PLL usage is
+unchanged. The fitted input identities, complete timing reports and audit
+are retained in the [fit evidence](../evidence/perf01-bridge-fit-20261002/README.md).
+
+### User-reported hardware performance
+
+After receiving the candidate, the user supplied CheckIT and CHECKNUM
+screenshots from MiSTer. Compared with the previous timing-closed RBF:
+
+| Measurement | Previous | Candidate | Gain |
+| --- | ---: | ---: | ---: |
+| Dhrystones, both programs | 3946 | 4361 | 10.517% |
+| CheckIT Whetstones | 76.7K | 84.1K | 9.648% |
+| CHECKNUM Whetstones | 76.7K | 83.7K | 9.126% |
+
+CheckIT still estimates approximately 35 MHz (35.04 versus 35.02 previously),
+while the configured CPU clock remains 50 MHz. The observed gains support
+the practical value of removing the bridge cycle and agree in magnitude
+with the directed simulation. The synthetic fixed-point Whetstone-shaped
+kernel and CheckIT math test remain different workloads.
+
+The [hardware evidence](../evidence/perf01-bridge-hardware-20261002/README.md)
+retains the unmodified screenshots and provenance limits. The association
+with the delivered RBF follows the conversation; its loaded hash was not
+independently measured. No new full CPU regression or general software
+acceptance is claimed. Preserve this performance result while recovering
+positive setup margins before selecting a new timing-closed release.

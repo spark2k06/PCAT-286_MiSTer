@@ -1,0 +1,863 @@
+diff --git a/rtl/spk286_integration/spk286_at_bus_bridge.sv b/rtl/spk286_integration/spk286_at_bus_bridge.sv
+index a787ce4..dd9db87 100644
+--- a/rtl/spk286_integration/spk286_at_bus_bridge.sv
++++ b/rtl/spk286_integration/spk286_at_bus_bridge.sv
+@@ -104,9 +104,11 @@ module spk286_at_bus_bridge #(
+     logic        request_lock_q;
+     logic        request_two_beats_q;
+     logic        request_native_word_q;
++    logic        request_native_memory_q;
+     logic        beat_high_q;
+     logic [7:0]  read_low_byte_q;
+     logic        complete_sampled_q;
++    logic [15:0] cpu_data_in_q;
+ 
+     logic request_status_valid;
+     logic request_lane_valid;
+@@ -208,6 +210,20 @@ module spk286_at_bus_bridge #(
+                               (!request_is_read || request_is_inta ||
+                                at_read_data_valid);
+ 
++    // RAM/ROM responses already come from a retained backend transaction.
++    // In the common clock domain, let the CPU consume that response on the
++    // same edge as the bridge. Byte requests still select their retained
++    // lane; split and peripheral cycles keep the registered completion path.
++    // The divided CPU clock keeps its explicit READY alignment/hold interval.
++    wire direct_memory_wait = !COMPLETE_ON_CPU_SAMPLE && !reset &&
++                              request_native_memory_q && !request_two_beats_q &&
++                              (state_q == STATE_WAIT);
++    wire direct_memory_response = direct_memory_wait && completion_valid;
++    wire [15:0] direct_memory_data = request_native_word_q ? at_read_data :
++                                     beat_byte_enable[1] ?
++                                     {at_read_data[15:8], 8'h00} :
++                                     {8'h00, at_read_data[7:0]};
++
+     assign at_valid          = early_memory_address || (state_q == STATE_ADDRESS) ||
+                                (state_q == STATE_COMMAND) ||
+                                (state_q == STATE_WAIT);
+@@ -235,8 +251,13 @@ module spk286_at_bus_bridge #(
+     assign at_lock           = early_memory_address ? cpu_bus_lock : (state_q != STATE_IDLE) && request_lock_q;
+     assign at_accepted       = (state_q == STATE_COMMAND) && at_accept;
+     assign at_completed      = completion_valid;
+-    assign at_response_valid = (state_q == STATE_COMPLETE);
+-    assign cpu_ready         = (state_q == STATE_COMPLETE);
++    assign at_response_valid = (state_q == STATE_COMPLETE) || direct_memory_response;
++    assign cpu_ready         = (state_q == STATE_COMPLETE) || direct_memory_response;
++    // Select the retained lane path independently of READY/data-valid. The
++    // CPU consumes it only with cpu_ready, keeping completion qualification
++    // out of the 16-bit response-data mux.
++    assign cpu_data_in       = direct_memory_wait && request_is_read ?
++                               direct_memory_data : cpu_data_in_q;
+     assign bridge_idle       = (state_q == STATE_IDLE) && !early_memory_address;
+     assign debug_state       = state_q;
+ 
+@@ -250,10 +271,11 @@ module spk286_at_bus_bridge #(
+             request_lock_q     <= 1'b0;
+             request_two_beats_q <= 1'b0;
+             request_native_word_q <= 1'b0;
++            request_native_memory_q <= 1'b0;
+             beat_high_q        <= 1'b0;
+             read_low_byte_q    <= 8'd0;
+             complete_sampled_q <= 1'b0;
+-            cpu_data_in        <= 16'd0;
++            cpu_data_in_q      <= 16'd0;
+             protocol_error     <= 1'b0;
+         end else begin
+             if (state_q != STATE_COMPLETE)
+@@ -276,9 +298,11 @@ module spk286_at_bus_bridge #(
+                                                 !cpu_bus_bhe_n;
+                         request_native_word_q <= live_request_valid &&
+                                                  native_word_request;
++                        request_native_memory_q <= live_request_valid &&
++                                                   memory_native_word_request;
+                         beat_high_q          <= 1'b0;
+                         read_low_byte_q      <= 8'd0;
+-                        cpu_data_in          <= 16'd0;
++                         cpu_data_in_q        <= 16'd0;
+                         if (live_request_valid)
+                             // P01 removes two bookkeeping-only states for
+                             // decoded RAM/ROM. The complete request is already
+@@ -315,26 +339,32 @@ module spk286_at_bus_bridge #(
+                     if (completion_valid) begin
+                         if (request_is_read) begin
+                             if (request_is_inta)
+-                                cpu_data_in <= {8'h00, at_read_data[7:0]};
++                                cpu_data_in_q <= {8'h00, at_read_data[7:0]};
+                             else if (request_native_word_q)
+-                                cpu_data_in <= at_read_data;
++                                cpu_data_in_q <= at_read_data;
+                             else if (beat_byte_enable[1]) begin
+                                 if (request_two_beats_q)
+-                                    cpu_data_in <= {at_read_data[15:8],
++                                    cpu_data_in_q <= {at_read_data[15:8],
+                                                     read_low_byte_q};
+                                 else
+-                                    cpu_data_in <= {at_read_data[15:8], 8'h00};
++                                    cpu_data_in_q <= {at_read_data[15:8], 8'h00};
+                             end else begin
+                                 if (request_two_beats_q)
+                                     read_low_byte_q <= at_read_data[7:0];
+                                 else
+-                                    cpu_data_in <= {8'h00, at_read_data[7:0]};
++                                    cpu_data_in_q <= {8'h00, at_read_data[7:0]};
+                             end
+                         end
+ 
+                         if (request_two_beats_q && !beat_high_q) begin
+                             beat_high_q <= 1'b1;
+                             state_q <= STATE_ADDRESS;
++                        end else if (direct_memory_response) begin
++                            // READY is sampled now. The BIU presents its next
++                            // request after this edge, so only IDLE may capture
++                            // it on the next edge; recapturing here would replay
++                            // the request that just completed.
++                            state_q <= STATE_IDLE;
+                         end else begin
+                             // Never launch READY on the same parent edge that
+                             // launches the divided CPU clock. Align it to the
+diff --git a/scripts/check_at_timing_closure.py b/scripts/check_at_timing_closure.py
+index cce2e30..a3bec99 100644
+--- a/scripts/check_at_timing_closure.py
++++ b/scripts/check_at_timing_closure.py
+@@ -12,6 +12,8 @@ parser.add_argument('run',type=Path)
+ parser.add_argument('--net-budget',type=float)
+ parser.add_argument('--output',required=True)
+ parser.add_argument('--summary-file',type=Path)
++parser.add_argument('--integration-cycle-sources',type=Path,
++                    help='New directed workload manifest for bridge/SDRAM-owner latency changes only')
+ args=parser.parse_args()
+ run=(args.run if args.run.exists() or args.run.is_absolute() else root/'build'/args.run).resolve()
+ summary=json.loads((args.summary_file or run/'summary.json').read_text())
+@@ -135,11 +137,31 @@ if executor_sha==offset_proof['candidate_source_sha256']:
+     cycle_sources=root/'docs/evidence/stack-offset-arithmetic-20261002/compiled-cycle-sources.sha256'
+ else:
+     cycle_sources=root/'docs/evidence/sync-microcode-20261001/compiled-sources.sha256'
++integration_cycle_binding=None
++cycle_hashes={name:expected for expected,name in
++              (line.split(maxsplit=1) for line in cycle_sources.read_text().splitlines())}
++if args.integration_cycle_sources:
++    new_sources=args.integration_cycle_sources
++    new_hashes={name:expected for expected,name in
++                (line.split(maxsplit=1) for line in new_sources.read_text().splitlines())}
++    if set(new_hashes)!=set(cycle_hashes):
++        raise ValueError('New cycle validation must cover the identical complete source set')
++    changed_cycle_inputs={name for name in cycle_hashes if cycle_hashes[name]!=new_hashes[name]}
++    allowed_integration_inputs={'rtl/spk286_integration/spk286_at_bus_bridge.sv',
++                                'rtl/spk286_integration/spk286_at_mister_sdram_owner.sv'}
++    if not changed_cycle_inputs or not changed_cycle_inputs.issubset(allowed_integration_inputs):
++        raise ValueError('Latency validation cannot replace CPU, harness, firmware or configuration proofs: '+
++                         str(sorted(changed_cycle_inputs)))
++    integration_cycle_binding={'manifest':str(new_sources),'sha256':sha(new_sources),
++                               'changed_inputs':sorted(changed_cycle_inputs),
++                               'scope':'Only bridge/owner rebound to new directed workload receipts; '
++                                       'all CPU, firmware, configuration and harness inputs unchanged'}
++    cycle_hashes=new_hashes
+ validated_source_count=0
+-for line in cycle_sources.read_text().splitlines():
+-    expected,name=line.split(maxsplit=1)
++for name,expected in cycle_hashes.items():
+     relative=Path(name)
+-    if relative.is_absolute():raise ValueError('Expected repository-relative cycle source')
++    if relative.is_absolute() or '..' in relative.parts:
++        raise ValueError('Expected repository-relative cycle source')
+     path=run/'work'/relative
+     if sha(path)!=expected:raise ValueError('Fitted source differs from directed cycle validation: '+name)
+     validated_source_count+=1
+@@ -191,6 +213,7 @@ result={'status':status,'run_directory':str(run.relative_to(root)),
+     'manifest_sha256':sha(run/'manifest.json'),'frozen_source_files_verified':len(manifest['source_sha256']),
+     'controlled_generated_sources':generated_sources,
+     'directed_cycle_sources_verified':validated_source_count,'compiled_rom':compiled_rom,
++    'integration_cycle_binding':integration_cycle_binding,
+     'original_constraints_guard':'All frozen SDC inputs match 45e95b4; only the explicitly checked additional video_stats net bound may differ',
+     'corners':corners,'failures':failures,
+     'scope':'Constrained FPGA fabric and conditional W9825 SDRAM flight/device budget; not certification of inherited platform I/O or HPS hard blocks',
+diff --git a/scripts/test_at_landmark_dma.sh b/scripts/test_at_landmark_dma.sh
+index 9c19eb7..1f363af 100644
+--- a/scripts/test_at_landmark_dma.sh
++++ b/scripts/test_at_landmark_dma.sh
+@@ -15,6 +15,7 @@ cd "$root"
+ sources=(
+   vendor/spk286/microcode/generated/spk286_microcode_pkg.sv
+   vendor/spk286/microcode/generated/spk286_microcode_rom.sv
++  vendor/spk286/microcode/generated/spk286_microcode_sync_rom.sv
+   vendor/spk286/rtl/spk286_protected_pkg.sv
+   vendor/spk286/rtl/spk286_tss_pkg.sv
+ )
+diff --git a/scripts/test_at_machine_boundary.sh b/scripts/test_at_machine_boundary.sh
+index 3de93f4..5093b2b 100644
+--- a/scripts/test_at_machine_boundary.sh
++++ b/scripts/test_at_machine_boundary.sh
+@@ -11,6 +11,7 @@ source "$root/scripts/at_performance_flags.sh"
+ sources=(
+   vendor/spk286/microcode/generated/spk286_microcode_pkg.sv
+   vendor/spk286/microcode/generated/spk286_microcode_rom.sv
++  vendor/spk286/microcode/generated/spk286_microcode_sync_rom.sv
+   vendor/spk286/rtl/spk286_protected_pkg.sv
+   vendor/spk286/rtl/spk286_tss_pkg.sv
+ )
+diff --git a/scripts/test_i1_cpu_package.sh b/scripts/test_i1_cpu_package.sh
+index a9d1ff9..fa8ea67 100644
+--- a/scripts/test_i1_cpu_package.sh
++++ b/scripts/test_i1_cpu_package.sh
+@@ -16,6 +16,7 @@ fi
+ sources=(
+   vendor/spk286/microcode/generated/spk286_microcode_pkg.sv
+   vendor/spk286/microcode/generated/spk286_microcode_rom.sv
++  vendor/spk286/microcode/generated/spk286_microcode_sync_rom.sv
+   vendor/spk286/rtl/spk286_protected_pkg.sv
+   vendor/spk286/rtl/spk286_tss_pkg.sv
+ )
+diff --git a/sim/spk286_integration/spk286_at_bus_bridge_tb.sv b/sim/spk286_integration/spk286_at_bus_bridge_tb.sv
+index f013f59..c8128c8 100644
+--- a/sim/spk286_integration/spk286_at_bus_bridge_tb.sv
++++ b/sim/spk286_integration/spk286_at_bus_bridge_tb.sv
+@@ -162,16 +162,11 @@ module spk286_at_bus_bridge_tb;
+         input logic [15:0] data_value,
+         output logic [15:0] response
+     );
+-        integer deadline;
+         begin
+             at_read_data = data_value;
+             at_read_data_valid = 1'b1;
+             at_ready = 1'b1;
+-            for (deadline = 0; deadline < 100 && !cpu_ready;
+-                 deadline = deadline + 1)
+-                @(negedge clk);
+-            check(cpu_ready, "CPU read completion did not arrive");
+-            response = cpu_data_in;
++            consume_response(response);
+             at_ready = 1'b0;
+             at_read_data_valid = 1'b0;
+             cpu_bus_valid = 1'b0;
+@@ -179,14 +174,28 @@ module spk286_at_bus_bridge_tb;
+         end
+     endtask
+ 
+-    task automatic complete_write;
++    // The BIU samples READY/data on a rising edge and changes its request
++    // afterwards. Merely observing READY at a falling edge is not consumption.
++    task automatic consume_response(output logic [15:0] response);
+         integer deadline;
++        begin
++            deadline = 0;
++            @(posedge clk);
++            while (!cpu_ready && deadline < 100) begin
++                deadline = deadline + 1;
++                @(posedge clk);
++            end
++            check(cpu_ready, "CPU completion did not reach a sampling edge");
++            response = cpu_data_in;
++            @(negedge clk);
++        end
++    endtask
++
++    task automatic complete_write;
++        logic [15:0] ignored_response;
+         begin
+             at_ready = 1'b1;
+-            for (deadline = 0; deadline < 100 && !cpu_ready;
+-                 deadline = deadline + 1)
+-                @(negedge clk);
+-            check(cpu_ready, "CPU write completion did not arrive");
++            consume_response(ignored_response);
+             at_ready = 1'b0;
+             cpu_bus_valid = 1'b0;
+             @(negedge clk);
+@@ -260,12 +269,11 @@ module spk286_at_bus_bridge_tb;
+         at_read_data = 16'h5600;
+         at_read_data_valid = 1'b1;
+         at_ready = 1'b1;
+-        for (integer deadline = 0; deadline < 100 && !cpu_ready;
+-             deadline = deadline + 1)
+-            @(negedge clk);
+-        check(cpu_ready && cpu_data_in == 16'h5634,
++        while (!cpu_ready) @(negedge clk);
++        check(cpu_data_in == 16'h5634,
+               "aligned word read assembly was wrong");
+         check(at_lock, "LOCK dropped before CPU observed word completion");
++        consume_response(response);
+         at_ready = 1'b0;
+         at_read_data_valid = 1'b0;
+         cpu_bus_valid = 1'b0;
+@@ -351,11 +359,10 @@ module spk286_at_bus_bridge_tb;
+         start_request(24'h000080, 4'h6, 1'b1, 1'b1, 16'h005A, 1'b0);
+         wait_command();
+         accept_command();
+-        while (!cpu_ready) @(negedge clk);
+-        while (cpu_ready) @(negedge clk);
++        consume_response(response);
+         wait_command();
+         accept_command();
+-        while (!cpu_ready) @(negedge clk);
++        consume_response(response);
+         check(accept_count == before_accept + 2,
+               "identical back-to-back requests were not both accepted");
+         cpu_bus_valid = 1'b0;
+@@ -374,8 +381,8 @@ module spk286_at_bus_bridge_tb;
+         at_read_data = 16'h00FF;
+         at_read_data_valid = 1'b1;
+         at_ready = 1'b1;
+-        while (!cpu_ready) @(negedge clk);
+-        check(cpu_data_in == 16'h00FF, "first INTA response was not returned");
++        consume_response(response);
++        check(response == 16'h00FF, "first INTA response was not returned");
+         at_ready = 1'b0;
+         at_read_data_valid = 1'b0;
+         cpu_bus_valid = 1'b0;
+@@ -387,8 +394,8 @@ module spk286_at_bus_bridge_tb;
+         at_read_data = 16'h0042;
+         at_read_data_valid = 1'b1;
+         at_ready = 1'b1;
+-        while (!cpu_ready) @(negedge clk);
+-        check(cpu_data_in == 16'h0042,
++        consume_response(response);
++        check(response == 16'h0042,
+               "second INTA vector was not sampled from D7:0");
+         at_ready = 1'b0;
+         at_read_data_valid = 1'b0;
+diff --git a/vendor/spk286/tools/audit_adjust.py b/vendor/spk286/tools/audit_adjust.py
+index 707f0b1..867162b 100644
+--- a/vendor/spk286/tools/audit_adjust.py
++++ b/vendor/spk286/tools/audit_adjust.py
+@@ -6,6 +6,8 @@ from pathlib import Path
+ import subprocess
+ import sys
+ 
++from tools.rtl_sources import ordered_rtl_sources
++
+ ROOT = Path(__file__).resolve().parents[1]
+ PROBES = (('decimal-low-threshold',
+   'spk286_adjust',
+@@ -88,8 +90,7 @@ def main():
+     subprocess.run([sys.executable, '-m', 'tools.microcode.compile_microcode', '--check'], check=True)
+     output = args.build_dir.resolve()/'adjust-audit'
+     output.mkdir(parents=True, exist_ok=True)
+-    sources = [ROOT/'microcode/generated/spk286_microcode_pkg.sv', ROOT/'microcode/generated/spk286_microcode_rom.sv',
+-               *sorted((ROOT/'rtl').glob('*.sv'))]
++    sources = ordered_rtl_sources(ROOT)
+     originals = {p: p.read_bytes() for p in sources}
+     (output/'source.sha256').write_text(''.join(f'{hashlib.sha256(data).hexdigest()}  {p.relative_to(ROOT).as_posix()}\n'
+                                               for p,data in originals.items()), encoding='utf-8')
+diff --git a/vendor/spk286/tools/audit_alu.py b/vendor/spk286/tools/audit_alu.py
+index c55ecc2..f28162f 100644
+--- a/vendor/spk286/tools/audit_alu.py
++++ b/vendor/spk286/tools/audit_alu.py
+@@ -8,6 +8,8 @@ import sys
+ from tools.alu_reference import write_vectors
+ from tools.alu_instruction_vectors import write_vectors as write_instruction_vectors
+ 
++from tools.rtl_sources import ordered_rtl_sources
++
+ ROOT = Path(__file__).resolve().parents[1]
+ PROBES = (
+     ('carry', 'spk286_alu', 'spk286_alu', 'candidate_flags[0] = operand_byte ? extended_result[8] : extended_result[16];',
+@@ -34,8 +36,7 @@ def main():
+     output.mkdir(parents=True, exist_ok=True)
+     alu_vectors = output/'alu.txt'; instruction_vectors = output/'instructions.txt'
+     write_vectors(alu_vectors); write_instruction_vectors(instruction_vectors)
+-    sources = [ROOT/'microcode/generated/spk286_microcode_pkg.sv', ROOT/'microcode/generated/spk286_microcode_rom.sv',
+-               *sorted((ROOT/'rtl').glob('*.sv'))]
++    sources = ordered_rtl_sources(ROOT)
+     originals = {p: p.read_bytes() for p in sources}
+     (output/'source.sha256').write_text(''.join(f'{hashlib.sha256(data).hexdigest()}  {p.relative_to(ROOT).as_posix()}\n'
+                                               for p,data in originals.items()), encoding='utf-8')
+diff --git a/vendor/spk286/tools/audit_byte_prefix.py b/vendor/spk286/tools/audit_byte_prefix.py
+index 1a74963..0e75593 100644
+--- a/vendor/spk286/tools/audit_byte_prefix.py
++++ b/vendor/spk286/tools/audit_byte_prefix.py
+@@ -6,6 +6,8 @@ from pathlib import Path
+ import subprocess
+ import sys
+ 
++from tools.rtl_sources import ordered_rtl_sources
++
+ ROOT = Path(__file__).resolve().parents[1]
+ PROBES = (
+     ('byte-write-lane','spk286_biu','spk286_biu_width_io',
+@@ -33,8 +35,7 @@ def main():
+     subprocess.run([sys.executable, '-m', 'tools.microcode.compile_microcode', '--check'], check=True)
+     output = args.build_dir.resolve()/'byte-prefix-audit'
+     output.mkdir(parents=True, exist_ok=True)
+-    sources = [ROOT/'microcode/generated/spk286_microcode_pkg.sv', ROOT/'microcode/generated/spk286_microcode_rom.sv',
+-               *sorted((ROOT/'rtl').glob('*.sv'))]
++    sources = ordered_rtl_sources(ROOT)
+     originals = {p: p.read_bytes() for p in sources}
+     (output/'source.sha256').write_text(''.join(f'{hashlib.sha256(data).hexdigest()}  {p.relative_to(ROOT).as_posix()}\n'
+                                               for p,data in originals.items()), encoding='utf-8')
+diff --git a/vendor/spk286/tools/audit_data.py b/vendor/spk286/tools/audit_data.py
+index 99bd0d8..e898821 100644
+--- a/vendor/spk286/tools/audit_data.py
++++ b/vendor/spk286/tools/audit_data.py
+@@ -6,6 +6,8 @@ from pathlib import Path
+ import subprocess
+ import sys
+ 
++from tools.rtl_sources import ordered_rtl_sources
++
+ ROOT = Path(__file__).resolve().parents[1]
+ PROBES = (('exchange-writeback',
+   'spk286_micro_executor',
+@@ -65,8 +67,8 @@ def main():
+     subprocess.run([sys.executable, '-m', 'tools.microcode.compile_microcode', '--check'], check=True)
+     output = args.build_dir.resolve()/'data-audit'
+     output.mkdir(parents=True, exist_ok=True)
+-    sources = [ROOT/'microcode/generated/spk286_microcode_pkg.sv', ROOT/'microcode/generated/spk286_microcode_rom.sv',
+-               *sorted((ROOT/'rtl').glob('*.sv'))]
++    packages = [ROOT/'rtl/spk286_protected_pkg.sv', ROOT/'rtl/spk286_tss_pkg.sv']
++    sources = ordered_rtl_sources(ROOT)
+     originals = {p: p.read_bytes() for p in sources}
+     (output/'source.sha256').write_text(''.join(f'{hashlib.sha256(data).hexdigest()}  {p.relative_to(ROOT).as_posix()}\n'
+                                               for p,data in originals.items()), encoding='utf-8')
+diff --git a/vendor/spk286/tools/audit_double_fault.py b/vendor/spk286/tools/audit_double_fault.py
+index f9a2295..e210fde 100644
+--- a/vendor/spk286/tools/audit_double_fault.py
++++ b/vendor/spk286/tools/audit_double_fault.py
+@@ -5,6 +5,8 @@ import json
+ from pathlib import Path
+ import subprocess
+ 
++from tools.rtl_sources import ordered_rtl_sources
++
+ ROOT = Path(__file__).resolve().parents[1]
+ PROBES = (
+     ('no-double-fault', 'spk286_events', 'spk286_double_fault_events',
+@@ -44,9 +46,7 @@ def main():
+     args = parser.parse_args()
+     output = args.output.resolve()
+     packages = [ROOT / 'rtl/spk286_protected_pkg.sv', ROOT / 'rtl/spk286_tss_pkg.sv']
+-    sources = [ROOT / 'microcode/generated/spk286_microcode_pkg.sv',
+-               ROOT / 'microcode/generated/spk286_microcode_rom.sv', *packages,
+-               *sorted(p for p in (ROOT / 'rtl').glob('*.sv') if p not in packages)]
++    sources = ordered_rtl_sources(ROOT)
+     originals = {p: p.read_bytes() for p in sources}
+     results = []
+ 
+diff --git a/vendor/spk286/tools/audit_events.py b/vendor/spk286/tools/audit_events.py
+index 4468231..c0e5412 100644
+--- a/vendor/spk286/tools/audit_events.py
++++ b/vendor/spk286/tools/audit_events.py
+@@ -8,6 +8,8 @@ import subprocess
+ import sys
+ from tools.event_vectors import records
+ 
++from tools.rtl_sources import ordered_rtl_sources
++
+ ROOT=Path(__file__).resolve().parents[1]
+ PROBES=(
+     ('owed-trap-priority','spk286_events','spk286_event_lifecycle',
+@@ -67,8 +69,7 @@ def main():
+     vectors=output/'event-vectors.txt';rows=list(records())
+     vectors.write_text(f'{len(rows):x}\n'+''.join(' '.join(f'{v:x}' for v in row)+'\n' for row in rows))
+     packages=[ROOT/'rtl/spk286_protected_pkg.sv',ROOT/'rtl/spk286_tss_pkg.sv']
+-    sources=[ROOT/'microcode/generated/spk286_microcode_pkg.sv',ROOT/'microcode/generated/spk286_microcode_rom.sv',*packages,
+-             *sorted(p for p in (ROOT/'rtl').glob('*.sv') if p not in packages)]
++    sources = ordered_rtl_sources(ROOT)
+     originals={p:p.read_bytes() for p in sources}
+     results=[]
+     def execute(name,bench,mutation=None,reason=None):
+diff --git a/vendor/spk286/tools/audit_far.py b/vendor/spk286/tools/audit_far.py
+index a97fa8e..f595419 100644
+--- a/vendor/spk286/tools/audit_far.py
++++ b/vendor/spk286/tools/audit_far.py
+@@ -6,6 +6,8 @@ from pathlib import Path
+ import subprocess
+ import sys
+ 
++from tools.rtl_sources import ordered_rtl_sources
++
+ ROOT = Path(__file__).resolve().parents[1]
+ PROBES = (('lds-cache-index',
+   'spk286_control_decode',
+@@ -26,11 +28,11 @@ PROBES = (('lds-cache-index',
+   "address_offset <= effective_offset + 16'd4",
+   'exact data transaction order, direction and lanes'),
+  ('call-stack-precheck',
+-  'spk286_micro_executor',
+-  'spk286_far_instructions',
+-  "stack_pointer<16'd4",
+-  "stack_pointer<16'd2",
+-  'no extra data transfer'),
++ 'spk286_micro_executor',
++ 'spk286_call_stack_precheck',
++ "stack_pointer[0] && stack_pointer < 16'd4",
++ "stack_pointer[0] && stack_pointer < 16'd2",
++ 'call-frame precheck prevents every stack write'),
+  ('return-stack-precheck',
+   'spk286_micro_executor',
+   'spk286_far_instructions',
+@@ -40,8 +42,8 @@ PROBES = (('lds-cache-index',
+  ('return-allocation',
+   'spk286_micro_executor',
+   'spk286_far_instructions',
+-  'add_allocation_arch ? stack_pointer+allocation_q',
+-  'add_allocation_arch ? stack_pointer-allocation_q',
++  '(stack_pointer+allocation_q)',
++  '(stack_pointer-allocation_q)',
+   'all architectural GPR results and preservation'),
+  ('far-context-selector',
+   'spk286_micro_executor',
+@@ -88,8 +90,8 @@ def main():
+     subprocess.run([sys.executable, '-m', 'tools.microcode.compile_microcode', '--check'], check=True)
+     output = args.build_dir.resolve()/'far-audit'
+     output.mkdir(parents=True, exist_ok=True)
+-    sources = [ROOT/'microcode/generated/spk286_microcode_pkg.sv', ROOT/'microcode/generated/spk286_microcode_rom.sv',
+-               *sorted((ROOT/'rtl').glob('*.sv'))]
++    packages = [ROOT/'rtl/spk286_protected_pkg.sv', ROOT/'rtl/spk286_tss_pkg.sv']
++    sources = ordered_rtl_sources(ROOT)
+     originals = {p: p.read_bytes() for p in sources}
+     (output/'source.sha256').write_text(''.join(f'{hashlib.sha256(data).hexdigest()}  {p.relative_to(ROOT).as_posix()}\n'
+                                               for p,data in originals.items()), encoding='utf-8')
+@@ -122,13 +124,13 @@ def main():
+         elif run.returncode or 'PASS:' not in run.stdout:
+             raise RuntimeError(f'{name}: pristine bench failed')
+         print(f'FAR_MUTATION {name}: {"rejected" if reason else "passed"} status={run.returncode}')
+-    for bench in ('spk286_far_instructions','spk286_far_lifecycle'):
++    for bench in ('spk286_far_instructions','spk286_far_lifecycle','spk286_call_stack_precheck'):
+         execute('pristine-'+bench,bench)
+     for name,module,bench,old,new,reason in PROBES:
+         execute(name,bench,(module,old,new),reason)
+     if any(p.read_bytes()!=data for p,data in originals.items()):
+         raise RuntimeError('production source changed during mutation audit')
+-    print('FAR_AUDIT PASS: 12 rejected RTL mutants; 2 pristine benches; source bytes unchanged')
++    print('FAR_AUDIT PASS: 12 rejected RTL mutants; 3 pristine benches; source bytes unchanged')
+ 
+ 
+ if __name__ == '__main__':
+diff --git a/vendor/spk286/tools/audit_io.py b/vendor/spk286/tools/audit_io.py
+index 25615ff..01145c9 100644
+--- a/vendor/spk286/tools/audit_io.py
++++ b/vendor/spk286/tools/audit_io.py
+@@ -6,6 +6,8 @@ from pathlib import Path
+ import subprocess
+ import sys
+ 
++from tools.rtl_sources import ordered_rtl_sources
++
+ ROOT = Path(__file__).resolve().parents[1]
+ PROBES = (('captured-port',
+   'spk286_micro_executor',
+@@ -133,8 +135,7 @@ def main():
+     rtl_sources = sorted((ROOT/'rtl').glob('*.sv'))
+     # Match scripts/rtl_sources.sh: packages must precede their users in Icarus.
+     packages = [ROOT/'rtl/spk286_protected_pkg.sv', ROOT/'rtl/spk286_tss_pkg.sv']
+-    sources = [ROOT/'microcode/generated/spk286_microcode_pkg.sv', ROOT/'microcode/generated/spk286_microcode_rom.sv',
+-               *packages, *(p for p in rtl_sources if p not in packages)]
++    sources = ordered_rtl_sources(ROOT)
+     originals = {p: p.read_bytes() for p in sources}
+     (output/'source.sha256').write_text(''.join(f'{hashlib.sha256(data).hexdigest()}  {p.relative_to(ROOT).as_posix()}\n'
+                                               for p,data in originals.items()), encoding='utf-8')
+diff --git a/vendor/spk286/tools/audit_muldiv.py b/vendor/spk286/tools/audit_muldiv.py
+index 328d4a3..90d967f 100644
+--- a/vendor/spk286/tools/audit_muldiv.py
++++ b/vendor/spk286/tools/audit_muldiv.py
+@@ -6,6 +6,8 @@ from pathlib import Path
+ import subprocess
+ import sys
+ 
++from tools.rtl_sources import ordered_rtl_sources
++
+ ROOT = Path(__file__).resolve().parents[1]
+ PROBES = (('product-sign',
+   'spk286_muldiv',
+@@ -108,8 +110,7 @@ def main():
+     subprocess.run([sys.executable, '-m', 'tools.microcode.compile_microcode', '--check'], check=True)
+     output = args.build_dir.resolve()/'muldiv-audit'
+     output.mkdir(parents=True, exist_ok=True)
+-    sources = [ROOT/'microcode/generated/spk286_microcode_pkg.sv', ROOT/'microcode/generated/spk286_microcode_rom.sv',
+-               *sorted((ROOT/'rtl').glob('*.sv'))]
++    sources = ordered_rtl_sources(ROOT)
+     originals = {p: p.read_bytes() for p in sources}
+     (output/'source.sha256').write_text(''.join(f'{hashlib.sha256(data).hexdigest()}  {p.relative_to(ROOT).as_posix()}\n'
+                                               for p,data in originals.items()), encoding='utf-8')
+diff --git a/vendor/spk286/tools/audit_null_ldtr.py b/vendor/spk286/tools/audit_null_ldtr.py
+index fd2e509..dd225a9 100644
+--- a/vendor/spk286/tools/audit_null_ldtr.py
++++ b/vendor/spk286/tools/audit_null_ldtr.py
+@@ -6,6 +6,8 @@ from pathlib import Path
+ import subprocess
+ from tools.null_ldtr_vectors import generate
+ 
++from tools.rtl_sources import ordered_rtl_sources
++
+ ROOT=Path(__file__).resolve().parents[1]
+ PROBES=(
+  ('exact-zero-task-null','spk286_task_switch_service',
+@@ -35,9 +37,7 @@ def main():
+     assert len(selected)==5
+     (output/'directed.txt').write_text('\n'.join(selected)+'\n')
+     packages=[ROOT/'rtl/spk286_protected_pkg.sv',ROOT/'rtl/spk286_tss_pkg.sv']
+-    sources=[ROOT/'microcode/generated/spk286_microcode_pkg.sv',
+-             ROOT/'microcode/generated/spk286_microcode_rom.sv',*packages,
+-             *sorted(p for p in (ROOT/'rtl').glob('*.sv') if p not in packages)]
++    sources = ordered_rtl_sources(ROOT)
+     originals={p:p.read_bytes() for p in sources}
+     results=[]
+     for name,module,old,new in [('pristine',None,None,None),('pristine-service',None,None,None),*PROBES]:
+diff --git a/vendor/spk286/tools/audit_phase3_boundaries.py b/vendor/spk286/tools/audit_phase3_boundaries.py
+index 7f113dd..714f4d6 100644
+--- a/vendor/spk286/tools/audit_phase3_boundaries.py
++++ b/vendor/spk286/tools/audit_phase3_boundaries.py
+@@ -12,6 +12,8 @@ from pathlib import Path
+ import subprocess
+ 
+ 
++from tools.rtl_sources import ordered_rtl_sources
++
+ ROOT = Path(__file__).resolve().parents[1]
+ PROBES = (
+     ("code-owner", "spk286_biu", "spk286_biu",
+@@ -26,9 +28,9 @@ PROBES = (
+      "allowed && is_memory && !pending_q && within_limit",
+      "allowed && is_memory && within_limit",
+      "pending operation cannot resubmit"),
+-    ("word-limit-wrap", "spk286_operand", "spk286_operand_service",
+-     "({1'b0, offset} + (request_byte ? 17'd0 : 17'd1))",
+-     "{1'b0, 16'(offset + (request_byte ? 16'd0 : 16'd1))}",
++    ("word-limit-inclusive", "spk286_operand", "spk286_operand_service",
++     "(offset < segment_limit ||",
++     "(offset <= segment_limit ||",
+      "invalid whole word rejected before acceptance"),
+ )
+ 
+@@ -40,8 +42,7 @@ def main():
+     args = parser.parse_args()
+     subprocess.run(["python3", "-m", "tools.microcode.compile_microcode", "--check"],
+                    cwd=ROOT, check=True)
+-    sources = [ROOT / "microcode/generated/spk286_microcode_pkg.sv",
+-               ROOT / "microcode/generated/spk286_microcode_rom.sv", *sorted((ROOT / "rtl").glob("*.sv"))]
++    sources = ordered_rtl_sources(ROOT)
+     originals = {p: p.read_bytes() for p in sources}
+     output = args.build_dir.resolve() / "phase3-boundary-audit"
+     output.mkdir(parents=True, exist_ok=True)
+diff --git a/vendor/spk286/tools/audit_phase8.py b/vendor/spk286/tools/audit_phase8.py
+index a7be800..d0e0812 100644
+--- a/vendor/spk286/tools/audit_phase8.py
++++ b/vendor/spk286/tools/audit_phase8.py
+@@ -15,6 +15,8 @@ import subprocess
+ import sys
+ 
+ 
++from tools.rtl_sources import ordered_rtl_sources
++
+ ROOT = Path(__file__).resolve().parents[1]
+ 
+ PROBES = (
+@@ -65,11 +67,7 @@ def main():
+ 
+     output = args.build_dir.resolve() / "phase8-audit"
+     output.mkdir(parents=True, exist_ok=True)
+-    sources = [
+-        ROOT / "microcode/generated/spk286_microcode_pkg.sv",
+-        ROOT / "microcode/generated/spk286_microcode_rom.sv",
+-        *sorted((ROOT / "rtl").glob("*.sv")),
+-    ]
++    sources = ordered_rtl_sources(ROOT)
+     originals = {path: path.read_bytes() for path in sources}
+     source_hashes = {
+         path.relative_to(ROOT).as_posix(): hashlib.sha256(data).hexdigest()
+diff --git a/vendor/spk286/tools/audit_scalar.py b/vendor/spk286/tools/audit_scalar.py
+index 5f5e59c..c9ea1af 100644
+--- a/vendor/spk286/tools/audit_scalar.py
++++ b/vendor/spk286/tools/audit_scalar.py
+@@ -6,6 +6,8 @@ from pathlib import Path
+ import subprocess
+ import sys
+ 
++from tools.rtl_sources import ordered_rtl_sources
++
+ ROOT = Path(__file__).resolve().parents[1]
+ PROBES = (
+     ('test-write-suppression','spk286_alu_decode','spk286_test_instructions',
+@@ -38,8 +40,7 @@ def main():
+     output.mkdir(parents=True, exist_ok=True)
+     # Match scripts/rtl_sources.sh: packages must precede their users in Icarus.
+     packages = [ROOT/'rtl/spk286_protected_pkg.sv', ROOT/'rtl/spk286_tss_pkg.sv']
+-    sources = [ROOT/'microcode/generated/spk286_microcode_pkg.sv', ROOT/'microcode/generated/spk286_microcode_rom.sv',
+-               *packages, *(p for p in sorted((ROOT/'rtl').glob('*.sv')) if p not in packages)]
++    sources = ordered_rtl_sources(ROOT)
+     originals = {p: p.read_bytes() for p in sources}
+     (output/'source.sha256').write_text(''.join(f'{hashlib.sha256(data).hexdigest()}  {p.relative_to(ROOT).as_posix()}\n'
+                                               for p,data in originals.items()), encoding='utf-8')
+diff --git a/vendor/spk286/tools/audit_segment.py b/vendor/spk286/tools/audit_segment.py
+index 73d7b58..89a4719 100644
+--- a/vendor/spk286/tools/audit_segment.py
++++ b/vendor/spk286/tools/audit_segment.py
+@@ -6,6 +6,8 @@ from pathlib import Path
+ import subprocess
+ import sys
+ 
++from tools.rtl_sources import ordered_rtl_sources
++
+ ROOT = Path(__file__).resolve().parents[1]
+ PROBES = (('segment-index',
+   'spk286_control_decode',
+@@ -76,8 +78,7 @@ def main():
+     subprocess.run([sys.executable, '-m', 'tools.microcode.compile_microcode', '--check'], check=True)
+     output = args.build_dir.resolve()/'segment-audit'
+     output.mkdir(parents=True, exist_ok=True)
+-    sources = [ROOT/'microcode/generated/spk286_microcode_pkg.sv', ROOT/'microcode/generated/spk286_microcode_rom.sv',
+-               *sorted((ROOT/'rtl').glob('*.sv'))]
++    sources = ordered_rtl_sources(ROOT)
+     originals = {p: p.read_bytes() for p in sources}
+     (output/'source.sha256').write_text(''.join(f'{hashlib.sha256(data).hexdigest()}  {p.relative_to(ROOT).as_posix()}\n'
+                                               for p,data in originals.items()), encoding='utf-8')
+diff --git a/vendor/spk286/tools/audit_shift.py b/vendor/spk286/tools/audit_shift.py
+index d0ff71e..7ece12b 100644
+--- a/vendor/spk286/tools/audit_shift.py
++++ b/vendor/spk286/tools/audit_shift.py
+@@ -6,6 +6,8 @@ from pathlib import Path
+ import subprocess
+ import sys
+ 
++from tools.rtl_sources import ordered_rtl_sources
++
+ ROOT = Path(__file__).resolve().parents[1]
+ PROBES = (('count-mask',
+   'spk286_shift',
+@@ -71,8 +73,7 @@ def main():
+     subprocess.run([sys.executable, '-m', 'tools.microcode.compile_microcode', '--check'], check=True)
+     output = args.build_dir.resolve()/'shift-audit'
+     output.mkdir(parents=True, exist_ok=True)
+-    sources = [ROOT/'microcode/generated/spk286_microcode_pkg.sv', ROOT/'microcode/generated/spk286_microcode_rom.sv',
+-               *sorted((ROOT/'rtl').glob('*.sv'))]
++    sources = ordered_rtl_sources(ROOT)
+     originals = {p: p.read_bytes() for p in sources}
+     (output/'source.sha256').write_text(''.join(f'{hashlib.sha256(data).hexdigest()}  {p.relative_to(ROOT).as_posix()}\n'
+                                               for p,data in originals.items()), encoding='utf-8')
+diff --git a/vendor/spk286/tools/audit_stack_control.py b/vendor/spk286/tools/audit_stack_control.py
+index 2ea5215..8257921 100644
+--- a/vendor/spk286/tools/audit_stack_control.py
++++ b/vendor/spk286/tools/audit_stack_control.py
+@@ -7,13 +7,16 @@ import subprocess
+ import sys
+ from tools.stack_control_vectors import records
+ 
++from tools.rtl_sources import ordered_rtl_sources
++
+ ROOT = Path(__file__).resolve().parents[1]
+ PROBES = (
+     ('sp-width','spk286_stack','spk286_stack_control',"16'hFFFE : 16'd2", "16'hFFFF : 16'd2",'exact GPR result/preservation'),
+     ('push-source','spk286_micro_executor','spk286_stack_control','result_operation ? tmp2_q : tmp0_q',
+      "result_operation ? tmp2_q : tmp0_q - 16'd2",'write byte'),
+-    ('pop-sp-order','spk286_micro_executor','spk286_stack_control','move_word ? tmp0_q : operand_gpr_write_data',
+-     "move_word ? tmp0_q + (destination == 3'd4 ? 16'd2 : 16'd0) : operand_gpr_write_data",'exact GPR result/preservation'),
++    ('pop-sp-order','spk286_micro_executor','spk286_stack_control',
++     '(operand_gpr_write_data),\n        (tmp0_q),',
++     "(operand_gpr_write_data),\n        (tmp0_q + (destination == 3'd4 ? 16'd2 : 16'd0)),",'exact GPR result/preservation'),
+     ('stack-segment','spk286','spk286_stack_control',"stack_request ? 2'd2 : (segment_override ? override_segment : operand_segment)",
+      "stack_request ? 2'd3 : (segment_override ? override_segment : operand_segment)",'ordered data address'),
+     ('return-cursor','spk286','spk286_stack_control','.architectural_ip(debug_ip)',
+@@ -46,8 +49,7 @@ def main():
+     instruction_vectors = output/'instructions.txt'
+     vectors=list(records())
+     instruction_vectors.write_text(f'{len(vectors):x}\n'+''.join(' '.join(f'{v:x}' for v in row)+'\n' for row in vectors))
+-    sources = [ROOT/'microcode/generated/spk286_microcode_pkg.sv', ROOT/'microcode/generated/spk286_microcode_rom.sv',
+-               *sorted((ROOT/'rtl').glob('*.sv'))]
++    sources = ordered_rtl_sources(ROOT)
+     originals = {p: p.read_bytes() for p in sources}
+     (output/'source.sha256').write_text(''.join(f'{hashlib.sha256(data).hexdigest()}  {p.relative_to(ROOT).as_posix()}\n'
+                                               for p,data in originals.items()), encoding='utf-8')
+diff --git a/vendor/spk286/tools/audit_stack_frame.py b/vendor/spk286/tools/audit_stack_frame.py
+index 725f286..91182d1 100644
+--- a/vendor/spk286/tools/audit_stack_frame.py
++++ b/vendor/spk286/tools/audit_stack_frame.py
+@@ -6,6 +6,8 @@ from pathlib import Path
+ import subprocess
+ import sys
+ 
++from tools.rtl_sources import ordered_rtl_sources
++
+ ROOT = Path(__file__).resolve().parents[1]
+ PROBES = (('pusha-original-sp',
+   'spk286_micro_executor',
+@@ -40,8 +42,8 @@ PROBES = (('pusha-original-sp',
+  ('enter-allocation',
+   'spk286_micro_executor',
+   'spk286_stack_frame_lifecycle',
+-  'allocate_stack ? stack_cursor_q - allocation_q',
+-  'allocate_stack ? stack_cursor_q + allocation_q',
++  '(stack_cursor_q - allocation_q)',
++  '(stack_cursor_q + allocation_q)',
+   'entire instruction completes before event'),
+  ('enter-level-mask',
+   'spk286_micro_executor',
+@@ -108,8 +110,7 @@ def main():
+     output = args.build_dir.resolve()/'stack-frame-audit'
+     output.mkdir(parents=True, exist_ok=True)
+     packages = [ROOT/'rtl/spk286_protected_pkg.sv', ROOT/'rtl/spk286_tss_pkg.sv']
+-    sources = [ROOT/'microcode/generated/spk286_microcode_pkg.sv', ROOT/'microcode/generated/spk286_microcode_rom.sv',
+-               *packages, *(p for p in sorted((ROOT/'rtl').glob('*.sv')) if p not in packages)]
++    sources = ordered_rtl_sources(ROOT)
+     originals = {p: p.read_bytes() for p in sources}
+     (output/'source.sha256').write_text(''.join(f'{hashlib.sha256(data).hexdigest()}  {p.relative_to(ROOT).as_posix()}\n'
+                                               for p,data in originals.items()), encoding='utf-8')
+diff --git a/vendor/spk286/tools/audit_strings.py b/vendor/spk286/tools/audit_strings.py
+index cfddd9c..d49f897 100644
+--- a/vendor/spk286/tools/audit_strings.py
++++ b/vendor/spk286/tools/audit_strings.py
+@@ -6,6 +6,8 @@ from pathlib import Path
+ import subprocess
+ import sys
+ 
++from tools.rtl_sources import ordered_rtl_sources
++
+ ROOT = Path(__file__).resolve().parents[1]
+ PROBES = (('word-stride',
+   'spk286_micro_executor',
+@@ -126,8 +128,7 @@ def main():
+     output.mkdir(parents=True, exist_ok=True)
+     rtl_sources = sorted((ROOT/'rtl').glob('*.sv'))
+     protected_pkg = ROOT/'rtl/spk286_protected_pkg.sv'
+-    sources = [ROOT/'microcode/generated/spk286_microcode_pkg.sv', ROOT/'microcode/generated/spk286_microcode_rom.sv',
+-               protected_pkg, *(p for p in rtl_sources if p != protected_pkg)]
++    sources = ordered_rtl_sources(ROOT)
+     originals = {p: p.read_bytes() for p in sources}
+     (output/'source.sha256').write_text(''.join(f'{hashlib.sha256(data).hexdigest()}  {p.relative_to(ROOT).as_posix()}\n'
+                                               for p,data in originals.items()), encoding='utf-8')
+diff --git a/vendor/spk286/tools/audit_task_late.py b/vendor/spk286/tools/audit_task_late.py
+index b2f32c2..df59706 100644
+--- a/vendor/spk286/tools/audit_task_late.py
++++ b/vendor/spk286/tools/audit_task_late.py
+@@ -6,6 +6,8 @@ from pathlib import Path
+ import subprocess
+ from tools.task_late_vectors import generate
+ 
++from tools.rtl_sources import ordered_rtl_sources
++
+ ROOT=Path(__file__).resolve().parents[1]
+ PROBES=(
+  ('retain-outgoing-caches','spk286_protected_state',
+@@ -34,9 +36,7 @@ def main():
+     assert len(selected)==4
+     (output/'directed.txt').write_text('\n'.join(selected)+'\n')
+     packages=[ROOT/'rtl/spk286_protected_pkg.sv',ROOT/'rtl/spk286_tss_pkg.sv']
+-    sources=[ROOT/'microcode/generated/spk286_microcode_pkg.sv',
+-             ROOT/'microcode/generated/spk286_microcode_rom.sv',*packages,
+-             *sorted(p for p in (ROOT/'rtl').glob('*.sv') if p not in packages)]
++    sources = ordered_rtl_sources(ROOT)
+     originals={p:p.read_bytes() for p in sources}
+     results=[]
+     for name,module,old,new in [('pristine',None,None,None),*PROBES]:
+diff --git a/vendor/spk286/tools/audit_unary.py b/vendor/spk286/tools/audit_unary.py
+index 4e10a78..26bc27f 100644
+--- a/vendor/spk286/tools/audit_unary.py
++++ b/vendor/spk286/tools/audit_unary.py
+@@ -6,6 +6,8 @@ from pathlib import Path
+ import subprocess
+ import sys
+ 
++from tools.rtl_sources import ordered_rtl_sources
++
+ ROOT = Path(__file__).resolve().parents[1]
+ PROBES = (('neg-direction',
+   'spk286_alu_decode',
+@@ -76,8 +78,7 @@ def main():
+     subprocess.run([sys.executable, '-m', 'tools.microcode.compile_microcode', '--check'], check=True)
+     output = args.build_dir.resolve()/'unary-audit'
+     output.mkdir(parents=True, exist_ok=True)
+-    sources = [ROOT/'microcode/generated/spk286_microcode_pkg.sv', ROOT/'microcode/generated/spk286_microcode_rom.sv',
+-               *sorted((ROOT/'rtl').glob('*.sv'))]
++    sources = ordered_rtl_sources(ROOT)
+     originals = {p: p.read_bytes() for p in sources}
+     (output/'source.sha256').write_text(''.join(f'{hashlib.sha256(data).hexdigest()}  {p.relative_to(ROOT).as_posix()}\n'
+                                               for p,data in originals.items()), encoding='utf-8')

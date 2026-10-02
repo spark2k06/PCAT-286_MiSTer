@@ -23,5 +23,7 @@ this implementation milestone.
 `resources-before/` captures the completed frozen P10 fitted reference before
 the user's candidate synthesis finishes. It retains map/fit summaries, the
 Fitter resource section and identities of the original full report, frozen
-source manifest and delivered RBF. Candidate resource totals and deltas require
-its completed Fitter; root `output_files` is not used as a historical baseline.
+source manifest and delivered RBF. `resources-after/` retains the completed
+user fit and its cost comparison; `hardware/` retains the original MiSTer
+screenshots and their numerical improvement. Root `output_files` is not used
+as a historical baseline.

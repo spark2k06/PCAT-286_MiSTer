@@ -20,6 +20,12 @@ that fixed candidate; the next production change waits for their hardware
 result and the complete candidate measurement. FPGA timing and hardware
 acceptance remain separate from this attribution and implementation evidence.
 
+The user subsequently reports 4911 / 94.4K in CHECKNUM on the 4 KiB candidate:
++12.612% / +12.784% against P10. The completed fit grows to 32,609 equivalent
+ALMs, 38,741 physically placed ALMs and 44,251 registers. Its code-buffer tags
+map to registers, making RAM-inference cost reduction the next requested step.
+The screenshots, fitted comparison and provenance limits are retained in P13.
+
 Added 2026-10-01. Status: numeric reference accepted; directed memory-path
 attribution and a coherent 1 KiB RAM-read buffer implemented and checked;
 hardware CheckIt/CHECKNUM improvement observed; repeated matched measurements

@@ -62,7 +62,7 @@ The private adapter follows the production instance's capacity by default;
 are reused unchanged. The frozen candidate executable and source/build hashes
 are under `build/perf01-real-memory-20261002/probe-code4k/`.
 
-## FPGA resource reference before candidate synthesis
+## FPGA resource reference and completed candidate fit
 
 The completed P10 fitted design is preserved in
 [resources-before](../evidence/perf01-code4k-20261002/resources-before/resources.json),
@@ -73,20 +73,44 @@ The candidate production RTL is commit `0399806`.
 
 | Fitted resource | P10 reference | P13 candidate | Delta |
 | --- | ---: | ---: | ---: |
-| Equivalent ALMs | 28,873 / 41,910 (69%) | Pending | Pending |
-| ALMs used in final placement | 34,740 / 41,910 (83%) | Pending | Pending |
-| Total registers | 37,171 | Pending | Pending |
-| M10K blocks | 414 / 553 (75%) | Pending | Pending |
-| Block memory bits | 3,267,227 / 5,662,720 (58%) | Pending | Pending |
-| Allocated block memory implementation bits | 4,239,360 (75%) | Pending | Pending |
-| DSP blocks | 39 / 112 (35%) | Pending | Pending |
-| PLLs | 3 / 6 (50%) | Pending | Pending |
+| Equivalent ALMs | 28,873 / 41,910 (69%) | 32,609 (78%) | +3,736 |
+| ALMs used in final placement | 34,740 / 41,910 (83%) | 38,741 (92%) | +4,001 |
+| Total registers | 37,171 | 44,251 | +7,080 |
+| M10K blocks | 414 / 553 (75%) | 415 (75%) | +1 |
+| Block memory bits | 3,267,227 / 5,662,720 (58%) | 3,293,851 (58%) | +26,624 |
+| Allocated block memory implementation bits | 4,239,360 (75%) | 4,249,600 (75%) | +10,240 |
+| DSP blocks | 39 / 112 (35%) | 39 (35%) | 0 |
+| PLLs | 3 / 6 (50%) | 3 (50%) | 0 |
 
 The instruction payload increases by 3.5 KiB. Tag mapping and logic change as
 well, so that byte difference is not an estimate of additional M10K/ALM usage.
-Compare the completed candidate Fitter with the same device, Quartus version
-and configuration. Mutable root `output_files` currently mixes an older fitted
-report with the ongoing candidate map; it is not the reference above.
+The completed user compilation uses the same device and Quartus version;
+its frozen outputs, source identities and entity rows are retained in
+[resources-after](../evidence/perf01-code4k-20261002/resources-after/README.md).
+Mutable reports initially mixed an old fit and the ongoing candidate map;
+the table now uses the completed fit rather than that intermediate state.
+
+The instruction-buffer entity rises from 332.0 to 4,127.9 estimated ALMs and
+from 277 to 7,456 dedicated registers. Data uses four M10Ks, versus one in P10;
+the two old tag RAM copies disappear and the 512-entry tags map to logic.
+Synchronous source and a `ramstyle` attribute did not guarantee tag RAM
+inference. Whole-design deltas also include packing/duplication changes.
+The user requests reducing this cost while retaining the measured improvement.
+
+### User-reported hardware improvement
+
+[The supplied screenshots](../evidence/perf01-code4k-20261002/hardware/README.md)
+report 4911 / 94.4K in CHECKNUM, versus 4361 / 83.7K with P10: +12.612% /
++12.784%. CheckIT reports 4911 / 95.1K, versus 4361 / 84.1K. Math observations
+are retained separately. Against standalone SPK286 at 50 MHz, hardware now
+achieves 63.70% of its integer rate and 70.82% of its math rate. Loaded RBF
+identity follows the conversation; no repeat distribution or general software
+acceptance is claimed.
+
+The STA summary gives `FPGA_CLK2_50` setup/hold of -1.052/+0.250 ns at Slow
+100 C, -0.888/+0.210 ns at Slow -40 C, +2.557/+0.134 ns at Fast 100 C and
++2.726/+0.107 ns at Fast -40 C. These are existing summary values, not a renewed
+full timing/constraint audit. This candidate does not establish 50 MHz closure.
 
 ## Measurement and physical acceptance
 

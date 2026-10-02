@@ -24,9 +24,13 @@ def change(path, replacements):
 
 
 def main():
+    global ROOT
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', required=True, type=Path)
+    parser.add_argument('--baseline-source', type=Path, default=ROOT,
+                        help='P16 source tree (before P17 adoption), or retained frozen baseline')
     args = parser.parse_args()
+    ROOT = args.baseline_source.resolve()
     out = args.output.resolve()
     assert not out.exists(), 'Preserve previous experiment directories'
     qip = 'rtl/spk286_integration/spk286_integration.qip'
@@ -115,9 +119,18 @@ def main():
     changed = [n for n in names if versions['baseline'][n] != versions['candidate'][n]]
     assert set(changed) == {bridge, port, 'tools/perf01/memory_probe_smoke.cpp'}
     assert all(sha(ROOT / n) == h for n, h in before.items())
+    retained_manifest = ROOT.parent / 'source-manifest.json'
+    if retained_manifest.exists():
+        original = json.loads(retained_manifest.read_text())
+        assert all(before[n] == original['variant_sha256']['baseline'][n] for n in names)
+        source_commit = original['created_from_commit']
+    else:
+        assert (ROOT / '.git').exists(), 'Use a P16 checkout or verified retained baseline'
+        source_commit = subprocess.check_output(['git', 'rev-parse', 'HEAD'],
+                                                cwd=ROOT, text=True).strip()
     (out / 'source-manifest.json').write_text(json.dumps({
-        'created_from_commit': subprocess.check_output(['git', 'rev-parse', 'HEAD'],
-                                                     cwd=ROOT, text=True).strip(),
+        'created_from_commit': source_commit,
+        'baseline_source': str(ROOT),
         'source_names': names, 'original_sha256': before,
         'variant_sha256': versions, 'changed_between_variants': changed,
         'production_rtl_modified': False,

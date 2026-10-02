@@ -1,8 +1,8 @@
 # P17: memory-path throughput review and entry-overlap prototype
 
 Date: 2026-10-02. Source baseline: PCAT `ea283d8`, including P16.
-Status: **isolated prototype validated and measured with fixed-work kernels;
-real CHECKNUM integer result provisional; math, adoption and FPGA fit pending**.
+Status: **entry overlap integrated; directed checks and complete CHECKNUM pass;
+frozen FPGA fit and MiSTer acceptance pending**.
 
 Prioritize the common cache-hit latency, followed by studying write service
 overlap. A private bridge/port prototype improves four directed workloads by
@@ -58,14 +58,16 @@ only after acceptance; backpressure retains the record for later acceptance.
 The port retains loader priority, collision diagnostics and CPU cancellation.
 Idle READY cannot complete an unaccepted record. Peripheral, INTA, split and
 divided-clock response paths retain their previous handling. Machine A20,
-BIOS/EMS mapping and ROM-write sinks require whole-machine checks before
-adoption.
+BIOS mapping, A20 transactions and ROM-write sinks have passed whole-machine
+checks during adoption. EMS translation remains unchanged; canonical 25-bit
+records and cache aliases are checked at the port/cache boundary.
 
 Tags/data remain synchronous M10K outputs; no combinational RAM response or
 zero-wait promise. Code/data capacities stay 4 KiB / 1 KiB two-way. Physical
 owner, KFSDRAM commands, CAS/recovery and refresh parameters are unchanged;
 writes still acknowledge physical completion. Production RTL/configuration
-is unchanged by this experiment.
+was unchanged during the isolated experiment. The measured bridge/port change
+is now integrated in production; CPU RTL and configuration remain unchanged.
 
 ## Fixed-work result
 
@@ -168,13 +170,50 @@ No SDRAM timing or refresh interval is relaxed in this review.
   or stop is issued. Full output, guest RC0/ALL_DONE and final profile remain
   pending; this is a **provisional integer result**, not complete acceptance.
 
-Before adoption: finish CHECKNUM and compare complete receipts to P16; check
-whole-machine mapping/ROM sinks, arbitration, external writers and divided
-clock; then fit a frozen FPGA candidate and report net/entity ALMs, registers,
+## Production adoption and completed CHECKNUM
+
+The unchanged DOS executable completed normally in the guest, with `RC TICKRUN
+0`, `ALL_DONE`, full formatted output and a final memory profile. The earlier
+provisional integer observation is confirmed. Strict comparison verifies the
+same original disk, calibrated CMOS, configuration, profiler/backend and
+compiled CPU objects as P16, at actual 50 MHz and ISA 8 MHz.
+
+| CHECKNUM | P16 | P17 | Gain |
+| --- | ---: | ---: | ---: |
+| Dhrystones/s | 5666 | 6138 | +8.33% |
+| Software Whetstones/s, thousands | 102.9 | 113.6 | +10.40% |
+
+Mean integer code/data waits are now 1.00085 / 1.00041 clocks instead of
+2.00112 / 2.00061. Writes average 5.16253 instead of 6.16845. Floating-point
+code/data waits fall to 1.11613 / 1.10429. Adaptive work differs between arms;
+compare rates rather than absolute instruction or elapsed-clock counts.
+Host time was 3563.322 s, application time 250 BIOS ticks. After complete guest
+success, the host again needed SIGTERM following its exit timeout; the retained
+receipt classifies `exit_timeout_then_sigterm` separately from guest completion.
+
+Production bridge/port/smoke sources match the measured private variant except
+comments. The CPU, cache geometry, physical owner/controller and configuration
+match the frozen control. Seven bounded integration scripts pass; bridge
+response covers common/divided clocks, port tests both simulators and all
+request fields, cancellation covers both 64 and production 512 code lines,
+and the cache scoreboard covers DMA/loader coherence and refresh/reset.
+Whole-machine boot passes with 108 memory beats. A second ROM completes actual
+A20 alias reads/writes and blocked word/upper-byte ROM writes, then the same
+IRQ/IRET path with 162 memory beats. No full regression was run.
+
+Initial fixture failures are retained, with their cause and adaptation:
+the bridge fixture changed live width before the new initial sampling edge;
+the port fixture checked combinational outputs without settling after changing
+READY. The new ROM initially contained NASM's 386 near conditional branch
+`0F 85`, rejected by vector 6 in both P16 and P17. Short conditional branches
+plus near JMP and a `cpu 286` assembly directive correct that fixture. No CPU
+change or instruction waiver is involved.
+
+Next: fit a frozen 50 MHz candidate and report net/entity ALMs, registers,
 M10Ks and all-corner setup/hold. No additional RAM capacity is requested, but
 fitted logic cost is **unmeasured** and the live-input acceptance/address path
-may affect timing. P16 CPU setup violations remain pending. No full regression,
-new RBF or hardware acceptance is part of this review milestone.
+may affect timing. P16 CPU setup violations remain pending. MiSTer throughput
+and compatibility need a user test of the resulting RBF.
 
 Reproduction and observations are in the
 [evidence inventory](../evidence/perf01-entry-overlap-20261002/README.md).

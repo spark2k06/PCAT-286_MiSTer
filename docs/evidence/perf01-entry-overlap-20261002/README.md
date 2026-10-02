@@ -35,6 +35,16 @@ remain unchanged. No FPGA fit or hardware result is claimed.
   messages and are not treated as results. Integer +8.33% over completed P16
   is provisional until normal CHECKNUM output/guest completion is captured.
 - `inventory.json`: retained hashes and production/private source guards.
+- `measurement/`: complete P16/P17 CHECKNUM output, guest RC0/ALL_DONE, final
+  counters, source/CPU/configuration identities and classified host teardown.
+  Confirms 6138 / 113.6K (+8.33% / +10.40%). Its separate byte inventory is
+  `measurement/retained-files.json`; earlier incomplete snapshots are preserved.
+- `promotion/`: seven production integration scripts and additional machine
+  A20/ROM-sink transactions pass. Production matches the measured prototype
+  except comments, with unchanged CPU/cache/controller/configuration inputs.
+  Initial fixture failures and the invalid near-Jcc ROM control are retained
+  alongside their explanation in `promotion/retained-files.json`. No full
+  regression or hardware acceptance is inferred from these checks.
 
 The kernel named `whetstone` is fixed point, unlike real CHECKNUM software
 floating point. Its code-hit/miss latency labels assume asynchronous tags;
@@ -49,9 +59,11 @@ memory timing chain, although KFSDRAM periodic refresh remains enabled.
 From the repository, prepare a fresh private root:
 
 ```text
-python3 tools/perf01/prepare_early_command.py --output build/fresh-entry-overlap
+python3 tools/perf01/prepare_early_command.py --baseline-source build/perf01-entry-overlap-20261002/baseline --output build/fresh-entry-overlap
 ```
 
+The baseline must be P16, before adoption of P17. A separate P16 checkout
+also works; current production is no longer the historical control.
 In WSL, run each frozen root's `scripts/test_checkit_directed.sh` with
 `PCAT_BUILD_DIR` pointing to a separate `directed-baseline` or
 `directed-candidate`, `PCAT_CODE_BUFFER_LINES=512`, and `PCAT_PROFILE=1`.

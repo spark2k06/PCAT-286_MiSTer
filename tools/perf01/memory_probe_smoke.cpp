@@ -29,11 +29,11 @@ int main() {
     const auto require=[](bool condition,const char *message) { if(!condition) throw std::runtime_error(message); };
     const unsigned miss=transfer("reset_alias_code_miss",0xff0000,0xf0000,13);
     const unsigned hit=transfer("canonical_alias_code_hit",0xf0000,0xf0000,13);
-    require(hit==2 && miss>hit,"Code miss/hit timing or alias mismatch");
+    require(hit==1 && miss>hit,"Code miss/hit timing or alias mismatch");
     require(memory.stat_p03_misses==1 && memory.stat_p03_hits==1,"Code request duplication");
     const unsigned read_miss=transfer("data_read_miss",0x1000,0x1000,5);
     const unsigned read_hit=transfer("data_read_hit",0x1000,0x1000,5);
-    require(read_hit==2 && read_miss>read_hit,"Data miss/hit timing mismatch");
+    require(read_hit==1 && read_miss>read_hit,"Data miss/hit timing mismatch");
     require(memory.stat_data_buffer_misses==1 && memory.stat_data_buffer_hits==1,"Data request duplication");
     transfer("upper_byte_write_update",0x1001,0x1001,6);
     require(memory.stat_data_buffer_updates==1,"Upper-byte write did not update cached word");

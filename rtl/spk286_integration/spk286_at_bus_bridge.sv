@@ -37,8 +37,8 @@ module spk286_at_bus_bridge #(
     output logic [15:0]  cpu_data_in,
 
     // Normalized AT-side transaction record. P06 exposes the initial memory
-    // address while both ends capture it; COMMAND and WAIT use retained
-    // metadata. The consumer decodes/captures before command acceptance.
+    // address while both ends capture it. Common-clock native memory can
+    // accept its command on that edge; later COMMAND/WAIT use retained data.
     output logic         at_valid,
     output logic         at_command_valid,
     output logic [2:0]   at_owner,
@@ -141,12 +141,14 @@ module spk286_at_bus_bridge #(
     logic [23:0] beat_address;
     logic [1:0]   beat_byte_enable;
     // Let the downstream memory owner capture its address record on the same
-    // edge as this bridge. Only decoded x16 memory targets qualify. COMMAND
-    // remains registered and starts on the following edge; no backend command
-    // or READY/data response bypasses a retained transaction record.
+    // edge as this bridge. Only decoded x16 memory targets qualify. In the
+    // common clock, command acceptance may share that edge; synchronous RAM
+    // and all completions still use the retained accepted record afterwards.
     wire early_memory_address = EARLY_MEMORY_ADDRESS && !reset &&
                                 (state_q == STATE_IDLE) && cpu_bus_valid &&
                                 memory_native_word_request && live_request_valid;
+    // Related slower CPU clocks keep the registered command sequence.
+    wire early_memory_command = early_memory_address && !COMPLETE_ON_CPU_SAMPLE;
     wire [1:0] early_byte_enable = native_word_request ? 2'b11 :
                                   cpu_address[0] ? 2'b10 : 2'b01;
     wire [15:0] early_data = native_word_request ? cpu_data_out :
@@ -227,7 +229,7 @@ module spk286_at_bus_bridge #(
     assign at_valid          = early_memory_address || (state_q == STATE_ADDRESS) ||
                                (state_q == STATE_COMMAND) ||
                                (state_q == STATE_WAIT);
-    assign at_command_valid  = (state_q == STATE_COMMAND);
+    assign at_command_valid  = early_memory_command || (state_q == STATE_COMMAND);
     assign at_owner          = OWNER_CPU;
     assign at_cycle_class    = early_memory_address ? cpu_bus_status : request_status_q;
     assign at_address        = early_memory_address ? cpu_address : beat_address;
@@ -238,7 +240,8 @@ module spk286_at_bus_bridge #(
                                beat_byte_enable[1] ?
                                {request_data_q[15:8], 8'h00} :
                                {8'h00, request_data_q[7:0]};
-    assign at_data_oe        = at_valid && request_write_q &&
+    assign at_data_oe        = early_memory_command ? cpu_data_oe :
+                               at_valid && request_write_q &&
                                ((state_q == STATE_COMMAND) ||
                                 (state_q == STATE_WAIT));
     assign at_write          = at_valid && (early_memory_address ? cpu_bus_write : request_write_q);
@@ -249,7 +252,7 @@ module spk286_at_bus_bridge #(
     // released only when the CPU has observed cpu_ready and the bridge returns
     // to IDLE on the following edge.
     assign at_lock           = early_memory_address ? cpu_bus_lock : (state_q != STATE_IDLE) && request_lock_q;
-    assign at_accepted       = (state_q == STATE_COMMAND) && at_accept;
+    assign at_accepted       = at_command_valid && at_accept;
     assign at_completed      = completion_valid;
     assign at_response_valid = (state_q == STATE_COMPLETE) || direct_memory_response;
     assign cpu_ready         = (state_q == STATE_COMPLETE) || direct_memory_response;
@@ -308,7 +311,8 @@ module spk286_at_bus_bridge #(
                             // decoded RAM/ROM. The complete request is already
                             // retained above; I/O, INTA, EGA and unmapped
                             // accesses preserve the reference sequence.
-                            state_q <= early_memory_address ? STATE_COMMAND :
+                            state_q <= early_memory_command && at_accept ? STATE_WAIT :
+                                       early_memory_address ? STATE_COMMAND :
                                        fast_memory_request ? STATE_ADDRESS :
                                        STATE_SNAPSHOT;
                         else begin

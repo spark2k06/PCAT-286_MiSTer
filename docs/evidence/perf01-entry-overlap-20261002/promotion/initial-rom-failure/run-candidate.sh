@@ -1,0 +1,121 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+root=/mnt/d/GitHub/PCAT-286_MiSTer
+build_dir="${PCAT_BUILD_DIR:-$root/build/at-machine-boundary}"
+rom_path="${AT_SYSTEM_ROM:-$root/tests/firmware/pcat286_event_diag.rom}"
+mkdir -p "$build_dir"
+cd "$root"
+source "$root/scripts/at_performance_flags.sh"
+
+sources=(
+  vendor/spk286/microcode/generated/spk286_microcode_pkg.sv
+  vendor/spk286/microcode/generated/spk286_microcode_rom.sv
+  vendor/spk286/microcode/generated/spk286_microcode_sync_rom.sv
+  vendor/spk286/rtl/spk286_protected_pkg.sv
+  vendor/spk286/rtl/spk286_tss_pkg.sv
+)
+for source in vendor/spk286/rtl/*.sv; do
+  case "$source" in
+    vendor/spk286/rtl/spk286_protected_pkg.sv|\
+    vendor/spk286/rtl/spk286_tss_pkg.sv)
+      ;;
+    *) sources+=("$source") ;;
+  esac
+done
+sources+=(
+  rtl/common/simple_fifo.v
+  rtl/common/floppy.v
+  rtl/common/ide.v
+  sim/spk286_integration/dpram_model.sv
+  rtl/spk286_integration/spk286_machine_cpu.sv
+  rtl/spk286_integration/spk286_at_bus_bridge.sv
+  rtl/spk286_integration/spk286_at_memory_decode.sv
+  rtl/spk286_integration/spk286_at_arbiter.sv
+  rtl/spk286_integration/spk286_at_pic.sv
+  rtl/spk286_integration/spk286_at_dma.sv
+  rtl/spk286_integration/spk286_at_refresh.sv
+  rtl/spk286_integration/spk286_at_pit.sv
+  rtl/spk286_integration/spk286_at_pit_clock.sv
+  rtl/spk286_integration/spk286_at_system_control.sv
+  rtl/KFPC-XT/HDL/KF8253/HDL/KF8253.sv
+  rtl/KFPC-XT/HDL/KF8253/HDL/KF8253_Counter.sv
+  rtl/KFPC-XT/HDL/KF8253/HDL/KF8253_Control_Logic.sv
+  rtl/spk286_integration/spk286_at_8042.sv
+  rtl/spk286_integration/spk286_at_ems.sv
+  rtl/spk286_integration/spk286_at_rtc_cmos.sv
+  rtl/spk286_integration/spk286_at_fdc.sv
+  rtl/spk286_integration/spk286_at_xtide.sv
+  rtl/spk286_integration/spk286_at_storage_video.sv
+  sys/at_cdc_snapshot.sv
+  rtl/spk286_integration/spk286_at_video_adapter.sv
+  rtl/spk286_integration/at286ctl.sv
+  rtl/KFPC-XT/HDL/ega_vram_bram_frontend.sv
+  rtl/common/tandy_pcjr_joy.sv
+  rtl/spk286_integration/spk286_at_gameport.sv
+  rtl/spk286_integration/spk286_at_sound.sv
+  rtl/spk286_integration/spk286_at_serial.sv
+  rtl/spk286_integration/spk286_at_device_router.sv
+  rtl/spk286_integration/spk286_at_machine.sv
+  rtl/spk286_integration/spk286_at_mister_memory_port.sv
+  rtl/KFPC-XT/HDL/KFSDRAM/HDL/KFSDRAM.sv
+  rtl/spk286_integration/spk286_at_mister_sdram_owner.sv
+)
+for source in rtl/video/*.v rtl/video/*.sv; do
+  sources+=("$source")
+done
+pic_sources=()
+for source in rtl/KFPC-XT/HDL/KF8259/HDL/*.sv; do
+  pic_sources+=("$source")
+done
+
+iverilog -g2012 "${performance_flags[@]}" -DSPK286_AT_NO_DEBUG \
+  -DSPK286_AT_SIM_MODEL \
+  -Irtl/KFPC-XT/HDL/KF8253/HDL -t null -Irtl/KFPC-XT/HDL/KF8259/HDL \
+  -s spk286_at_machine "${sources[@]}" "${pic_sources[@]}" \
+  >"$build_dir/iverilog-build.log" 2>&1
+echo AT_MACHINE_ICARUS_ELAB_PASS
+
+verilator "${performance_flags[@]}" -DSPK286_AT_NO_DEBUG \
+  -DSPK286_AT_SIM_MODEL \
+  -Irtl/KFPC-XT/HDL/KF8253/HDL --lint-only --timing --top-module spk286_at_machine \
+  -Wno-fatal -Irtl/KFPC-XT/HDL/KF8259/HDL \
+  "${sources[@]}" "${pic_sources[@]}" \
+  >"$build_dir/verilator-production-lint.log" 2>&1
+echo AT_MACHINE_PRODUCTION_LINT_PASS
+
+if [[ "${AT_REAL_PIC_ONLY:-0}" != 1 ]]; then
+  rm -rf "$build_dir/verilator-obj"
+  verilator "${performance_flags[@]}" -Irtl/KFPC-XT/HDL/KF8253/HDL --binary --timing -DAT_MACHINE_PIC_MODEL \
+    -DSPK286_AT_SIM_MODEL \
+    --top-module spk286_at_machine_tb \
+    -Wno-fatal -Irtl/KFPC-XT/HDL/KF8259/HDL \
+    --Mdir "$build_dir/verilator-obj" -o at_machine_vlt \
+    "${sources[@]}" sim/spk286_integration/spk286_at_machine_pic_model.sv \
+    /mnt/d/GitHub/PCAT-286_MiSTer/build/perf01-entry-overlap-20261002/rom-diagnostic/trace_tb.sv \
+    >"$build_dir/verilator-build.log" 2>&1
+  (cd "$root/rtl/video" && timeout 120s "$build_dir/verilator-obj/at_machine_vlt" "+ROM=$rom_path" \
+    "+ENTRY_TRACE" "+MAX_CYCLES=10000") \
+    | tee "$build_dir/verilator-run.log"
+fi
+
+if [[ "${AT_REAL_PIC_TEST:-0}" == 1 ]]; then
+  real_build_dir="$root/build/at-mpu-irq"
+  real_rom_path="${AT_MPU_ROM:-$real_build_dir/pcat286_mpu_irq_diag.rom}"
+  mkdir -p "$real_build_dir"
+  nasm -f bin -o "$real_build_dir/pcat286_mpu_irq_diag.rom" \
+    "$root/tests/firmware/pcat286_mpu_irq_diag.asm"
+  rm -rf "$real_build_dir/verilator-obj"
+  verilator "${performance_flags[@]}" -Irtl/KFPC-XT/HDL/KF8253/HDL --binary --timing \
+    -DENABLE_MIDI=1 -DSPK286_AT_SIM_MODEL --top-module spk286_at_machine_tb \
+    -Wno-fatal -Irtl/KFPC-XT/HDL/KF8259/HDL \
+    --Mdir "$real_build_dir/verilator-obj" -o at_mpu_irq_vlt \
+    "${sources[@]}" /mnt/d/GitHub/PCAT-286_MiSTer/build/perf01-entry-overlap-20261002/rom-diagnostic/trace_tb.sv \
+    >"$real_build_dir/verilator-build.log" 2>&1
+  (cd "$root/rtl/video" && timeout 120s "$real_build_dir/verilator-obj/at_mpu_irq_vlt" \
+    "+ROM=$real_rom_path" "+MPU_RX_TEST" "+MAX_CYCLES=${AT_MPU_MAX_CYCLES:-2000000}") \
+    | tee "$real_build_dir/verilator-run.log"
+  echo AT_REAL_PIC_MPU_IRQ_TEST_PASS
+fi
+
+echo AT_MACHINE_BOUNDARY_TEST_PASS

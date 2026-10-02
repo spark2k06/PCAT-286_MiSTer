@@ -3,7 +3,9 @@
 // Production ordering: bridge -> memory owner -> P03 -> RAM data buffer.
 // A controllable, retained physical backend lets cancellation coincide with
 // hits and burst completion, without depending on a particular SDRAM delay.
-module spk286_at_bridge_cancel_pipeline_tb;
+module spk286_at_bridge_cancel_pipeline_tb #(
+    parameter integer CODE_BUFFER_LINES = 64
+);
     logic clk = 0, reset = 1, cancel_cpu = 0;
     always #10 clk = ~clk;
     typedef struct packed {
@@ -81,7 +83,7 @@ module spk286_at_bridge_cancel_pipeline_tb;
         .backend_read_data_valid(pr.data_valid), .debug_state(port_state), .protocol_error(port_error)
     );
     assign p.burst = 0;
-    spk286_at_sdram_read_buffer code_buffer (
+    spk286_at_sdram_read_buffer #(.LINE_COUNT(CODE_BUFFER_LINES)) code_buffer (
         .clk(clk), .reset(reset), .cancel_cpu(cancel_cpu), .enable(1'b1),
         .in_valid(p.valid), .in_command_valid(p.command), .in_owner(p.owner),
         .in_write(p.write), .in_refresh(p.refresh), .in_code_fetch(p.code),
@@ -245,7 +247,12 @@ module spk286_at_bridge_cancel_pipeline_tb;
             check(port_ready, "warm cache did not present the expected hit response");
             // P03 counts on acceptance; the data buffer counts on the later
             // response edge that this case is about to cancel.
-            check(code_fetch != 0 ? code_hits == before_hits + 1 : data_buffer.tag_hit,
+            // Synchronous tags count on completion, which this case cancels.
+            // Inspect the actual retained tag result before that completion.
+            check(code_fetch != 0 ?
+                  (code_buffer.SYNC_TAGS ?
+                   (code_buffer.request_tag_hit && code_hits == before_hits) :
+                   code_hits == before_hits + 1) : data_buffer.tag_hit,
                   "cancellation case was not a cache hit");
             assert_cancel(); release_cancel(); idle_check();
             check(samples == before_samples && physical_accepted == before_physical,

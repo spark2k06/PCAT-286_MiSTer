@@ -97,15 +97,17 @@ prototype overlaps bridge/port capture with backend command acceptance,
 reducing common hits from two wait clocks to one at unchanged cache capacity.
 Four fixed-work physical-data kernels gain **9.46–11.40%** with unchanged
 GPR/FLAGS/memory/retired/write signatures. Strict bridge/port lint and bounded
-ownership/cancellation checks pass. Real CHECKNUM has provisionally formatted
-**6138 Dhrystones (+8.33% versus P16 5666)**; math and complete guest receipts
-remain pending. Further ideal-write controls show 13.31–15.74% extra scope on
+ownership/cancellation checks pass. Complete real CHECKNUM now gives
+**6138 / 113.6K (+8.33% / +10.40% versus P16 5666 / 102.9K)**, with guest
+RC0/ALL_DONE and final profile. Entry overlap is integrated after directed
+common/divided-clock, machine A20/ROM-sink and external-writer checks. Further
+ideal-write controls show 13.31–15.74% extra scope on
 those kernels after entry overlap, requiring an explicit posting/coherence/
 drain specification rather than assuming that ideal service is implementable.
 Open-row SDRAM is another unmeasured possibility; bounded write-address
-locality is not controller row-hit evidence. Production RTL is unchanged;
-whole-machine checks, fitted resource cost, setup/hold and MiSTer acceptance
-are gates before adoption. No full regression or new RBF is claimed.
+locality is not controller row-hit evidence. CPU RTL/options, cache capacity
+and SDRAM timings/refresh are unchanged. Fitted resource cost, setup/hold and
+MiSTer acceptance remain pending. No full regression or new RBF is claimed yet.
 
 Added 2026-10-01. Status: numeric reference accepted; directed memory-path
 attribution and a coherent 1 KiB RAM-read buffer implemented and checked;

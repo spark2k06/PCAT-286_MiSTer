@@ -124,7 +124,7 @@ module spk286_at_bus_bridge_tb;
             if (EXPECT_EARLY_MEMORY_ADDRESS && cpu_memory_word_capable &&
                 !(address_value[0] && bhe_n_value) &&
                 (status_value == 4'hD || status_value == 4'h5 || status_value == 4'h6)) begin
-                check(at_valid && !at_command_valid && !at_accepted && !cpu_ready,
+                check(at_valid && at_command_valid && !at_accepted && !cpu_ready,
                       $sformatf("early address phase missing: addr=%h status=%h state=%0d valid=%b command=%b ready=%b",
                                 address_value, status_value, dut.state_q, at_valid, at_command_valid, cpu_ready));
                 check(at_address == address_value && at_cycle_class == status_value &&
@@ -285,10 +285,13 @@ module spk286_at_bus_bridge_tb;
         before_accept = accept_count;
         start_request(24'hFFFFF0, 4'hD, 1'b0, 1'b0, 16'd0, 1'b0);
         wait_command();
-        if (EXPECT_EARLY_MEMORY_ADDRESS)
-            check(command_wait_ticks == 1,
-                  "early address capture did not overlap the bridge snapshot");
-        else if (EXPECT_P01_FAST_MEMORY_START)
+        if (EXPECT_EARLY_MEMORY_ADDRESS) begin
+            check(command_wait_ticks == 0,
+                  "early memory command did not overlap the bridge snapshot");
+            // The live width belongs to the initial sampling edge. Change
+            // it only after capture, then prove the retained shape is stable.
+            @(negedge clk);
+        end else if (EXPECT_P01_FAST_MEMORY_START)
             check(command_wait_ticks == 2,
                   "P01 did not remove the two memory-start states");
         else

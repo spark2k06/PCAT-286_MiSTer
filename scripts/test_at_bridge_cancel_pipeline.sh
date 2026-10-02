@@ -21,3 +21,14 @@ timeout 30s "$build_dir/obj/cancel_pipeline" | tee "$build_dir/verilator-run.log
 grep -q '^AT_BRIDGE_CANCEL_PIPELINE_PASS' "$build_dir/verilator-run.log"
 sha256sum --check "$build_dir/compiled-sources.sha256" > "$build_dir/sources-verified.log"
 echo AT_BRIDGE_CANCEL_PIPELINE_TEST_PASS
+
+# Production's 4 KiB code buffer has synchronous tags. Repeat the same
+# cancellation/data/uniqueness scoreboard at that geometry.
+verilator --binary --timing --assert -j 2 -Wno-fatal "${performance_flags[@]}" \
+  -GCODE_BUFFER_LINES=512 --top-module spk286_at_bridge_cancel_pipeline_tb \
+  --Mdir "$build_dir/production-obj" -o cancel_pipeline "${sources[@]}" \
+  > "$build_dir/production-build.log" 2>&1
+timeout 30s "$build_dir/production-obj/cancel_pipeline" | tee "$build_dir/production-run.log"
+grep -q '^AT_BRIDGE_CANCEL_PIPELINE_PASS' "$build_dir/production-run.log"
+sha256sum --check "$build_dir/compiled-sources.sha256" > "$build_dir/sources-verified.log"
+echo AT_BRIDGE_CANCEL_PRODUCTION_TEST_PASS

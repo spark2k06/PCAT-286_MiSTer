@@ -10,6 +10,11 @@ module spk286_at_bus_bridge_response_case #(
 `else
     localparam bit EXPECT_DIRECT = !DIV2;
 `endif
+`ifdef SPK286_P06_EARLY_MEMORY_ADDRESS
+    localparam bit EXPECT_ENTRY_COMMAND = !DIV2;
+`else
+    localparam bit EXPECT_ENTRY_COMMAND = 1'b0;
+`endif
     logic clk = 0, reset = 1, cpu_phase = 0;
     always #10 clk = ~clk;
     always @(posedge clk) cpu_phase <= !cpu_phase;
@@ -210,6 +215,25 @@ module spk286_at_bus_bridge_response_case #(
         at_ready = 0;
         reply(16'h5BEA, 1, EXPECT_DIRECT, 16'h5BEA, 1);
         retire_request();
+
+        // Backend already able to accept on the initial capture edge.
+        // Common-clock native memory skips COMMAND; divided clocks retain it.
+        before_accept = accepted;
+        before_writes = write_effects;
+        begin_request(24'h012341, 4'h6, 0, 16'hAB00, 1, 1, 0);
+        at_accept = 1;
+        #1;
+        check(at_command == EXPECT_ENTRY_COMMAND && !cpu_ready,
+              "initial command eligibility or premature completion");
+        wait_command();
+        @(negedge clk);
+        at_accept = 0;
+        check(accepted == before_accept + 1 && at_out == 16'hAB00 &&
+              at_lanes == 2'b10 && at_address == 24'h012341,
+              "initial accepted write lost its complete record");
+        reply(0, 0, EXPECT_DIRECT, 0, 0);
+        retire_request();
+        check(write_effects == before_writes + 1, "initial write duplicated");
 
         // All three native lane shapes, both reads and writes. Upper-byte
         // requests are already a single BIU beat and must not split again.

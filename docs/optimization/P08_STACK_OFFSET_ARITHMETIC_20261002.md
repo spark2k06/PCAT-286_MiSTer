@@ -73,4 +73,7 @@ four models. Complete-design setup still fails: the global minima are
 has CPU setup -0.160/-0.005 ns and is not selected. Both measured fits,
 unchanged timing budgets and controlled regenerated metadata are retained
 in `P05_STACK_OFFSET_SEED2_FIT_20261002.md` and the seed-3 counterpart.
-Complete-design closure remains pending.
+These two checkpoints did not close complete-design timing. The subsequent
+statistics-register placement fit does close all four models and is
+selected; see `P08_50MHZ_TIMING_CLOSURE_20261002.md`. The executor RTL and
+its directed instruction-cycle results remain unchanged by that placement.

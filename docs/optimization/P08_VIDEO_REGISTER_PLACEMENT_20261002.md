@@ -46,11 +46,14 @@ Both full compilations terminate with 12 compilation errors and produce
 no new RBF. These are failed placement experiments, not timing results.
 Their sources, assignments, failure logs and receipts are retained.
 
-The next experiments use one source/capture pair per ALM across 17 LABs,
-and compare statistics-only placement with statistics plus two HDMI
-register assignments. A successful fit must bind every requested location
-and pass the original complete-design setup/hold requirements. Neither
-experimental layout is selected in production before this verification.
+The subsequent experiments use one source/capture pair per ALM across
+17 LABs. Both bind every requested location and compile successfully.
+Statistics-only placement passes the original complete-design timing in
+all four models and is now selected. Its slow-model global setup is
++0.184/+0.154 ns and its minimum hold is +0.014 ns. Adding the two HDMI
+assignments instead gives global setup -0.182/-0.011 ns and is rejected.
+See `P08_50MHZ_TIMING_CLOSURE_20261002.md` for the selected artifact,
+complete timing, fresh directed checks and scope qualifications.
 
 The two sparse frozen snapshots match the baseline in all 848 RTL, sys,
 vendor, clock and budget inputs checked. Their QSF difference is exactly
@@ -88,7 +91,10 @@ syntax, missing/duplicate fitted nodes and malformed inventory are
 rejected. The positive controls use synthetic requests for already
 known baseline locations; they are not newly compiled placement results.
 
-Evidence: `docs/evidence/video-register-placement-20261002`.
+Initial diagnosis and rejected dense-packing evidence:
+`docs/evidence/video-register-placement-20261002`.
+Completed sparse fits and selection evidence:
+`docs/evidence/50mhz-closed-placement-20261002`.
 No RTL, CPU instruction cycles or SDRAM/held-bus budgets change in these
 experiments. No complete CPU regression or new hardware benchmark is run.
 

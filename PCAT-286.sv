@@ -730,7 +730,7 @@ module emu_at
     // therefore invalidate one line on every accepted write without adding
     // a second coherence arbiter.
     spk286_at_sdram_read_buffer #(
-        .ENABLE(1'b1)
+        .ENABLE(1'b1), .LINE_COUNT(512)
     ) u_at_sdram_read_buffer (
         .clk                     (CLK_50M),
         .reset                   (RESET),

@@ -15,7 +15,7 @@ def digest(path):
     return hashlib.sha256(path.read_bytes()).hexdigest()
 
 
-def generate_top():
+def generate_top(code_lines):
     # Reuse the already validated directed bench's exact memory-chain wiring.
     bench = (ROOT/'sim/spk286_integration/spk286_checkit_workload_tb.sv').read_text()
     wires = bench.split('    wire at_valid,', 1)[1].split('    spk286_machine_cpu cpu (', 1)[0]
@@ -53,8 +53,7 @@ module pcat_memory_timing (
 ''' + ',\n'.join('    output wire [31:0] stat_'+c for c in counters) + '\n);\n' + '''
     integer p03_enable = 1;
     integer data_buffer_enable = 1;
-    localparam integer CODE_BUFFER_LINES = 64;
-''' + wires + chain + '''
+''' + f'    localparam integer CODE_BUFFER_LINES = {code_lines};\n' + wires + chain + '''
     assign memory_out_accept = physical_accept;
     assign memory_out_ready = physical_ready;
     assign memory_out_read_valid = physical_read_valid;
@@ -73,11 +72,20 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--build-dir', required=True, type=Path)
     p.add_argument('--output', required=True, type=Path)
+    p.add_argument('--code-lines', type=int,
+                   help='Explicit comparison capacity; default follows PCAT production top')
     a = p.parse_args()
     build, out = a.build_dir.resolve(), a.output.resolve()
     out.mkdir(parents=True, exist_ok=True)
+    production_top = ROOT/'PCAT-286.sv'
+    production_text = production_top.read_text()
+    production_instance = production_text.split('spk286_at_sdram_read_buffer #(', 1)[1].split(') u_at_sdram_read_buffer', 1)[0]
+    capacity = re.search(r'\.LINE_COUNT\((\d+)\)', production_instance)
+    production_lines = int(capacity.group(1)) if capacity else 64
+    code_lines = a.code_lines if a.code_lines is not None else production_lines
+    assert 1 <= code_lines <= 1024 and code_lines & (code_lines-1) == 0
     generated = out/'pcat_memory_timing.sv'
-    generated.write_text(generate_top())
+    generated.write_text(generate_top(code_lines))
     source_names = ['spk286_at_bus_bridge', 'spk286_at_mister_memory_port',
                     'spk286_at_sdram_read_buffer', 'spk286_at_sdram_data_buffer',
                     'spk286_at_mister_sdram_owner']
@@ -122,7 +130,7 @@ def main():
     link[link.index('-o')+1] = str(out/'86Box-memory-probe')
     link.insert(link.index('-o'), str(obj/'Vpcat_memory__ALL.a'))
     commands.append(link)
-    inputs = [*sources, original, header, Path(__file__), ROOT/'config.tcl']
+    inputs = [*sources, original, header, Path(__file__), ROOT/'config.tcl', production_top]
     before = {str(f):digest(f) for f in inputs}
     cpu_objects = sorted((build/'src/cpu/CMakeFiles/cpu.dir/spk286_verilated').glob('*.o'))
     assert cpu_objects, 'No standalone CPU model objects found'
@@ -135,6 +143,8 @@ def main():
     assert all(digest(Path(f)) == h for f,h in cpu_before.items()), 'CPU objects changed while linking'
     (out/'build-manifest.json').write_text(json.dumps({
         'commands':commands, 'sources_sha256':before, 'cpu_objects_sha256':cpu_before, 'macros':macros,
+        'code_buffer_lines':code_lines, 'production_code_buffer_lines':production_lines,
+        'code_buffer_sync_tags':code_lines > 128, 'data_buffer_words':512,
         'binary_sha256':digest(out/'86Box-memory-probe'),
         'note':'Private adapter only; CPU model and release objects reused unchanged. Guest memory values stay in 86Box.'}, indent=2)+'\n')
     print('MEMORY_PROBE_READY', out/'86Box-memory-probe', flush=True)

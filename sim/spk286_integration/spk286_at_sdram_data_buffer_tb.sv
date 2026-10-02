@@ -1,5 +1,8 @@
 `timescale 1ns/1ps
-module spk286_at_sdram_data_buffer_tb #(parameter logic FULL_PIPELINE = 1'b0);
+module spk286_at_sdram_data_buffer_tb #(
+    parameter logic FULL_PIPELINE = 1'b0,
+    parameter integer CODE_BUFFER_LINES = 64
+);
     logic clk = 0, reset = 1, cancel_cpu = 0, enable = 1;
     always #5 clk = ~clk;
     logic in_valid=0, in_command_valid=0, in_write=0, in_refresh=0, in_code_fetch=0, in_burst=0;
@@ -57,7 +60,7 @@ module spk286_at_sdram_data_buffer_tb #(parameter logic FULL_PIPELINE = 1'b0);
             .backend_read_data(port_read_data), .backend_read_data_valid(port_read_valid),
             .debug_state(), .protocol_error(protocol_error)
         );
-        spk286_at_sdram_read_buffer code_buffer (
+        spk286_at_sdram_read_buffer #(.LINE_COUNT(CODE_BUFFER_LINES)) code_buffer (
             .clk(clk), .reset(reset), .cancel_cpu(cancel_cpu), .enable(1'b1),
             .in_valid(port_valid), .in_command_valid(port_command), .in_owner(port_owner),
             .in_write(port_write), .in_refresh(port_refresh), .in_code_fetch(port_code),

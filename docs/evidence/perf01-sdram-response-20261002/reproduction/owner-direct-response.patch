@@ -1,0 +1,105 @@
+diff --git a/rtl/spk286_integration/spk286_at_mister_sdram_owner.sv b/rtl/spk286_integration/spk286_at_mister_sdram_owner.sv
+index 029c055..c1c1c0a 100644
+--- a/rtl/spk286_integration/spk286_at_mister_sdram_owner.sv
++++ b/rtl/spk286_integration/spk286_at_mister_sdram_owner.sv
+@@ -1,3 +1,4 @@
++// Unvalidated PERF01 owner-response prototype. Not production RTL.
+ `timescale 1ns/1ps
+ 
+ // Physical SDRAM owner for the normalized AT memory backend.
+@@ -64,9 +65,8 @@ module spk286_at_mister_sdram_owner #(
+     logic [24:0] address_q;
+     logic [1:0]  byte_enable_q;
+     logic [15:0] data_out_q;
+-    logic        response_pending_q;
+-    logic [15:0] response_data_q;
+-    logic        response_data_valid_q;
++    logic        read_response_valid;
++    logic        last_read_beat;
+     logic        burst_q;
+     logic [2:0]  read_beat_count_q;
+ 
+@@ -82,8 +82,8 @@ module spk286_at_mister_sdram_owner #(
+     logic        kf_dq_io;
+     logic [15:0] kf_dq_out;
+ 
+-    assign debug_state = {active_q, write_q, response_pending_q,
+-                          response_data_valid_q, kf_idle, kf_write_flag,
++    assign debug_state = {active_q, write_q, request_ready,
++                          read_response_valid, kf_idle, kf_write_flag,
+                           kf_read_flag, kf_refresh_mode};
+ 
+     logic        launch_request;
+@@ -105,16 +105,20 @@ module spk286_at_mister_sdram_owner #(
+     assign kf_write_request = launch_request && write_q;
+     assign kf_read_request  = launch_request && !write_q;
+ 
+-    // KFSDRAM presents read_flag/data_out at its internal sampling boundary.
+-    // Capture that pair first, then expose a stable response to the AT bus.
+-    // This prevents the CPU-facing ready/data path from depending on the
+-    // same-cycle combinational propagation of the SDRAM controller outputs.
++    // EXPERIMENT ONLY: KFSDRAM already registers data_out and read_flag on
++    // the same sampling edge. Forward that registered pair without a second
++    // owner data register. The controller's physical DQ capture is unchanged.
++    // Each beat is consumed on the following owner edge; READY accompanies
++    // only the final beat. Admission and physical launch remain registered.
++    assign read_response_valid = active_q && issued_q &&
++                                 !owner_refresh_q && !write_q && kf_read_flag;
++    assign last_read_beat = !burst_q || read_beat_count_q == 3'd3;
+     assign request_ready = active_q &&
+                            (owner_refresh_q ? kf_idle :
+-                            (write_q ? (issued_q && kf_idle) : response_pending_q));
+-    assign request_read_data = response_data_q;
+-    assign request_read_data_valid = active_q && !owner_refresh_q &&
+-                                     !write_q && response_data_valid_q;
++                            (write_q ? (issued_q && kf_idle) :
++                             (read_response_valid && last_read_beat)));
++    assign request_read_data = kf_data_out;
++    assign request_read_data_valid = read_response_valid;
+ 
+     assign kf_access_num = burst_q ? 9'd4 : 9'd1;
+ 
+@@ -215,14 +219,10 @@ module spk286_at_mister_sdram_owner #(
+             address_q      <= 25'h0000000;
+             byte_enable_q  <= 2'b00;
+             data_out_q     <= 16'h0000;
+-            response_pending_q <= 1'b0;
+-            response_data_q <= 16'h0000;
+-            response_data_valid_q <= 1'b0;
+             burst_q         <= 1'b0;
+             read_beat_count_q <= 3'd0;
+             protocol_error <= 1'b0;
+         end else begin
+-            response_data_valid_q <= 1'b0;
+             if (request_valid && request_command_valid &&
+                 (request_byte_enable == 2'b00))
+                 protocol_error <= 1'b1;
+@@ -242,23 +242,18 @@ module spk286_at_mister_sdram_owner #(
+                 issued_q        <= 1'b0;
+                 owner_refresh_q <= request_owner_refresh;
+                 write_q         <= request_write;
+-                response_pending_q <= 1'b0;
+-                response_data_valid_q <= 1'b0;
+                 read_beat_count_q <= 3'd0;
+             end else if (launch_request) begin
+                 issued_q <= 1'b1;
+-            end else if (active_q && issued_q && !owner_refresh_q && !write_q &&
+-                         kf_read_flag && !response_pending_q) begin
+-                response_data_q <= kf_data_out;
+-                response_data_valid_q <= 1'b1;
++            end else if (read_response_valid) begin
+                 read_beat_count_q <= read_beat_count_q + 3'd1;
+-                if (burst_q ? (read_beat_count_q == 3'd3) : 1'b1)
+-                    response_pending_q <= 1'b1;
++                if (last_read_beat) begin
++                    active_q <= 1'b0;
++                    issued_q <= 1'b0;
++                end
+             end else if (active_q && request_ready) begin
+                 active_q <= 1'b0;
+                 issued_q <= 1'b0;
+-                response_pending_q <= 1'b0;
+-                response_data_valid_q <= 1'b0;
+             end
+         end
+     end

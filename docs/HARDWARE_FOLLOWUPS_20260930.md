@@ -305,6 +305,17 @@ scores and normal boot/DMA coverage remain open under PERF01.
 
 #### Next bounded performance work
 
+The [2026-10-02 physical-read response experiment](optimization/P09_SDRAM_RESPONSE_EVALUATION_20261002.md)
+has now measured one of these candidates in isolation. Forwarding KFSDRAM's
+already registered read response removes one owner cycle, while preserving
+the registered request entry. All eight directed workload pairs preserve
+architectural state and write counts. With production buffers enabled, the
+cycle reduction is only 0.027–0.112% in the two CheckIT-shaped kernels and
+Dhrystone 2.1, versus 2.010% in the working-set kernel. The prototype remains
+an experiment: no timing fit or hardware validation was performed and the
+production owner is unchanged. Reducing the bridge return cycle is being
+evaluated separately, because it also benefits cache hits and writes.
+
 1. Capture completed CHECKNUM scores and request/wait counts in matched SPK286
    and hardware configurations, with the loaded RBF recorded. Use the same
    benchmark region to check how closely these kernel findings transfer.

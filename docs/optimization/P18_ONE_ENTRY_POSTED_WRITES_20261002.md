@@ -3,8 +3,8 @@
 Date: 2026-10-02. Production baseline: PCAT `89b9b4f`, including P17.
 Status: **adopted after private prototype and full-machine gates pass; first
 matched Dhrystone output is 6138 -> 6906 (+12.51%); candidate CHECKNUM completes
-with 6906 / 121.6K and RC0/ALL_DONE; paired final comparison and hardware
-validation pending**.
+with 6906 / 121.6K and RC0/ALL_DONE; strict paired comparison passes;
+hardware validation pending**.
 
 The user retained P17 and explicitly deferred timing closure. This experiment
 addresses write service without changing CPU RTL, cache capacity, SDRAM timing
@@ -151,6 +151,21 @@ See the [evidence inventory](../evidence/perf01-posted-write-20261002/README.md)
 
 The guest writes `6906` and `121.6` to TICKRUN.TXT, followed by suite RC0 and
 ALL_DONE. This reaches 89.58% / 91.22% of the SPK286 immediate-memory reference
-(7709 / 133.3K). The old P17 recorded route is 6138 / 113.6K; the slower matched
-control and strict final identities comparison are still being collected.
+(7709 / 133.3K). The completed matched control reproduces 6138 / 113.6K. Strict
+comparison verifies unchanged disk, CHECKNUM, configuration, initial CMOS,
+profiler, original CPU backend, CPU objects and options. Both guests report
+RC0/ALL_DONE. Both owned hosts need SIGTERM after their exit timeout; receipts
+classify this cleanup issue separately from successful guest completion.
 No PIT-correction gain is included in these numbers.
+
+| Matched 50 MHz route | Dhrystones | K Whetstones |
+| --- | ---: | ---: |
+| P17 control | 6138 | 113.6 |
+| P18 posted writes | 6906 | 121.6 |
+| Gain | +12.51% | +7.04% |
+| P18 / immediate-memory SPK286 (7709 / 133.3K) | 89.58% | 91.22% |
+
+The immutable `complete-checknum/` evidence group retains final receipts,
+configuration, calibrated initial CMOS, profiler phase boundaries, generated
+timing tops, CPU-object identities and the strict comparison. Complete traces
+are hashed in that comparison and remain in the original build directory.

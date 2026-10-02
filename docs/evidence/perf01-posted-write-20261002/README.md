@@ -46,6 +46,12 @@ These groups each have independent byte inventories; `prototype/` is unchanged.
 original fixture failures and corrected fixtures. Its own byte inventory keeps
 these additions separate from the original fixed 32-clock attribution.
 
+`complete-checknum/` retains the completed 6138 / 113.6K versus 6906 / 121.6K
+P18 comparison and its configuration, initial CMOS and build identities.
+Each guest has RC0/ALL_DONE. Host exit timeouts and SIGTERM are explicitly
+recorded. This group supersedes partial-score status, preserving the original
+`integer-partial/` observations unchanged.
+
 ## Reproduction
 
 Use the prototype checkpoint's production P17 sources, before adoption, with

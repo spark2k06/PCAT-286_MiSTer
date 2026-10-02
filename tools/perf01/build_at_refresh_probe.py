@@ -29,6 +29,8 @@ def main():
     parser.add_argument('validated_work', type=Path)
     parser.add_argument('output', type=Path)
     parser.add_argument('--build-dir', required=True, type=Path)
+    parser.add_argument('--pit-out', action='store_true',
+                        help='Use the corrected requester driven by real 86Box PIT OUT1')
     args = parser.parse_args()
     work, out = args.validated_work.resolve(), args.output.resolve()
     assert not out.exists(), 'Keep old experiments intact'
@@ -64,6 +66,14 @@ def main():
         'posted_out_valid && posted_out_command && physical_accept && !posted_out_refresh;')
     text = change(text, "'spk286_at_mister_sdram_owner', 'spk286_at_posted_write_buffer']",
         "'spk286_at_mister_sdram_owner', 'spk286_at_posted_write_buffer', 'spk286_at_arbiter', 'spk286_at_refresh']")
+    if args.pit_out:
+        shutil.copyfile(ROOT/'tools/perf01/prototypes/spk286_at_pit_refresh.sv',
+                        source/'rtl/spk286_integration/spk286_at_refresh.sv')
+        text=change(text,'cpu_hlda, at_refresh_enable,',
+                    'cpu_hlda, at_refresh_enable, pit_timer1_out,')
+        marker="    wires = wires.replace('integer at_refresh_enabled = 0;', 'wire at_refresh_enabled = at_refresh_enable;')"
+        text=change(text,marker,marker+'''\n    wires = wires.replace('.refresh_enable(at_refresh_enabled != 0),',
+                          '.refresh_enable(at_refresh_enabled != 0), .timer_1_out(pit_timer1_out),')''')
     builder.write_text(text)
     header = source/'tools/perf01/spk286_memory_probe.hpp'
     text = header.read_text()
@@ -84,6 +94,17 @@ def main():
     text = change(text, '        cpu.ready = memory.bus_valid ? memory.ready :',
         '        cpu.hold_request = enabled ? memory.cpu_hold : 0;\n'
         '        cpu.ready = memory.bus_valid ? memory.ready :')
+    if args.pit_out:
+        text=change(text,'#include "Vpcat_memory.h"', '''#include "Vpcat_memory.h"
+extern "C" {
+#include <86box/timer.h>
+#include <86box/pit.h>
+}''')
+        text=change(text,'        memory.cpu_hlda=cpu.hlda;',
+                    '        memory.pit_timer1_out = pit_devs[0].data && pit_devs[0].get_outlevel ?\n'
+                    '            pit_devs[0].get_outlevel(pit_devs[0].data,1) : 0;\n'
+                    '        memory.cpu_hlda=cpu.hlda;')
+        text=change(text,r'\"at_refresh_interval\":32,',r'\"at_refresh_source\":\"PIT_OUT1\",')
     header.write_text(text)
     binary_dir = out/'probe'
     with (out/'build.log').open('w') as log:
@@ -94,7 +115,9 @@ def main():
     (out/'inputs.json').write_text(json.dumps({'validated_work_inputs_sha256': sha(work/'inputs.json'),
         'builder_sha256': sha(builder), 'profiler_sha256': sha(header),
         'runtime_control': 'PCAT_AT_REFRESH=0/1; same binary and CPU objects',
-        'production_changed': False, 'clock': '50 MHz CPU/system, 32-clock AT requester, native SDRAM refresh unchanged'}, indent=2)+'\n')
+        'production_changed': False, 'clock': '50 MHz CPU/system, native SDRAM refresh unchanged',
+        'at_refresh_source': 'real 86Box PIT OUT1' if args.pit_out else 'frozen 32-clock requester',
+        'posted_writes': 'POSTED_WRITES = 1' in (source/'sim/spk286_integration/spk286_checkit_workload_tb.sv').read_text()}, indent=2)+'\n')
     print('AT_REFRESH_86BOX_PROBE_READY', binary_dir/'86Box-memory-probe')
 
 

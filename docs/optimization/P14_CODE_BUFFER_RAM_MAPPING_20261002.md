@@ -140,6 +140,9 @@ only mapping and directed checks had been run. The later user fit above now
 supplies placed occupancy and STA results for that correction.
 
 The CHECKNUM repeat uses the frozen P13 executable and measures the 4 KiB
-control behavior in the private 86Box adapter. It is separate from the hardware
+control behavior in the private 86Box adapter. It has now completed at
+5390 / 101.4K; [P15](P15_DATA_BUFFER_ASSOCIATIVITY_PLAN_20261002.md) retains
+the measurements and proposes addressing data-buffer conflicts next.
+It is separate from the hardware
 observation of this RAM-mapping correction. Further PERF01 changes remain
 separate from P14.

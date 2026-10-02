@@ -117,10 +117,13 @@ full timing/constraint audit. This candidate does not establish 50 MHz closure.
 
 ## Measurement and physical acceptance
 
-The frozen `0399806` candidate is executing the unchanged CHECKNUM executable on the same
+The frozen `0399806` candidate executed the unchanged CHECKNUM executable on the same
 initial disk and calibrated CMOS as the old-capacity arm, at actual 50 MHz
-CPU / 8 MHz ISA. At this implementation commit, complete candidate scores are
-pending. No full CPU regression, FPGA fitter, timing closure or new RBF was
+CPU / 8 MHz ISA. At the initial implementation commit, complete candidate scores
+were pending. The fresh repeat has now completed at **5390 / 101.4K**, versus
+4804 / 88.6K before; [P15](P15_DATA_BUFFER_ASSOCIATIVITY_PLAN_20261002.md)
+records complete receipts, teardown classification and phase counts.
+No full CPU regression, FPGA fitter, timing closure or new RBF was
 run at the initial implementation milestone. The later user fit is recorded
 above; corrected RAM mapping is documented in P14. The corrected design's
 50 MHz timing still requires a new fit and STA.
@@ -132,4 +135,7 @@ receipt is retained under `build/perf01-real-memory-20261002/pcat-code4k/`.
 The sampler now takes CPU and RTL values in one coherent stop and records a
 transient stop timeout as a skipped sample, without accepting incoherent data.
 A fresh image/CMOS repeat (`pcat-code4k-repeat1`) uses the identical frozen
-candidate binary; only the host measurement script differs.
+candidate binary; only the host measurement script differs. This repeat
+reached guest RC0 and `ALL_DONE`; its host exited after a classified SIGTERM
+following monitor-exit timeout. It is a completed guest result, not a clean
+host-exit claim.

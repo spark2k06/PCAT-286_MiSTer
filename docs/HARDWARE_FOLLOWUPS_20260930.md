@@ -14,7 +14,7 @@ now records 4804 / 88.6K with production PCAT READY timing in 86Box, against
 7709 / 133.3K with immediate READY on the same CPU. Actual code-buffer hit rates
 are approximately 79.41% / 84.18%, much lower than the synthetic kernel. The
 [4 KiB synchronous-tag instruction candidate](optimization/P13_CODE_BUFFER_4K_20261002.md),
-commit `0399806`, has passed directed coherence/cancellation checks and is being
+commit `0399806`, has passed directed coherence/cancellation checks and was
 measured separately with the 1 KiB data buffer retained. FPGA timing and hardware
 acceptance remain separate from this attribution and implementation evidence.
 
@@ -36,6 +36,15 @@ an established cause for the math variation. CPU/system 50 MHz setup/hold is
 positive in all four models. HDMI setup -0.104 ns at Slow -40 C still prevents
 whole-design closure. The user retains P14 and explicitly defers HDMI while
 prioritizing PERF01 throughput.
+
+The frozen P13 private CHECKNUM repeat has now completed at 5390 / 101.4K
+with PCAT memory-control timing, up 12.20% / 14.45% over the old-capacity
+4804 / 88.6K control. [P15](optimization/P15_DATA_BUFFER_ASSOCIATIVITY_PLAN_20261002.md)
+records the completed guest/host-teardown qualification and proposes a
+same-capacity 1 KiB two-way data buffer. On the accepted candidate traffic,
+its shadow reduces data-read misses from 378,345 to 420 in Dhrystone and from
+1,931,287 to 190,075 in Whetstone. This is a proposed next step, not a measured
+two-way implementation or promised hardware gain.
 
 Added 2026-10-01. Status: numeric reference accepted; directed memory-path
 attribution and a coherent 1 KiB RAM-read buffer implemented and checked;

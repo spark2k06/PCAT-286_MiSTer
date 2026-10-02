@@ -28,8 +28,14 @@ The screenshots, fitted comparison and provenance limits are retained in P13.
 to M10K while preserving 4 KiB capacity and directed cycle-visible responses.
 Full-project synthesis registers fall from 42,403 to 35,680; estimated ALMs
 needed fall from 34,101 to 31,317. These are map counts, not placed occupancy.
-The correction is ready for the user's final synthesis; new Fitter/STA and
-MiSTer throughput confirmation remain pending.
+The subsequent user fit reduces placed ALMs from 38,741 (92%) to 36,043 (86%),
+equivalent ALMs from 32,609 (78%) to 30,552 (73%) and registers from 44,251 to
+37,733, with one additional M10K. Hardware retains 4911 Dhrystones. CheckIT
+remains 95.1K Whetstones; CHECKNUM reports 99.1K versus 94.4K before, without
+an established cause for the math variation. CPU/system 50 MHz setup/hold is
+positive in all four models. HDMI setup -0.104 ns at Slow -40 C still prevents
+whole-design closure. The user retains P14 and explicitly defers HDMI while
+prioritizing PERF01 throughput.
 
 Added 2026-10-01. Status: numeric reference accepted; directed memory-path
 attribution and a coherent 1 KiB RAM-read buffer implemented and checked;

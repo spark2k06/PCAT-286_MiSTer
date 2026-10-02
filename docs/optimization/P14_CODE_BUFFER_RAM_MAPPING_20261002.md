@@ -88,15 +88,58 @@ quartus_map PCAT-286
 The paired script uses commit `0399806` as its baseline. The isolated script
 requires the existing Quartus Docker image and does not run Fitter or emit RBF.
 
-## Next physical acceptance
+## Completed user fit and hardware observation
 
-The RTL is ready for the user's final synthesis. No new Fitter, STA or RBF was
-produced here. The last fitted percentages still describe the older P13 RBF:
-78% equivalent ALMs, 92% physical ALMs and 75% M10K. The corrected design's
-placed occupancy and 50 MHz setup/hold remain to be measured.
+Implementation commit: `84dbf17`. The user has synthesized and tested the
+correction. The [fit/hardware evidence](../evidence/perf01-code4k-tags-20261002/fitted-hardware/README.md)
+retains the reports, source identities and supplied screenshots.
 
-The in-progress CHECKNUM repeat uses the frozen P13 executable. Its result
-will measure the 4 KiB control behavior in the private 86Box adapter; it is not
-a hardware benchmark of this RAM-mapping correction. A new MiSTer RBF should
-confirm retained throughput after fitting. Further PERF01 changes remain
-separate from this resource correction.
+| Fitted resource | Previous 4 KiB RBF | P14 RBF | Delta |
+| --- | ---: | ---: | ---: |
+| Equivalent ALMs | 32,609 (78%) | 30,552 (73%) | -2,057 |
+| ALMs used in final placement | 38,741 (92%) | 36,043 (86%) | -2,698 |
+| Total registers | 44,251 | 37,733 | -6,518 |
+| M10K blocks | 415 (75%) | 416 (75%) | +1 |
+
+The instruction-buffer entity uses 830 dedicated registers and five M10Ks,
+versus 7,456 registers and four M10Ks before. Its estimated ALMs fall from
+4,127.9 to 2,001.3. These entity estimates and whole-design placement totals
+have different packing and duplication effects.
+
+The supplied CheckIT observation remains **4911 / 95.1K**. CHECKNUM reports
+**4911 / 99.1K**, versus 4911 / 94.4K before. Its math value is 4.98% higher,
+but CheckIT is unchanged and neither has a repeat distribution. This supports
+retained benchmark throughput; it does not establish a math speedup caused by
+the inference rewrite or new general-software/full-regression acceptance.
+
+### Existing STA report review
+
+| Model | CPU/system 50 MHz setup | CPU/system 50 MHz hold |
+| --- | ---: | ---: |
+| Slow 100 C | +0.167 ns | +0.249 ns |
+| Slow -40 C | +0.369 ns | +0.239 ns |
+| Fast 100 C | +2.561 ns | +0.134 ns |
+| Fast -40 C | +2.733 ns | +0.118 ns |
+
+The complete summary has one negative row: HDMI PLL clock setup **-0.104 ns**
+at Slow -40 C, TNS -0.231 ns. Other summary rows, including all hold,
+recovery/removal and pulse-width rows, are positive. Thus CPU/system 50 MHz
+meets its reported setup/hold constraints, while whole-design closure remains
+pending. The user elects to keep P14 and defer HDMI while pursuing PERF01.
+
+The unconstrained-path summary reports no illegal/unconstrained clocks and
+retains platform input/output exclusions. Current production sources/config/SDC
+match the frozen P14 map inputs, but the user fit was captured post-build.
+This is a review of existing reports, not a renewed full constraint audit.
+No compilation or regression was launched for this observation update.
+
+### Initial milestone boundary
+
+At the initial P14 commit the RTL was ready for the user's final synthesis;
+only mapping and directed checks had been run. The later user fit above now
+supplies placed occupancy and STA results for that correction.
+
+The CHECKNUM repeat uses the frozen P13 executable and measures the 4 KiB
+control behavior in the private 86Box adapter. It is separate from the hardware
+observation of this RAM-mapping correction. Further PERF01 changes remain
+separate from P14.

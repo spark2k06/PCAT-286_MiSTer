@@ -107,6 +107,8 @@ class MemoryProbe {
             }
             std::fprintf(f,"}");
         };
+        std::fprintf(f,"\"posted_writes\":%u,\"posted_drains\":%u,\"posted_blocked\":%u,",
+                     memory.stat_posted_count, memory.stat_drained_count, memory.stat_posted_stalls);
         caches("shadow_code",code_shadow); std::fprintf(f,",");
         caches("shadow_data",data_shadow); std::fprintf(f,"}\n");
         std::fclose(f);
@@ -175,7 +177,8 @@ public:
                   (mapped >= 0x100000 && mapped < 0x260000));
         memory.bus_valid=enabled && selected && cpu.bus_valid;
         memory.eval();
-        cpu.ready = memory.bus_valid ? memory.ready : 1;
+        cpu.ready = memory.bus_valid ? memory.ready :
+                    enabled && memory.pending_write ? 0 : 1;
     }
 
     template<typename CPU> void observe(const CPU &cpu) {

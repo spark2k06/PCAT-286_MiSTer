@@ -1,9 +1,9 @@
 # P18: one retained CPU write below the coherent caches
 
 Date: 2026-10-02. Production baseline: PCAT `89b9b4f`, including P17.
-Status: **private prototype and full-machine promotion gates pass; first matched
-Dhrystone output is 6138 -> 6906 (+12.51%); complete CHECKNUM measurements,
-production adoption and hardware validation pending**.
+Status: **adopted after private prototype and full-machine gates pass; first
+matched Dhrystone output is 6138 -> 6906 (+12.51%); complete CHECKNUM math
+measurement and hardware validation pending**.
 
 The user retained P17 and explicitly deferred timing closure. This experiment
 addresses write service without changing CPU RTL, cache capacity, SDRAM timing
@@ -122,12 +122,12 @@ host writes at logical CPU READY and cannot by itself validate backing-memory
 effects of a reset before that READY. Use the physical cancellation tests for
 that case. No live partial formatted number is treated as complete acceptance.
 
-After completed guest output, compare both rates and phase counters, retaining
-guest RC0/ALL_DONE separately from possible host teardown timeouts. If the gain
-persists, adopt the measured block/fences, run bounded machine integration and
-prepare the source candidate for the user's synthesis. Keep 50 MHz CPU options
-unchanged; timing closure is explicitly deferred. MiSTer throughput and broader
-compatibility remain hardware follow-ups.
+The user authorizes a combined posting/PIT-refresh RBF after confirmation.
+The measured posting block and fences are adopted with their existing physical,
+coherence, bridge and full-machine gates. CPU options stay unchanged. The slower
+math run continues; record guest RC0/ALL_DONE separately from host teardown.
+Timing closure is deferred. MiSTer throughput and broader compatibility remain
+hardware follow-ups; a partial integer result does not establish full DOS acceptance.
 
 ### Early integer notification
 

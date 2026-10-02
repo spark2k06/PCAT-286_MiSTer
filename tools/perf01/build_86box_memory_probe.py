@@ -25,6 +25,8 @@ def generate_top(code_lines):
     wires = wires[:begin] + wires[end:]
     chain = bench.split('    spk286_at_bus_bridge bridge (', 1)[1].split('    spk286_sdram_pin_model dram (', 1)[0]
     chain = '    spk286_at_bus_bridge bridge (' + chain
+    posted = int(re.search(r'POSTED_WRITES = (\d+)', bench).group(1))
+    chain = chain.replace('POSTED_WRITES != 0', str(posted))
     chain = chain.replace('width_capable && native_width != 0', "1'b1")
     chain = chain.replace(' && !ideal_selected', '')
     assert 'ideal_selected' not in chain
@@ -46,7 +48,8 @@ module pcat_memory_timing (
     output wire ready,
     output wire [15:0] data_in,
     output wire protocol_error,
-    output wire idle,
+    output wire idle, pending_write,
+    output wire [31:0] stat_posted_count, stat_drained_count, stat_posted_stalls,
     output wire owner_accept, owner_refresh,
     output wire [1:0] owner_kind,
     output wire [3:0] bridge_state,
@@ -54,16 +57,16 @@ module pcat_memory_timing (
     integer p03_enable = 1;
     integer data_buffer_enable = 1;
 ''' + f'    localparam integer CODE_BUFFER_LINES = {code_lines};\n' + wires + chain + '''
-    assign memory_out_accept = physical_accept;
-    assign memory_out_ready = physical_ready;
-    assign memory_out_read_valid = physical_read_valid;
-    assign memory_out_read_data = physical_read_data;
+    assign pending_write = posted_pending;
+    assign stat_posted_count = posted_count;
+    assign stat_drained_count = drained_count;
+    assign stat_posted_stalls = posted_stalls;
     assign dram_in = 16'd0;
-    assign protocol_error = bridge_error || port_error || owner_error;
-    assign idle = bridge.bridge_idle && physical_idle;
-    assign owner_accept = memory_out_valid && memory_out_command && physical_accept;
+    assign protocol_error = bridge_error || port_error || owner_error || posted_error;
+    assign idle = bridge.bridge_idle && physical_idle && posted_idle;
+    assign owner_accept = posted_out_valid && posted_out_command && physical_accept;
     assign owner_refresh = owner.kf_refresh_mode;
-    assign owner_kind = memory_out_write ? 2'd2 : memory_out_code ? 2'd0 : 2'd1;
+    assign owner_kind = posted_out_write ? 2'd2 : posted_out_code ? 2'd0 : 2'd1;
     assign bridge_state = bridge.debug_state;
 ''' + ''.join('    assign stat_'+c+' = '+c+';\n' for c in counters) + 'endmodule\n'
 
@@ -88,7 +91,7 @@ def main():
     generated.write_text(generate_top(code_lines))
     source_names = ['spk286_at_bus_bridge', 'spk286_at_mister_memory_port',
                     'spk286_at_sdram_read_buffer', 'spk286_at_sdram_data_buffer',
-                    'spk286_at_mister_sdram_owner']
+                    'spk286_at_mister_sdram_owner', 'spk286_at_posted_write_buffer']
     sources = [ROOT/'rtl/spk286_integration'/f'{name}.sv' for name in source_names]
     sources += [ROOT/'rtl/KFPC-XT/HDL/KFSDRAM/HDL/KFSDRAM.sv', generated]
     config = (ROOT/'config.tcl').read_text()

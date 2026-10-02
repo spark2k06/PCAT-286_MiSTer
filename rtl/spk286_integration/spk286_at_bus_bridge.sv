@@ -25,6 +25,7 @@ module spk286_at_bus_bridge #(
     input  logic         cpu_bus_bhe_n,
     input  logic [3:0]   cpu_bus_status,
     input  logic         cpu_bus_lock,
+    input  logic         memory_drain_pending,
     // Board address decode, sampled with the CPU request. Memory width and
     // selected ISA16 I/O width are separate so ordinary ISA peripherals
     // retain byte-wide sequencing.
@@ -138,6 +139,10 @@ module spk286_at_bus_bridge #(
                                 io_native_word_request) &&
                                !cpu_address[0] && !cpu_bus_bhe_n;
 
+    wire drain_pending = memory_drain_pending === 1'b1;
+    wire drain_barrier = drain_pending &&
+                         (cpu_bus_lock || !memory_native_word_request);
+
     logic [23:0] beat_address;
     logic [1:0]   beat_byte_enable;
     // Let the downstream memory owner capture its address record on the same
@@ -146,7 +151,7 @@ module spk286_at_bus_bridge #(
     // and all completions still use the retained accepted record afterwards.
     wire early_memory_address = EARLY_MEMORY_ADDRESS && !reset &&
                                 (state_q == STATE_IDLE) && cpu_bus_valid &&
-                                memory_native_word_request && live_request_valid;
+                                memory_native_word_request && live_request_valid && !drain_barrier;
     // Related slower CPU clocks keep the registered command sequence.
     wire early_memory_command = early_memory_address && !COMPLETE_ON_CPU_SAMPLE;
     wire [1:0] early_byte_enable = native_word_request ? 2'b11 :
@@ -261,7 +266,7 @@ module spk286_at_bus_bridge #(
     // out of the 16-bit response-data mux.
     assign cpu_data_in       = direct_memory_wait && request_is_read ?
                                direct_memory_data : cpu_data_in_q;
-    assign bridge_idle       = (state_q == STATE_IDLE) && !early_memory_address;
+    assign bridge_idle       = (state_q == STATE_IDLE) && !early_memory_address && !drain_pending;
     assign debug_state       = state_q;
 
     always_ff @(posedge clk) begin
@@ -285,7 +290,7 @@ module spk286_at_bus_bridge #(
                 complete_sampled_q <= 1'b0;
             case (state_q)
                 STATE_IDLE: begin
-                    if (cpu_bus_valid) begin
+                    if (cpu_bus_valid && !drain_barrier) begin
                         // Snapshot is performed once per request.  No edge or
                         // payload comparison is used as a delimiter, so an
                         // identical request held back-to-back is accepted.

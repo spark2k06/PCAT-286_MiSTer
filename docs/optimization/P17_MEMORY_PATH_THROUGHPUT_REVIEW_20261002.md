@@ -2,7 +2,7 @@
 
 Date: 2026-10-02. Source baseline: PCAT `ea283d8`, including P16.
 Status: **entry overlap integrated; directed checks and complete CHECKNUM pass;
-frozen FPGA fit and MiSTer acceptance pending**.
+user fit and MiSTer throughput observed; 50 MHz timing closure pending**.
 
 Prioritize the common cache-hit latency, followed by studying write service
 overlap. A private bridge/port prototype improves four directed workloads by
@@ -159,16 +159,16 @@ No SDRAM timing or refresh interval is relaxed in this review.
   fixture checking the actual synchronous hit before cancelled completion;
   address, data, uniqueness and reset assertions remain. Failures are retained.
 - Frozen source guards pass. The private 86Box candidate reuses unchanged
-  compiled SPK286 objects and the unchanged profiler. Unmodified CHECKNUM is
-  running with the same disk, CMOS, BIOS, EGA, RAM, actual 50 MHz CPU and 8 MHz
+  compiled SPK286 objects and the unchanged profiler. Unmodified CHECKNUM ran
+  with the same disk, CMOS, BIOS, EGA, RAM, actual 50 MHz CPU and 8 MHz
   ISA configuration as P16. Binary SHA-256:
   `b51ff6e1a9bcd057149b5f988684998aaffa62743881c3d20f45a7977f4f446b`.
   A read-only diagnostic recovered **6138 Dhrystones** from the guest's stable
   formatted output buffer at 4CB38h while execution had entered Whetstone.
   This is **+8.33%** against P16's completed 5666. Two successive reads agree,
   process/executable ownership and binary hash are checked, and no guest write
-  or stop is issued. Full output, guest RC0/ALL_DONE and final profile remain
-  pending; this is a **provisional integer result**, not complete acceptance.
+  or stop was issued. This initial observation was provisional; the complete
+  output, guest RC0/ALL_DONE and final profile below subsequently confirmed it.
 
 ## Production adoption and completed CHECKNUM
 
@@ -209,11 +209,116 @@ READY. The new ROM initially contained NASM's 386 near conditional branch
 plus near JMP and a `cpu 286` assembly directive correct that fixture. No CPU
 change or instruction waiver is involved.
 
-Next: fit a frozen 50 MHz candidate and report net/entity ALMs, registers,
-M10Ks and all-corner setup/hold. No additional RAM capacity is requested, but
-fitted logic cost is **unmeasured** and the live-input acceptance/address path
-may affect timing. P16 CPU setup violations remain pending. MiSTer throughput
-and compatibility need a user test of the resulting RBF.
+## User fit and MiSTer observation
+
+The user subsequently synthesized production P17 and supplied CheckIT and
+CHECKNUM screenshots. Both report **5666 Dhrystones/s and 106.7K Whetstones/s**.
+Against the previous hardware observation, P16's 5139 / 97.1K, this is
+**+10.25% / +9.89%**. The first hardware baseline was 3584 / 72.2K, making the
+observed cumulative gain **+58.09% / +47.78%**. These are individual observations,
+without a repeat-run distribution. The private model's P17 6138 / 113.6K and
+P16 5666 / 102.9K are separate measurements; the repeated integer value 5666
+does not make the model and hardware arms interchangeable.
+
+The existing user build completed in **27 min 17 s**. Its RBF is
+`output_files/PCAT-286.rbf`, 4,102,776 bytes, modified at 17:19:55 Europe/Madrid
+on 2026-10-02. Quartus report timestamps use UTC. SHA-256:
+`94f210cbaa590e3e80e210e661bea5eb9ba34772a6c8d04f797620359ba27ad0`.
+The pre-user-build freeze matches all 1206 current source files. Relative to
+the preserved P16 inputs, the only production compilation-input differences
+are the bridge and memory port. The new fit hierarchy also contains the P17
+logic. No compiler-side input receipt or independent attestation of the RBF
+hash loaded on MiSTer is available; the screenshots are associated with this
+latest build by session context. The OSD speed was not separately reconfirmed.
+
+### Fitted resource cost
+
+| Resource | P16 | User P17 fit | Difference |
+| --- | ---: | ---: | ---: |
+| Equivalent ALMs | 31,052 | 30,832 / 41,910 (74%) | -220 |
+| Physically placed ALMs | 36,442 | 36,191 / 41,910 (86.35%) | -251 |
+| Registers | 38,171 | 38,198 | +27 |
+| M10K blocks | 416 | 416 / 553 (75%) | 0 |
+| Block memory bits | 3,301,019 | 3,301,019 / 5,662,720 (58%) | 0 |
+| DSP blocks | 39 | 39 / 112 (35%) | 0 |
+| PLLs | 3 | 3 / 6 (50%) | 0 |
+
+The two changed entities add only **13.8 equivalent ALMs** in this fit:
+bridge 98.8 -> 105.6 (+6.8), memory port 82.9 -> 89.9 (+7.0).
+Their combined register count falls by three, with no added M10K.
+Whole-design area falls, but unchanged cache/CPU logic also changes packing
+and replication. The global reduction is an observed fitted total, not proof
+that entry overlap intrinsically removes 220 ALMs. Hierarchical owner and
+KFSDRAM resource rows must not be added as independent costs.
+
+### Timing at the configured 50 MHz
+
+The original user-build STA summary is authoritative for the whole clock:
+
+| Quartus model | P16 setup, ns | P17 setup, ns | P17 hold, ns |
+| --- | ---: | ---: | ---: |
+| Slow 1100 mV, 100 C | -0.450 | **-0.979** | +0.251 |
+| Slow 1100 mV, -40 C | -0.029 | **-0.958** | +0.240 |
+| Fast 1100 mV, 100 C | +2.569 | +2.570 | +0.134 |
+| Fast 1100 mV, -40 C | +2.734 | +2.735 | +0.119 |
+
+CPU/system hold remains positive in all four corners. Setup worsens by
+0.529 / 0.929 ns in the slow corners; setup TNS rises in magnitude from
+-6.195 / -0.080 ns to **-63.600 / -72.436 ns**. Reported CPU Fmax is
+**47.67 / 47.71 MHz** in those corners, versus 48.90 / 49.93 MHz for P16.
+The hardware remains clocked at 50 MHz; this report does not automatically
+reduce its frequency. CheckIT's estimated 35.06 MHz is calibration software,
+not measurement of the actual FPGA clock. This candidate is **not timing
+closed at 50 MHz**, despite the successful benchmark execution.
+
+Other negative summary entries are video-domain hold **-0.042 / -0.074 ns**
+in the two slow corners, and HDMI PLL source-domain setup **-0.034 ns** at
+Slow -40 C. These are recorded separately from CPU hold and from the scaled
+HDMI output clocks. They also prevent whole-design closure.
+
+### Bounded critical-path review
+
+TimeQuest was run against a private copy of the user's fitted netlist, without
+synthesis, fitting, RTL/SDC changes or regression. Ten paths per group and
+check were requested. The slow same-clock setup paths reproduce the original
+summary's worst CPU margins:
+
+- Slow 100 C: `prefetch_queue.storage_q[1][4]` ->
+  `events.event_error_code[5]` / `[8]`, **-0.979 ns**, 20 logic levels.
+  Data delay is 20.282 ns: 8.265 ns cells and 12.017 ns interconnect, with
+  -0.517 ns clock skew.
+- Slow -40 C: `prefetch_queue.storage_q[1][7]` ->
+  `events.event_error_code[5]`, **-0.958 ns**, also 20 logic levels.
+- Code-buffer setup reaches **-0.269 / -0.486 ns**; data-buffer setup reaches
+  **-0.486 / -0.500 ns**. The top paths start at machine reset/admission
+  synchronizers (`at_reset_sync2_q` or `missing_main_sync[1]`) and end in
+  code validity or data lookup-valid registers, with 17 / 18 logic levels.
+- Groups ending at bridge registers have **+0.828 / +0.629 ns** setup;
+  groups ending at memory-port registers have **+1.129 / +0.890 ns**.
+  This does not establish the slack of every path passing through their
+  combinational logic and ending elsewhere.
+- The worst video hold path goes from DAC `write_index[3]` to the blue palette
+  memory address register, reaching **-0.074 ns** at Slow -40 C.
+
+The worst setup path is inside unchanged CPU RTL. Placement/replication can
+expose an existing long decode path after a local integration change; one fit
+does not establish the sole cause of its regression. The CPU prefetch-to-event
+decode and cache reset/admission controls are concrete timing follow-ups.
+Preserve the measured one-clock cache-hit behavior when addressing them.
+
+The available custom fast operating conditions are `MIN_fast`; their bounded
+internal-clock setup values are not replacements for the original report's
+all-clock fast summary. This extraction is not a full constraint/CDC audit.
+TimeQuest regenerated **only the private `db/PCAT-286.cmp.rdb`**, causing the
+initial immutable-artifact guard to reject the run. The final verifier records
+that exception and confirms every source, the other 22 private fit artifacts,
+and **all 23 original project fit artifacts** remain unchanged. No original
+user build artifact was overwritten.
+
+The observed performance gain justifies retaining entry overlap at this small
+local area cost. Timing closure, repeated hardware measurements and broader
+compatibility remain open. The posted-write and open-row ideas above remain
+future experiments; neither is implemented by this observation.
 
 Reproduction and observations are in the
 [evidence inventory](../evidence/perf01-entry-overlap-20261002/README.md).

@@ -1,0 +1,946 @@
+----------------
+; Command Info ;
+----------------
+Report Timing: Found 10 hold paths (0 violated).  Worst case slack is 0.240 
+
+Tcl Command:
+    report_timing -hold -file /build/review-paths/7_slow_1100mv_-40c/clk50_hold.rpt -from_clock [get_clocks {FPGA_CLK2_50}] -to_clock [get_clocks {FPGA_CLK2_50}] -npaths 10 -detail full_path
+
+Options:
+    -from_clock [get_clocks {FPGA_CLK2_50}] 
+    -to_clock [get_clocks {FPGA_CLK2_50}] 
+    -hold 
+    -npaths 10 
+    -detail full_path 
+    -file {/build/review-paths/7_slow_1100mv_-40c/clk50_hold.rpt} 
+
+Delay Model:
+    Slow 1100mV -40C Model
+
++----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Summary of Paths                                                                                                                                                                                                                                                                                                                                                                                                                                                           ;
++-------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------+--------------+--------------+------------+------------+
+; Slack ; From Node                                                                                                                                                                                    ; To Node                                                                                                                                                                                      ; Launch Clock ; Latch Clock  ; Relationship ; Clock Skew ; Data Delay ;
++-------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------+--------------+--------------+------------+------------+
+; 0.240 ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms1|saa1099_triplet:bottom|saa1099_noise:noise_gen|count[2]~DUPLICATE ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms1|saa1099_triplet:bottom|saa1099_noise:noise_gen|count[2]           ; FPGA_CLK2_50 ; FPGA_CLK2_50 ; 0.000        ; 0.103      ; 0.343      ;
+; 0.241 ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:bottom|saa1099_noise:noise_gen|count[2]~DUPLICATE ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:bottom|saa1099_noise:noise_gen|count[2]           ; FPGA_CLK2_50 ; FPGA_CLK2_50 ; 0.000        ; 0.097      ; 0.338      ;
+; 0.242 ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:bottom|saa1099_noise:noise_gen|count[2]~DUPLICATE ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:bottom|saa1099_noise:noise_gen|count[2]~DUPLICATE ; FPGA_CLK2_50 ; FPGA_CLK2_50 ; 0.000        ; 0.096      ; 0.338      ;
+; 0.244 ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:bottom|saa1099_tone:freq_gen1|count[2]            ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:bottom|saa1099_tone:freq_gen1|count[2]            ; FPGA_CLK2_50 ; FPGA_CLK2_50 ; 0.000        ; 0.099      ; 0.343      ;
+; 0.245 ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms1|saa1099_triplet:top|saa1099_tone:freq_gen2|count[2]               ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms1|saa1099_triplet:top|saa1099_tone:freq_gen2|count[2]               ; FPGA_CLK2_50 ; FPGA_CLK2_50 ; 0.000        ; 0.097      ; 0.342      ;
+; 0.246 ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms1|saa1099_triplet:bottom|saa1099_noise:noise_gen|count[2]~DUPLICATE ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms1|saa1099_triplet:bottom|saa1099_noise:noise_gen|count[2]~DUPLICATE ; FPGA_CLK2_50 ; FPGA_CLK2_50 ; 0.000        ; 0.098      ; 0.344      ;
+; 0.247 ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:top|saa1099_tone:freq_gen1|count[2]               ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:top|saa1099_tone:freq_gen1|count[2]               ; FPGA_CLK2_50 ; FPGA_CLK2_50 ; 0.000        ; 0.096      ; 0.343      ;
+; 0.247 ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_machine_cpu:u_cpu|spk286:cpu|spk286_micro_executor:micro_executor|spk286_muldiv:muldiv_service|product_q[22]                                ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_machine_cpu:u_cpu|spk286:cpu|spk286_micro_executor:micro_executor|spk286_muldiv:muldiv_service|product_q[22]                                ; FPGA_CLK2_50 ; FPGA_CLK2_50 ; 0.000        ; 0.098      ; 0.345      ;
+; 0.248 ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:bottom|saa1099_noise:noise_gen|count[10]          ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:bottom|saa1099_noise:noise_gen|count[10]          ; FPGA_CLK2_50 ; FPGA_CLK2_50 ; 0.000        ; 0.096      ; 0.344      ;
+; 0.250 ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:top|saa1099_noise:noise_gen|count[4]              ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:top|saa1099_noise:noise_gen|count[4]              ; FPGA_CLK2_50 ; FPGA_CLK2_50 ; 0.000        ; 0.099      ; 0.349      ;
++-------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+--------------+--------------+--------------+------------+------------+
+
+Path #1: Hold slack is 0.240 
+===============================================================================
++-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Path Summary                                                                                                                                                                                                      ;
++--------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Property           ; Value                                                                                                                                                                                        ;
++--------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; From Node          ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms1|saa1099_triplet:bottom|saa1099_noise:noise_gen|count[2]~DUPLICATE ;
+; To Node            ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms1|saa1099_triplet:bottom|saa1099_noise:noise_gen|count[2]           ;
+; Launch Clock       ; FPGA_CLK2_50                                                                                                                                                                                 ;
+; Latch Clock        ; FPGA_CLK2_50                                                                                                                                                                                 ;
+; Data Arrival Time  ; 5.603                                                                                                                                                                                        ;
+; Data Required Time ; 5.363                                                                                                                                                                                        ;
+; Slack              ; 0.240                                                                                                                                                                                        ;
++--------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
++-----------------------------------------------------------------------------------+
+; Statistics                                                                        ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Property               ; Value ; Count ; Total Delay ; % of Total ; Min   ; Max   ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Hold Relationship      ; 0.000 ;       ;             ;            ;       ;       ;
+; Clock Skew             ; 0.103 ;       ;             ;            ;       ;       ;
+; Data Delay             ; 0.343 ;       ;             ;            ;       ;       ;
+; Number of Logic Levels ;       ; 1     ;             ;            ;       ;       ;
+; Physical Delays        ;       ;       ;             ;            ;       ;       ;
+;  Arrival Path          ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 3.556       ; 68         ; 0.000 ; 2.023 ;
+;    Cell                ;       ; 3     ; 1.704       ; 32         ; 0.452 ; 0.792 ;
+;   Data                 ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 2     ; 0.195       ; 57         ; 0.000 ; 0.195 ;
+;    Cell                ;       ; 3     ; 0.148       ; 43         ; 0.000 ; 0.076 ;
+;    uTco                ;       ; 1     ; 0.000       ; 0          ; 0.000 ; 0.000 ;
+;  Required Path         ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 4.215       ; 70         ; 0.000 ; 2.468 ;
+;    Cell                ;       ; 3     ; 1.801       ; 30         ; 0.476 ; 0.792 ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+Note: Negative delays are omitted from totals when calculating percentages
+
++------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Data Arrival Path                                                                                                                                                                                                                                          ;
++---------+---------+----+------+--------+--------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Total   ; Incr    ; RF ; Type ; Fanout ; Location           ; Element                                                                                                                                                                                      ;
++---------+---------+----+------+--------+--------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; 0.000   ; 0.000   ;    ;      ;        ;                    ; launch edge time                                                                                                                                                                             ;
+; 5.260   ; 5.260   ;    ;      ;        ;                    ; clock path                                                                                                                                                                                   ;
+;   0.000 ;   0.000 ;    ;      ;        ;                    ; source latency                                                                                                                                                                               ;
+;   0.000 ;   0.000 ;    ;      ; 1      ; PIN_Y13            ; FPGA_CLK2_50                                                                                                                                                                                 ;
+;   0.000 ;   0.000 ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1   ; FPGA_CLK2_50~input|i                                                                                                                                                                         ;
+;   0.792 ;   0.792 ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1   ; FPGA_CLK2_50~input|o                                                                                                                                                                         ;
+;   2.325 ;   1.533 ; RR ; IC   ; 1      ; CLKCTRL_G3         ; FPGA_CLK2_50~inputCLKENA0|inclk                                                                                                                                                              ;
+;   2.777 ;   0.452 ; RR ; CELL ; 20824  ; CLKCTRL_G3         ; FPGA_CLK2_50~inputCLKENA0|outclk                                                                                                                                                             ;
+;   4.800 ;   2.023 ; RR ; IC   ; 1      ; FF_X16_Y10_N8      ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms1|bottom|noise_gen|count[2]~DUPLICATE|clk                                                                                                    ;
+;   5.260 ;   0.460 ; RR ; CELL ; 1      ; FF_X16_Y10_N8      ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms1|saa1099_triplet:bottom|saa1099_noise:noise_gen|count[2]~DUPLICATE ;
+; 5.603   ; 0.343   ;    ;      ;        ;                    ; data path                                                                                                                                                                                    ;
+;   5.260 ;   0.000 ;    ; uTco ; 1      ; FF_X16_Y10_N8      ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms1|saa1099_triplet:bottom|saa1099_noise:noise_gen|count[2]~DUPLICATE ;
+;   5.260 ;   0.000 ; FF ; CELL ; 1      ; FF_X16_Y10_N8      ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms1|bottom|noise_gen|count[2]~DUPLICATE|q                                                                                                      ;
+;   5.455 ;   0.195 ; FF ; IC   ; 2      ; LABCELL_X16_Y10_N6 ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms1|bottom|noise_gen|Add0~29|dataf                                                                                                             ;
+;   5.531 ;   0.076 ; FF ; CELL ; 2      ; LABCELL_X16_Y10_N6 ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms1|bottom|noise_gen|Add0~29|sumout                                                                                                            ;
+;   5.531 ;   0.000 ; FF ; IC   ; 1      ; FF_X16_Y10_N7      ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms1|bottom|noise_gen|count[2]|d                                                                                                                ;
+;   5.603 ;   0.072 ; FF ; CELL ; 1      ; FF_X16_Y10_N7      ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms1|saa1099_triplet:bottom|saa1099_noise:noise_gen|count[2]           ;
++---------+---------+----+------+--------+--------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
++-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Data Required Path                                                                                                                                                                                                                              ;
++---------+----------+----+------+--------+------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Total   ; Incr     ; RF ; Type ; Fanout ; Location         ; Element                                                                                                                                                                            ;
++---------+----------+----+------+--------+------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; 0.000   ; 0.000    ;    ;      ;        ;                  ; latch edge time                                                                                                                                                                    ;
+; 5.363   ; 5.363    ;    ;      ;        ;                  ; clock path                                                                                                                                                                         ;
+;   0.000 ;   0.000  ;    ;      ;        ;                  ; source latency                                                                                                                                                                     ;
+;   0.000 ;   0.000  ;    ;      ; 1      ; PIN_Y13          ; FPGA_CLK2_50                                                                                                                                                                       ;
+;   0.000 ;   0.000  ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|i                                                                                                                                                               ;
+;   0.792 ;   0.792  ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|o                                                                                                                                                               ;
+;   2.539 ;   1.747  ; RR ; IC   ; 1      ; CLKCTRL_G3       ; FPGA_CLK2_50~inputCLKENA0|inclk                                                                                                                                                    ;
+;   3.015 ;   0.476  ; RR ; CELL ; 20824  ; CLKCTRL_G3       ; FPGA_CLK2_50~inputCLKENA0|outclk                                                                                                                                                   ;
+;   5.483 ;   2.468  ; RR ; IC   ; 1      ; FF_X16_Y10_N7    ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms1|bottom|noise_gen|count[2]|clk                                                                                                    ;
+;   6.016 ;   0.533  ; RR ; CELL ; 1      ; FF_X16_Y10_N7    ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms1|saa1099_triplet:bottom|saa1099_noise:noise_gen|count[2] ;
+;   5.363 ;   -0.653 ;    ;      ;        ;                  ; clock pessimism removed                                                                                                                                                            ;
+; 5.363   ; 0.000    ;    ;      ;        ;                  ; clock uncertainty                                                                                                                                                                  ;
+; 5.363   ; 0.000    ;    ; uTh  ; 1      ; FF_X16_Y10_N7    ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms1|saa1099_triplet:bottom|saa1099_noise:noise_gen|count[2] ;
++---------+----------+----+------+--------+------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+----------------------------
+; Extra Fitter Information ;
+----------------------------
+HTML report is unavailable in plain text report export.
+
+
+Path #2: Hold slack is 0.241 
+===============================================================================
++-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Path Summary                                                                                                                                                                                                      ;
++--------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Property           ; Value                                                                                                                                                                                        ;
++--------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; From Node          ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:bottom|saa1099_noise:noise_gen|count[2]~DUPLICATE ;
+; To Node            ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:bottom|saa1099_noise:noise_gen|count[2]           ;
+; Launch Clock       ; FPGA_CLK2_50                                                                                                                                                                                 ;
+; Latch Clock        ; FPGA_CLK2_50                                                                                                                                                                                 ;
+; Data Arrival Time  ; 5.598                                                                                                                                                                                        ;
+; Data Required Time ; 5.357                                                                                                                                                                                        ;
+; Slack              ; 0.241                                                                                                                                                                                        ;
++--------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
++-----------------------------------------------------------------------------------+
+; Statistics                                                                        ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Property               ; Value ; Count ; Total Delay ; % of Total ; Min   ; Max   ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Hold Relationship      ; 0.000 ;       ;             ;            ;       ;       ;
+; Clock Skew             ; 0.097 ;       ;             ;            ;       ;       ;
+; Data Delay             ; 0.338 ;       ;             ;            ;       ;       ;
+; Number of Logic Levels ;       ; 1     ;             ;            ;       ;       ;
+; Physical Delays        ;       ;       ;             ;            ;       ;       ;
+;  Arrival Path          ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 3.557       ; 68         ; 0.000 ; 2.024 ;
+;    Cell                ;       ; 3     ; 1.703       ; 32         ; 0.452 ; 0.792 ;
+;   Data                 ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 2     ; 0.197       ; 58         ; 0.000 ; 0.197 ;
+;    Cell                ;       ; 3     ; 0.141       ; 42         ; 0.000 ; 0.076 ;
+;    uTco                ;       ; 1     ; 0.000       ; 0          ; 0.000 ; 0.000 ;
+;  Required Path         ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 4.219       ; 70         ; 0.000 ; 2.472 ;
+;    Cell                ;       ; 3     ; 1.795       ; 30         ; 0.476 ; 0.792 ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+Note: Negative delays are omitted from totals when calculating percentages
+
++------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Data Arrival Path                                                                                                                                                                                                                                          ;
++---------+---------+----+------+--------+--------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Total   ; Incr    ; RF ; Type ; Fanout ; Location           ; Element                                                                                                                                                                                      ;
++---------+---------+----+------+--------+--------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; 0.000   ; 0.000   ;    ;      ;        ;                    ; launch edge time                                                                                                                                                                             ;
+; 5.260   ; 5.260   ;    ;      ;        ;                    ; clock path                                                                                                                                                                                   ;
+;   0.000 ;   0.000 ;    ;      ;        ;                    ; source latency                                                                                                                                                                               ;
+;   0.000 ;   0.000 ;    ;      ; 1      ; PIN_Y13            ; FPGA_CLK2_50                                                                                                                                                                                 ;
+;   0.000 ;   0.000 ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1   ; FPGA_CLK2_50~input|i                                                                                                                                                                         ;
+;   0.792 ;   0.792 ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1   ; FPGA_CLK2_50~input|o                                                                                                                                                                         ;
+;   2.325 ;   1.533 ; RR ; IC   ; 1      ; CLKCTRL_G3         ; FPGA_CLK2_50~inputCLKENA0|inclk                                                                                                                                                              ;
+;   2.777 ;   0.452 ; RR ; CELL ; 20824  ; CLKCTRL_G3         ; FPGA_CLK2_50~inputCLKENA0|outclk                                                                                                                                                             ;
+;   4.801 ;   2.024 ; RR ; IC   ; 1      ; FF_X25_Y6_N8       ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms0|bottom|noise_gen|count[2]~DUPLICATE|clk                                                                                                    ;
+;   5.260 ;   0.459 ; RR ; CELL ; 1      ; FF_X25_Y6_N8       ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:bottom|saa1099_noise:noise_gen|count[2]~DUPLICATE ;
+; 5.598   ; 0.338   ;    ;      ;        ;                    ; data path                                                                                                                                                                                    ;
+;   5.260 ;   0.000 ;    ; uTco ; 1      ; FF_X25_Y6_N8       ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:bottom|saa1099_noise:noise_gen|count[2]~DUPLICATE ;
+;   5.260 ;   0.000 ; FF ; CELL ; 1      ; FF_X25_Y6_N8       ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms0|bottom|noise_gen|count[2]~DUPLICATE|q                                                                                                      ;
+;   5.457 ;   0.197 ; FF ; IC   ; 2      ; MLABCELL_X25_Y6_N6 ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms0|bottom|noise_gen|Add0~29|dataf                                                                                                             ;
+;   5.533 ;   0.076 ; FF ; CELL ; 2      ; MLABCELL_X25_Y6_N6 ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms0|bottom|noise_gen|Add0~29|sumout                                                                                                            ;
+;   5.533 ;   0.000 ; FF ; IC   ; 1      ; FF_X25_Y6_N7       ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms0|bottom|noise_gen|count[2]|d                                                                                                                ;
+;   5.598 ;   0.065 ; FF ; CELL ; 1      ; FF_X25_Y6_N7       ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:bottom|saa1099_noise:noise_gen|count[2]           ;
++---------+---------+----+------+--------+--------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
++-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Data Required Path                                                                                                                                                                                                                              ;
++---------+----------+----+------+--------+------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Total   ; Incr     ; RF ; Type ; Fanout ; Location         ; Element                                                                                                                                                                            ;
++---------+----------+----+------+--------+------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; 0.000   ; 0.000    ;    ;      ;        ;                  ; latch edge time                                                                                                                                                                    ;
+; 5.357   ; 5.357    ;    ;      ;        ;                  ; clock path                                                                                                                                                                         ;
+;   0.000 ;   0.000  ;    ;      ;        ;                  ; source latency                                                                                                                                                                     ;
+;   0.000 ;   0.000  ;    ;      ; 1      ; PIN_Y13          ; FPGA_CLK2_50                                                                                                                                                                       ;
+;   0.000 ;   0.000  ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|i                                                                                                                                                               ;
+;   0.792 ;   0.792  ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|o                                                                                                                                                               ;
+;   2.539 ;   1.747  ; RR ; IC   ; 1      ; CLKCTRL_G3       ; FPGA_CLK2_50~inputCLKENA0|inclk                                                                                                                                                    ;
+;   3.015 ;   0.476  ; RR ; CELL ; 20824  ; CLKCTRL_G3       ; FPGA_CLK2_50~inputCLKENA0|outclk                                                                                                                                                   ;
+;   5.487 ;   2.472  ; RR ; IC   ; 1      ; FF_X25_Y6_N7     ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms0|bottom|noise_gen|count[2]|clk                                                                                                    ;
+;   6.014 ;   0.527  ; RR ; CELL ; 1      ; FF_X25_Y6_N7     ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:bottom|saa1099_noise:noise_gen|count[2] ;
+;   5.357 ;   -0.657 ;    ;      ;        ;                  ; clock pessimism removed                                                                                                                                                            ;
+; 5.357   ; 0.000    ;    ;      ;        ;                  ; clock uncertainty                                                                                                                                                                  ;
+; 5.357   ; 0.000    ;    ; uTh  ; 1      ; FF_X25_Y6_N7     ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:bottom|saa1099_noise:noise_gen|count[2] ;
++---------+----------+----+------+--------+------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+----------------------------
+; Extra Fitter Information ;
+----------------------------
+HTML report is unavailable in plain text report export.
+
+
+Path #3: Hold slack is 0.242 
+===============================================================================
++-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Path Summary                                                                                                                                                                                                      ;
++--------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Property           ; Value                                                                                                                                                                                        ;
++--------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; From Node          ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:bottom|saa1099_noise:noise_gen|count[2]~DUPLICATE ;
+; To Node            ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:bottom|saa1099_noise:noise_gen|count[2]~DUPLICATE ;
+; Launch Clock       ; FPGA_CLK2_50                                                                                                                                                                                 ;
+; Latch Clock        ; FPGA_CLK2_50                                                                                                                                                                                 ;
+; Data Arrival Time  ; 5.598                                                                                                                                                                                        ;
+; Data Required Time ; 5.356                                                                                                                                                                                        ;
+; Slack              ; 0.242                                                                                                                                                                                        ;
++--------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
++-----------------------------------------------------------------------------------+
+; Statistics                                                                        ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Property               ; Value ; Count ; Total Delay ; % of Total ; Min   ; Max   ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Hold Relationship      ; 0.000 ;       ;             ;            ;       ;       ;
+; Clock Skew             ; 0.096 ;       ;             ;            ;       ;       ;
+; Data Delay             ; 0.338 ;       ;             ;            ;       ;       ;
+; Number of Logic Levels ;       ; 1     ;             ;            ;       ;       ;
+; Physical Delays        ;       ;       ;             ;            ;       ;       ;
+;  Arrival Path          ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 3.557       ; 68         ; 0.000 ; 2.024 ;
+;    Cell                ;       ; 3     ; 1.703       ; 32         ; 0.452 ; 0.792 ;
+;   Data                 ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 2     ; 0.197       ; 58         ; 0.000 ; 0.197 ;
+;    Cell                ;       ; 3     ; 0.141       ; 42         ; 0.000 ; 0.076 ;
+;    uTco                ;       ; 1     ; 0.000       ; 0          ; 0.000 ; 0.000 ;
+;  Required Path         ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 4.219       ; 70         ; 0.000 ; 2.472 ;
+;    Cell                ;       ; 3     ; 1.794       ; 30         ; 0.476 ; 0.792 ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+Note: Negative delays are omitted from totals when calculating percentages
+
++------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Data Arrival Path                                                                                                                                                                                                                                          ;
++---------+---------+----+------+--------+--------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Total   ; Incr    ; RF ; Type ; Fanout ; Location           ; Element                                                                                                                                                                                      ;
++---------+---------+----+------+--------+--------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; 0.000   ; 0.000   ;    ;      ;        ;                    ; launch edge time                                                                                                                                                                             ;
+; 5.260   ; 5.260   ;    ;      ;        ;                    ; clock path                                                                                                                                                                                   ;
+;   0.000 ;   0.000 ;    ;      ;        ;                    ; source latency                                                                                                                                                                               ;
+;   0.000 ;   0.000 ;    ;      ; 1      ; PIN_Y13            ; FPGA_CLK2_50                                                                                                                                                                                 ;
+;   0.000 ;   0.000 ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1   ; FPGA_CLK2_50~input|i                                                                                                                                                                         ;
+;   0.792 ;   0.792 ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1   ; FPGA_CLK2_50~input|o                                                                                                                                                                         ;
+;   2.325 ;   1.533 ; RR ; IC   ; 1      ; CLKCTRL_G3         ; FPGA_CLK2_50~inputCLKENA0|inclk                                                                                                                                                              ;
+;   2.777 ;   0.452 ; RR ; CELL ; 20824  ; CLKCTRL_G3         ; FPGA_CLK2_50~inputCLKENA0|outclk                                                                                                                                                             ;
+;   4.801 ;   2.024 ; RR ; IC   ; 1      ; FF_X25_Y6_N8       ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms0|bottom|noise_gen|count[2]~DUPLICATE|clk                                                                                                    ;
+;   5.260 ;   0.459 ; RR ; CELL ; 1      ; FF_X25_Y6_N8       ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:bottom|saa1099_noise:noise_gen|count[2]~DUPLICATE ;
+; 5.598   ; 0.338   ;    ;      ;        ;                    ; data path                                                                                                                                                                                    ;
+;   5.260 ;   0.000 ;    ; uTco ; 1      ; FF_X25_Y6_N8       ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:bottom|saa1099_noise:noise_gen|count[2]~DUPLICATE ;
+;   5.260 ;   0.000 ; FF ; CELL ; 1      ; FF_X25_Y6_N8       ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms0|bottom|noise_gen|count[2]~DUPLICATE|q                                                                                                      ;
+;   5.457 ;   0.197 ; FF ; IC   ; 2      ; MLABCELL_X25_Y6_N6 ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms0|bottom|noise_gen|Add0~29|dataf                                                                                                             ;
+;   5.533 ;   0.076 ; FF ; CELL ; 2      ; MLABCELL_X25_Y6_N6 ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms0|bottom|noise_gen|Add0~29|sumout                                                                                                            ;
+;   5.533 ;   0.000 ; FF ; IC   ; 1      ; FF_X25_Y6_N8       ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms0|bottom|noise_gen|count[2]~DUPLICATE|d                                                                                                      ;
+;   5.598 ;   0.065 ; FF ; CELL ; 1      ; FF_X25_Y6_N8       ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:bottom|saa1099_noise:noise_gen|count[2]~DUPLICATE ;
++---------+---------+----+------+--------+--------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
++-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Data Required Path                                                                                                                                                                                                                                        ;
++---------+----------+----+------+--------+------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Total   ; Incr     ; RF ; Type ; Fanout ; Location         ; Element                                                                                                                                                                                      ;
++---------+----------+----+------+--------+------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; 0.000   ; 0.000    ;    ;      ;        ;                  ; latch edge time                                                                                                                                                                              ;
+; 5.356   ; 5.356    ;    ;      ;        ;                  ; clock path                                                                                                                                                                                   ;
+;   0.000 ;   0.000  ;    ;      ;        ;                  ; source latency                                                                                                                                                                               ;
+;   0.000 ;   0.000  ;    ;      ; 1      ; PIN_Y13          ; FPGA_CLK2_50                                                                                                                                                                                 ;
+;   0.000 ;   0.000  ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|i                                                                                                                                                                         ;
+;   0.792 ;   0.792  ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|o                                                                                                                                                                         ;
+;   2.539 ;   1.747  ; RR ; IC   ; 1      ; CLKCTRL_G3       ; FPGA_CLK2_50~inputCLKENA0|inclk                                                                                                                                                              ;
+;   3.015 ;   0.476  ; RR ; CELL ; 20824  ; CLKCTRL_G3       ; FPGA_CLK2_50~inputCLKENA0|outclk                                                                                                                                                             ;
+;   5.487 ;   2.472  ; RR ; IC   ; 1      ; FF_X25_Y6_N8     ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms0|bottom|noise_gen|count[2]~DUPLICATE|clk                                                                                                    ;
+;   6.013 ;   0.526  ; RR ; CELL ; 1      ; FF_X25_Y6_N8     ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:bottom|saa1099_noise:noise_gen|count[2]~DUPLICATE ;
+;   5.356 ;   -0.657 ;    ;      ;        ;                  ; clock pessimism removed                                                                                                                                                                      ;
+; 5.356   ; 0.000    ;    ;      ;        ;                  ; clock uncertainty                                                                                                                                                                            ;
+; 5.356   ; 0.000    ;    ; uTh  ; 1      ; FF_X25_Y6_N8     ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:bottom|saa1099_noise:noise_gen|count[2]~DUPLICATE ;
++---------+----------+----+------+--------+------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+----------------------------
+; Extra Fitter Information ;
+----------------------------
+HTML report is unavailable in plain text report export.
+
+
+Path #4: Hold slack is 0.244 
+===============================================================================
++--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Path Summary                                                                                                                                                                                           ;
++--------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Property           ; Value                                                                                                                                                                             ;
++--------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; From Node          ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:bottom|saa1099_tone:freq_gen1|count[2] ;
+; To Node            ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:bottom|saa1099_tone:freq_gen1|count[2] ;
+; Launch Clock       ; FPGA_CLK2_50                                                                                                                                                                      ;
+; Latch Clock        ; FPGA_CLK2_50                                                                                                                                                                      ;
+; Data Arrival Time  ; 5.642                                                                                                                                                                             ;
+; Data Required Time ; 5.398                                                                                                                                                                             ;
+; Slack              ; 0.244                                                                                                                                                                             ;
++--------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
++-----------------------------------------------------------------------------------+
+; Statistics                                                                        ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Property               ; Value ; Count ; Total Delay ; % of Total ; Min   ; Max   ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Hold Relationship      ; 0.000 ;       ;             ;            ;       ;       ;
+; Clock Skew             ; 0.099 ;       ;             ;            ;       ;       ;
+; Data Delay             ; 0.343 ;       ;             ;            ;       ;       ;
+; Number of Logic Levels ;       ; 1     ;             ;            ;       ;       ;
+; Physical Delays        ;       ;       ;             ;            ;       ;       ;
+;  Arrival Path          ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 3.613       ; 68         ; 0.000 ; 2.080 ;
+;    Cell                ;       ; 3     ; 1.686       ; 32         ; 0.442 ; 0.792 ;
+;   Data                 ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 2     ; 0.196       ; 57         ; 0.000 ; 0.196 ;
+;    Cell                ;       ; 3     ; 0.147       ; 43         ; 0.000 ; 0.076 ;
+;    uTco                ;       ; 1     ; 0.000       ; 0          ; 0.000 ; 0.000 ;
+;  Required Path         ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 4.276       ; 71         ; 0.000 ; 2.529 ;
+;    Cell                ;       ; 3     ; 1.775       ; 29         ; 0.476 ; 0.792 ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+Note: Negative delays are omitted from totals when calculating percentages
+
++-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Data Arrival Path                                                                                                                                                                                                                               ;
++---------+---------+----+------+--------+--------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Total   ; Incr    ; RF ; Type ; Fanout ; Location           ; Element                                                                                                                                                                           ;
++---------+---------+----+------+--------+--------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; 0.000   ; 0.000   ;    ;      ;        ;                    ; launch edge time                                                                                                                                                                  ;
+; 5.299   ; 5.299   ;    ;      ;        ;                    ; clock path                                                                                                                                                                        ;
+;   0.000 ;   0.000 ;    ;      ;        ;                    ; source latency                                                                                                                                                                    ;
+;   0.000 ;   0.000 ;    ;      ; 1      ; PIN_Y13            ; FPGA_CLK2_50                                                                                                                                                                      ;
+;   0.000 ;   0.000 ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1   ; FPGA_CLK2_50~input|i                                                                                                                                                              ;
+;   0.792 ;   0.792 ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1   ; FPGA_CLK2_50~input|o                                                                                                                                                              ;
+;   2.325 ;   1.533 ; RR ; IC   ; 1      ; CLKCTRL_G3         ; FPGA_CLK2_50~inputCLKENA0|inclk                                                                                                                                                   ;
+;   2.777 ;   0.452 ; RR ; CELL ; 20824  ; CLKCTRL_G3         ; FPGA_CLK2_50~inputCLKENA0|outclk                                                                                                                                                  ;
+;   4.857 ;   2.080 ; RR ; IC   ; 1      ; FF_X11_Y11_N8      ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms0|bottom|freq_gen1|count[2]|clk                                                                                                   ;
+;   5.299 ;   0.442 ; RR ; CELL ; 1      ; FF_X11_Y11_N8      ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:bottom|saa1099_tone:freq_gen1|count[2] ;
+; 5.642   ; 0.343   ;    ;      ;        ;                    ; data path                                                                                                                                                                         ;
+;   5.299 ;   0.000 ;    ; uTco ; 1      ; FF_X11_Y11_N8      ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:bottom|saa1099_tone:freq_gen1|count[2] ;
+;   5.299 ;   0.000 ; FF ; CELL ; 2      ; FF_X11_Y11_N8      ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms0|bottom|freq_gen1|count[2]|q                                                                                                     ;
+;   5.495 ;   0.196 ; FF ; IC   ; 2      ; LABCELL_X11_Y11_N6 ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms0|bottom|freq_gen1|Add1~37|dataf                                                                                                  ;
+;   5.571 ;   0.076 ; FF ; CELL ; 1      ; LABCELL_X11_Y11_N6 ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms0|bottom|freq_gen1|Add1~37|sumout                                                                                                 ;
+;   5.571 ;   0.000 ; FF ; IC   ; 1      ; FF_X11_Y11_N8      ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms0|bottom|freq_gen1|count[2]|d                                                                                                     ;
+;   5.642 ;   0.071 ; FF ; CELL ; 1      ; FF_X11_Y11_N8      ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:bottom|saa1099_tone:freq_gen1|count[2] ;
++---------+---------+----+------+--------+--------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
++------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Data Required Path                                                                                                                                                                                                                             ;
++---------+----------+----+------+--------+------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Total   ; Incr     ; RF ; Type ; Fanout ; Location         ; Element                                                                                                                                                                           ;
++---------+----------+----+------+--------+------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; 0.000   ; 0.000    ;    ;      ;        ;                  ; latch edge time                                                                                                                                                                   ;
+; 5.398   ; 5.398    ;    ;      ;        ;                  ; clock path                                                                                                                                                                        ;
+;   0.000 ;   0.000  ;    ;      ;        ;                  ; source latency                                                                                                                                                                    ;
+;   0.000 ;   0.000  ;    ;      ; 1      ; PIN_Y13          ; FPGA_CLK2_50                                                                                                                                                                      ;
+;   0.000 ;   0.000  ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|i                                                                                                                                                              ;
+;   0.792 ;   0.792  ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|o                                                                                                                                                              ;
+;   2.539 ;   1.747  ; RR ; IC   ; 1      ; CLKCTRL_G3       ; FPGA_CLK2_50~inputCLKENA0|inclk                                                                                                                                                   ;
+;   3.015 ;   0.476  ; RR ; CELL ; 20824  ; CLKCTRL_G3       ; FPGA_CLK2_50~inputCLKENA0|outclk                                                                                                                                                  ;
+;   5.544 ;   2.529  ; RR ; IC   ; 1      ; FF_X11_Y11_N8    ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms0|bottom|freq_gen1|count[2]|clk                                                                                                   ;
+;   6.051 ;   0.507  ; RR ; CELL ; 1      ; FF_X11_Y11_N8    ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:bottom|saa1099_tone:freq_gen1|count[2] ;
+;   5.398 ;   -0.653 ;    ;      ;        ;                  ; clock pessimism removed                                                                                                                                                           ;
+; 5.398   ; 0.000    ;    ;      ;        ;                  ; clock uncertainty                                                                                                                                                                 ;
+; 5.398   ; 0.000    ;    ; uTh  ; 1      ; FF_X11_Y11_N8    ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:bottom|saa1099_tone:freq_gen1|count[2] ;
++---------+----------+----+------+--------+------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+----------------------------
+; Extra Fitter Information ;
+----------------------------
+HTML report is unavailable in plain text report export.
+
+
+Path #5: Hold slack is 0.245 
+===============================================================================
++-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Path Summary                                                                                                                                                                                        ;
++--------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Property           ; Value                                                                                                                                                                          ;
++--------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; From Node          ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms1|saa1099_triplet:top|saa1099_tone:freq_gen2|count[2] ;
+; To Node            ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms1|saa1099_triplet:top|saa1099_tone:freq_gen2|count[2] ;
+; Launch Clock       ; FPGA_CLK2_50                                                                                                                                                                   ;
+; Latch Clock        ; FPGA_CLK2_50                                                                                                                                                                   ;
+; Data Arrival Time  ; 5.595                                                                                                                                                                          ;
+; Data Required Time ; 5.350                                                                                                                                                                          ;
+; Slack              ; 0.245                                                                                                                                                                          ;
++--------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
++-----------------------------------------------------------------------------------+
+; Statistics                                                                        ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Property               ; Value ; Count ; Total Delay ; % of Total ; Min   ; Max   ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Hold Relationship      ; 0.000 ;       ;             ;            ;       ;       ;
+; Clock Skew             ; 0.097 ;       ;             ;            ;       ;       ;
+; Data Delay             ; 0.342 ;       ;             ;            ;       ;       ;
+; Number of Logic Levels ;       ; 1     ;             ;            ;       ;       ;
+; Physical Delays        ;       ;       ;             ;            ;       ;       ;
+;  Arrival Path          ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 3.557       ; 68         ; 0.000 ; 2.024 ;
+;    Cell                ;       ; 3     ; 1.696       ; 32         ; 0.452 ; 0.792 ;
+;   Data                 ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 2     ; 0.195       ; 57         ; 0.000 ; 0.195 ;
+;    Cell                ;       ; 3     ; 0.147       ; 43         ; 0.000 ; 0.076 ;
+;    uTco                ;       ; 1     ; 0.000       ; 0          ; 0.000 ; 0.000 ;
+;  Required Path         ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 4.216       ; 70         ; 0.000 ; 2.469 ;
+;    Cell                ;       ; 3     ; 1.787       ; 30         ; 0.476 ; 0.792 ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+Note: Negative delays are omitted from totals when calculating percentages
+
++----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Data Arrival Path                                                                                                                                                                                                                            ;
++---------+---------+----+------+--------+--------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Total   ; Incr    ; RF ; Type ; Fanout ; Location           ; Element                                                                                                                                                                        ;
++---------+---------+----+------+--------+--------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; 0.000   ; 0.000   ;    ;      ;        ;                    ; launch edge time                                                                                                                                                               ;
+; 5.253   ; 5.253   ;    ;      ;        ;                    ; clock path                                                                                                                                                                     ;
+;   0.000 ;   0.000 ;    ;      ;        ;                    ; source latency                                                                                                                                                                 ;
+;   0.000 ;   0.000 ;    ;      ; 1      ; PIN_Y13            ; FPGA_CLK2_50                                                                                                                                                                   ;
+;   0.000 ;   0.000 ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1   ; FPGA_CLK2_50~input|i                                                                                                                                                           ;
+;   0.792 ;   0.792 ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1   ; FPGA_CLK2_50~input|o                                                                                                                                                           ;
+;   2.325 ;   1.533 ; RR ; IC   ; 1      ; CLKCTRL_G3         ; FPGA_CLK2_50~inputCLKENA0|inclk                                                                                                                                                ;
+;   2.777 ;   0.452 ; RR ; CELL ; 20824  ; CLKCTRL_G3         ; FPGA_CLK2_50~inputCLKENA0|outclk                                                                                                                                               ;
+;   4.801 ;   2.024 ; RR ; IC   ; 1      ; FF_X17_Y11_N8      ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms1|top|freq_gen2|count[2]|clk                                                                                                   ;
+;   5.253 ;   0.452 ; RR ; CELL ; 1      ; FF_X17_Y11_N8      ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms1|saa1099_triplet:top|saa1099_tone:freq_gen2|count[2] ;
+; 5.595   ; 0.342   ;    ;      ;        ;                    ; data path                                                                                                                                                                      ;
+;   5.253 ;   0.000 ;    ; uTco ; 1      ; FF_X17_Y11_N8      ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms1|saa1099_triplet:top|saa1099_tone:freq_gen2|count[2] ;
+;   5.253 ;   0.000 ; FF ; CELL ; 2      ; FF_X17_Y11_N8      ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms1|top|freq_gen2|count[2]|q                                                                                                     ;
+;   5.448 ;   0.195 ; FF ; IC   ; 2      ; LABCELL_X17_Y11_N6 ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms1|top|freq_gen2|Add1~37|dataf                                                                                                  ;
+;   5.524 ;   0.076 ; FF ; CELL ; 1      ; LABCELL_X17_Y11_N6 ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms1|top|freq_gen2|Add1~37|sumout                                                                                                 ;
+;   5.524 ;   0.000 ; FF ; IC   ; 1      ; FF_X17_Y11_N8      ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms1|top|freq_gen2|count[2]|d                                                                                                     ;
+;   5.595 ;   0.071 ; FF ; CELL ; 1      ; FF_X17_Y11_N8      ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms1|saa1099_triplet:top|saa1099_tone:freq_gen2|count[2] ;
++---------+---------+----+------+--------+--------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
++---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Data Required Path                                                                                                                                                                                                                          ;
++---------+----------+----+------+--------+------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Total   ; Incr     ; RF ; Type ; Fanout ; Location         ; Element                                                                                                                                                                        ;
++---------+----------+----+------+--------+------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; 0.000   ; 0.000    ;    ;      ;        ;                  ; latch edge time                                                                                                                                                                ;
+; 5.350   ; 5.350    ;    ;      ;        ;                  ; clock path                                                                                                                                                                     ;
+;   0.000 ;   0.000  ;    ;      ;        ;                  ; source latency                                                                                                                                                                 ;
+;   0.000 ;   0.000  ;    ;      ; 1      ; PIN_Y13          ; FPGA_CLK2_50                                                                                                                                                                   ;
+;   0.000 ;   0.000  ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|i                                                                                                                                                           ;
+;   0.792 ;   0.792  ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|o                                                                                                                                                           ;
+;   2.539 ;   1.747  ; RR ; IC   ; 1      ; CLKCTRL_G3       ; FPGA_CLK2_50~inputCLKENA0|inclk                                                                                                                                                ;
+;   3.015 ;   0.476  ; RR ; CELL ; 20824  ; CLKCTRL_G3       ; FPGA_CLK2_50~inputCLKENA0|outclk                                                                                                                                               ;
+;   5.484 ;   2.469  ; RR ; IC   ; 1      ; FF_X17_Y11_N8    ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms1|top|freq_gen2|count[2]|clk                                                                                                   ;
+;   6.003 ;   0.519  ; RR ; CELL ; 1      ; FF_X17_Y11_N8    ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms1|saa1099_triplet:top|saa1099_tone:freq_gen2|count[2] ;
+;   5.350 ;   -0.653 ;    ;      ;        ;                  ; clock pessimism removed                                                                                                                                                        ;
+; 5.350   ; 0.000    ;    ;      ;        ;                  ; clock uncertainty                                                                                                                                                              ;
+; 5.350   ; 0.000    ;    ; uTh  ; 1      ; FF_X17_Y11_N8    ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms1|saa1099_triplet:top|saa1099_tone:freq_gen2|count[2] ;
++---------+----------+----+------+--------+------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+----------------------------
+; Extra Fitter Information ;
+----------------------------
+HTML report is unavailable in plain text report export.
+
+
+Path #6: Hold slack is 0.246 
+===============================================================================
++-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Path Summary                                                                                                                                                                                                      ;
++--------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Property           ; Value                                                                                                                                                                                        ;
++--------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; From Node          ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms1|saa1099_triplet:bottom|saa1099_noise:noise_gen|count[2]~DUPLICATE ;
+; To Node            ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms1|saa1099_triplet:bottom|saa1099_noise:noise_gen|count[2]~DUPLICATE ;
+; Launch Clock       ; FPGA_CLK2_50                                                                                                                                                                                 ;
+; Latch Clock        ; FPGA_CLK2_50                                                                                                                                                                                 ;
+; Data Arrival Time  ; 5.604                                                                                                                                                                                        ;
+; Data Required Time ; 5.358                                                                                                                                                                                        ;
+; Slack              ; 0.246                                                                                                                                                                                        ;
++--------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
++-----------------------------------------------------------------------------------+
+; Statistics                                                                        ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Property               ; Value ; Count ; Total Delay ; % of Total ; Min   ; Max   ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Hold Relationship      ; 0.000 ;       ;             ;            ;       ;       ;
+; Clock Skew             ; 0.098 ;       ;             ;            ;       ;       ;
+; Data Delay             ; 0.344 ;       ;             ;            ;       ;       ;
+; Number of Logic Levels ;       ; 1     ;             ;            ;       ;       ;
+; Physical Delays        ;       ;       ;             ;            ;       ;       ;
+;  Arrival Path          ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 3.556       ; 68         ; 0.000 ; 2.023 ;
+;    Cell                ;       ; 3     ; 1.704       ; 32         ; 0.452 ; 0.792 ;
+;   Data                 ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 2     ; 0.195       ; 57         ; 0.000 ; 0.195 ;
+;    Cell                ;       ; 3     ; 0.149       ; 43         ; 0.000 ; 0.076 ;
+;    uTco                ;       ; 1     ; 0.000       ; 0          ; 0.000 ; 0.000 ;
+;  Required Path         ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 4.215       ; 70         ; 0.000 ; 2.468 ;
+;    Cell                ;       ; 3     ; 1.796       ; 30         ; 0.476 ; 0.792 ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+Note: Negative delays are omitted from totals when calculating percentages
+
++------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Data Arrival Path                                                                                                                                                                                                                                          ;
++---------+---------+----+------+--------+--------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Total   ; Incr    ; RF ; Type ; Fanout ; Location           ; Element                                                                                                                                                                                      ;
++---------+---------+----+------+--------+--------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; 0.000   ; 0.000   ;    ;      ;        ;                    ; launch edge time                                                                                                                                                                             ;
+; 5.260   ; 5.260   ;    ;      ;        ;                    ; clock path                                                                                                                                                                                   ;
+;   0.000 ;   0.000 ;    ;      ;        ;                    ; source latency                                                                                                                                                                               ;
+;   0.000 ;   0.000 ;    ;      ; 1      ; PIN_Y13            ; FPGA_CLK2_50                                                                                                                                                                                 ;
+;   0.000 ;   0.000 ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1   ; FPGA_CLK2_50~input|i                                                                                                                                                                         ;
+;   0.792 ;   0.792 ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1   ; FPGA_CLK2_50~input|o                                                                                                                                                                         ;
+;   2.325 ;   1.533 ; RR ; IC   ; 1      ; CLKCTRL_G3         ; FPGA_CLK2_50~inputCLKENA0|inclk                                                                                                                                                              ;
+;   2.777 ;   0.452 ; RR ; CELL ; 20824  ; CLKCTRL_G3         ; FPGA_CLK2_50~inputCLKENA0|outclk                                                                                                                                                             ;
+;   4.800 ;   2.023 ; RR ; IC   ; 1      ; FF_X16_Y10_N8      ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms1|bottom|noise_gen|count[2]~DUPLICATE|clk                                                                                                    ;
+;   5.260 ;   0.460 ; RR ; CELL ; 1      ; FF_X16_Y10_N8      ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms1|saa1099_triplet:bottom|saa1099_noise:noise_gen|count[2]~DUPLICATE ;
+; 5.604   ; 0.344   ;    ;      ;        ;                    ; data path                                                                                                                                                                                    ;
+;   5.260 ;   0.000 ;    ; uTco ; 1      ; FF_X16_Y10_N8      ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms1|saa1099_triplet:bottom|saa1099_noise:noise_gen|count[2]~DUPLICATE ;
+;   5.260 ;   0.000 ; FF ; CELL ; 1      ; FF_X16_Y10_N8      ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms1|bottom|noise_gen|count[2]~DUPLICATE|q                                                                                                      ;
+;   5.455 ;   0.195 ; FF ; IC   ; 2      ; LABCELL_X16_Y10_N6 ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms1|bottom|noise_gen|Add0~29|dataf                                                                                                             ;
+;   5.531 ;   0.076 ; FF ; CELL ; 2      ; LABCELL_X16_Y10_N6 ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms1|bottom|noise_gen|Add0~29|sumout                                                                                                            ;
+;   5.531 ;   0.000 ; FF ; IC   ; 1      ; FF_X16_Y10_N8      ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms1|bottom|noise_gen|count[2]~DUPLICATE|d                                                                                                      ;
+;   5.604 ;   0.073 ; FF ; CELL ; 1      ; FF_X16_Y10_N8      ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms1|saa1099_triplet:bottom|saa1099_noise:noise_gen|count[2]~DUPLICATE ;
++---------+---------+----+------+--------+--------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
++-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Data Required Path                                                                                                                                                                                                                                        ;
++---------+----------+----+------+--------+------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Total   ; Incr     ; RF ; Type ; Fanout ; Location         ; Element                                                                                                                                                                                      ;
++---------+----------+----+------+--------+------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; 0.000   ; 0.000    ;    ;      ;        ;                  ; latch edge time                                                                                                                                                                              ;
+; 5.358   ; 5.358    ;    ;      ;        ;                  ; clock path                                                                                                                                                                                   ;
+;   0.000 ;   0.000  ;    ;      ;        ;                  ; source latency                                                                                                                                                                               ;
+;   0.000 ;   0.000  ;    ;      ; 1      ; PIN_Y13          ; FPGA_CLK2_50                                                                                                                                                                                 ;
+;   0.000 ;   0.000  ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|i                                                                                                                                                                         ;
+;   0.792 ;   0.792  ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|o                                                                                                                                                                         ;
+;   2.539 ;   1.747  ; RR ; IC   ; 1      ; CLKCTRL_G3       ; FPGA_CLK2_50~inputCLKENA0|inclk                                                                                                                                                              ;
+;   3.015 ;   0.476  ; RR ; CELL ; 20824  ; CLKCTRL_G3       ; FPGA_CLK2_50~inputCLKENA0|outclk                                                                                                                                                             ;
+;   5.483 ;   2.468  ; RR ; IC   ; 1      ; FF_X16_Y10_N8    ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms1|bottom|noise_gen|count[2]~DUPLICATE|clk                                                                                                    ;
+;   6.011 ;   0.528  ; RR ; CELL ; 1      ; FF_X16_Y10_N8    ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms1|saa1099_triplet:bottom|saa1099_noise:noise_gen|count[2]~DUPLICATE ;
+;   5.358 ;   -0.653 ;    ;      ;        ;                  ; clock pessimism removed                                                                                                                                                                      ;
+; 5.358   ; 0.000    ;    ;      ;        ;                  ; clock uncertainty                                                                                                                                                                            ;
+; 5.358   ; 0.000    ;    ; uTh  ; 1      ; FF_X16_Y10_N8    ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms1|saa1099_triplet:bottom|saa1099_noise:noise_gen|count[2]~DUPLICATE ;
++---------+----------+----+------+--------+------------------+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+----------------------------
+; Extra Fitter Information ;
+----------------------------
+HTML report is unavailable in plain text report export.
+
+
+Path #7: Hold slack is 0.247 
+===============================================================================
++-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Path Summary                                                                                                                                                                                        ;
++--------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Property           ; Value                                                                                                                                                                          ;
++--------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; From Node          ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:top|saa1099_tone:freq_gen1|count[2] ;
+; To Node            ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:top|saa1099_tone:freq_gen1|count[2] ;
+; Launch Clock       ; FPGA_CLK2_50                                                                                                                                                                   ;
+; Latch Clock        ; FPGA_CLK2_50                                                                                                                                                                   ;
+; Data Arrival Time  ; 5.612                                                                                                                                                                          ;
+; Data Required Time ; 5.365                                                                                                                                                                          ;
+; Slack              ; 0.247                                                                                                                                                                          ;
++--------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
++-----------------------------------------------------------------------------------+
+; Statistics                                                                        ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Property               ; Value ; Count ; Total Delay ; % of Total ; Min   ; Max   ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Hold Relationship      ; 0.000 ;       ;             ;            ;       ;       ;
+; Clock Skew             ; 0.096 ;       ;             ;            ;       ;       ;
+; Data Delay             ; 0.343 ;       ;             ;            ;       ;       ;
+; Number of Logic Levels ;       ; 1     ;             ;            ;       ;       ;
+; Physical Delays        ;       ;       ;             ;            ;       ;       ;
+;  Arrival Path          ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 3.573       ; 68         ; 0.000 ; 2.040 ;
+;    Cell                ;       ; 3     ; 1.696       ; 32         ; 0.452 ; 0.792 ;
+;   Data                 ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 2     ; 0.204       ; 59         ; 0.000 ; 0.204 ;
+;    Cell                ;       ; 3     ; 0.139       ; 41         ; 0.000 ; 0.076 ;
+;    uTco                ;       ; 1     ; 0.000       ; 0          ; 0.000 ; 0.000 ;
+;  Required Path         ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 4.235       ; 70         ; 0.000 ; 2.488 ;
+;    Cell                ;       ; 3     ; 1.786       ; 30         ; 0.476 ; 0.792 ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+Note: Negative delays are omitted from totals when calculating percentages
+
++-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Data Arrival Path                                                                                                                                                                                                                             ;
++---------+---------+----+------+--------+---------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Total   ; Incr    ; RF ; Type ; Fanout ; Location            ; Element                                                                                                                                                                        ;
++---------+---------+----+------+--------+---------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; 0.000   ; 0.000   ;    ;      ;        ;                     ; launch edge time                                                                                                                                                               ;
+; 5.269   ; 5.269   ;    ;      ;        ;                     ; clock path                                                                                                                                                                     ;
+;   0.000 ;   0.000 ;    ;      ;        ;                     ; source latency                                                                                                                                                                 ;
+;   0.000 ;   0.000 ;    ;      ; 1      ; PIN_Y13             ; FPGA_CLK2_50                                                                                                                                                                   ;
+;   0.000 ;   0.000 ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1    ; FPGA_CLK2_50~input|i                                                                                                                                                           ;
+;   0.792 ;   0.792 ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1    ; FPGA_CLK2_50~input|o                                                                                                                                                           ;
+;   2.325 ;   1.533 ; RR ; IC   ; 1      ; CLKCTRL_G3          ; FPGA_CLK2_50~inputCLKENA0|inclk                                                                                                                                                ;
+;   2.777 ;   0.452 ; RR ; CELL ; 20824  ; CLKCTRL_G3          ; FPGA_CLK2_50~inputCLKENA0|outclk                                                                                                                                               ;
+;   4.817 ;   2.040 ; RR ; IC   ; 1      ; FF_X25_Y10_N8       ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms0|top|freq_gen1|count[2]|clk                                                                                                   ;
+;   5.269 ;   0.452 ; RR ; CELL ; 1      ; FF_X25_Y10_N8       ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:top|saa1099_tone:freq_gen1|count[2] ;
+; 5.612   ; 0.343   ;    ;      ;        ;                     ; data path                                                                                                                                                                      ;
+;   5.269 ;   0.000 ;    ; uTco ; 1      ; FF_X25_Y10_N8       ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:top|saa1099_tone:freq_gen1|count[2] ;
+;   5.269 ;   0.000 ; FF ; CELL ; 2      ; FF_X25_Y10_N8       ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms0|top|freq_gen1|count[2]|q                                                                                                     ;
+;   5.473 ;   0.204 ; FF ; IC   ; 2      ; MLABCELL_X25_Y10_N6 ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms0|top|freq_gen1|Add1~37|dataf                                                                                                  ;
+;   5.549 ;   0.076 ; FF ; CELL ; 1      ; MLABCELL_X25_Y10_N6 ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms0|top|freq_gen1|Add1~37|sumout                                                                                                 ;
+;   5.549 ;   0.000 ; FF ; IC   ; 1      ; FF_X25_Y10_N8       ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms0|top|freq_gen1|count[2]|d                                                                                                     ;
+;   5.612 ;   0.063 ; FF ; CELL ; 1      ; FF_X25_Y10_N8       ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:top|saa1099_tone:freq_gen1|count[2] ;
++---------+---------+----+------+--------+---------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
++---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Data Required Path                                                                                                                                                                                                                          ;
++---------+----------+----+------+--------+------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Total   ; Incr     ; RF ; Type ; Fanout ; Location         ; Element                                                                                                                                                                        ;
++---------+----------+----+------+--------+------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; 0.000   ; 0.000    ;    ;      ;        ;                  ; latch edge time                                                                                                                                                                ;
+; 5.365   ; 5.365    ;    ;      ;        ;                  ; clock path                                                                                                                                                                     ;
+;   0.000 ;   0.000  ;    ;      ;        ;                  ; source latency                                                                                                                                                                 ;
+;   0.000 ;   0.000  ;    ;      ; 1      ; PIN_Y13          ; FPGA_CLK2_50                                                                                                                                                                   ;
+;   0.000 ;   0.000  ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|i                                                                                                                                                           ;
+;   0.792 ;   0.792  ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|o                                                                                                                                                           ;
+;   2.539 ;   1.747  ; RR ; IC   ; 1      ; CLKCTRL_G3       ; FPGA_CLK2_50~inputCLKENA0|inclk                                                                                                                                                ;
+;   3.015 ;   0.476  ; RR ; CELL ; 20824  ; CLKCTRL_G3       ; FPGA_CLK2_50~inputCLKENA0|outclk                                                                                                                                               ;
+;   5.503 ;   2.488  ; RR ; IC   ; 1      ; FF_X25_Y10_N8    ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms0|top|freq_gen1|count[2]|clk                                                                                                   ;
+;   6.021 ;   0.518  ; RR ; CELL ; 1      ; FF_X25_Y10_N8    ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:top|saa1099_tone:freq_gen1|count[2] ;
+;   5.365 ;   -0.656 ;    ;      ;        ;                  ; clock pessimism removed                                                                                                                                                        ;
+; 5.365   ; 0.000    ;    ;      ;        ;                  ; clock uncertainty                                                                                                                                                              ;
+; 5.365   ; 0.000    ;    ; uTh  ; 1      ; FF_X25_Y10_N8    ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:top|saa1099_tone:freq_gen1|count[2] ;
++---------+----------+----+------+--------+------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+----------------------------
+; Extra Fitter Information ;
+----------------------------
+HTML report is unavailable in plain text report export.
+
+
+Path #8: Hold slack is 0.247 
+===============================================================================
++------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Path Summary                                                                                                                                                                       ;
++--------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Property           ; Value                                                                                                                                                         ;
++--------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; From Node          ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_machine_cpu:u_cpu|spk286:cpu|spk286_micro_executor:micro_executor|spk286_muldiv:muldiv_service|product_q[22] ;
+; To Node            ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_machine_cpu:u_cpu|spk286:cpu|spk286_micro_executor:micro_executor|spk286_muldiv:muldiv_service|product_q[22] ;
+; Launch Clock       ; FPGA_CLK2_50                                                                                                                                                  ;
+; Latch Clock        ; FPGA_CLK2_50                                                                                                                                                  ;
+; Data Arrival Time  ; 5.610                                                                                                                                                         ;
+; Data Required Time ; 5.363                                                                                                                                                         ;
+; Slack              ; 0.247                                                                                                                                                         ;
++--------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
++-----------------------------------------------------------------------------------+
+; Statistics                                                                        ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Property               ; Value ; Count ; Total Delay ; % of Total ; Min   ; Max   ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Hold Relationship      ; 0.000 ;       ;             ;            ;       ;       ;
+; Clock Skew             ; 0.098 ;       ;             ;            ;       ;       ;
+; Data Delay             ; 0.345 ;       ;             ;            ;       ;       ;
+; Number of Logic Levels ;       ; 1     ;             ;            ;       ;       ;
+; Physical Delays        ;       ;       ;             ;            ;       ;       ;
+;  Arrival Path          ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 3.569       ; 68         ; 0.000 ; 2.036 ;
+;    Cell                ;       ; 3     ; 1.696       ; 32         ; 0.452 ; 0.792 ;
+;   Data                 ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 2     ; 0.201       ; 58         ; 0.000 ; 0.201 ;
+;    Cell                ;       ; 3     ; 0.144       ; 42         ; 0.000 ; 0.079 ;
+;    uTco                ;       ; 1     ; 0.000       ; 0          ; 0.000 ; 0.000 ;
+;  Required Path         ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 4.223       ; 70         ; 0.000 ; 2.476 ;
+;    Cell                ;       ; 3     ; 1.786       ; 30         ; 0.476 ; 0.792 ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+Note: Negative delays are omitted from totals when calculating percentages
+
++-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Data Arrival Path                                                                                                                                                                                                           ;
++---------+---------+----+------+--------+--------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Total   ; Incr    ; RF ; Type ; Fanout ; Location           ; Element                                                                                                                                                       ;
++---------+---------+----+------+--------+--------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; 0.000   ; 0.000   ;    ;      ;        ;                    ; launch edge time                                                                                                                                              ;
+; 5.265   ; 5.265   ;    ;      ;        ;                    ; clock path                                                                                                                                                    ;
+;   0.000 ;   0.000 ;    ;      ;        ;                    ; source latency                                                                                                                                                ;
+;   0.000 ;   0.000 ;    ;      ; 1      ; PIN_Y13            ; FPGA_CLK2_50                                                                                                                                                  ;
+;   0.000 ;   0.000 ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1   ; FPGA_CLK2_50~input|i                                                                                                                                          ;
+;   0.792 ;   0.792 ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1   ; FPGA_CLK2_50~input|o                                                                                                                                          ;
+;   2.325 ;   1.533 ; RR ; IC   ; 1      ; CLKCTRL_G3         ; FPGA_CLK2_50~inputCLKENA0|inclk                                                                                                                               ;
+;   2.777 ;   0.452 ; RR ; CELL ; 20824  ; CLKCTRL_G3         ; FPGA_CLK2_50~inputCLKENA0|outclk                                                                                                                              ;
+;   4.813 ;   2.036 ; RR ; IC   ; 1      ; FF_X87_Y9_N8       ; emu|u_at_machine|u_cpu|cpu|micro_executor|muldiv_service|product_q[22]|clk                                                                                    ;
+;   5.265 ;   0.452 ; RR ; CELL ; 1      ; FF_X87_Y9_N8       ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_machine_cpu:u_cpu|spk286:cpu|spk286_micro_executor:micro_executor|spk286_muldiv:muldiv_service|product_q[22] ;
+; 5.610   ; 0.345   ;    ;      ;        ;                    ; data path                                                                                                                                                     ;
+;   5.265 ;   0.000 ;    ; uTco ; 1      ; FF_X87_Y9_N8       ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_machine_cpu:u_cpu|spk286:cpu|spk286_micro_executor:micro_executor|spk286_muldiv:muldiv_service|product_q[22] ;
+;   5.265 ;   0.000 ; FF ; CELL ; 1      ; FF_X87_Y9_N8       ; emu|u_at_machine|u_cpu|cpu|micro_executor|muldiv_service|product_q[22]|q                                                                                      ;
+;   5.466 ;   0.201 ; FF ; IC   ; 2      ; MLABCELL_X87_Y9_N6 ; emu|u_at_machine|u_cpu|cpu|micro_executor|muldiv_service|Add8~37|dataf                                                                                        ;
+;   5.545 ;   0.079 ; FF ; CELL ; 3      ; MLABCELL_X87_Y9_N6 ; emu|u_at_machine|u_cpu|cpu|micro_executor|muldiv_service|Add8~37|sumout                                                                                       ;
+;   5.545 ;   0.000 ; FF ; IC   ; 1      ; FF_X87_Y9_N8       ; emu|u_at_machine|u_cpu|cpu|micro_executor|muldiv_service|product_q[22]|d                                                                                      ;
+;   5.610 ;   0.065 ; FF ; CELL ; 1      ; FF_X87_Y9_N8       ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_machine_cpu:u_cpu|spk286:cpu|spk286_micro_executor:micro_executor|spk286_muldiv:muldiv_service|product_q[22] ;
++---------+---------+----+------+--------+--------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
++----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Data Required Path                                                                                                                                                                                                         ;
++---------+----------+----+------+--------+------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Total   ; Incr     ; RF ; Type ; Fanout ; Location         ; Element                                                                                                                                                       ;
++---------+----------+----+------+--------+------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; 0.000   ; 0.000    ;    ;      ;        ;                  ; latch edge time                                                                                                                                               ;
+; 5.363   ; 5.363    ;    ;      ;        ;                  ; clock path                                                                                                                                                    ;
+;   0.000 ;   0.000  ;    ;      ;        ;                  ; source latency                                                                                                                                                ;
+;   0.000 ;   0.000  ;    ;      ; 1      ; PIN_Y13          ; FPGA_CLK2_50                                                                                                                                                  ;
+;   0.000 ;   0.000  ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|i                                                                                                                                          ;
+;   0.792 ;   0.792  ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|o                                                                                                                                          ;
+;   2.539 ;   1.747  ; RR ; IC   ; 1      ; CLKCTRL_G3       ; FPGA_CLK2_50~inputCLKENA0|inclk                                                                                                                               ;
+;   3.015 ;   0.476  ; RR ; CELL ; 20824  ; CLKCTRL_G3       ; FPGA_CLK2_50~inputCLKENA0|outclk                                                                                                                              ;
+;   5.491 ;   2.476  ; RR ; IC   ; 1      ; FF_X87_Y9_N8     ; emu|u_at_machine|u_cpu|cpu|micro_executor|muldiv_service|product_q[22]|clk                                                                                    ;
+;   6.009 ;   0.518  ; RR ; CELL ; 1      ; FF_X87_Y9_N8     ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_machine_cpu:u_cpu|spk286:cpu|spk286_micro_executor:micro_executor|spk286_muldiv:muldiv_service|product_q[22] ;
+;   5.363 ;   -0.646 ;    ;      ;        ;                  ; clock pessimism removed                                                                                                                                       ;
+; 5.363   ; 0.000    ;    ;      ;        ;                  ; clock uncertainty                                                                                                                                             ;
+; 5.363   ; 0.000    ;    ; uTh  ; 1      ; FF_X87_Y9_N8     ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_machine_cpu:u_cpu|spk286:cpu|spk286_micro_executor:micro_executor|spk286_muldiv:muldiv_service|product_q[22] ;
++---------+----------+----+------+--------+------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+----------------------------
+; Extra Fitter Information ;
+----------------------------
+HTML report is unavailable in plain text report export.
+
+
+Path #9: Hold slack is 0.248 
+===============================================================================
++----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Path Summary                                                                                                                                                                                             ;
++--------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Property           ; Value                                                                                                                                                                               ;
++--------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; From Node          ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:bottom|saa1099_noise:noise_gen|count[10] ;
+; To Node            ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:bottom|saa1099_noise:noise_gen|count[10] ;
+; Launch Clock       ; FPGA_CLK2_50                                                                                                                                                                        ;
+; Latch Clock        ; FPGA_CLK2_50                                                                                                                                                                        ;
+; Data Arrival Time  ; 5.604                                                                                                                                                                               ;
+; Data Required Time ; 5.356                                                                                                                                                                               ;
+; Slack              ; 0.248                                                                                                                                                                               ;
++--------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
++-----------------------------------------------------------------------------------+
+; Statistics                                                                        ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Property               ; Value ; Count ; Total Delay ; % of Total ; Min   ; Max   ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Hold Relationship      ; 0.000 ;       ;             ;            ;       ;       ;
+; Clock Skew             ; 0.096 ;       ;             ;            ;       ;       ;
+; Data Delay             ; 0.344 ;       ;             ;            ;       ;       ;
+; Number of Logic Levels ;       ; 1     ;             ;            ;       ;       ;
+; Physical Delays        ;       ;       ;             ;            ;       ;       ;
+;  Arrival Path          ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 3.557       ; 68         ; 0.000 ; 2.024 ;
+;    Cell                ;       ; 3     ; 1.703       ; 32         ; 0.452 ; 0.792 ;
+;   Data                 ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 2     ; 0.205       ; 60         ; 0.000 ; 0.205 ;
+;    Cell                ;       ; 3     ; 0.139       ; 40         ; 0.000 ; 0.076 ;
+;    uTco                ;       ; 1     ; 0.000       ; 0          ; 0.000 ; 0.000 ;
+;  Required Path         ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 4.219       ; 70         ; 0.000 ; 2.472 ;
+;    Cell                ;       ; 3     ; 1.794       ; 30         ; 0.476 ; 0.792 ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+Note: Negative delays are omitted from totals when calculating percentages
+
++----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Data Arrival Path                                                                                                                                                                                                                                  ;
++---------+---------+----+------+--------+---------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Total   ; Incr    ; RF ; Type ; Fanout ; Location            ; Element                                                                                                                                                                             ;
++---------+---------+----+------+--------+---------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; 0.000   ; 0.000   ;    ;      ;        ;                     ; launch edge time                                                                                                                                                                    ;
+; 5.260   ; 5.260   ;    ;      ;        ;                     ; clock path                                                                                                                                                                          ;
+;   0.000 ;   0.000 ;    ;      ;        ;                     ; source latency                                                                                                                                                                      ;
+;   0.000 ;   0.000 ;    ;      ; 1      ; PIN_Y13             ; FPGA_CLK2_50                                                                                                                                                                        ;
+;   0.000 ;   0.000 ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1    ; FPGA_CLK2_50~input|i                                                                                                                                                                ;
+;   0.792 ;   0.792 ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1    ; FPGA_CLK2_50~input|o                                                                                                                                                                ;
+;   2.325 ;   1.533 ; RR ; IC   ; 1      ; CLKCTRL_G3          ; FPGA_CLK2_50~inputCLKENA0|inclk                                                                                                                                                     ;
+;   2.777 ;   0.452 ; RR ; CELL ; 20824  ; CLKCTRL_G3          ; FPGA_CLK2_50~inputCLKENA0|outclk                                                                                                                                                    ;
+;   4.801 ;   2.024 ; RR ; IC   ; 1      ; FF_X25_Y6_N32       ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms0|bottom|noise_gen|count[10]|clk                                                                                                    ;
+;   5.260 ;   0.459 ; RR ; CELL ; 1      ; FF_X25_Y6_N32       ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:bottom|saa1099_noise:noise_gen|count[10] ;
+; 5.604   ; 0.344   ;    ;      ;        ;                     ; data path                                                                                                                                                                           ;
+;   5.260 ;   0.000 ;    ; uTco ; 1      ; FF_X25_Y6_N32       ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:bottom|saa1099_noise:noise_gen|count[10] ;
+;   5.260 ;   0.000 ; FF ; CELL ; 2      ; FF_X25_Y6_N32       ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms0|bottom|noise_gen|count[10]|q                                                                                                      ;
+;   5.465 ;   0.205 ; FF ; IC   ; 1      ; MLABCELL_X25_Y6_N30 ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms0|bottom|noise_gen|Add0~9|dataf                                                                                                     ;
+;   5.541 ;   0.076 ; FF ; CELL ; 1      ; MLABCELL_X25_Y6_N30 ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms0|bottom|noise_gen|Add0~9|sumout                                                                                                    ;
+;   5.541 ;   0.000 ; FF ; IC   ; 1      ; FF_X25_Y6_N32       ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms0|bottom|noise_gen|count[10]|d                                                                                                      ;
+;   5.604 ;   0.063 ; FF ; CELL ; 1      ; FF_X25_Y6_N32       ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:bottom|saa1099_noise:noise_gen|count[10] ;
++---------+---------+----+------+--------+---------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
++--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Data Required Path                                                                                                                                                                                                                               ;
++---------+----------+----+------+--------+------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Total   ; Incr     ; RF ; Type ; Fanout ; Location         ; Element                                                                                                                                                                             ;
++---------+----------+----+------+--------+------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; 0.000   ; 0.000    ;    ;      ;        ;                  ; latch edge time                                                                                                                                                                     ;
+; 5.356   ; 5.356    ;    ;      ;        ;                  ; clock path                                                                                                                                                                          ;
+;   0.000 ;   0.000  ;    ;      ;        ;                  ; source latency                                                                                                                                                                      ;
+;   0.000 ;   0.000  ;    ;      ; 1      ; PIN_Y13          ; FPGA_CLK2_50                                                                                                                                                                        ;
+;   0.000 ;   0.000  ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|i                                                                                                                                                                ;
+;   0.792 ;   0.792  ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|o                                                                                                                                                                ;
+;   2.539 ;   1.747  ; RR ; IC   ; 1      ; CLKCTRL_G3       ; FPGA_CLK2_50~inputCLKENA0|inclk                                                                                                                                                     ;
+;   3.015 ;   0.476  ; RR ; CELL ; 20824  ; CLKCTRL_G3       ; FPGA_CLK2_50~inputCLKENA0|outclk                                                                                                                                                    ;
+;   5.487 ;   2.472  ; RR ; IC   ; 1      ; FF_X25_Y6_N32    ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms0|bottom|noise_gen|count[10]|clk                                                                                                    ;
+;   6.013 ;   0.526  ; RR ; CELL ; 1      ; FF_X25_Y6_N32    ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:bottom|saa1099_noise:noise_gen|count[10] ;
+;   5.356 ;   -0.657 ;    ;      ;        ;                  ; clock pessimism removed                                                                                                                                                             ;
+; 5.356   ; 0.000    ;    ;      ;        ;                  ; clock uncertainty                                                                                                                                                                   ;
+; 5.356   ; 0.000    ;    ; uTh  ; 1      ; FF_X25_Y6_N32    ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:bottom|saa1099_noise:noise_gen|count[10] ;
++---------+----------+----+------+--------+------------------+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+----------------------------
+; Extra Fitter Information ;
+----------------------------
+HTML report is unavailable in plain text report export.
+
+
+Path #10: Hold slack is 0.250 
+===============================================================================
++------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Path Summary                                                                                                                                                                                         ;
++--------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Property           ; Value                                                                                                                                                                           ;
++--------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; From Node          ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:top|saa1099_noise:noise_gen|count[4] ;
+; To Node            ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:top|saa1099_noise:noise_gen|count[4] ;
+; Launch Clock       ; FPGA_CLK2_50                                                                                                                                                                    ;
+; Latch Clock        ; FPGA_CLK2_50                                                                                                                                                                    ;
+; Data Arrival Time  ; 5.626                                                                                                                                                                           ;
+; Data Required Time ; 5.376                                                                                                                                                                           ;
+; Slack              ; 0.250                                                                                                                                                                           ;
++--------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
++-----------------------------------------------------------------------------------+
+; Statistics                                                                        ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Property               ; Value ; Count ; Total Delay ; % of Total ; Min   ; Max   ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Hold Relationship      ; 0.000 ;       ;             ;            ;       ;       ;
+; Clock Skew             ; 0.099 ;       ;             ;            ;       ;       ;
+; Data Delay             ; 0.349 ;       ;             ;            ;       ;       ;
+; Number of Logic Levels ;       ; 1     ;             ;            ;       ;       ;
+; Physical Delays        ;       ;       ;             ;            ;       ;       ;
+;  Arrival Path          ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 3.573       ; 68         ; 0.000 ; 2.040 ;
+;    Cell                ;       ; 3     ; 1.704       ; 32         ; 0.452 ; 0.792 ;
+;   Data                 ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 2     ; 0.202       ; 58         ; 0.000 ; 0.202 ;
+;    Cell                ;       ; 3     ; 0.147       ; 42         ; 0.000 ; 0.076 ;
+;    uTco                ;       ; 1     ; 0.000       ; 0          ; 0.000 ; 0.000 ;
+;  Required Path         ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 4.236       ; 70         ; 0.000 ; 2.489 ;
+;    Cell                ;       ; 3     ; 1.796       ; 30         ; 0.476 ; 0.792 ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+Note: Negative delays are omitted from totals when calculating percentages
+
++-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Data Arrival Path                                                                                                                                                                                                                             ;
++---------+---------+----+------+--------+--------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Total   ; Incr    ; RF ; Type ; Fanout ; Location           ; Element                                                                                                                                                                         ;
++---------+---------+----+------+--------+--------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; 0.000   ; 0.000   ;    ;      ;        ;                    ; launch edge time                                                                                                                                                                ;
+; 5.277   ; 5.277   ;    ;      ;        ;                    ; clock path                                                                                                                                                                      ;
+;   0.000 ;   0.000 ;    ;      ;        ;                    ; source latency                                                                                                                                                                  ;
+;   0.000 ;   0.000 ;    ;      ; 1      ; PIN_Y13            ; FPGA_CLK2_50                                                                                                                                                                    ;
+;   0.000 ;   0.000 ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1   ; FPGA_CLK2_50~input|i                                                                                                                                                            ;
+;   0.792 ;   0.792 ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1   ; FPGA_CLK2_50~input|o                                                                                                                                                            ;
+;   2.325 ;   1.533 ; RR ; IC   ; 1      ; CLKCTRL_G3         ; FPGA_CLK2_50~inputCLKENA0|inclk                                                                                                                                                 ;
+;   2.777 ;   0.452 ; RR ; CELL ; 20824  ; CLKCTRL_G3         ; FPGA_CLK2_50~inputCLKENA0|outclk                                                                                                                                                ;
+;   4.817 ;   2.040 ; RR ; IC   ; 1      ; FF_X27_Y5_N14      ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms0|top|noise_gen|count[4]|clk                                                                                                    ;
+;   5.277 ;   0.460 ; RR ; CELL ; 1      ; FF_X27_Y5_N14      ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:top|saa1099_noise:noise_gen|count[4] ;
+; 5.626   ; 0.349   ;    ;      ;        ;                    ; data path                                                                                                                                                                       ;
+;   5.277 ;   0.000 ;    ; uTco ; 1      ; FF_X27_Y5_N14      ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:top|saa1099_noise:noise_gen|count[4] ;
+;   5.277 ;   0.000 ; FF ; CELL ; 2      ; FF_X27_Y5_N14      ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms0|top|noise_gen|count[4]|q                                                                                                      ;
+;   5.479 ;   0.202 ; FF ; IC   ; 2      ; LABCELL_X27_Y5_N12 ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms0|top|noise_gen|Add0~37|dataf                                                                                                   ;
+;   5.555 ;   0.076 ; FF ; CELL ; 1      ; LABCELL_X27_Y5_N12 ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms0|top|noise_gen|Add0~37|sumout                                                                                                  ;
+;   5.555 ;   0.000 ; FF ; IC   ; 1      ; FF_X27_Y5_N14      ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms0|top|noise_gen|count[4]|d                                                                                                      ;
+;   5.626 ;   0.071 ; FF ; CELL ; 1      ; FF_X27_Y5_N14      ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:top|saa1099_noise:noise_gen|count[4] ;
++---------+---------+----+------+--------+--------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
++----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Data Required Path                                                                                                                                                                                                                           ;
++---------+----------+----+------+--------+------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Total   ; Incr     ; RF ; Type ; Fanout ; Location         ; Element                                                                                                                                                                         ;
++---------+----------+----+------+--------+------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; 0.000   ; 0.000    ;    ;      ;        ;                  ; latch edge time                                                                                                                                                                 ;
+; 5.376   ; 5.376    ;    ;      ;        ;                  ; clock path                                                                                                                                                                      ;
+;   0.000 ;   0.000  ;    ;      ;        ;                  ; source latency                                                                                                                                                                  ;
+;   0.000 ;   0.000  ;    ;      ; 1      ; PIN_Y13          ; FPGA_CLK2_50                                                                                                                                                                    ;
+;   0.000 ;   0.000  ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|i                                                                                                                                                            ;
+;   0.792 ;   0.792  ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|o                                                                                                                                                            ;
+;   2.539 ;   1.747  ; RR ; IC   ; 1      ; CLKCTRL_G3       ; FPGA_CLK2_50~inputCLKENA0|inclk                                                                                                                                                 ;
+;   3.015 ;   0.476  ; RR ; CELL ; 20824  ; CLKCTRL_G3       ; FPGA_CLK2_50~inputCLKENA0|outclk                                                                                                                                                ;
+;   5.504 ;   2.489  ; RR ; IC   ; 1      ; FF_X27_Y5_N14    ; emu|u_at_machine|u_devices|u_sound|GEN_CMS.u_cms0|top|noise_gen|count[4]|clk                                                                                                    ;
+;   6.032 ;   0.528  ; RR ; CELL ; 1      ; FF_X27_Y5_N14    ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:top|saa1099_noise:noise_gen|count[4] ;
+;   5.376 ;   -0.656 ;    ;      ;        ;                  ; clock pessimism removed                                                                                                                                                         ;
+; 5.376   ; 0.000    ;    ;      ;        ;                  ; clock uncertainty                                                                                                                                                               ;
+; 5.376   ; 0.000    ;    ; uTh  ; 1      ; FF_X27_Y5_N14    ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_sound:u_sound|saa1099:GEN_CMS.u_cms0|saa1099_triplet:top|saa1099_noise:noise_gen|count[4] ;
++---------+----------+----+------+--------+------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+----------------------------
+; Extra Fitter Information ;
+----------------------------
+HTML report is unavailable in plain text report export.
+
+

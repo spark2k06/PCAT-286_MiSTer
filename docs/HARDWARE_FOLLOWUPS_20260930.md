@@ -106,8 +106,21 @@ those kernels after entry overlap, requiring an explicit posting/coherence/
 drain specification rather than assuming that ideal service is implementable.
 Open-row SDRAM is another unmeasured possibility; bounded write-address
 locality is not controller row-hit evidence. CPU RTL/options, cache capacity
-and SDRAM timings/refresh are unchanged. Fitted resource cost, setup/hold and
-MiSTer acceptance remain pending. No full regression or new RBF is claimed yet.
+and SDRAM timings/refresh are unchanged. The subsequent user build and MiSTer
+screenshots give **5666 / 106.7K**, agreeing between CheckIT and CHECKNUM:
+**+10.25% / +9.89%** over the hardware P16 observation. Fitted total is 30,832
+equivalent ALMs (74%), 36,191 placed ALMs (86.35%), 38,198 registers and 416
+M10Ks. Bridge/port local cost is +13.8 equivalent ALMs with no additional RAM;
+global logic/placement counts fall by 220/251, partly through changed packing.
+CPU setup remains negative at **-0.979 / -0.958 ns** in the slow corners
+(reported minimum Fmax **47.67 MHz**), with positive hold in all four models.
+The worst setup path is unchanged CPU prefetch -> event error-code decode,
+with 20 logic levels; cache reset/admission controls also have setup violations.
+Video hold reaches -0.074 ns and HDMI PLL source setup -0.034 ns. The hardware
+gain supports retaining P17, but does not establish 50 MHz closure or broad
+compatibility. User reports, screenshot provenance and a private fitted-path
+extraction are preserved in P17; no new synthesis or full regression was run
+for this analysis.
 
 Added 2026-10-01. Status: numeric reference accepted; directed memory-path
 attribution and a coherent 1 KiB RAM-read buffer implemented and checked;

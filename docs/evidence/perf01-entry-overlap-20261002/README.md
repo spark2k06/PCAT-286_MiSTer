@@ -1,9 +1,10 @@
 # PERF01 entry-overlap review evidence
 
 The [P17 review](../../optimization/P17_MEMORY_PATH_THROUGHPUT_REVIEW_20261002.md)
-records a private bridge/port entry-overlap prototype and larger write-path
-opportunities. Production RTL, CPU options, cache capacities and SDRAM timing
-remain unchanged. No FPGA fit or hardware result is claimed.
+records the private bridge/port entry-overlap prototype, its production adoption,
+and larger write-path opportunities. Production now includes entry overlap;
+CPU options, cache capacities and SDRAM timing remain unchanged. The latest
+user fit and MiSTer throughput observation are retained separately below.
 
 ## Evidence
 
@@ -45,6 +46,25 @@ remain unchanged. No FPGA fit or hardware result is claimed.
   Initial fixture failures and the invalid near-Jcc ROM control are retained
   alongside their explanation in `promotion/retained-files.json`. No full
   regression or hardware acceptance is inferred from these checks.
+- `hardware/`: user CheckIT and CHECKNUM screenshots both report **5666 /
+  106.7K**, +10.25% / +9.89% against the prior hardware observation. The JSON
+  receipt records original paths, hashes, single-observation scope and the
+  absence of independent loaded-RBF/OSD attestation. This is a hardware
+  throughput observation, not a broad compatibility or timing-closure receipt.
+- `fitted-user/`: byte-preserved user STA report, fit/map/STA summaries and
+  flow report, extracted resource/entity comparison, RBF identity, pre-build
+  source freeze, fitted snapshot manifest and bounded TimeQuest path reports.
+  The source freeze matches 1206 current files; only bridge/port production
+  inputs differ from P16. Total equivalent/placed ALMs are 30,832 / 36,191,
+  with 416 M10Ks unchanged. CPU setup reaches -0.979 ns, hold stays positive;
+  video hold and HDMI PLL setup also contain negative entries. No synthesis,
+  fitting or regression was performed for this review. `path-verification.json`
+  records TimeQuest's private `.cmp.rdb` regeneration and confirms all original
+  build artifacts and all sources remain unchanged. Original reports determine
+  all-clock margins; custom MIN_fast internal path reports have a narrower scope.
+  Analysis helpers retain their original `build/` paths for reproduction.
+  Each new group has its own `retained-files.json` byte inventory; the initial
+  inventory is a historical receipt and is not rewritten to cover these groups.
 
 The kernel named `whetstone` is fixed point, unlike real CHECKNUM software
 floating point. Its code-hit/miss latency labels assume asynchronous tags;

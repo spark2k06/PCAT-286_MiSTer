@@ -285,9 +285,18 @@ module spk286_micro_executor #(parameter bit USE_PARALLEL_SYSTEM_LIMIT = 1'b0) (
     assign decrement_frame_address = allowed && operation == spk286_microcode_pkg::MC_DECREMENT_STACK_ADDRESS && frame_address_valid_q;
     assign allocate_stack = allowed && operation == spk286_microcode_pkg::MC_ALLOCATE_STACK && allocation_valid_q && stack_cursor_valid_q;
     assign set_ea_plus2 = allowed && operation == spk286_microcode_pkg::MC_SET_EA_PLUS2;
+    // Finish the independent arithmetic before the late operation selector.
+    // Keep these combinational boundaries to prevent an arithmetic-sharing
+    // rewrite from moving the selector back into the carry path.
+    (* keep *) logic [15:0] call_parameter_write_offset;
+    (* keep *) logic [15:0] iret_parameter_bytes;
+    (* keep *) logic [15:0] iret_outer_stack_offset;
+    assign call_parameter_write_offset = stack_cursor_q - 16'd2;
+    assign iret_parameter_bytes = allocation_valid_q ? allocation_q : 16'd0;
+    assign iret_outer_stack_offset = return_stack_pointer + iret_parameter_bytes;
     assign stack_offset = call_parameter_read ? call_parameter_source_sp_q :
-                          call_parameter_write ? (stack_cursor_q - 16'd2) :
-                          iret_outer_pop ? (return_stack_pointer + (allocation_valid_q ? allocation_q : 16'd0)) :
+                          call_parameter_write ? call_parameter_write_offset :
+                          iret_outer_pop ? iret_outer_stack_offset :
                           read_frame_address ? frame_address_q : stack_native_offset;
 
     logic [15:0] tmp0_q, tmp1_q, tmp2_q, flags_q, flags_mask_q;

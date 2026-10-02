@@ -31,8 +31,8 @@ diagnostic outputs. The previous full fit had two M10Ks for data/tag storage;
 the new geometry also fits two. Whole-design placed cost is being measured
 separately in a pre-build frozen Quartus run. A fresh unchanged CHECKNUM run
 uses the same initial disk/configuration/CMOS and actual 50 MHz CPU. Its
-completed private-model scores are pending. The final fit and user-confirmed
-MiSTer benchmark are recorded below. No full regression is part of this milestone.
+completed private-model comparison, final fit and user-confirmed MiSTer benchmark
+are recorded below. No full regression is part of this milestone.
 
 ## Completed FPGA fit and first MiSTer observation
 
@@ -90,9 +90,50 @@ there is no repeat distribution or established math speedup from these images.
 Earlier CHECKNUM math observations at the same integer score also differed
 (P13 94.4K, P14 99.1K). The source images and explicit RBF/max-speed attestation
 are retained without treating that variation as a proven implementation effect.
-Windows/OS/2 or a full regression were not re-exercised for P15. The unchanged
-private 86Box/PCAT CHECKNUM is still running to completion for its separate
-controlled comparison against 5390 / 101.4K.
+Windows/OS/2 or a full regression were not re-exercised for P15.
+
+## Completed unchanged CHECKNUM on the private PCAT model
+
+The guest completed with RC0, `ALL_DONE` and a final profile. The strict
+[comparison and retained receipts](../evidence/perf01-data2way-20261002/measurement/comparison.json)
+verify matched initial disk, CHECKNUM/configuration/CMOS, actual 50 MHz CPU,
+8 MHz 86Box ISA, original CPU backend, profiler, compiled CPU objects and CPU
+macros. Capacity is 4 KiB code and 1 KiB data in both; data changes from direct
+to two-way. The P13 control uses the older code-tag mapping; P14's separate
+paired directed check established matching behavior/latency under its exercised
+traffic. This comparison does not assert byte-identical code-buffer sources.
+
+| Private PCAT memory-control path | Dhrystones/s | K Whetstones/s | Application BIOS ticks |
+| --- | ---: | ---: | ---: |
+| Completed 4 KiB code / 1 KiB direct data control | 5,390 | 101.4 | 260 |
+| P15 4 KiB code / 1 KiB two-way data | 5,525 | 102.4 | 256 |
+| Measured rate change | **+2.50%** | **+0.99%** | Adaptive work; not fixed-work timing |
+
+The host elapsed time was 3895.737 seconds including teardown. The owned host
+again needed SIGTERM after the monitor-exit timeout (return code -15), after
+successful guest completion and final profile publication. The receipt keeps
+`exit_timeout_then_sigterm`; the comparison required explicit
+`--allow-host-teardown-issue`. This is not a clean host-exit claim.
+
+| Completed phase | Direct data misses | Two-way data misses | Direct mean read wait | Two-way mean read wait |
+| --- | ---: | ---: | ---: | ---: |
+| Dhrystone | 378,345 | 421 | 2.54574 | 2.00059 |
+| Whetstone | 1,931,287 | 190,051 | 3.06706 | 2.10415 |
+
+Actual data hit/miss counts **exactly match** the corresponding direct/two-way
+shadow model in each full function phase. P15 data hit fractions are 99.9919%
+and 98.5562%. CHECKNUM adapts work and interrupt placement, so rates and mean
+per-transfer waits are the comparisons; absolute phase work is not forced equal.
+Each retained trace has 250,000 accepted operations including calibration and
+interrupts. These bounded traces are not the full phase or simultaneous occupancy.
+
+The increase is modest because CPU execution, code fetches and physical writes
+still consume time. P15 writes average 7.24954 / 7.26504 wait clocks; code
+transfers average 2.00110 / 2.11925. Bus waits overlap internal CPU execution
+and cannot be added to instruction clocks or directly converted to a speedup.
+86Box owns guest values/peripherals; DMA/loader/abstract AT-refresh arbitration
+and electrical SDRAM behavior remain outside this adapter. The user hardware
+benchmark is a separate observation. No full regression was launched.
 
 ## Completed 4 KiB code-buffer CHECKNUM measurement
 
@@ -181,10 +222,13 @@ logic. P14's cost reduction makes disciplined cost measurement a requirement.
 6. Commit the directed, measured implementation milestone and leave a
    reviewable candidate for the user's final synthesis/hardware measurement.
 
-After this candidate, the next throughput targets are the fixed cost of
-common hit responses and physical RAM writes. Current candidate averages are
-approximately 2.00 / 2.12 wait clocks for code transfers, 2.55 / 3.07 for data
-reads and 7.32 / 7.28 for data writes. These counts overlap internal execution;
-they cannot be added to instruction clocks or directly converted to a speedup.
-Any latency reduction must retain physical ownership, coherence and event
-ordering. No latency-reduction change is implemented by this recommendation.
+After this candidate, the next throughput targets are the fixed cost of common
+hit responses and physical RAM writes. P15's completed averages are 2.00110 /
+2.11925 wait clocks for code, 2.00059 / 2.10415 for data reads and 7.24954 /
+7.26504 for writes. The user has authorized a private write-admission prototype
+and a real 86Box measurement **before** another resource synthesis. Production
+RTL remains P15 during that experiment. Later options include eliminating
+avoidable common-hit pipeline cycles, reusing open SDRAM rows (KFSDRAM currently
+precharges after each transfer) and evaluating larger code capacity from
+measured traffic. Every reduction must retain physical ownership, coherence,
+refresh behavior and event ordering; no such change is part of P15.

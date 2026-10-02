@@ -41,6 +41,25 @@ attestation. CheckIT gives 5023 / 95.6K; CHECKNUM gives 5023 / 96.4K. Both show
 math is -2.72% versus the last 99.1K observation. No math repeat distribution
 or established math gain is claimed.
 
-Full private-model CHECKNUM results are pending. Its frozen run is under
-`build/perf01-data2way-20261002/`; the completed FPGA build/RBF is under
-`build/perf01-data2way-fit-20261002/`. No full regression is part of P15.
+`measurement/` retains the completed private-model CHECKNUM comparison,
+receipts, phase/final profiles, coherent samples, frozen runner/sampler and
+adapter manifests. P15 completed guest RC0/ALL_DONE at **5525 / 102.4K** versus
+**5390 / 101.4K**, or **+2.50% / +0.99%**. Identical compiled CPU objects are
+now also enforced by the comparison tool. Both hosts have explicitly classified
+SIGTERM teardown after completed guests; the tool was run with
+`--allow-host-teardown-issue`. No clean host exit is claimed.
+
+`actual-vs-shadow.json` records exact matching actual/shadow data misses in both
+complete function phases: 421 / 190,051 for P15 versus 378,345 / 1,931,287 for
+direct data. Mean data-read waits fall from 2.54574 / 3.06706 to 2.00059 /
+2.10415 clocks. The real P15 model's source uses P14's synchronous tag mapping;
+the control binary is the older P13 mapping. P14's paired directed evidence
+establishes matching exercised responses, not byte-identical code sources.
+
+`trace-footprint.json` identifies both 250,000-operation bounded traces;
+full CSVs and private binaries/source snapshots remain under
+`build/perf01-data2way-20261002/`. 86Box owns values/peripherals and the adapter
+omits DMA/loader/abstract AT-refresh arbitration and electrical board effects.
+Adaptive work and single observations limit direct score/absolute-work claims.
+The completed FPGA build/RBF is under `build/perf01-data2way-fit-20261002/`.
+No full regression is part of P15.

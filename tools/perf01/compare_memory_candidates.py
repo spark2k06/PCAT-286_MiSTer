@@ -24,6 +24,7 @@ def identity(arm):
             'data_buffer_words':manifest.get('data_buffer_words',512),
             'data_buffer_ways':manifest.get('data_buffer_ways',1),
             'profiler_header_sha256':header,'original_backend_sha256':backend,
+            'cpu_objects_sha256':manifest['cpu_objects_sha256'],
             'macros':manifest['macros']}
 
 
@@ -42,7 +43,7 @@ def main():
     for key in ('checknum_sha256','config_sha256','nvr_sha256'):
         assert runs[0][key]==runs[1][key], f'Mismatched {key}'
     identities=[identity(path) for path in arms]
-    for key in ('profiler_header_sha256','original_backend_sha256','macros'):
+    for key in ('profiler_header_sha256','original_backend_sha256','cpu_objects_sha256','macros'):
         assert identities[0][key]==identities[1][key],f'Mismatched {key}'
     result={'baseline':baseline,'candidate':candidate,
         'build_identities':identities,

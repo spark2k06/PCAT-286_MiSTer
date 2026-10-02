@@ -60,8 +60,20 @@ The user tested the exact candidate RBF at maximum CPU speed. CheckIT reports
 5023 / 95.6K and CHECKNUM 5023 / 96.4K: both improve integer by 2.28% over 4911.
 Math is inconclusive across the separate observations; no repeated sample set
 or full compatibility regression is established. The private unchanged
-CHECKNUM is still running for a controlled model comparison. See P15 and its
-retained fit/hardware evidence for exact identities and limitations.
+CHECKNUM has completed RC0/ALL_DONE/final profile at **5525 / 102.4K**, versus
+5390 / 101.4K (+2.50% / +0.99%). Its retained identities include matched CPU
+objects; actual data miss counts match the two-way shadow exactly in both
+function phases. Host teardown required the classified SIGTERM after guest
+completion. See P15 and its retained evidence for exact identities/limitations.
+
+The user next authorized a write-path experiment measured in 86Box before
+synthesis. A private owner prototype overlaps ordinary write admission/launch,
+retaining physical completion and unchanged KFSDRAM commands/recovery. Directed
+physical byte/address scoreboards pass in Icarus and Verilator (22 writes/20
+reads in each variant), and private-adapter smoke reduces writes from 7 to 6
+wait clocks while preserving two-clock hits. Unchanged CHECKNUM is running on
+that private variant against the now-completed P15 control. Production RTL is
+still P15; no new synthesis or full regression has been launched for it.
 
 Added 2026-10-01. Status: numeric reference accepted; directed memory-path
 attribution and a coherent 1 KiB RAM-read buffer implemented and checked;

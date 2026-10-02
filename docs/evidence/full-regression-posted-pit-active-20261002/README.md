@@ -50,3 +50,20 @@ The stack-offset replay supplies the already committed proof omitted by the
 runner's initial snapshot, verifies its source/artifact hashes and runs only
 the requested active profile with both simulators. These successful repairs
 do not waive the separate unresolved MRBIOS restart or compiler-fixture checks.
+
+## SingleStep comparator controls
+
+`singlestep-probes/` retains the completed corpus/parser/comparator audit and
+the earlier rejected repair attempt separately. The audit cross-checks all
+1,398,000 source records against the upstream parser and rejects **1,925**
+fault probes with **320** successful positive controls against the unchanged
+production executable. Counts here are derived from actual `FAULT_PROBE`
+records, including the additional #UD-vector positive control.
+
+The original negative fixture replaced only the first byte with 0Fh and
+expected an unsupported latch from early development. Supported 286 system
+forms and architectural #UD delivery make that fixture stale. The corrected
+probe uses a complete reserved escape and supplies the four #UD vector bytes,
+then requires an architectural completion mismatch against the original MOV
+expectation. The unchanged MOV with the same added vector must first pass.
+No physical-corpus expected state, CPU RTL or comparator assertion changes.

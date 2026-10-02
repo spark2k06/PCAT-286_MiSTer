@@ -1,11 +1,11 @@
 # P16: measure overlapping write admission and launch
 
-Date: 2026-10-02. PERF01 private candidate, authorized by the user.
+Date: 2026-10-02. PERF01 write-admission candidate, authorized by the user.
 Status: directed checks, unchanged 86Box CHECKNUM RC0 and frozen full fit complete.
 After the early integer result, the user authorized an RBF while math continued.
-The write-admission candidate is in production RTL; the RBF is available for
-MiSTer comparison. Hardware acceptance and CPU timing closure remain open.
-No full regression.
+The write-admission candidate is in production RTL and the user has supplied
+MiSTer benchmark improvement. CPU timing closure, repeated measurements and
+broad hardware compatibility remain open. No full regression.
 
 ## Control and motivation
 
@@ -127,7 +127,7 @@ Each function trace retains 250,000 accepted operations including calibration
 and interrupts. Those bounded footprints are not full working sets. There is
 one completed guest run per build; the small math gain is not a repeated result.
 86Box owns values/peripherals; DMA/loader/abstract AT refresh and electrical
-board behavior remain outside the adapter. Hardware performance remains pending.
+board behavior remain outside the adapter. Hardware is a separate observation below.
 
 ## Completed frozen FPGA fit and available RBF
 
@@ -177,16 +177,38 @@ No new full constraint/electrical audit or vendor SDRAM timing sign-off is claim
 Candidate: `D:/GitHub/PCAT-286_MiSTer/build/perf01-write-admission-fit-20261002/work/output_files/PCAT-286.rbf`
 (4,147,800 bytes; SHA256
 `fc5b0694b00e529ac49ad2e5461086c8c176bfc84c2a854d8be2cded0e981cf2`).
-This is the candidate to test at maximum CPU speed against the user's P15
-CHECKNUM 5023 / 96.4K observation. No hardware gain is yet established.
+This is the candidate delivered for comparison against the user's P15
+CHECKNUM 5023 / 96.4K observation.
+
+## User MiSTer benchmark observation
+
+[Both original screenshots and provenance](../evidence/perf01-write-admission-20261002/hardware/hardware-observation.json)
+retain the subsequent user report: CheckIT and CHECKNUM both show **5139 / 97.1K**.
+The immediate handoff context associates this report with the delivered P16 RBF;
+the screenshots do not attest the loaded hash or explicitly reconfirm the maximum
+OSD setting. The candidate's frozen configuration is 50 MHz with CPU options active.
+CheckIT's 35.02 MHz is its application estimate.
+
+| User MiSTer observation | P15 | P16 | Change |
+| --- | ---: | ---: | ---: |
+| Integer, both programs | 5023 | 5139 | +2.31% |
+| CheckIT K Whetstones/s | 95.6 | 97.1 | +1.57% |
+| CHECKNUM K Whetstones/s | 96.4 | 97.1 | +0.73% |
+
+The observed integer gain agrees in direction and scale with the private
+PCAT-model +2.55%. Math also improves in these observations, with one sample per
+program; there is no repeat distribution. This hardware benchmark does not
+establish full compatibility or repair the negative setup corners. No new
+synthesis or regression was run to record these screenshots.
 
 Implementation: `95f5b21`. Complete guest comparison: `b4e73bf`.
 
 1. Completed: guest RC0/ALL_DONE/final profile and classified host teardown retained.
 2. Completed: rates and per-transfer waits compared against P15 with identities enforced.
 3. Completed: user-authorized frozen full fit, resources/timing and RBF retained.
-4. Await matched MiSTer measurement; CPU closure and any resource reduction are
-   subsequent work. A full regression remains a separate task.
+4. User MiSTer benchmark improvement observed. Repeated hardware measurements,
+   CPU closure and any resource reduction are subsequent work. A full regression
+   remains a separate task.
 
 Open-row SDRAM policy, refresh-cadence evaluation and a faster common-hit path
 are later investigations. No such controller-policy change is in this prototype.

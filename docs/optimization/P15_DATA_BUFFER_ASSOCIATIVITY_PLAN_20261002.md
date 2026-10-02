@@ -232,7 +232,8 @@ subsequently completed 5666 / 102.9K versus 5525 / 102.4K (+2.55% / +0.49%). The
 requested an RBF after the early integer output. Commit `95f5b21` adds the directed-tested
 write-admission owner. Its frozen full fit adds 465 net equivalent ALMs, 149
 registers and no M10Ks; worst CPU setup is -0.450 ns with positive hold. A candidate
-RBF is available for hardware comparison. Later options include eliminating
+RBF is available; the subsequent MiSTer observation is 5139 / 97.1K in both
+programs (see P16 for provenance and separate math comparisons). Later options include eliminating
 avoidable common-hit pipeline cycles, reusing open SDRAM rows (KFSDRAM currently
 precharges after each transfer) and evaluating larger code capacity from
 measured traffic. Every reduction must retain physical ownership, coherence,

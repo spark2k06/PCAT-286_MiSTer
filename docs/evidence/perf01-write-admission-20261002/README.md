@@ -25,7 +25,8 @@ physical refresh/byte/burst, finite read-window and composed cancellation checks
 **5666 / 102.9K**, versus **5525 / 102.4K** (+2.55% / +0.49%). The matched
 CPU/configuration/disk/CMOS comparison also retains each classified host
 monitor-exit timeout and SIGTERM after successful guest completion. No clean
-host exit or hardware speedup is claimed. `fitted/` retains the completed frozen
+host exit is claimed. Hardware observations are recorded separately below.
+`fitted/` retains the completed frozen
 full fit and artifact identities: +465 net equivalent ALMs, +149 registers,
 no extra M10Ks; worst CPU setup -0.450 ns and all CPU hold positive. This fit's
 HDMI setup/hold are positive. No whole-design closure or full regression is claimed.
@@ -34,4 +35,11 @@ The candidate RBF is at
 Only the owner differs in the common P15/P16 inputs; the +465 is a full-design
 fit delta, while the owner including KFSDRAM increases by 11.2 equivalent ALMs.
 The owner introduces an incoming-address launch path for ordinary writes.
+`hardware/` now retains the user's subsequent MiSTer screenshots: both programs
+show 5139 / 97.1K, integer +2.31%, CheckIT math +1.57%, CHECKNUM math +0.73%
+against their P15 observations. Association with the delivered candidate follows
+the immediate conversation context; the loaded RBF hash/OSD setting are not
+independently captured. The original fit receipt's hardware flag describes its
+earlier capture milestone. No new fit, closure or full compatibility regression
+is inferred from the benchmark observation.
 86Box owns guest values/peripherals in the control co-simulation.

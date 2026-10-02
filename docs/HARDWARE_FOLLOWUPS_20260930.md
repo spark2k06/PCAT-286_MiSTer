@@ -84,7 +84,11 @@ The owner including KFSDRAM itself adds 11.2 ALMs; much of the net change comes
 from physical synthesis of unchanged logic. CPU setup is -0.450 ns / -0.029 ns
 in the slow models, with positive hold in all four; this fit has positive HDMI
 setup/hold. The RBF is available under `build/perf01-write-admission-fit-20261002/`.
-Hardware performance/acceptance and CPU closure are pending; no full regression.
+The user subsequently reports **5139 / 97.1K in both CheckIT and CHECKNUM**:
+integer +2.31% over P15, math +1.57% / +0.73% respectively. The report follows
+delivery of the P16 RBF; loaded hash/OSD setting were not separately captured.
+Screenshots and provenance are retained in P16. Repeated hardware measurements,
+broad compatibility and CPU closure remain pending; no full regression.
 
 Added 2026-10-01. Status: numeric reference accepted; directed memory-path
 attribution and a coherent 1 KiB RAM-read buffer implemented and checked;

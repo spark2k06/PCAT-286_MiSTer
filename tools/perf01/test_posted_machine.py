@@ -120,7 +120,7 @@ def main():
     flags = ['-D'+m for m in re.findall(r'VERILOG_MACRO "(SPK286_P\d\d_[A-Z0-9_]+|SPK286_AT_RAM_READ_BUFFER)"', (work/'config.tcl').read_text())]
     rom = out/'entry.rom'
     firmware = work/'tests/firmware/pcat286_event_diag.asm'
-    if args.pit_refresh:
+    if args.pit_refresh and 'Initialize PIT channel 1 as an AT BIOS' not in firmware.read_text():
         firmware = out/'entry-pit.asm'
         original = (work/'tests/firmware/pcat286_event_diag.asm').read_text()
         marker = '    ; Program PIT channel 0, mode 2, divisor 0020h.'

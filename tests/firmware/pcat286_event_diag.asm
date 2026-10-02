@@ -80,6 +80,18 @@ start:
     mov al, 0xfe
     out dx, al
 
+    ; Initialize PIT channel 1 as an AT BIOS does: mode 2, divisor 18.
+    ; Real AT refresh ownership now follows OUT1 instead of a free-running
+    ; simulation requester, so the diagnostic must initialize its source.
+    mov dx, 0x0043
+    mov al, 0x74
+    out dx, al
+    mov dx, 0x0041
+    mov al, 18
+    out dx, al
+    xor al, al
+    out dx, al
+
     ; Program PIT channel 0, mode 2, divisor 0020h. The focused simulation
     ; observes these writes and supplies the corresponding IRQ0 edge; the full
     ; machine routes the real timer output to the PIC.

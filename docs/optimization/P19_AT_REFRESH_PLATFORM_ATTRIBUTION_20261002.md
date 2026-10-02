@@ -143,6 +143,14 @@ acceptance before sampling and emit one delayed A4 event. The RTL is unchanged
 by these repairs. The user requests an RBF containing this correction and P18,
 with 50 MHz timing closure still deferred.
 
+The distributed event diagnostic ROM also initializes channel 1, mode 2,
+divisor 18, so future machine-boundary runs test a programmed AT refresh source.
+Its ROM/HEX/case/metadata are regenerated and reproducibly checked. Both common
+and divided-clock machine fixtures pass with the distributed ROM (12 posts /
+12 drains) and the A20/ROM-sink entry variant (14 / 14), preserving all original
+POST/IRQ/memory expectations. This is a diagnostic-fixture update, not another
+hardware RTL change. The frozen RBF inputs retain their original unused test ROM.
+
 Evidence: [P18 follow-up inventory](../evidence/perf01-posted-write-20261002/README.md),
 particularly the immutable `refresh/` group. This extends the missing-ownership
 observations already documented in [P12](P12_REAL_CHECKNUM_MEMORY_ATTRIBUTION_20261002.md).

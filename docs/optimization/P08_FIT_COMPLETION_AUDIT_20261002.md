@@ -58,7 +58,8 @@ rejected. Mutation inputs live in separate build directories; the actual
 fit and its reports are untouched. The added 1 ns experiment is also
 rejected by its original setup and full-edge requirements. The first
 stack-offset fit passes the source/ROM/budget checks while retaining its
-two measured video-statistics setup failures.
+two negative global setup minima. The warm model also has a negative
+scaled HDMI output path; global minima do not enumerate every failure.
 
 Evidence: `docs/evidence/fit-completion-audit-20261002`. No complete CPU
 regression or hardware measurement was performed. These are validation

@@ -66,4 +66,11 @@ have not been measured again. No global CPU regression was run.
 
 The next frozen-input fit uses the original 20 ns system and unchanged
 SDRAM/held-payload budgets; it does not select the rejected 0.6/1.0 ns
-route-bound experiments. Physical closure remains pending.
+route-bound experiments. The completed seed-2 fit has CPU setup +0.540 ns
+at slow 100 C and +0.467 ns at slow -40 C, with CPU hold positive in all
+four models. Complete-design setup still fails: the global minima are
+-0.255/-0.033 ns, and warm scaled HDMI output also has -0.214 ns. Seed 3
+has CPU setup -0.160/-0.005 ns and is not selected. Both measured fits,
+unchanged timing budgets and controlled regenerated metadata are retained
+in `P05_STACK_OFFSET_SEED2_FIT_20261002.md` and the seed-3 counterpart.
+Complete-design closure remains pending.

@@ -27,6 +27,21 @@ experiment and inventory. All declared private input/source guards pass.
 DOS images, ongoing output and binary/object build products. Historical receipts
 will not be rewritten to cover later measurement/promotion groups.
 
+`promotion/` retains the full private candidate, exact changed-source hashes,
+common/divided real-CPU machine checks, dual-simulator bridge checks and Quartus
+analysis/elaboration (0 errors, no fitter/RBF). The initial divided-clock
+observer failure and corrected sampling-edge fixture are preserved separately.
+Production has not yet adopted this candidate.
+
+`integer-partial/` retains two stable read-only formatter observations (6138
+control, 6906 posted), owned executable/PID/start identities and unchanged
+disk/profiler inputs. Guest completion and math output remain pending.
+
+`refresh/` retains eight matched physical-data AT refresh/HOLD controls, their
+generated fixture, exact production requester/arbiter and source identities.
+All signatures, retired work and physical stores match. See [P19](../../optimization/P19_AT_REFRESH_PLATFORM_ATTRIBUTION_20261002.md).
+These groups each have independent byte inventories; `prototype/` is unchanged.
+
 ## Reproduction
 
 Use the prototype checkpoint's production P17 sources, before adoption, with

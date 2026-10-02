@@ -1,8 +1,9 @@
 # P18: one retained CPU write below the coherent caches
 
 Date: 2026-10-02. Production baseline: PCAT `89b9b4f`, including P17.
-Status: **private prototype passes directed checks; matched real CHECKNUM
-measurements running; production adoption and hardware validation pending**.
+Status: **private prototype and full-machine promotion gates pass; first matched
+Dhrystone output is 6138 -> 6906 (+12.51%); complete CHECKNUM measurements,
+production adoption and hardware validation pending**.
 
 The user retained P17 and explicitly deferred timing closure. This experiment
 addresses write service without changing CPU RTL, cache capacity, SDRAM timing
@@ -85,9 +86,19 @@ buffer, gains are 1.12–5.41%; scarce read service limits overlap in that contr
   stores; and replacement among three tags mapping to one set. All 26 stores
   physically complete once; all 24 posted CPU stores drain.
 
-The composed fixtures do not execute the whole PCAT machine, interrupt handlers
-or the divided CPU clock. Those remain promotion checks. No full regression is
-requested or claimed.
+The composed cache fixture is complemented by a bounded real-CPU machine
+promotion check: A20 mapping, ROM-word write sink, IRQ/IRET and AT refresh pass
+at both common and divided CPU clocks. Each case posts and physically drains
+14 stores, with no I/O/external ownership crossing a pending write. The existing
+bridge response fixture passes 169 checks per clock mode with both Icarus and
+Verilator. Whole-project Quartus analysis/elaboration passes with 0 errors and
+158 warnings; it runs no fitter or RBF. No full regression is requested or claimed.
+
+The first divided-clock machine fixture counted held READY on both parent
+edges and therefore duplicated observed POST codes. The corrected observation
+counts only actual CPU sampling edges, preserves the original four-code and
+data/IRQ requirements, and passes. Original failure, generated fixture and
+compiled identities are retained beside the successful check.
 
 ## Initial resource measurement
 
@@ -117,5 +128,20 @@ persists, adopt the measured block/fences, run bounded machine integration and
 prepare the source candidate for the user's synthesis. Keep 50 MHz CPU options
 unchanged; timing closure is explicitly deferred. MiSTer throughput and broader
 compatibility remain hardware follow-ups.
+
+### Early integer notification
+
+The user requested the integer result before the slower math completion.
+Two read-only RAM samples from each owned process establish stable CHECKNUM
+formatter output: control **6138**, candidate **6906**. The executable hashes,
+initial disk hash, recognized DOS load segment and profiler's Whetstone phase
+are checked. This is a **+12.51% partial integer result**, reaching 89.58% of
+the earlier immediate-memory SPK286 reference (7709). It is diagnostic evidence
+until guest RC0/ALL_DONE and complete output are recorded. No final math score
+or full DOS acceptance is inferred from the partial buffer.
+
+The separate [P19 platform attribution](P19_AT_REFRESH_PLATFORM_ATTRIBUTION_20261002.md)
+adds missing AT refresh/HOLD arbitration to a private adapter. Its controls do
+not alter the ongoing matched posting runs or any production timing policy.
 
 See the [evidence inventory](../evidence/perf01-posted-write-20261002/README.md).

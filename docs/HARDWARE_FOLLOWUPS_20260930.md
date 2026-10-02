@@ -129,8 +129,15 @@ matching architectural signatures and exact physical write counts. The module
 passes strict lint, 495 physical/bridge/arbiter checks and 145 composed-cache
 checks. Isolated mapping estimates the entire enabled new block at 51 ALMs,
 59 registers and no RAM; no fitted whole-design delta is claimed. Matched real
-CHECKNUM arms are running. Production adoption, bounded machine/divided-clock
-checks and MiSTer throughput remain pending; no full regression.
+CHECKNUM integer formatter outputs are **6138 -> 6906 (+12.51%)**; complete DOS
+math/exit receipts remain pending. Bounded real-CPU machine checks pass at
+common/divided clocks, as do bridge dual-simulator checks and Quartus frontend
+elaboration (0 errors). Production adoption and MiSTer throughput remain pending.
+The separate [P19 platform attribution](optimization/P19_AT_REFRESH_PLATFORM_ATTRIBUTION_20261002.md)
+identifies missing AT refresh/HOLD/arbitration: production's 32-clock requester
+costs 7.18-9.88% in P17 physical-data kernels with unchanged signatures. That is
+comparable to the residual 7.69% / 6.07% hardware gap; real matched CHECKNUM
+controls are running. No refresh-policy change or full regression is claimed.
 
 Added 2026-10-01. Status: numeric reference accepted; directed memory-path
 attribution and a coherent 1 KiB RAM-read buffer implemented and checked;

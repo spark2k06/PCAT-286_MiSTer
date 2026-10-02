@@ -23,6 +23,8 @@ def main():
     p.add_argument('--seconds', type=int, default=0)
     p.add_argument('--probe-binary', type=Path)
     p.add_argument('--arm-name', help='Distinct directory name for an explicit repeat')
+    p.add_argument('--at-refresh', type=int, choices=(0, 1),
+                   help='Explicit AT refresh/HOLD control for the private extended adapter')
     a = p.parse_args()
     reference, probe, box = a.reference_root.resolve(), a.probe_root.resolve(), a.box.resolve()
     out = probe/(a.arm_name or a.mode)
@@ -56,6 +58,8 @@ def main():
     (out/'profiles.json').write_text(json.dumps(profiles, indent=2)+'\n')
     env = dict(os.environ, PCAT_MEMORY_TIMING='1' if a.mode == 'pcat' else '0',
                PCAT_MEMORY_PROFILE=str(target/'memory-profile.json'))
+    if a.at_refresh is not None:
+        env['PCAT_AT_REFRESH'] = str(a.at_refresh)
     runner_source = box/'tools/spk286_cpu/run_checknum.py'
     runner = out/'run_checknum_private.py'
     runner_text = runner_source.read_text()
@@ -123,6 +127,7 @@ def main():
                '--build-dir', str(box/'build/spk286'), '--roms', str(a.roms),
                '--seconds', str(a.seconds)]
     (out/'probe-run.json').write_text(json.dumps({'command':command,
+        'at_refresh_control':a.at_refresh,
         'memory_mode':a.mode, 'initial_image_sha256':sha(target/'dos-test.img'),
         'config_sha256':sha(target/'86box.cfg'),
         'nvr_sha256':{f.name:sha(f) for f in (target/'nvr').iterdir()},

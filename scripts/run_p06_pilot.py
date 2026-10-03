@@ -14,6 +14,14 @@ STAGES = {
         "top": "p06_clock", "pass": "P06_CLOCK_PASS",
         "negative": ("6'd6", "6'd5", "rational enable mismatch"),
     },
+    "bus": {
+        "sources": ["rtl/spk286_timing_pilot/p06_bus_cycle.sv",
+                    "rtl/spk286_timing_pilot/p06_clock.sv"],
+        "bench": "sim/spk286_timing_pilot/p06_bus_cycle_tb.sv",
+        "top": "p06_bus_cycle", "pass": "P06_BUS_PASS",
+        "negative": ("cpu_boundary && (state_q == TC)",
+                     "1'b1 && (state_q == TC)", "early logical completion"),
+    },
 }
 
 

@@ -31,10 +31,51 @@ Frozen receipts/logs are in
 This covers C01 and the clock-component portion of C15. It does not establish
 EU/BIU scheduling, whole-CPU MAX equivalence or the other directed cases.
 
+## M2b: retained one-beat bus fixture
+
+`p06_bus_cycle` accepts a packet at a virtual boundary, retains its address,
+lanes, class, write data and LOCK indication, then submits it exactly once.
+Physical completion can be captured at any fabric edge. Logical completion
+requires an eligible Tc boundary, abstract board permission and the result.
+Same-edge capture/publication has an explicit data bypass. A held logical
+reply retains its data until consumption. Consecutive packets can share the
+old completion/new Ts boundary, including identical commands.
+
+Both simulators pass 759 counted scenarios / 33,404 fabric ticks, plus
+published/eligible-boundary cancellation, joint reset/stale completion,
+duplicate-completion detection and all 64 MAX control combinations. The sweep
+covers all 25 capture offsets, acceptance delays 0..4, response delays 0..24,
+board waits 0/1/2 and consume backpressure. A response delayed 80 edges is
+classified as nine implementation deadline misses, not nine board waits.
+The negative control removing the boundary guard fails for early completion.
+
+Selected fabric-edge traces:
+
+| Scenario | Request | Physical accept | Capture | Logical completion | Board waits | Implementation misses |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Early, zero waits | 9 | 10 | 10 | 25 | 0 | 0 |
+| Early, one wait | 9 | 10 | 10 | 34 | 1 | 0 |
+| Early, two waits | 9 | 10 | 10 | 42 | 2 | 0 |
+| Capture on eligible edge | 9 | 14 | 25 | 25 | 0 | 0 |
+| Late implementation result | 9 | 14 | 94 | 100 | 0 | 9 |
+
+Strict RTL lint passes. Generic synthesis of this **standalone fixture** is
+165 cells / 72 register bits; MAX is six cells / zero registers. Of the 72
+bits, 48 retain the request, 16 retain the response and eight are control.
+This is **not an additional CPU buffer or a production cost estimate**: the
+integration must reuse current BIU/fetch/bridge retention wherever possible.
+The component is an unwired handshake reference, not a replacement bridge.
+Its packet interface needs a qualified admission shim for the existing
+level-held CPU request. Global reset assumes a joint backend reset; CPU-only
+cancellation drains accepted read/write work and drops its logical response.
+
+Evidence: [`bus`](../evidence/p06-pilot-20261003/bus). This qualifies component
+parts of C02/C03/C04/C10/C15, not complete CPU coverage. LOCK is retained but
+HOLD/odd-word arbitration, prefetch reservation, decoded lookahead, posted
+write visibility and architectural event scheduling remain unimplemented.
+
 ## Next stages
 
-- M2b: logical Ts/Tc scheduling, physical response capture and delayed
-  publication, including cancellation and MAX bypass.
 - M2c: qualified first instruction-form metadata and dependency-aware
   duration control in a bounded fixture.
 - Full CPU wiring, architectural issue milestones, IU lookahead (P06-IU01),

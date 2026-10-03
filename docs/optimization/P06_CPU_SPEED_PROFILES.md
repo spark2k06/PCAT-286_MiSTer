@@ -22,6 +22,10 @@ las tablas Intel y los handlers nativos de 86Box; sus medidas se conservan como
 contraste. Falta implementar y validar el piloto, completar los hitos internos
 de cada instrucción y obtener la referencia de placa/CPU física.
 
+El desarrollo provisional de componentes temporales y sus pruebas dirigidas
+se registra en [el progreso del piloto](P06_PILOT_PROGRESS_20261003.md).
+Todavía no hay un perfil histórico conectado a la CPU completa ni al RBF.
+
 ## 1. Objetivo y alcance de precisión
 
 Ofrecer las velocidades de la familia Intel 286 de 86Box:

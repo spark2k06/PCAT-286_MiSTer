@@ -1,0 +1,64 @@
+{
+  "status": "P06_DIRECTED_COMPONENT_PASS",
+  "stage": "clock",
+  "sources_sha256": {
+    "rtl/spk286_timing_pilot/p06_clock.sv": "a8689e02ec33d361f1eaec81cacb2146d1d46f7ace909ee30fdd9ead339e49fa",
+    "sim/spk286_timing_pilot/p06_clock_tb.sv": "fb1c67fbf018312b58abefae3199aba38130196259316753f42c7f612d0add26",
+    "scripts/run_p06_pilot.py": "f6b8f0a8bb280f7373650f18bfb5e197948374f41c085c84267cc2801394bd8a"
+  },
+  "tool_versions": {
+    "iverilog": "Icarus Verilog version 12.0 (stable) ()",
+    "verilator": "Verilator 5.020 2024-01-01 rev (Debian 5.020-1)",
+    "yosys": "Yosys 0.33 (git sha1 2584903a060)"
+  },
+  "production_sources_unchanged": 16,
+  "production_qip_excludes_pilot": true,
+  "generic_synthesis": {
+    "0": {
+      "generic_cells": 1,
+      "register_bits": 0,
+      "cell_types": {
+        "$_NOT_": 1
+      },
+      "scope": "Yosys generic mapping; not Cyclone V ALMs, fit or STA"
+    },
+    "1": {
+      "generic_cells": 44,
+      "register_bits": 6,
+      "cell_types": {
+        "$_AND_": 1,
+        "$_NOR_": 3,
+        "$_ANDNOT_": 14,
+        "$_XOR_": 6,
+        "$_ORNOT_": 5,
+        "$_NAND_": 1,
+        "$_XNOR_": 1,
+        "$_NOT_": 3,
+        "$_MUX_": 4,
+        "$_SDFF_PP0_": 4,
+        "$_SDFFE_PP0P_": 2
+      },
+      "scope": "Yosys generic mapping; not Cyclone V ALMs, fit or STA"
+    }
+  },
+  "negative_control": {
+    "mutation": "6'd6 -> 6'd5",
+    "returncode": 1,
+    "expected_reason": "rational enable mismatch"
+  },
+  "log_sha256": {
+    "iverilog-build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "iverilog-run.log": "eda00dff42d851a190cb7cb0da14487157a24e9a654d52687b91a0c67349e568",
+    "iverilog-version.log": "f9199cc8658f4afcec3edeb93f29f23bb2aebf66d3eeb217cdc728aaa692f946",
+    "lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "negative-build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "negative-run.log": "377d64b483388b5cf134ca4bca12201a4bea0c3091eeb711137059cad2bd209c",
+    "verilator-build.log": "30e34e1e411885f70810c977253cac9e1b6f06cbe49b10b0630e0d6226150e5a",
+    "verilator-run.log": "470f07957659225b80f6ed3f6fe22ba20fa48dd4c38be969d9ad49f4c6e64a49",
+    "verilator-version.log": "26daf9ad1ba36ee1c20cab9a869d0a1fbb8117230c80c78ec2d8cf597f64c4a5",
+    "yosys-0.log": "484aa810ccdd1b440f974f8f2bc832592178e3bdeb3a524397e463fb5cd0dda8",
+    "yosys-1.log": "b685cdacdfc9d7d8d4d06828d3fe70e222b806c1365b51677002b3169128edcc",
+    "yosys-version.log": "14022961a7564dcc908f30f8b52cc1289449e8f25a95ed5c2d2afb88c4bde4fa"
+  },
+  "scope": "Unwired component, strict RTL lint, Icarus/Verilator directed checks and generic synthesis; no full regression, fit or historical CPU accuracy"
+}

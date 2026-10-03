@@ -78,6 +78,16 @@ manifest, fitted resource summaries and detailed timing/path reports. The
 Hardware acceptance and 50 MHz setup closure remain pending. A full CPU and
 PCAT regression was subsequently requested and is recorded separately.
 
+### Subsequent hardware confirmation
+
+`hardware-combined/measurement.json` retains the user screenshots and the
+2026-10-03 confirmation that the delivered combined RBF was used. CHECKNUM
+reports **6906 / 121.6K**, matching the completed combined platform model;
+CheckIT separately reports **6765 / 121.6K**. This confirms artifact attribution
+for the user's observation, not an independently observed loaded hash, timing
+closure or aggregate compatibility acceptance. Earlier immutable simulation
+and build receipts retain their original observation-time status.
+
 Use the prototype checkpoint's production P17 sources, before adoption, with
 Ubuntu WSL, Verilator, NASM and the existing Quartus container:
 

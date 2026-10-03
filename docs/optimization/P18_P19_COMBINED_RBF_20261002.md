@@ -1,7 +1,9 @@
 # P18/P19: combined posted-write and PIT-refresh candidate
 
-Date: 2026-10-02. Status: **RBF generated and verified; hardware acceptance and
-50 MHz timing closure pending**. The complete CPU and PCAT regression has
+Date: 2026-10-02; hardware confirmation updated 2026-10-03. Status:
+**RBF generated and verified; user-confirmed hardware throughput observed;
+aggregate acceptance and 50 MHz timing closure pending**.
+The complete CPU and PCAT regression has
 subsequently completed in
 `build/full-regression-posted-pit-active-20261002`, with only the active CPU
 options, as requested. The earlier two-profile run was interrupted for this
@@ -101,7 +103,8 @@ CMOS and cache capacities match the old-policy run. The model and profiler
 header intentionally differ to enable posting and observe actual PIT OUT1;
 their exact hashes and source bytes are retained. The native SDRAM refresh
 remains enabled. Host exit timeout/SIGTERM is recorded separately from guest
-success. This is a completed platform-model result; MiSTer acceptance is pending.
+success. This is a completed platform-model result; the subsequent hardware
+observation is recorded below and does not imply aggregate acceptance.
 
 | CHECKNUM reference | Dhrystones/s | K Whetstones/s |
 | --- | ---: | ---: |
@@ -126,10 +129,43 @@ CHECKNUM with CHECKNUM; the separate CheckIT integer observation is 2.04%
 lower and is retained, not substituted for the matched measurement.
 
 The screenshots and their byte hashes are retained under
-`docs/evidence/perf01-posted-write-20261002/hardware-combined`. Exact attribution
-to the exported bitstream and maximum CPU speed was requested from the user
-and remains pending. This observation does not establish timing closure or
-aggregate regression acceptance.
+`docs/evidence/perf01-posted-write-20261002/hardware-combined`. On 2026-10-03 the
+user confirms the delivered RBF. This is user attribution to the exported
+artifact, not an independently observed loaded-bitstream hash. This observation
+does not establish timing closure or aggregate regression acceptance.
+
+## Next performance experiment
+
+The completed combined model's function-phase counters identify the next
+measurement priority. Dhrystone reads already hit almost always: code hit
+rate **99.9921%**, data hit rate **99.9944%**. There are **18,017,746 code
+transfers** at **1.000825 wait clocks** on average and **7,464,837 data reads**
+at **1.000414**. Writes average only **1.024723 wait clocks** after posting.
+These are bus-service counters; prefetch overlaps execution, so summed wait
+clocks are not saved elapsed clocks or a predicted benchmark gain.
+
+First investigate instruction-read lookahead and consecutive-hit response
+handling: reuse already obtained instruction-line words or start a synchronous
+lookup early when the address is demonstrably stable. Keep canonical-address
+checks, store invalidation, redirects, reset and external-writer coherence.
+Do not replace M10K outputs with unbounded combinational RAM or assume a
+zero-wait response is feasible at the configured clock. Compare a private
+prototype against this frozen model before RTL adoption or synthesis, with
+unchanged CPU/options, work and architectural results. No such prototype or
+gain is measured by this documentation update.
+
+For software-floating-point Whetstone, the code/data hit rates are lower,
+**98.8652% / 98.5558%**. The existing 8 KiB code shadow predicts **201,126**
+misses versus **858,392** actual at 4 KiB; the 4 KiB direct data shadow predicts
+**31,318** versus **189,573** actual at 1 KiB two-way. These support a separate
+capacity experiment, with fitted RAM/tag/control cost measured before adoption;
+they are shadow predictions, not an implemented cache or a throughput result.
+
+Open-row SDRAM service and deeper posted-write buffering remain possible
+later experiments. Their marginal value must use physical-owner traffic and
+queue-pressure traces, rather than extrapolate the old pre-posting bottleneck.
+The current nearly one-clock integer write service makes common read service
+the stronger next hypothesis. Timing closure remains a separately deferred task.
 
 ## Reproduction and retained evidence
 

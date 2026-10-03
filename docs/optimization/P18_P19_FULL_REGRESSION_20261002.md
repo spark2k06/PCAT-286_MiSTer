@@ -180,8 +180,9 @@ recorded scopes in the global protected-mode review.
 
 The user supplies CHECKNUM **6906 / 121.6K**, matching the completed combined
 86Box platform model exactly. The independent CheckIT screen reports
-**6765 / 121.6K**. Exact RBF/max-speed attribution was requested and remains
-pending in the hardware receipt. The same-CPU immediate-memory reference is
+**6765 / 121.6K**. On 2026-10-03 the user confirms the delivered RBF; this
+attribution does not imply independently observing its loaded hash or passing
+the still-open regression checks. The same-CPU immediate-memory reference is
 **7709 / 133.3K**: current CHECKNUM reaches **89.58% / 91.22%**, requiring
 another **11.63% / 9.62%** rate increase to equal it. Native 86Box's separate
 286 model, **8287 / 144.9K**, remains a later comparison.

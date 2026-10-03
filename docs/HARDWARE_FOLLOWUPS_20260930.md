@@ -143,13 +143,23 @@ The PIT-driven cadence correction is adopted after
 directed real-PIT, DMA and CPU checks. The user requests a combined P18/P19
 RBF. The combined actual-PIT platform model completes at **6906 / 121.6K**,
 RC0/ALL_DONE, matching the subsequent user CHECKNUM screenshot exactly.
-CheckIT separately reports **6765 / 121.6K**. Exact exported-RBF/max-speed
-attribution still awaits confirmation; timing closure remains deferred.
+CheckIT separately reports **6765 / 121.6K**. On 2026-10-03 the user confirms
+the delivered combined RBF; timing closure remains deferred.
 The [active-option full regression](optimization/P18_P19_FULL_REGRESSION_20261002.md)
 has completed: all 129 original CPU banks and 1,392,996 evaluable physical
 cases pass, including separately verified replays, while MRBIOS restart and
 verification/input gaps prevent aggregate acceptance. Original failed attempts
 and unsuccessful diagnostic controls remain retained.
+
+The next measurement priority is common cache-hit read service: combined
+Dhrystone code/data hit rates are 99.9921% / 99.9944%, but reads still wait
+approximately one clock each. Posted writes now average only 1.024723 wait
+clocks. Investigate instruction lookahead/consecutive-hit handling in a private
+86Box prototype first; no further RTL or gain is claimed. The 8 KiB code and
+4 KiB data shadows separately support a Whetstone capacity experiment. See
+the [combined candidate's next experiment](optimization/P18_P19_COMBINED_RBF_20261002.md#next-performance-experiment)
+for counters, coherence requirements and the distinction between shadow
+miss counts and actual throughput.
 
 Added 2026-10-01. Status: numeric reference accepted; directed memory-path
 attribution and a coherent 1 KiB RAM-read buffer implemented and checked;

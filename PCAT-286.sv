@@ -1079,7 +1079,8 @@ module emu_at
     localparam logic AT_CPU_DIV2_ENABLED = 1'b0;
 
     spk286_at_machine #(
-        .CPU_USES_SAMPLE_EDGE(AT_CPU_DIV2_ENABLED)
+        .CPU_USES_SAMPLE_EDGE(AT_CPU_DIV2_ENABLED),
+        .DMA_REGISTERED_MEMORY_COMPLETION(1'b1)
     ) u_at_machine (
         .clk                    (CLK_50M),
         .clk_cpu                (at_cpu_clock),

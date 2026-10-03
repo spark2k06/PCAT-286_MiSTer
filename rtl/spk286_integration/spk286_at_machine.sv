@@ -24,7 +24,11 @@
 `endif
 
 module spk286_at_machine #(
-    parameter logic CPU_USES_SAMPLE_EDGE = 1'b0
+    parameter logic CPU_USES_SAMPLE_EDGE = 1'b0,
+    // Backend protocol, not a CPU speed option. The MiSTer memory port
+    // completes only a previously accepted record; abstract test backends
+    // may also accept and complete on the same edge.
+    parameter logic DMA_REGISTERED_MEMORY_COMPLETION = 1'b0
 ) (
     input  logic         clk,
     input  logic         clk_cpu,
@@ -508,6 +512,9 @@ module spk286_at_machine #(
     logic        rom_write_sink_ready;
 
     logic        dma_memory_accept_q;
+    wire dma_memory_response_valid = dma_memory_ready &&
+        (DMA_REGISTERED_MEMORY_COMPLETION ? dma_memory_accept_q :
+                                           (dma_memory_accept || dma_memory_accept_q));
     logic        nmi_source_active_q;
 
     logic [15:0] debug_cpu_cycle_count_q;
@@ -922,8 +929,7 @@ module spk286_at_machine #(
         .dma_terminal_count     (dma_terminal_count),
         .dma_active_channel     (dma_active_channel),
         .dma_transfer_read_from_memory(dma_transfer_read_from_memory),
-        .dma_memory_data_valid  (dma_memory_ready &&
-                                 (dma_memory_accept || dma_memory_accept_q)),
+        .dma_memory_data_valid  (dma_memory_response_valid),
         // DMA1 byte devices consume a normalized low-byte value. Select the
         // addressed SDRAM lane for memory-to-I/O transfers.
         .dma_transfer_data_in   ((dma_active_channel < 3'd4) &&
@@ -1071,8 +1077,7 @@ module spk286_at_machine #(
         .dma_grant               (dma_grant),
         .transfer_accept         (devices_dma_transfer_accept),
         .transfer_ready          (devices_dma_transfer_ready &&
-                                  dma_memory_ready &&
-                                  (dma_memory_accept || dma_memory_accept_q)),
+                                  dma_memory_response_valid),
         .transfer_data_in        (dma_transfer_read_from_memory ?
                                   dma_memory_data_in :
                                   devices_dma_transfer_data_out),

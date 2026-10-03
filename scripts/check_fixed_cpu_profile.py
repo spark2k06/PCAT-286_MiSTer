@@ -27,6 +27,8 @@ FILES = (
     'sim/spk286_integration/spk286_at_bus_bridge_tb.sv',
     'sim/spk286_integration/spk286_at_bus_bridge_response_tb.sv',
     'vendor/spk286/sim/unit/spk286_fetch_tb.sv',
+    'sys/hps_io.sv',
+    'sys/sys_top.v',
 )
 
 
@@ -56,7 +58,7 @@ def main():
     rows = {}
     for name in FILES:
         before = normalized_preprocess(reference, name, ['-D' + m for m in ACTIVE])
-        after = normalized_preprocess(candidate, name, [])
+        after = normalized_preprocess(candidate, name, ['-DSPK286_AT_CDC'])
         if before != after:
             raise SystemExit('Active preprocessed RTL differs: ' + name)
         rows[name] = dict(
@@ -65,11 +67,14 @@ def main():
             preprocessed_sha256=hashlib.sha256(after.encode()).hexdigest(),
         )
     config = (candidate / 'config.tcl').read_text()
-    if any(m in config for m in (*ACTIVE, 'SPK286_AT_DEBUG_CPU_DIV2')):
+    if any(m in config for m in (*(m for m in ACTIVE if m != 'SPK286_AT_CDC'), 'SPK286_AT_DEBUG_CPU_DIV2')):
         raise SystemExit('Retired CPU/debug option remains in config.tcl')
+    if 'VERILOG_MACRO "SPK286_AT_CDC"' not in (candidate / 'PCAT-286.qsf').read_text():
+        raise SystemExit('Required platform CDC selection is missing')
     result = dict(status='FIXED_CPU_ACTIVE_RTL_EQUIVALENCE_PASS',
                   reference=str(reference), candidate=str(candidate), files=rows,
-                  retired_active_macros=list(ACTIVE),
+                  retired_active_macros=[m for m in ACTIVE if m != 'SPK286_AT_CDC'],
+                  required_platform_macro='SPK286_AT_CDC',
                   note='Exact normalized preprocessor output except the proven unused observer enable; no later timing RTL covered.')
     a.output.parent.mkdir(parents=True, exist_ok=True)
     a.output.write_text(json.dumps(result, indent=2) + '\n')

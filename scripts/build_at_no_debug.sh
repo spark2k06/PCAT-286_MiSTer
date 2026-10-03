@@ -43,7 +43,7 @@ r = Path(sys.argv[1])
 m = json.loads((r/'manifest.json').read_text())
 assert m['revision'] == 'PCAT-286' and not m['fit_sha256']
 for n, h in m['source_sha256'].items():
-    p = Path(n)
+    p = Path(n.replace('\\', '/'))
     assert not p.is_absolute() and '..' not in p.parts
     assert hashlib.sha256((r/'work'/p).read_bytes()).hexdigest() == h, n
 print('FROZEN_NEW_RUN_INPUTS_PASS', len(m['source_sha256']))

@@ -166,3 +166,25 @@ speed-change acknowledgment and F10 to record CMOS; the final references used
 CMOS already calibrated by preceding runs. No periodic screenshots were used
 in the accepted final runs. Initial host teardown failures are retained as
 failed runs in the evidence, independently of valid guest CSV output.
+
+## Explicit 86Box memory waits
+
+`--memory-wait-states 1` and `--memory-wait-states 2` select the visible 86Box
+options **1 wait state** and **2 wait states**. Omitting the argument preserves
+Automatic. The UI stores visible count + 1 in `cpu_waitstates`: Default=0,
+0 waits=1, 1 wait=2, 2 waits=3. Native memory/prefetch service costs are then
+config + 1, so the requested 1/2 waits produce 3/4 service cycles.
+They do not replace intrinsic instruction cycles. Use a different fresh output
+directory for every CPU frequency and wait setting.
+
+The runner checks the config value and effective prefetch/read/write costs,
+and records internal/external cache flags (both disabled in these controls).
+It retries an uninitialized native dispatcher within the existing bounded
+startup timeout; a wrong initialized dispatcher remains an error. After DOS
+completion it pauses the owned emulator before requesting exit. This is host
+teardown after the measurement, not a change to guest timer/workload policy.
+
+The [1/2-wait results](../../docs/optimization/P06_NATIVE_WAITSTATES_RESULTS_20261003.md)
+retain four controls with guest/host exit 0, plus earlier unsuccessful attempts.
+The automatic reference bundle pins the runner from commit `936e7de`; the new
+wait-state bundle pins this later runner. The DOS program remains identical.

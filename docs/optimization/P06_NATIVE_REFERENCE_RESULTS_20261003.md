@@ -116,3 +116,10 @@ by the CPU; board READY waits may be configurable on some machines and otherwise
 remain a property of that recorded system. A physical 12 MHz measurement is
 distinct from the native 12.5 MHz control. No historical profile is certified
 by these initial samples; M1's physical and reference-extraction gates stay open.
+
+## Follow-up: explicit memory waits
+
+The user requested the same native controls with the visible 86Box 1/2-wait
+options. [The additional results](P06_NATIVE_WAITSTATES_RESULTS_20261003.md)
+record all four guest/host-successful runs, their config mapping and raw CSVs.
+They preserve this original automatic reference and the identical DOS program.

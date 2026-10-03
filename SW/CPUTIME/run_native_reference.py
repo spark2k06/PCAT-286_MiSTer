@@ -57,8 +57,11 @@ def main():
     p.add_argument('--exe', type=Path, required=True)
     p.add_argument('--roms', type=Path, required=True)
     p.add_argument('--hz', type=int, choices=(6000000, 12500000), required=True)
+    p.add_argument('--memory-wait-states', type=int, choices=(0, 1, 2),
+        help='Visible 86Box wait-state count; omitted means Automatic (config 0)')
     p.add_argument('--seconds', type=int, default=300)
     a = p.parse_args()
+    waitstates_config = 0 if a.memory_wait_states is None else a.memory_wait_states+1
     out, source = a.output.resolve(), a.disk.resolve()
     if out.exists():
         p.error('Use a fresh output directory; results cannot be overwritten')
@@ -90,9 +93,12 @@ def main():
     cfg = (a.profile/'86box.cfg').read_text()
     cfg = re.sub(r'^cpu_speed\s*=.*$', f'cpu_speed = {a.hz}', cfg, flags=re.M)
     cfg = re.sub(r'^hdd_01_fn\s*=.*$', 'hdd_01_fn = dos-test.img', cfg, flags=re.M)
+    cfg = re.sub(r'^cpu_waitstates[ \t]*=.*\n?', '', cfg, flags=re.M)
+    assert cfg.count('[Machine]\n') == 1
+    cfg = cfg.replace('[Machine]\n', f'[Machine]\ncpu_waitstates = {waitstates_config}\n', 1)
     assert re.search(r'^cpu_family\s*=\s*286\s*$', cfg, re.M)
     assert re.search(r'^cpu_use_dynarec\s*=\s*0\s*$', cfg, re.M)
-    assert not re.search(r'^cpu_waitstates\s*=\s*[1-9]', cfg, re.M)
+    assert re.search(rf'^cpu_waitstates[ \t]*=[ \t]*{waitstates_config}$', cfg, re.M)
     (out/'86box.cfg').write_text(cfg)
     (out/'global.cfg').write_text('')
     shutil.copytree(a.profile/'nvr', out/'nvr')
@@ -103,7 +109,8 @@ def main():
     names = ('ram', 'cpu_s', 'cpu_exec', 'exec386_2386', 'cpu_waitstates',
              'cpu_prefetch_cycles', 'cpu_cycles_read', 'cpu_cycles_write',
              'cpu_isa_speed', 'isa_cycles', 'timing_rr', 'tsc',
-             'SavedKbd', 'keyboard_mode', 'keyboard_scan')
+             'SavedKbd', 'keyboard_mode', 'keyboard_scan',
+             'cpu_cache_int_enabled', 'cpu_cache_ext_enabled')
     symbols = {n: int(next(l.split()[0] for l in listing.splitlines()
                           if l.endswith(' '+n)), 16) for n in names}
     master, slave = pty.openpty()
@@ -116,7 +123,9 @@ def main():
     os.close(slave)
     os.set_blocking(master, False)
     log = (out/'console.log').open('wb')
-    receipt = dict(hz=a.hz, cpu_label=label, binary_sha256=sha(exe),
+    receipt = dict(hz=a.hz, cpu_label=label,
+        requested_visible_wait_states=a.memory_wait_states,
+        cpu_waitstates_config=waitstates_config, binary_sha256=sha(exe),
         program_sha256=sha(a.program), runner_sha256=sha(Path(__file__)),
         validator_sha256=sha(Path(__file__).with_name('validate_t286ref.py')),
         source_disk_sha256=source_hash, image_sha256_before=sha(image),
@@ -161,13 +170,24 @@ def main():
                     assert len(data)==size
                     return int.from_bytes(data, 'little')
                 cpu = integer(base+symbols['cpu_s'], 8)
+                if not cpu:
+                    assert key is None, 'Cannot inject keys before CPU initialization'
+                    return None
                 state = {n:integer(base+symbols[n], 4) for n in names[4:11]}
+                state.update({n:integer(base+symbols[n], 4) for n in
+                    ('cpu_cache_int_enabled', 'cpu_cache_ext_enabled')})
                 state.update(cpu_hz_actual=integer(cpu+24, 4),
                     dispatcher=integer(base+symbols['cpu_exec'], 8)-base,
                     tsc=integer(base+symbols['tsc'], 8))
+                if state['dispatcher']==-base and state['tsc']==0:
+                    assert key is None, 'Cannot inject keys before native dispatch initialization'
+                    return None
                 assert state['cpu_hz_actual']==a.hz
                 assert state['dispatcher']==symbols['exec386_2386'], (state, symbols['exec386_2386'])
-                assert state['cpu_waitstates']==0
+                assert state['cpu_waitstates']==waitstates_config
+                if a.memory_wait_states is not None:
+                    assert state['cpu_cache_int_enabled']==state['cpu_cache_ext_enabled']==0
+                    assert state['cpu_prefetch_cycles']==state['cpu_cycles_read']==state['cpu_cycles_write']==a.memory_wait_states+2
                 if key:
                     pointer = integer(base+symbols['SavedKbd'], 8)
                     mode = integer(base+symbols['keyboard_mode'], 1)&3
@@ -227,14 +247,19 @@ def main():
             if elapsed>=next_sample:
                 next_sample = elapsed+5
                 state = sample()
-                state['host_elapsed_seconds'] = round(elapsed, 3)
-                receipt['samples'].append(state)
-                (out/'samples.json').write_text(json.dumps(receipt['samples'], indent=2)+'\n')
-                result = results()
-                print('STATE', json.dumps(state), 'STATUS', repr(result.get('STATUS.TXT', '')), flush=True)
-                if 'ALL_DONE' in result.get('STATUS.TXT', ''):
-                    completed = True
-                    break
+                if state is None:
+                    next_sample = elapsed+1
+                    receipt.setdefault('startup_probes', []).append(round(elapsed, 3))
+                    print('STARTUP native CPU dispatcher not initialized', flush=True)
+                else:
+                    state['host_elapsed_seconds'] = round(elapsed, 3)
+                    receipt['samples'].append(state)
+                    (out/'samples.json').write_text(json.dumps(receipt['samples'], indent=2)+'\n')
+                    result = results()
+                    print('STATE', json.dumps(state), 'STATUS', repr(result.get('STATUS.TXT', '')), flush=True)
+                    if 'ALL_DONE' in result.get('STATUS.TXT', ''):
+                        completed = True
+                        break
             if elapsed>=a.seconds:
                 failure = 'host_time_limit'
                 break
@@ -244,6 +269,11 @@ def main():
         raise
     finally:
         if proc.poll() is None:
+            if completed:
+                receipt['teardown_policy'] = 'pause_after_guest_completion_then_exit'
+                send('pause')
+                time.sleep(.5)
+                drain()
             send('exit')
             try:
                 proc.wait(timeout=15)

@@ -18,7 +18,8 @@ module spk286_prefetch_queue (
     localparam logic [4:0] CAPACITY = 5'd6;
 
     logic [7:0] storage_q [0:5];
-    logic [2:0] head_q, tail_q;
+    logic [5:0] head_onehot_q;
+    logic [2:0] tail_q;
     logic [3:0] count_q;
     logic do_fill, do_consume;
     logic [2:0] tail_after_first;
@@ -32,9 +33,9 @@ module spk286_prefetch_queue (
     assign consume_valid = (count_q != 4'd0);
     // Decode the six legal head positions in parallel, keeping the selection
     // before the byte reduction instead of cascading byte-wide mux stages.
-    // The pointer resets to zero and increment_pointer wraps at five.
+    // The one-hot head resets to byte zero and rotates at consumption.
     (* keep *) logic [5:0] consume_head_select;
-    assign consume_head_select = 6'b000001 << head_q;
+    assign consume_head_select = head_onehot_q;
     assign consume_data = ({8{consume_head_select[0]}} & storage_q[0]) |
                           ({8{consume_head_select[1]}} & storage_q[1]) |
                           ({8{consume_head_select[2]}} & storage_q[2]) |
@@ -50,7 +51,7 @@ module spk286_prefetch_queue (
 
     always_ff @(posedge clk) begin
         if (reset || flush) begin
-            head_q <= 3'd0;
+            head_onehot_q <= 6'b000001;
             tail_q <= 3'd0;
             count_q <= 4'd0;
         end else begin
@@ -61,7 +62,7 @@ module spk286_prefetch_queue (
                 tail_q <= (fill_count == 2'd2) ? tail_after_second : tail_after_first;
             end
             if (do_consume)
-                head_q <= increment_pointer(head_q);
+                head_onehot_q <= {head_onehot_q[4:0], head_onehot_q[5]};
 
             case ({do_fill, do_consume})
                 2'b10: count_q <= count_q + {2'b00, fill_count};

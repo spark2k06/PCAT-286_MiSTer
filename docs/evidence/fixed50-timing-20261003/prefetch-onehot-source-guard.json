@@ -1,0 +1,30 @@
+{
+  "reference_path": "D:\\GitHub\\PCAT-286_MiSTer\\build\\fixed50-data-capture-factored-bridge-seed1-fit-20261003\\work\\vendor\\spk286\\rtl\\spk286_prefetch_queue.sv",
+  "reference_sha256": "7a53a407df6114214a7d3861d7fb94c7f35b094d9e0162ab6789cb46a6bc2e29",
+  "reference_copy_sha256": "7a53a407df6114214a7d3861d7fb94c7f35b094d9e0162ab6789cb46a6bc2e29",
+  "candidate_sha256": "1ff56d25c7d241edb27ef3c9f9e3addc8fe65e878467656f3c9e65b9de43a542",
+  "changes": [
+    {
+      "before": "    logic [2:0] head_q, tail_q;",
+      "after": "    logic [5:0] head_onehot_q;\n    logic [2:0] tail_q;"
+    },
+    {
+      "before": "    // The pointer resets to zero and increment_pointer wraps at five.",
+      "after": "    // The one-hot head resets to byte zero and rotates at consumption."
+    },
+    {
+      "before": "    assign consume_head_select = 6'b000001 << head_q;",
+      "after": "    assign consume_head_select = head_onehot_q;"
+    },
+    {
+      "before": "            head_q <= 3'd0;",
+      "after": "            head_onehot_q <= 6'b000001;"
+    },
+    {
+      "before": "                head_q <= increment_pointer(head_q);",
+      "after": "                head_onehot_q <= {head_onehot_q[4:0], head_onehot_q[5]};"
+    }
+  ],
+  "scope": "Only head encoding/selection/reset/rotation, plus explanatory comment. Tail, count, storage, handshakes and timing remain normalized byte-identical.",
+  "preparation_script_sha256": "8c4a5734efd35f9255ea785ac616679f1faeb7b1a9c9cc3633cb6b3278412b7e"
+}

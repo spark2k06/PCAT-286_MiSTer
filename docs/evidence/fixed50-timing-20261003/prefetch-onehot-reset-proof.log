@@ -1,0 +1,377 @@
+
+ /----------------------------------------------------------------------------\
+ |                                                                            |
+ |  yosys -- Yosys Open SYnthesis Suite                                       |
+ |                                                                            |
+ |  Copyright (C) 2012 - 2020  Claire Xenia Wolf <claire@yosyshq.com>         |
+ |                                                                            |
+ |  Permission to use, copy, modify, and/or distribute this software for any  |
+ |  purpose with or without fee is hereby granted, provided that the above    |
+ |  copyright notice and this permission notice appear in all copies.         |
+ |                                                                            |
+ |  THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES  |
+ |  WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF          |
+ |  MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR   |
+ |  ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES    |
+ |  WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN     |
+ |  ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF   |
+ |  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.            |
+ |                                                                            |
+ \----------------------------------------------------------------------------/
+
+ Yosys 0.33 (git sha1 2584903a060)
+
+
+-- Running command `read_verilog -sv one-step.v invariant.sv; hierarchy -top invariant; proc; flatten; wreduce; opt -full -keepdc; check -assert; sat -verify -set-def-inputs -prove reset_ok 1 -show relation -show outputs_equal -show common_next_equal -show head_next_relation -show reset -show flush -show previous_head_q -show previous_head_onehot_q -dump_json counterexample.json' --
+
+1. Executing Verilog-2005 frontend: one-step.v
+Parsing SystemVerilog input from `one-step.v' to AST representation.
+Generating RTLIL representation for module `\queue_gate'.
+Generating RTLIL representation for module `\queue_gold'.
+Successfully finished Verilog frontend.
+
+2. Executing Verilog-2005 frontend: invariant.sv
+Parsing SystemVerilog input from `invariant.sv' to AST representation.
+Generating RTLIL representation for module `\invariant'.
+Successfully finished Verilog frontend.
+
+3. Executing HIERARCHY pass (managing design hierarchy).
+
+3.1. Analyzing design hierarchy..
+Top module:  \invariant
+Used module:     \queue_gate
+Used module:     \queue_gold
+
+3.2. Analyzing design hierarchy..
+Top module:  \invariant
+Used module:     \queue_gate
+Used module:     \queue_gold
+Removed 0 unused modules.
+
+4. Executing PROC pass (convert processes to netlists).
+
+4.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+4.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Removed a total of 0 dead cases.
+
+4.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 0 redundant assignments.
+Promoted 0 assignments to connections.
+
+4.4. Executing PROC_INIT pass (extract init attributes).
+
+4.5. Executing PROC_ARST pass (detect async resets in processes).
+
+4.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+
+4.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+
+4.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+
+4.9. Executing PROC_DFF pass (convert process syncs to FFs).
+
+4.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+4.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+4.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module invariant.
+<suppressed ~6 debug messages>
+Optimizing module queue_gold.
+Optimizing module queue_gate.
+
+5. Executing FLATTEN pass (flatten design).
+Deleting now unused module queue_gold.
+Deleting now unused module queue_gate.
+<suppressed ~2 debug messages>
+
+6. Executing WREDUCE pass (reducing word size of cells).
+Removed top 5 bits (of 6) from port A of cell invariant.$shl$invariant.sv:109$292 ($shl).
+Removed top 5 bits (of 6) from port A of cell invariant.$shl$invariant.sv:122$318 ($shl).
+Removed top 5 bits (of 6) from port B of cell invariant.$eq$invariant.sv:125$328 ($eq).
+Removed top 5 bits (of 6) from port B of cell invariant.$eq$invariant.sv:126$338 ($eq).
+Removed top 3 bits (of 4) from port B of cell invariant.$flatten\u_gold.$sub$one-step.v:849$286 ($sub).
+Removed top 5 bits (of 6) from port A of cell invariant.$flatten\u_gold.$shl$one-step.v:848$285 ($shl).
+Removed top 1 bits (of 2) from port B of cell invariant.$flatten\u_gold.$eq$one-step.v:844$281 ($eq).
+Removed top 2 bits (of 5) from port B of cell invariant.$flatten\u_gold.$le$one-step.v:769$206 ($le).
+Removed top 2 bits (of 4) from port B of cell invariant.$flatten\u_gold.$add$one-step.v:711$148 ($add).
+Removed top 1 bits (of 5) from port A of cell invariant.$flatten\u_gold.$add$one-step.v:710$147 ($add).
+Removed top 3 bits (of 5) from port B of cell invariant.$flatten\u_gold.$add$one-step.v:710$147 ($add).
+Removed top 2 bits (of 3) from port B of cell invariant.$flatten\u_gold.$add$one-step.v:709$146 ($add).
+Removed top 2 bits (of 3) from port B of cell invariant.$flatten\u_gold.$add$one-step.v:708$145 ($add).
+Removed top 2 bits (of 3) from port B of cell invariant.$flatten\u_gold.$add$one-step.v:707$144 ($add).
+Removed top 3 bits (of 4) from port B of cell invariant.$flatten\u_gate.$sub$one-step.v:405$140 ($sub).
+Removed top 1 bits (of 2) from port B of cell invariant.$flatten\u_gate.$eq$one-step.v:401$136 ($eq).
+Removed top 2 bits (of 5) from port B of cell invariant.$flatten\u_gate.$le$one-step.v:326$61 ($le).
+Removed top 2 bits (of 4) from port B of cell invariant.$flatten\u_gate.$add$one-step.v:269$4 ($add).
+Removed top 1 bits (of 5) from port A of cell invariant.$flatten\u_gate.$add$one-step.v:268$3 ($add).
+Removed top 3 bits (of 5) from port B of cell invariant.$flatten\u_gate.$add$one-step.v:268$3 ($add).
+Removed top 2 bits (of 3) from port B of cell invariant.$flatten\u_gate.$add$one-step.v:267$2 ($add).
+Removed top 2 bits (of 3) from port B of cell invariant.$flatten\u_gate.$add$one-step.v:266$1 ($add).
+
+7. Executing OPT pass (performing simple optimizations).
+
+7.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module invariant.
+
+7.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\invariant'.
+<suppressed ~117 debug messages>
+Removed a total of 39 cells.
+
+7.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \invariant..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~26 debug messages>
+
+7.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \invariant.
+Performed a total of 0 changes.
+
+7.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\invariant'.
+<suppressed ~300 debug messages>
+Removed a total of 100 cells.
+
+7.6. Executing OPT_SHARE pass.
+
+7.7. Executing OPT_DFF pass (perform DFF optimizations).
+
+7.8. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \invariant..
+Removed 0 unused cells and 308 unused wires.
+<suppressed ~1 debug messages>
+
+7.9. Executing OPT_EXPR pass (perform const folding).
+Optimizing module invariant.
+<suppressed ~22 debug messages>
+
+7.10. Rerunning OPT passes. (Maybe there is more to do..)
+
+7.11. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \invariant..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:360$95.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:360$95.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:361$96.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:361$96.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:362$97.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:362$97.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:363$98.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:363$98.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:364$99.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:364$99.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:365$100.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:365$100.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:366$101.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:366$101.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:367$102.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:367$102.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:368$103.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:368$103.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:369$104.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:369$104.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:370$105.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:370$105.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:371$106.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:371$106.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:372$107.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:372$107.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:373$108.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:373$108.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:374$109.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:374$109.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:375$110.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:375$110.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:376$111.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:376$111.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:377$112.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:377$112.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:378$113.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:378$113.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:379$114.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:379$114.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:380$115.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:380$115.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:381$116.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:381$116.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:382$117.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:382$117.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:383$118.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:383$118.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:384$119.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:384$119.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:390$125.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:390$125.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:721$158.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:721$158.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:722$159.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:722$159.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:723$160.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:723$160.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:724$161.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:724$161.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:725$162.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:725$162.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:726$163.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:726$163.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:786$223.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:786$223.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:787$224.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:787$224.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:788$225.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:788$225.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:789$226.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:789$226.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:790$227.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:790$227.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:791$228.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:791$228.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:792$229.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:792$229.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:793$230.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:793$230.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:794$231.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:794$231.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:795$232.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:795$232.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:796$233.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:796$233.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:797$234.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:797$234.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:798$235.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:798$235.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:799$236.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:799$236.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:800$237.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:800$237.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:801$238.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:801$238.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:802$239.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:802$239.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:828$265.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:828$265.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:829$266.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:829$266.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:830$267.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:830$267.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:831$268.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:831$268.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:832$269.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:832$269.
+Removed 108 multiplexer ports.
+<suppressed ~8 debug messages>
+
+7.12. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \invariant.
+Performed a total of 0 changes.
+
+7.13. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\invariant'.
+Removed a total of 0 cells.
+
+7.14. Executing OPT_SHARE pass.
+
+7.15. Executing OPT_DFF pass (perform DFF optimizations).
+
+7.16. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \invariant..
+Removed 47 unused cells and 204 unused wires.
+<suppressed ~232 debug messages>
+
+7.17. Executing OPT_EXPR pass (perform const folding).
+Optimizing module invariant.
+<suppressed ~36 debug messages>
+
+7.18. Rerunning OPT passes. (Maybe there is more to do..)
+
+7.19. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \invariant..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~6 debug messages>
+
+7.20. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \invariant.
+Performed a total of 0 changes.
+
+7.21. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\invariant'.
+Removed a total of 0 cells.
+
+7.22. Executing OPT_SHARE pass.
+
+7.23. Executing OPT_DFF pass (perform DFF optimizations).
+
+7.24. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \invariant..
+
+7.25. Executing OPT_EXPR pass (perform const folding).
+Optimizing module invariant.
+
+7.26. Finished OPT passes. (There is nothing left to do.)
+
+8. Executing CHECK pass (checking for obvious problems).
+Checking module invariant...
+Found and reported 0 problems.
+
+9. Executing SAT pass (solving SAT problems in the circuit).
+
+Setting up SAT problem:
+Final constraint equation: { } = { }
+Import def constraint for this timestep: \reset
+Import def constraint for this timestep: \consume_ready
+Import def constraint for this timestep: \clk
+Import def constraint for this timestep: \fill_valid
+Import def constraint for this timestep: \flush
+Import def constraint for this timestep: \fill_count
+Import def constraint for this timestep: \previous_head_q
+Import def constraint for this timestep: \previous_tail_q
+Import def constraint for this timestep: \previous_count_q
+Import def constraint for this timestep: \previous_head_onehot_q
+Import def constraint for this timestep: \previous_storage_q_5
+Import def constraint for this timestep: \previous_storage_q_4
+Import def constraint for this timestep: \previous_storage_q_1
+Import def constraint for this timestep: \previous_storage_q_0
+Import def constraint for this timestep: \previous_storage_q_3
+Import def constraint for this timestep: \previous_storage_q_2
+Import def constraint for this timestep: \fill_data
+Imported 82 cells to SAT database.
+Import proof-constraint: \reset_ok = 1'1
+Final proof equation: \reset_ok = 1'1
+Import show expression: \relation
+Import show expression: \outputs_equal
+Import show expression: \common_next_equal
+Import show expression: \head_next_relation
+Import show expression: \reset
+Import show expression: \flush
+Import show expression: \previous_head_q
+Import show expression: \previous_head_onehot_q
+
+Solving problem with 6281 variables and 16752 clauses..
+SAT proof finished - no model found: SUCCESS!
+
+                  /$$$$$$      /$$$$$$$$     /$$$$$$$    
+                 /$$__  $$    | $$_____/    | $$__  $$   
+                | $$  \ $$    | $$          | $$  \ $$   
+                | $$  | $$    | $$$$$       | $$  | $$   
+                | $$  | $$    | $$__/       | $$  | $$   
+                | $$/$$ $$    | $$          | $$  | $$   
+                |  $$$$$$/ /$$| $$$$$$$$ /$$| $$$$$$$//$$
+                 \____ $$$|__/|________/|__/|_______/|__/
+                       \__/                              
+
+End of script. Logfile hash: 74fe5627b6, CPU: user 0.12s system 0.00s, MEM: 15.62 MB peak
+Yosys 0.33 (git sha1 2584903a060)
+Time spent: 18% 3x read_verilog (0 sec), 18% 4x opt_merge (0 sec), ...

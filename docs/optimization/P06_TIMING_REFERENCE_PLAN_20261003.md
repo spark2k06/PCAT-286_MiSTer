@@ -13,7 +13,8 @@ The [Intel instruction extraction](P06_INTEL_TIMING_REFERENCE_20261003.md)
 and [fixed-50 MHz pilot contract](P06_TIMING_CONTRACT_20261003.md) now complete
 the kernel reference/design preparation. They identify native-86Box timing
 differences, capture/publication rules, the 6 MHz rational generator and
-directed acceptance cases. They introduce no historical RTL and do not close
+directed acceptance cases. Provisional component implementation is tracked in
+[the pilot progress](P06_PILOT_PROGRESS_20261003.md); it does not close
 the physical/board or complete instruction-timeline evidence gates.
 
 ## 1. Current boundary and intended product

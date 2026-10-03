@@ -1,0 +1,808 @@
+
+-- Executing script file `/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-fixture-acceptance-20261003/generic-1.ys' --
+
+1. Executing Verilog-2005 frontend: rtl/spk286_timing_pilot/p06_instruction_duration.sv
+Parsing SystemVerilog input from `rtl/spk286_timing_pilot/p06_instruction_duration.sv' to AST representation.
+Generating RTLIL representation for module `\p06_instruction_duration'.
+Successfully finished Verilog frontend.
+
+2. Executing Verilog-2005 frontend: rtl/spk286_timing_pilot/p06_bus_cycle.sv
+Parsing SystemVerilog input from `rtl/spk286_timing_pilot/p06_bus_cycle.sv' to AST representation.
+Generating RTLIL representation for module `\p06_bus_cycle'.
+Successfully finished Verilog frontend.
+
+3. Executing Verilog-2005 frontend: rtl/spk286_timing_pilot/p06_clock.sv
+Parsing SystemVerilog input from `rtl/spk286_timing_pilot/p06_clock.sv' to AST representation.
+Generating RTLIL representation for module `\p06_clock'.
+Successfully finished Verilog frontend.
+Parameter \HISTORICAL = 1
+
+4. Executing AST frontend in derive mode using pre-parsed AST for module `\p06_instruction_duration'.
+Parameter \HISTORICAL = 1
+Generating RTLIL representation for module `$paramod\p06_instruction_duration\HISTORICAL=32'00000000000000000000000000000001'.
+
+5. Executing SYNTH pass.
+
+5.1. Executing HIERARCHY pass (managing design hierarchy).
+
+5.1.1. Analyzing design hierarchy..
+Top module:  \p06_instruction_duration
+
+5.1.2. Analyzing design hierarchy..
+Top module:  \p06_instruction_duration
+Removing unused module `\p06_clock'.
+Removing unused module `\p06_bus_cycle'.
+Removed 2 unused modules.
+
+5.2. Executing PROC pass (convert processes to netlists).
+
+5.2.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+5.2.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Marked 3 switch rules as full_case in process $proc$rtl/spk286_timing_pilot/p06_instruction_duration.sv:0$214 in module p06_instruction_duration.
+Marked 1 switch rules as full_case in process $proc$rtl/spk286_timing_pilot/p06_instruction_duration.sv:102$261 in module p06_instruction_duration.
+Removed a total of 0 dead cases.
+
+5.2.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 0 redundant assignments.
+Promoted 9 assignments to connections.
+
+5.2.4. Executing PROC_INIT pass (extract init attributes).
+
+5.2.5. Executing PROC_ARST pass (detect async resets in processes).
+
+5.2.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+<suppressed ~10 debug messages>
+
+5.2.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\p06_instruction_duration.$proc$rtl/spk286_timing_pilot/p06_instruction_duration.sv:0$214'.
+     1/8: $1\minimum_clocks[5:0]
+     2/8: $1\historical.alignment_clocks[5:0]
+     3/8: $1\historical.base_clocks[5:0]
+     4/8: $1\historical.requires_target_length[0:0]
+     5/8: $1\historical.branch_form[0:0]
+     6/8: $1\historical.permits_read_wait[0:0]
+     7/8: $1\historical.memory_form[0:0]
+     8/8: $1\historical.row_known[0:0]
+Creating decoders for process `\p06_instruction_duration.$proc$rtl/spk286_timing_pilot/p06_instruction_duration.sv:102$261'.
+     1/5: $0\historical.budget_q[7:0]
+     2/5: $0\historical.elapsed_q[7:0]
+     3/5: $0\historical.permits_wait_q[0:0]
+     4/5: $0\historical.active_q[0:0]
+     5/5: $0\timing_error[0:0]
+
+5.2.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+No latch inferred for signal `\p06_instruction_duration.\metadata_qualified' from process `\p06_instruction_duration.$proc$rtl/spk286_timing_pilot/p06_instruction_duration.sv:0$214'.
+No latch inferred for signal `\p06_instruction_duration.\minimum_clocks' from process `\p06_instruction_duration.$proc$rtl/spk286_timing_pilot/p06_instruction_duration.sv:0$214'.
+No latch inferred for signal `\p06_instruction_duration.\historical.row_known' from process `\p06_instruction_duration.$proc$rtl/spk286_timing_pilot/p06_instruction_duration.sv:0$214'.
+No latch inferred for signal `\p06_instruction_duration.\historical.memory_form' from process `\p06_instruction_duration.$proc$rtl/spk286_timing_pilot/p06_instruction_duration.sv:0$214'.
+No latch inferred for signal `\p06_instruction_duration.\historical.permits_read_wait' from process `\p06_instruction_duration.$proc$rtl/spk286_timing_pilot/p06_instruction_duration.sv:0$214'.
+No latch inferred for signal `\p06_instruction_duration.\historical.branch_form' from process `\p06_instruction_duration.$proc$rtl/spk286_timing_pilot/p06_instruction_duration.sv:0$214'.
+No latch inferred for signal `\p06_instruction_duration.\historical.requires_target_length' from process `\p06_instruction_duration.$proc$rtl/spk286_timing_pilot/p06_instruction_duration.sv:0$214'.
+No latch inferred for signal `\p06_instruction_duration.\historical.base_clocks' from process `\p06_instruction_duration.$proc$rtl/spk286_timing_pilot/p06_instruction_duration.sv:0$214'.
+No latch inferred for signal `\p06_instruction_duration.\historical.alignment_clocks' from process `\p06_instruction_duration.$proc$rtl/spk286_timing_pilot/p06_instruction_duration.sv:0$214'.
+
+5.2.9. Executing PROC_DFF pass (convert process syncs to FFs).
+Creating register for signal `\p06_instruction_duration.\timing_error' using process `\p06_instruction_duration.$proc$rtl/spk286_timing_pilot/p06_instruction_duration.sv:102$261'.
+  created $dff cell `$procdff$359' with positive edge clock.
+Creating register for signal `\p06_instruction_duration.\historical.active_q' using process `\p06_instruction_duration.$proc$rtl/spk286_timing_pilot/p06_instruction_duration.sv:102$261'.
+  created $dff cell `$procdff$360' with positive edge clock.
+Creating register for signal `\p06_instruction_duration.\historical.permits_wait_q' using process `\p06_instruction_duration.$proc$rtl/spk286_timing_pilot/p06_instruction_duration.sv:102$261'.
+  created $dff cell `$procdff$361' with positive edge clock.
+Creating register for signal `\p06_instruction_duration.\historical.elapsed_q' using process `\p06_instruction_duration.$proc$rtl/spk286_timing_pilot/p06_instruction_duration.sv:102$261'.
+  created $dff cell `$procdff$362' with positive edge clock.
+Creating register for signal `\p06_instruction_duration.\historical.budget_q' using process `\p06_instruction_duration.$proc$rtl/spk286_timing_pilot/p06_instruction_duration.sv:102$261'.
+  created $dff cell `$procdff$363' with positive edge clock.
+
+5.2.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+5.2.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Found and cleaned up 3 empty switches in `\p06_instruction_duration.$proc$rtl/spk286_timing_pilot/p06_instruction_duration.sv:0$214'.
+Removing empty process `p06_instruction_duration.$proc$rtl/spk286_timing_pilot/p06_instruction_duration.sv:0$214'.
+Found and cleaned up 7 empty switches in `\p06_instruction_duration.$proc$rtl/spk286_timing_pilot/p06_instruction_duration.sv:102$261'.
+Removing empty process `p06_instruction_duration.$proc$rtl/spk286_timing_pilot/p06_instruction_duration.sv:102$261'.
+Cleaned up 10 empty switches.
+
+5.2.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_instruction_duration.
+<suppressed ~3 debug messages>
+
+5.3. Executing FLATTEN pass (flatten design).
+
+5.4. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_instruction_duration.
+
+5.5. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_instruction_duration..
+Removed 1 unused cells and 66 unused wires.
+<suppressed ~2 debug messages>
+
+5.6. Executing CHECK pass (checking for obvious problems).
+Checking module p06_instruction_duration...
+Found and reported 0 problems.
+
+5.7. Executing OPT pass (performing simple optimizations).
+
+5.7.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_instruction_duration.
+
+5.7.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\p06_instruction_duration'.
+<suppressed ~123 debug messages>
+Removed a total of 41 cells.
+
+5.7.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \p06_instruction_duration..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~14 debug messages>
+
+5.7.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \p06_instruction_duration.
+    New ctrl vector for $pmux cell $procmux$275: { $procmux$283_CTRL $procmux$281_CMP $procmux$279_CMP $procmux$278_CMP $auto$opt_reduce.cc:134:opt_pmux$367 $auto$opt_reduce.cc:134:opt_pmux$365 }
+    New ctrl vector for $pmux cell $procmux$296: $auto$opt_reduce.cc:134:opt_pmux$369
+    New ctrl vector for $pmux cell $procmux$300: $auto$opt_reduce.cc:134:opt_pmux$371
+    New ctrl vector for $pmux cell $procmux$304: $auto$opt_reduce.cc:134:opt_pmux$373
+    New ctrl vector for $pmux cell $procmux$309: $auto$opt_reduce.cc:134:opt_pmux$375
+    New input vector for $reduce_or cell $auto$opt_reduce.cc:128:opt_pmux$364: { $eq$rtl/spk286_timing_pilot/p06_instruction_duration.sv:88$236_Y $eq$rtl/spk286_timing_pilot/p06_instruction_duration.sv:80$218_Y $procmux$280_CMP }
+    New input vector for $reduce_or cell $auto$opt_reduce.cc:128:opt_pmux$366: { $procmux$277_CMP $procmux$282_CMP }
+    New input vector for $reduce_or cell $auto$opt_reduce.cc:128:opt_pmux$370: { $eq$rtl/spk286_timing_pilot/p06_instruction_duration.sv:88$236_Y $eq$rtl/spk286_timing_pilot/p06_instruction_duration.sv:80$218_Y $procmux$278_CMP }
+    New input vector for $reduce_or cell $auto$opt_reduce.cc:128:opt_pmux$372: { $eq$rtl/spk286_timing_pilot/p06_instruction_duration.sv:88$236_Y $eq$rtl/spk286_timing_pilot/p06_instruction_duration.sv:80$218_Y $procmux$277_CMP $procmux$278_CMP }
+    New input vector for $reduce_or cell $auto$opt_reduce.cc:128:opt_pmux$374: { $eq$rtl/spk286_timing_pilot/p06_instruction_duration.sv:88$236_Y $eq$rtl/spk286_timing_pilot/p06_instruction_duration.sv:80$218_Y $procmux$277_CMP $procmux$278_CMP $procmux$279_CMP $procmux$280_CMP $procmux$281_CMP $procmux$282_CMP $procmux$283_CMP }
+  Optimizing cells in module \p06_instruction_duration.
+Performed a total of 10 changes.
+
+5.7.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\p06_instruction_duration'.
+Removed a total of 0 cells.
+
+5.7.6. Executing OPT_DFF pass (perform DFF optimizations).
+
+5.7.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_instruction_duration..
+Removed 2 unused cells and 36 unused wires.
+<suppressed ~3 debug messages>
+
+5.7.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_instruction_duration.
+
+5.7.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+5.7.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \p06_instruction_duration..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~14 debug messages>
+
+5.7.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \p06_instruction_duration.
+Performed a total of 0 changes.
+
+5.7.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\p06_instruction_duration'.
+Removed a total of 0 cells.
+
+5.7.13. Executing OPT_DFF pass (perform DFF optimizations).
+
+5.7.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_instruction_duration..
+
+5.7.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_instruction_duration.
+
+5.7.16. Finished OPT passes. (There is nothing left to do.)
+
+5.8. Executing FSM pass (extract and optimize FSM).
+
+5.8.1. Executing FSM_DETECT pass (finding FSMs in design).
+
+5.8.2. Executing FSM_EXTRACT pass (extracting FSM from design).
+
+5.8.3. Executing FSM_OPT pass (simple optimizations of FSMs).
+
+5.8.4. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_instruction_duration..
+
+5.8.5. Executing FSM_OPT pass (simple optimizations of FSMs).
+
+5.8.6. Executing FSM_RECODE pass (re-assigning FSM state encoding).
+
+5.8.7. Executing FSM_INFO pass (dumping all available information on FSM cells).
+
+5.8.8. Executing FSM_MAP pass (mapping FSMs to basic logic).
+
+5.9. Executing OPT pass (performing simple optimizations).
+
+5.9.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_instruction_duration.
+
+5.9.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\p06_instruction_duration'.
+Removed a total of 0 cells.
+
+5.9.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \p06_instruction_duration..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~14 debug messages>
+
+5.9.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \p06_instruction_duration.
+Performed a total of 0 changes.
+
+5.9.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\p06_instruction_duration'.
+Removed a total of 0 cells.
+
+5.9.6. Executing OPT_DFF pass (perform DFF optimizations).
+Adding SRST signal on $procdff$363 ($dff) from module p06_instruction_duration (D = $procmux$324_Y [5:0], Q = \historical.budget_q [5:0], rval = 6'000000).
+Adding SRST signal on $procdff$363 ($dff) from module p06_instruction_duration (D = $procmux$320_Y [7:6], Q = \historical.budget_q [7:6], rval = 2'00).
+Adding EN signal on $auto$ff.cc:266:slice$377 ($sdff) from module p06_instruction_duration (D = \historical.extended_budget [7:6], Q = \historical.budget_q [7:6]).
+Adding EN signal on $auto$ff.cc:266:slice$376 ($sdff) from module p06_instruction_duration (D = $procmux$324_Y [5:0], Q = \historical.budget_q [5:0]).
+Adding SRST signal on $procdff$362 ($dff) from module p06_instruction_duration (D = $procmux$329_Y, Q = \historical.elapsed_q, rval = 8'00000000).
+Adding EN signal on $auto$ff.cc:266:slice$390 ($sdff) from module p06_instruction_duration (D = \historical.next_elapsed [7:0], Q = \historical.elapsed_q).
+Adding SRST signal on $procdff$361 ($dff) from module p06_instruction_duration (D = $procmux$340_Y, Q = \historical.permits_wait_q, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$394 ($sdff) from module p06_instruction_duration (D = $procmux$340_Y, Q = \historical.permits_wait_q).
+Adding SRST signal on $procdff$360 ($dff) from module p06_instruction_duration (D = $procmux$349_Y, Q = \historical.active_q, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$398 ($sdff) from module p06_instruction_duration (D = $procmux$349_Y, Q = \historical.active_q).
+Adding SRST signal on $procdff$359 ($dff) from module p06_instruction_duration (D = $procmux$354_Y, Q = \timing_error, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$402 ($sdff) from module p06_instruction_duration (D = 1'1, Q = \timing_error).
+
+5.9.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_instruction_duration..
+Removed 9 unused cells and 9 unused wires.
+<suppressed ~10 debug messages>
+
+5.9.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_instruction_duration.
+<suppressed ~3 debug messages>
+
+5.9.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+5.9.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \p06_instruction_duration..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~12 debug messages>
+
+5.9.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \p06_instruction_duration.
+Performed a total of 0 changes.
+
+5.9.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\p06_instruction_duration'.
+<suppressed ~3 debug messages>
+Removed a total of 1 cells.
+
+5.9.13. Executing OPT_DFF pass (perform DFF optimizations).
+
+5.9.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_instruction_duration..
+Removed 0 unused cells and 1 unused wires.
+<suppressed ~1 debug messages>
+
+5.9.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_instruction_duration.
+
+5.9.16. Rerunning OPT passes. (Maybe there is more to do..)
+
+5.9.17. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \p06_instruction_duration..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~12 debug messages>
+
+5.9.18. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \p06_instruction_duration.
+Performed a total of 0 changes.
+
+5.9.19. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\p06_instruction_duration'.
+Removed a total of 0 cells.
+
+5.9.20. Executing OPT_DFF pass (perform DFF optimizations).
+
+5.9.21. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_instruction_duration..
+
+5.9.22. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_instruction_duration.
+
+5.9.23. Finished OPT passes. (There is nothing left to do.)
+
+5.10. Executing WREDUCE pass (reducing word size of cells).
+Removed top 2 bits (of 8) from mux cell p06_instruction_duration.$procmux$324 ($mux).
+Removed top 2 bits (of 8) from mux cell p06_instruction_duration.$procmux$322 ($mux).
+Removed top 2 bits (of 8) from mux cell p06_instruction_duration.$procmux$320 ($mux).
+Removed top 2 bits (of 8) from mux cell p06_instruction_duration.$procmux$318 ($mux).
+Removed top 2 bits (of 4) from port B of cell p06_instruction_duration.$procmux$283_CMP2 ($eq).
+Removed top 3 bits (of 4) from port B of cell p06_instruction_duration.$procmux$283_CMP1 ($eq).
+Removed top 1 bits (of 4) from port B of cell p06_instruction_duration.$procmux$282_CMP1 ($eq).
+Removed top 2 bits (of 4) from port B of cell p06_instruction_duration.$procmux$282_CMP0 ($eq).
+Removed top 1 bits (of 4) from port B of cell p06_instruction_duration.$procmux$281_CMP0 ($eq).
+Removed top 1 bits (of 4) from port B of cell p06_instruction_duration.$procmux$280_CMP0 ($eq).
+Removed top 1 bits (of 4) from port B of cell p06_instruction_duration.$procmux$279_CMP0 ($eq).
+Removed top 1 bits (of 9) from port A of cell p06_instruction_duration.$add$rtl/spk286_timing_pilot/p06_instruction_duration.sv:38$178 ($add).
+Removed top 8 bits (of 9) from port B of cell p06_instruction_duration.$add$rtl/spk286_timing_pilot/p06_instruction_duration.sv:38$178 ($add).
+Removed top 1 bits (of 9) from port A of cell p06_instruction_duration.$add$rtl/spk286_timing_pilot/p06_instruction_duration.sv:40$180 ($add).
+Removed top 8 bits (of 9) from port B of cell p06_instruction_duration.$add$rtl/spk286_timing_pilot/p06_instruction_duration.sv:40$180 ($add).
+Removed top 1 bits (of 4) from port B of cell p06_instruction_duration.$auto$opt_dff.cc:195:make_patterns_logic$387 ($ne).
+Removed top 3 bits (of 6) from mux cell p06_instruction_duration.$ternary$rtl/spk286_timing_pilot/p06_instruction_duration.sv:61$215 ($mux).
+Removed top 2 bits (of 6) from mux cell p06_instruction_duration.$ternary$rtl/spk286_timing_pilot/p06_instruction_duration.sv:68$216 ($mux).
+Removed top 3 bits (of 6) from mux cell p06_instruction_duration.$ternary$rtl/spk286_timing_pilot/p06_instruction_duration.sv:80$219 ($mux).
+Removed top 5 bits (of 6) from port B of cell p06_instruction_duration.$add$rtl/spk286_timing_pilot/p06_instruction_duration.sv:81$222 ($add).
+Removed top 2 bits (of 6) from mux cell p06_instruction_duration.$ternary$rtl/spk286_timing_pilot/p06_instruction_duration.sv:83$223 ($mux).
+Removed top 2 bits (of 6) from port B of cell p06_instruction_duration.$add$rtl/spk286_timing_pilot/p06_instruction_duration.sv:81$224 ($add).
+Removed top 31 bits (of 32) from port B of cell p06_instruction_duration.$ge$rtl/spk286_timing_pilot/p06_instruction_duration.sv:89$242 ($ge).
+Removed top 29 bits (of 32) from port B of cell p06_instruction_duration.$le$rtl/spk286_timing_pilot/p06_instruction_duration.sv:89$244 ($le).
+Removed top 5 bits (of 6) from wire p06_instruction_duration.$logic_and$rtl/spk286_timing_pilot/p06_instruction_duration.sv:82$221_Y.
+Removed top 2 bits (of 8) from wire p06_instruction_duration.$procmux$318_Y.
+Removed top 2 bits (of 8) from wire p06_instruction_duration.$procmux$320_Y.
+Removed top 5 bits (of 8) from wire p06_instruction_duration.$procmux$322_Y.
+Removed top 3 bits (of 8) from wire p06_instruction_duration.$procmux$324_Y.
+Removed top 3 bits (of 6) from wire p06_instruction_duration.$ternary$rtl/spk286_timing_pilot/p06_instruction_duration.sv:61$215_Y.
+Removed top 2 bits (of 6) from wire p06_instruction_duration.$ternary$rtl/spk286_timing_pilot/p06_instruction_duration.sv:68$216_Y.
+Removed top 3 bits (of 6) from wire p06_instruction_duration.$ternary$rtl/spk286_timing_pilot/p06_instruction_duration.sv:80$219_Y.
+Removed top 2 bits (of 6) from wire p06_instruction_duration.$ternary$rtl/spk286_timing_pilot/p06_instruction_duration.sv:83$223_Y.
+
+5.11. Executing PEEPOPT pass (run peephole optimizers).
+
+5.12. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_instruction_duration..
+Removed 0 unused cells and 9 unused wires.
+<suppressed ~1 debug messages>
+
+5.13. Executing ALUMACC pass (create $alu and $macc cells).
+Extracting $alu and $macc cells in module p06_instruction_duration:
+  creating $macc model for $add$rtl/spk286_timing_pilot/p06_instruction_duration.sv:38$178 ($add).
+  creating $macc model for $add$rtl/spk286_timing_pilot/p06_instruction_duration.sv:40$180 ($add).
+  creating $macc model for $add$rtl/spk286_timing_pilot/p06_instruction_duration.sv:81$220 ($add).
+  creating $macc model for $add$rtl/spk286_timing_pilot/p06_instruction_duration.sv:81$222 ($add).
+  creating $macc model for $add$rtl/spk286_timing_pilot/p06_instruction_duration.sv:81$224 ($add).
+  merging $macc model for $add$rtl/spk286_timing_pilot/p06_instruction_duration.sv:81$222 into $add$rtl/spk286_timing_pilot/p06_instruction_duration.sv:81$224.
+  merging $macc model for $add$rtl/spk286_timing_pilot/p06_instruction_duration.sv:81$220 into $add$rtl/spk286_timing_pilot/p06_instruction_duration.sv:81$224.
+  creating $alu model for $macc $add$rtl/spk286_timing_pilot/p06_instruction_duration.sv:40$180.
+  creating $alu model for $macc $add$rtl/spk286_timing_pilot/p06_instruction_duration.sv:38$178.
+  creating $macc cell for $add$rtl/spk286_timing_pilot/p06_instruction_duration.sv:81$224: $auto$alumacc.cc:365:replace_macc$413
+  creating $alu model for $ge$rtl/spk286_timing_pilot/p06_instruction_duration.sv:46$201 ($ge): new $alu
+  creating $alu model for $ge$rtl/spk286_timing_pilot/p06_instruction_duration.sv:89$242 ($ge): new $alu
+  creating $alu model for $le$rtl/spk286_timing_pilot/p06_instruction_duration.sv:89$244 ($le): new $alu
+  creating $alu cell for $le$rtl/spk286_timing_pilot/p06_instruction_duration.sv:89$244: $auto$alumacc.cc:485:replace_alu$417
+  creating $alu cell for $ge$rtl/spk286_timing_pilot/p06_instruction_duration.sv:89$242: $auto$alumacc.cc:485:replace_alu$430
+  creating $alu cell for $ge$rtl/spk286_timing_pilot/p06_instruction_duration.sv:46$201: $auto$alumacc.cc:485:replace_alu$439
+  creating $alu cell for $add$rtl/spk286_timing_pilot/p06_instruction_duration.sv:38$178: $auto$alumacc.cc:485:replace_alu$452
+  creating $alu cell for $add$rtl/spk286_timing_pilot/p06_instruction_duration.sv:40$180: $auto$alumacc.cc:485:replace_alu$455
+  created 5 $alu and 1 $macc cells.
+
+5.14. Executing SHARE pass (SAT-based resource sharing).
+
+5.15. Executing OPT pass (performing simple optimizations).
+
+5.15.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_instruction_duration.
+
+5.15.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\p06_instruction_duration'.
+Removed a total of 0 cells.
+
+5.15.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \p06_instruction_duration..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~12 debug messages>
+
+5.15.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \p06_instruction_duration.
+Performed a total of 0 changes.
+
+5.15.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\p06_instruction_duration'.
+Removed a total of 0 cells.
+
+5.15.6. Executing OPT_DFF pass (perform DFF optimizations).
+
+5.15.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_instruction_duration..
+Removed 2 unused cells and 5 unused wires.
+<suppressed ~3 debug messages>
+
+5.15.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_instruction_duration.
+
+5.15.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+5.15.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \p06_instruction_duration..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~12 debug messages>
+
+5.15.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \p06_instruction_duration.
+Performed a total of 0 changes.
+
+5.15.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\p06_instruction_duration'.
+Removed a total of 0 cells.
+
+5.15.13. Executing OPT_DFF pass (perform DFF optimizations).
+
+5.15.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_instruction_duration..
+
+5.15.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_instruction_duration.
+
+5.15.16. Finished OPT passes. (There is nothing left to do.)
+
+5.16. Executing MEMORY pass.
+
+5.16.1. Executing OPT_MEM pass (optimize memories).
+Performed a total of 0 transformations.
+
+5.16.2. Executing OPT_MEM_PRIORITY pass (removing unnecessary memory write priority relations).
+Performed a total of 0 transformations.
+
+5.16.3. Executing OPT_MEM_FEEDBACK pass (finding memory read-to-write feedback paths).
+
+5.16.4. Executing MEMORY_BMUX2ROM pass (converting muxes to ROMs).
+
+5.16.5. Executing MEMORY_DFF pass (merging $dff cells to $memrd).
+
+5.16.6. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_instruction_duration..
+
+5.16.7. Executing MEMORY_SHARE pass (consolidating $memrd/$memwr cells).
+
+5.16.8. Executing OPT_MEM_WIDEN pass (optimize memories where all ports are wide).
+Performed a total of 0 transformations.
+
+5.16.9. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_instruction_duration..
+
+5.16.10. Executing MEMORY_COLLECT pass (generating $mem cells).
+
+5.17. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_instruction_duration..
+
+5.18. Executing OPT pass (performing simple optimizations).
+
+5.18.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_instruction_duration.
+<suppressed ~12 debug messages>
+
+5.18.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\p06_instruction_duration'.
+Removed a total of 0 cells.
+
+5.18.3. Executing OPT_DFF pass (perform DFF optimizations).
+
+5.18.4. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_instruction_duration..
+Removed 1 unused cells and 11 unused wires.
+<suppressed ~2 debug messages>
+
+5.18.5. Finished fast OPT passes.
+
+5.19. Executing MEMORY_MAP pass (converting memories to logic and flip-flops).
+
+5.20. Executing OPT pass (performing simple optimizations).
+
+5.20.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_instruction_duration.
+<suppressed ~1 debug messages>
+
+5.20.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\p06_instruction_duration'.
+Removed a total of 0 cells.
+
+5.20.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \p06_instruction_duration..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~7 debug messages>
+
+5.20.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \p06_instruction_duration.
+    Consolidated identical input bits for $mux cell $procmux$272:
+      Old ports: A=6'000000, B={ 3'000 $auto$wreduce.cc:461:run$411 [2:0] }, Y=\historical.alignment_clocks
+      New ports: A=3'000, B=$auto$wreduce.cc:461:run$411 [2:0], Y=\historical.alignment_clocks [2:0]
+      New connections: \historical.alignment_clocks [5:3] = 3'000
+    Consolidated identical input bits for $pmux cell $procmux$275:
+      Old ports: A=6'000000, B={ 9'000010000 $auto$wreduce.cc:461:run$409 [2:0] 2'00 $auto$wreduce.cc:461:run$410 [3:0] 18'000101000011000111 }, Y=\historical.base_clocks
+      New ports: A=4'0000, B={ 5'00100 $auto$wreduce.cc:461:run$409 [2:0] $auto$wreduce.cc:461:run$410 [3:0] 12'010100110111 }, Y=\historical.base_clocks [3:0]
+      New connections: \historical.base_clocks [5:4] = 2'00
+    Consolidated identical input bits for $mux cell $ternary$rtl/spk286_timing_pilot/p06_instruction_duration.sv:61$215:
+      Old ports: A=3'011, B=3'111, Y=$auto$wreduce.cc:461:run$409 [2:0]
+      New ports: A=1'0, B=1'1, Y=$auto$wreduce.cc:461:run$409 [2]
+      New connections: $auto$wreduce.cc:461:run$409 [1:0] = 2'11
+    Consolidated identical input bits for $mux cell $ternary$rtl/spk286_timing_pilot/p06_instruction_duration.sv:68$216:
+      Old ports: A=4'0100, B=4'1000, Y=$auto$wreduce.cc:461:run$410 [3:0]
+      New ports: A=2'01, B=2'10, Y=$auto$wreduce.cc:461:run$410 [3:2]
+      New connections: $auto$wreduce.cc:461:run$410 [1:0] = 2'00
+    Consolidated identical input bits for $mux cell $ternary$rtl/spk286_timing_pilot/p06_instruction_duration.sv:80$219:
+      Old ports: A=3'010, B=3'100, Y=$auto$wreduce.cc:461:run$411 [2:0]
+      New ports: A=2'01, B=2'10, Y=$auto$wreduce.cc:461:run$411 [2:1]
+      New connections: $auto$wreduce.cc:461:run$411 [0] = 1'0
+  Optimizing cells in module \p06_instruction_duration.
+    Consolidated identical input bits for $mux cell $procmux$272:
+      Old ports: A=3'000, B=$auto$wreduce.cc:461:run$411 [2:0], Y=\historical.alignment_clocks [2:0]
+      New ports: A=2'00, B=$auto$wreduce.cc:461:run$411 [2:1], Y=\historical.alignment_clocks [2:1]
+      New connections: \historical.alignment_clocks [0] = 1'0
+  Optimizing cells in module \p06_instruction_duration.
+Performed a total of 6 changes.
+
+5.20.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\p06_instruction_duration'.
+Removed a total of 0 cells.
+
+5.20.6. Executing OPT_SHARE pass.
+
+5.20.7. Executing OPT_DFF pass (perform DFF optimizations).
+
+5.20.8. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_instruction_duration..
+
+5.20.9. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_instruction_duration.
+<suppressed ~1 debug messages>
+
+5.20.10. Rerunning OPT passes. (Maybe there is more to do..)
+
+5.20.11. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \p06_instruction_duration..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~7 debug messages>
+
+5.20.12. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \p06_instruction_duration.
+Performed a total of 0 changes.
+
+5.20.13. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\p06_instruction_duration'.
+Removed a total of 0 cells.
+
+5.20.14. Executing OPT_SHARE pass.
+
+5.20.15. Executing OPT_DFF pass (perform DFF optimizations).
+
+5.20.16. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_instruction_duration..
+Removed 0 unused cells and 1 unused wires.
+<suppressed ~1 debug messages>
+
+5.20.17. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_instruction_duration.
+
+5.20.18. Rerunning OPT passes. (Maybe there is more to do..)
+
+5.20.19. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \p06_instruction_duration..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~7 debug messages>
+
+5.20.20. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \p06_instruction_duration.
+Performed a total of 0 changes.
+
+5.20.21. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\p06_instruction_duration'.
+Removed a total of 0 cells.
+
+5.20.22. Executing OPT_SHARE pass.
+
+5.20.23. Executing OPT_DFF pass (perform DFF optimizations).
+
+5.20.24. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_instruction_duration..
+
+5.20.25. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_instruction_duration.
+
+5.20.26. Finished OPT passes. (There is nothing left to do.)
+
+5.21. Executing TECHMAP pass (map to technology primitives).
+
+5.21.1. Executing Verilog-2005 frontend: /usr/bin/../share/yosys/techmap.v
+Parsing Verilog input from `/usr/bin/../share/yosys/techmap.v' to AST representation.
+Generating RTLIL representation for module `\_90_simplemap_bool_ops'.
+Generating RTLIL representation for module `\_90_simplemap_reduce_ops'.
+Generating RTLIL representation for module `\_90_simplemap_logic_ops'.
+Generating RTLIL representation for module `\_90_simplemap_compare_ops'.
+Generating RTLIL representation for module `\_90_simplemap_various'.
+Generating RTLIL representation for module `\_90_simplemap_registers'.
+Generating RTLIL representation for module `\_90_shift_ops_shr_shl_sshl_sshr'.
+Generating RTLIL representation for module `\_90_shift_shiftx'.
+Generating RTLIL representation for module `\_90_fa'.
+Generating RTLIL representation for module `\_90_lcu'.
+Generating RTLIL representation for module `\_90_alu'.
+Generating RTLIL representation for module `\_90_macc'.
+Generating RTLIL representation for module `\_90_alumacc'.
+Generating RTLIL representation for module `\$__div_mod_u'.
+Generating RTLIL representation for module `\$__div_mod_trunc'.
+Generating RTLIL representation for module `\_90_div'.
+Generating RTLIL representation for module `\_90_mod'.
+Generating RTLIL representation for module `\$__div_mod_floor'.
+Generating RTLIL representation for module `\_90_divfloor'.
+Generating RTLIL representation for module `\_90_modfloor'.
+Generating RTLIL representation for module `\_90_pow'.
+Generating RTLIL representation for module `\_90_pmux'.
+Generating RTLIL representation for module `\_90_demux'.
+Generating RTLIL representation for module `\_90_lut'.
+Successfully finished Verilog frontend.
+
+5.21.2. Continuing TECHMAP pass.
+Using extmapper simplemap for cells of type $and.
+Using extmapper simplemap for cells of type $not.
+Using extmapper simplemap for cells of type $reduce_or.
+Using extmapper simplemap for cells of type $mux.
+Using template $paramod$1a3a0c35c4a4896fbfd612699525c057298e72d2\_90_alu for cells of type $alu.
+Using extmapper simplemap for cells of type $or.
+Using extmapper simplemap for cells of type $reduce_and.
+Using extmapper simplemap for cells of type $reduce_bool.
+Using template $paramod$c5c783b17ab1d780abfad8cfe6563a0a7b47a3b0\_90_pmux for cells of type $pmux.
+Using extmapper simplemap for cells of type $sdffe.
+Using extmapper simplemap for cells of type $eq.
+Using extmapper simplemap for cells of type $logic_not.
+Using template $paramod$a13703aa027da371a1931fc542d213d7de559b19\_90_pmux for cells of type $pmux.
+Using extmapper simplemap for cells of type $logic_and.
+Using template $paramod$a2af9b43308e3114c3b5dd3f4dc3329b2387395d\_90_alu for cells of type $alu.
+Using extmapper simplemap for cells of type $logic_or.
+Using extmapper simplemap for cells of type $ne.
+Using extmapper maccmap for cells of type $macc.
+  add { 2'00 \historical.base_clocks [3:0] } (6 bits, unsigned)
+  add $auto$wreduce.cc:461:run$412 [3:0] (4 bits, unsigned)
+  add { 3'000 \historical.alignment_clocks [2:1] 1'0 } (6 bits, unsigned)
+  add bits $auto$wreduce.cc:461:run$404 [0] (1 bits)
+Using template $paramod$d2fa05d38998afabc6d4f34471305d0af4b8b2df\_90_alu for cells of type $alu.
+Using template $paramod$7af24cf7f572852703f08ef7a936c59efa2c57af\_90_alu for cells of type $alu.
+Using extmapper simplemap for cells of type $pos.
+Using template $paramod\_90_lcu\WIDTH=32'00000000000000000000000000000100 for cells of type $lcu.
+Using extmapper simplemap for cells of type $xor.
+Using template $paramod\_90_lcu\WIDTH=32'00000000000000000000000000001001 for cells of type $lcu.
+Using template $paramod\_90_fa\WIDTH=32'00000000000000000000000000000100 for cells of type $fa.
+Using template $paramod$00298f3f8094950cb9a5ff2fda48d0d8bde8806c\_90_alu for cells of type $alu.
+Using template $paramod\_90_lcu\WIDTH=32'00000000000000000000000000000011 for cells of type $lcu.
+Using template $paramod\_90_lcu\WIDTH=32'00000000000000000000000000000110 for cells of type $lcu.
+No more expansions possible.
+<suppressed ~970 debug messages>
+
+5.22. Executing OPT pass (performing simple optimizations).
+
+5.22.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_instruction_duration.
+<suppressed ~279 debug messages>
+
+5.22.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\p06_instruction_duration'.
+<suppressed ~189 debug messages>
+Removed a total of 63 cells.
+
+5.22.3. Executing OPT_DFF pass (perform DFF optimizations).
+
+5.22.4. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_instruction_duration..
+Removed 37 unused cells and 346 unused wires.
+<suppressed ~38 debug messages>
+
+5.22.5. Finished fast OPT passes.
+
+5.23. Executing ABC pass (technology mapping using ABC).
+
+5.23.1. Extracting gate netlist of module `\p06_instruction_duration' to `<abc-temp-dir>/input.blif'..
+Extracted 348 gates and 392 wires to a netlist network with 42 inputs and 37 outputs.
+
+5.23.1.1. Executing ABC.
+Running ABC command: "<yosys-exe-dir>/yosys-abc" -s -f <abc-temp-dir>/abc.script 2>&1
+ABC: ABC command line: "source <abc-temp-dir>/abc.script".
+ABC: 
+ABC: + read_blif <abc-temp-dir>/input.blif 
+ABC: + read_library <abc-temp-dir>/stdcells.genlib 
+ABC: Entered genlib library with 13 gates from file "<abc-temp-dir>/stdcells.genlib".
+ABC: + strash 
+ABC: + dretime 
+ABC: + map 
+ABC: + write_blif <abc-temp-dir>/output.blif 
+
+5.23.1.2. Re-integrating ABC results.
+ABC RESULTS:               AND cells:       11
+ABC RESULTS:              NAND cells:       19
+ABC RESULTS:              XNOR cells:        7
+ABC RESULTS:               XOR cells:       29
+ABC RESULTS:             ORNOT cells:       23
+ABC RESULTS:               MUX cells:        6
+ABC RESULTS:               NOT cells:       14
+ABC RESULTS:                OR cells:       43
+ABC RESULTS:               NOR cells:       30
+ABC RESULTS:            ANDNOT cells:      102
+ABC RESULTS:        internal signals:      313
+ABC RESULTS:           input signals:       42
+ABC RESULTS:          output signals:       37
+Removing temp directory.
+
+5.24. Executing OPT pass (performing simple optimizations).
+
+5.24.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_instruction_duration.
+<suppressed ~8 debug messages>
+
+5.24.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\p06_instruction_duration'.
+Removed a total of 0 cells.
+
+5.24.3. Executing OPT_DFF pass (perform DFF optimizations).
+
+5.24.4. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_instruction_duration..
+Removed 0 unused cells and 262 unused wires.
+<suppressed ~12 debug messages>
+
+5.24.5. Finished fast OPT passes.
+
+5.25. Executing HIERARCHY pass (managing design hierarchy).
+
+5.25.1. Analyzing design hierarchy..
+Top module:  \p06_instruction_duration
+
+5.25.2. Analyzing design hierarchy..
+Top module:  \p06_instruction_duration
+Removed 0 unused modules.
+
+5.26. Printing statistics.
+
+=== p06_instruction_duration ===
+
+   Number of wires:                299
+   Number of wire bits:            364
+   Number of public wires:          38
+   Number of public wire bits:     103
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                303
+     $_ANDNOT_                     102
+     $_AND_                         11
+     $_MUX_                          6
+     $_NAND_                        19
+     $_NOR_                         30
+     $_NOT_                         14
+     $_ORNOT_                       23
+     $_OR_                          43
+     $_SDFFE_PP0N_                   8
+     $_SDFFE_PP0P_                  11
+     $_XNOR_                         7
+     $_XOR_                         29
+
+5.27. Executing CHECK pass (checking for obvious problems).
+Checking module p06_instruction_duration...
+Found and reported 0 problems.
+
+6. Executing JSON backend.
+
+End of script. Logfile hash: 4501f09e47, CPU: user 0.53s system 0.02s, MEM: 17.11 MB peak
+Yosys 0.33 (git sha1 2584903a060)
+Time spent: 27% 27x opt_expr (0 sec), 15% 23x opt_clean (0 sec), ...

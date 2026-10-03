@@ -19,8 +19,9 @@ y la [especificación del piloto de 6 MHz](P06_TIMING_CONTRACT_20261003.md), con
 captura/publicación de respuestas, unidades temporales, pruebas dirigidas y
 base de recursos del fit seleccionado. Se han identificado diferencias entre
 las tablas Intel y los handlers nativos de 86Box; sus medidas se conservan como
-contraste. Falta implementar y validar el piloto, completar los hitos internos
-de cada instrucción y obtener la referencia de placa/CPU física.
+contraste. Ya hay componentes provisionales de reloj, bus retenido y primeras
+duraciones con pruebas dirigidas. Falta conectarlos y validar el piloto en la
+CPU completa, completar los hitos internos y obtener la referencia física.
 
 El desarrollo provisional de componentes temporales y sus pruebas dirigidas
 se registra en [el progreso del piloto](P06_PILOT_PROGRESS_20261003.md).

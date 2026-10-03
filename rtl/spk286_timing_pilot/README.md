@@ -18,6 +18,16 @@ Reuse existing retention when integrating; do not stack the reference slots
 on top of existing BIU/fetch/bridge slots. MAX is a static wire bypass whose
 endpoint must provide the original command/response ownership contract.
 
+`p06_instruction_duration.sv` accepts already-decoded, explicitly qualified
+forms. It starts its minimum duration in parallel with functional work and
+permits retirement only at a CPU boundary with functional completion and
+dependencies available. It owns no architectural result storage or execution
+semantics. Actual read-wait events extend the table budget; write/fetch waits
+remain dependencies. The bounded fixture reports malformed waits and budget
+overflow; elapsed time saturates. This is not enough to certify complete
+instruction timing, bus issue phases, branch refill or interrupt boundaries.
+The static MAX form bypasses duration and metadata without state.
+
 See [the contract](../../docs/optimization/P06_TIMING_CONTRACT_20261003.md)
 and [implementation progress](../../docs/optimization/P06_PILOT_PROGRESS_20261003.md).
 Run the relevant stage from WSL/Linux with a fresh output directory:
@@ -25,7 +35,13 @@ Run the relevant stage from WSL/Linux with a fresh output directory:
 ```sh
 python3 scripts/run_p06_pilot.py --stage clock --output build/p06-clock-repeat
 python3 scripts/run_p06_pilot.py --stage bus --output build/p06-bus-repeat
+python3 scripts/run_p06_pilot.py --stage duration --output build/p06-duration-repeat
+python3 scripts/run_p06_pilot.py --stage fixture --output build/p06-coupled-repeat
 ```
 
 The runner checks lint, Icarus/Verilator, a failing mutation and generic
 Yosys synthesis. Generic cells/register bits are not Quartus ALMs or STA.
+The coupled stage mocks a functional caller, issues data at instruction start,
+and uses an abstract backend. That issue milestone is an unvalidated fixture
+assumption, not an Intel-qualified phase. It does not execute SPK286 or DOS.
+Its generic synthesis measures the named duration component, not a full CPU.

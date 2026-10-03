@@ -540,5 +540,13 @@ capture, logical bus completion, architectural publication, explicit board
 waits and implementation deadline misses. It retains common physical 50 MHz
 and the six-byte CPU queue, records the selected fit's resource baseline and
 prepares C01-C16 directed acceptance cases. Actual board timing, physical
-6/12 MHz measurements and historical RTL remain pending. This closes the
+6/12 MHz measurements and historical CPU integration remain pending. This closes the
 reference/design preparation, not the complete physical M1 or P06/P12 scope.
+
+The [provisional pilot implementation](P06_PILOT_PROGRESS_20261003.md) now has
+directed clock, retained Ts/Tc bus and first Intel form-duration components,
+plus a coupled abstract memory fixture. It separates read-wait corrections
+from bus dependencies instead of adding every bus clock to the table budget.
+It executes no real x86/DOS benchmark and makes no new performance attribution
+or historical accuracy claim. Full issue/commit, prefetch/decoded lookahead,
+write-buffer and board/physical coverage remain acceptance gates.

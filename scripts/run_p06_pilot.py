@@ -22,6 +22,24 @@ STAGES = {
         "negative": ("cpu_boundary && (state_q == TC)",
                      "1'b1 && (state_q == TC)", "early logical completion"),
     },
+    "duration": {
+        "sources": ["rtl/spk286_timing_pilot/p06_instruction_duration.sv",
+                    "rtl/spk286_timing_pilot/p06_clock.sv"],
+        "bench": "sim/spk286_timing_pilot/p06_instruction_duration_tb.sv",
+        "top": "p06_instruction_duration", "pass": "P06_DURATION_PASS",
+        "negative": ("ADD_RI, XOR_RI: base_clocks = 6'd3;",
+                     "ADD_RI, XOR_RI: base_clocks = 6'd2;", "Intel metadata mismatch"),
+    },
+    "fixture": {
+        "sources": ["rtl/spk286_timing_pilot/p06_instruction_duration.sv",
+                    "rtl/spk286_timing_pilot/p06_bus_cycle.sv",
+                    "rtl/spk286_timing_pilot/p06_clock.sv"],
+        "bench": "sim/spk286_timing_pilot/p06_timing_fixture_tb.sv",
+        "bench_top": "p06_timing_fixture_tb",
+        "top": "p06_instruction_duration", "pass": "P06_FIXTURE_PASS",
+        "negative": ("eligible && functional_done && dependencies_ready",
+                     "eligible && functional_done", "fixture premature retirement"),
+    },
 }
 
 
@@ -66,7 +84,7 @@ def main():
     output.mkdir(parents=True, exist_ok=False)
     stage = STAGES[options.stage]
     top = stage["top"]
-    bench_top = top + "_tb"
+    bench_top = stage.get("bench_top", top + "_tb")
     sources = stage["sources"]
     paths = sources + [stage["bench"], "scripts/run_p06_pilot.py"]
     before = {path: sha(ROOT / path) for path in paths}
@@ -116,6 +134,7 @@ def main():
     for path, metadata in production.items():
         assert sha(ROOT / path) == metadata["sha256"], f"Production changed: {path}"
     receipt = {"status": "P06_DIRECTED_COMPONENT_PASS", "stage": options.stage,
+               "generic_synthesis_top": top,
                "sources_sha256": before, "tool_versions": versions,
                "production_sources_unchanged": len(production),
                "production_qip_excludes_pilot": "spk286_timing_pilot" not in

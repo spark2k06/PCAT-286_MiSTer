@@ -200,7 +200,9 @@ historical EU completion or permit an I/O side effect before its bus command.
 
 ## 6. Directed acceptance matrix, prepared for the pilot
 
-These are required checks, **not executed pilot results**. Retain a fabric
+These are required whole-pilot checks. Component portions executed so far are
+identified in [the progress and evidence](P06_PILOT_PROGRESS_20261003.md),
+**not whole-CPU pilot results**. Retain a fabric
 timestamp and phase/state timeline, plus architectural and byte scoreboards.
 Use simulation observers for wide counters; synthesizable timing control
 should not inherit a bank of 64-bit trace registers.

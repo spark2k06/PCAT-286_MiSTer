@@ -1,8 +1,9 @@
 # P06/P12: Intel timing extraction for T286REF
 
 Date: 2026-10-03. Status: reference extraction and source review complete for
-the R0/B0/M0 kernel bodies. Historical RTL and physical 6/12 MHz measurements
-remain pending. This is a companion to the
+the R0/B0/M0 kernel bodies. Historical CPU integration and physical 6/12 MHz
+measurements remain pending; provisional components are tracked in
+[the implementation progress](P06_PILOT_PROGRESS_20261003.md). This is a companion to the
 [pilot contract](P06_TIMING_CONTRACT_20261003.md) and
 [native wait-state measurements](P06_NATIVE_WAITSTATES_RESULTS_20261003.md).
 

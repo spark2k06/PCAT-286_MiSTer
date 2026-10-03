@@ -74,10 +74,95 @@ parts of C02/C03/C04/C10/C15, not complete CPU coverage. LOCK is retained but
 HOLD/odd-word arbitration, prefetch reservation, decoded lookahead, posted
 write visibility and architectural event scheduling remain unimplemented.
 
+## M2c: first form metadata and minimum-duration fixture
+
+`p06_instruction_duration` starts a minimum duration **at instruction start**,
+in parallel with functional work. It does not insert a delay after execution.
+The existing functional owner would retain results; permission to retire is
+conditional on functional completion, dependencies and an eligible boundary.
+An actual read-wait event increases the retained budget by one. No blanket
+sum of bus clocks, fetch/write waits and instruction clocks is applied.
+
+Already-decoded form IDs (these are not opcode encodings):
+
+| ID | Qualified form | Base processor clocks | Intel programmer PDF page |
+| --- | --- | ---: | ---: |
+| 0 / 1 / 2 | ADD / XOR / CMP register-register | 2 | 227 / 324 / 241 |
+| 3 / 4 | ADD / XOR register-immediate | 3 | 227 / 324 |
+| 5 | Jcc | 3 not taken; 7 + next executed instruction bytes when taken | 262 |
+| 6 | JMP short | 7 + next executed instruction bytes | 264 |
+| 7 | LOOP | 8 taken / 4 exit; no added target-length note | 278 |
+| 8 / 9 | A1 moffs16 read / A3 moffs16 write | 5 / 3 | 281 |
+| 10 | ADD register from memory | 7 | 227 |
+| 11 | XOR memory-immediate RMW | 7 | 324 |
+
+Qualification is restricted to Real Mode, no prefixes and those forms.
+Conditional outcomes must be known. A taken Jcc/JMP requires a known next
+instruction length of 1..6 bytes in this pilot. Direct A1/A3 reject a complex
+EA. Arithmetic memory forms accept an explicitly identified
+base+index+displacement correction (+1). Physically odd word operands add +2
+per operand reference (+4 for RMW's read and write), under B-6 / PDF 214.
+All other form/mode/prefix combinations are explicitly rejected; no zero-cost
+fallback is installed. Target metadata and issue/commit milestones still need
+an integration contract with the actual decoder/functional engine.
+
+Both simulators check 16,448 metadata combinations/cases and 64 duration cases,
+including branch target lengths, LOOP outcomes, register/immediate distinction,
+odd/complex-EA corrections, zero/one/two read waits, independent functional/data
+dependencies, consumer backpressure, cancellation and consecutive instructions.
+Separate cases reject off-boundary or write-class wait events. The 8-bit budget
+is a **bounded fixture**: overflow is explicit and blocks retirement. Elapsed
+time saturates without wrapping across long dependency stalls. All 64 MAX
+control combinations bypass timing. A 3-to-2 register-immediate mutation fails.
+
+The coupled fixture checks 72 aligned memory scenarios using the real new
+clock/bus/duration components together. Abstract board waits are 0/1/2, accept
+delays 0/4 and physical response delays 0/13/80 fabric edges. Captured data is
+poisoned outside the one-edge response. Read/write/RMW traffic and mock-memory
+effects are counted; a late result prevents retirement. A mutation ignoring
+dependencies fails while the read is still pending.
+
+Selected coupled results, **not CPU benchmark measurements**:
+
+| Form | Board waits per beat | Physical delay | Table minimum + read waits | Observed duration, processor clocks |
+| --- | ---: | ---: | ---: | ---: |
+| A1 read | 0 | 0 | 5 | 5 |
+| A1 read | 2 | 0 | 5 + 2 | 7 |
+| ADD register from memory | 0 | 0 | 7 | 7 |
+| XOR RMW | 0 | 0 | 7 | 7, two commands / one write |
+| XOR RMW | 2 | 0 | 7 + 2 | 9, two commands / one write |
+| XOR RMW | 0 | 80 | 7 | 20, waiting for both logical responses |
+
+This caller **mocks functional work as ready**, with response dependencies.
+Data issue at instruction start is an unvalidated fixture assumption. The
+write/RMW fixture waits for final bus publication conservatively: it does not
+model the historical one-entry CPU write buffer or establish its overlap.
+There is no prefetch/decoder model, actual odd-word split, GPR/FLAGS engine,
+interrupt semantics or full T286REF wrapper here. The initial coupled-test
+failure was classified as a test-adapter race: its pre-edge observer altered
+the caller count before sampling, temporarily counting one read twice. The
+caller now updates its own publication state on clock edges; production CPU
+RTL and expected metadata/results were not changed to address it.
+
+Strict lint and generic synthesis pass. The isolated duration component maps
+to 19 register bits and about 300 generic cells (the receipts identify exact
+source scope and mapping; the coupled stage still synthesizes only this named
+component). MAX maps to zero register bits / three cells. These figures are
+**not ALMs, full CPU cost or timing margins**. No additional functional engine,
+production queue, cache, PLL or timing constraint is added.
+
+Evidence: [`duration`](../evidence/p06-pilot-20261003/duration) and
+[`fixture`](../evidence/p06-pilot-20261003/fixture). M2c covers parts of
+C06/C07/C08/C15 only. It does not close those whole-CPU cases, C13, historical
+CPU integration or physical M1. The final component acceptance reruns clock
+and bus too; prior frozen receipts remain unchanged.
+
 ## Next stages
 
-- M2c: qualified first instruction-form metadata and dependency-aware
-  duration control in a bounded fixture.
+- Map the qualified forms to actual decode/start/issue/commit milestones,
+  reuse existing retention and validate fetch/redirect/ownership/events.
+- Catalogue the full T286REF timer/setup/return wrapper before running that
+  DOS program under a historical policy; component results cannot replace it.
 - Full CPU wiring, architectural issue milestones, IU lookahead (P06-IU01),
   event coverage, physical-board calibration and complete FPGA cost/STA
   remain separate gates in the [contract](P06_TIMING_CONTRACT_20261003.md).

@@ -1,0 +1,636 @@
+
+-- Executing script file `/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-bus-acceptance-20261003/generic-1.ys' --
+
+1. Executing Verilog-2005 frontend: rtl/spk286_timing_pilot/p06_bus_cycle.sv
+Parsing SystemVerilog input from `rtl/spk286_timing_pilot/p06_bus_cycle.sv' to AST representation.
+Generating RTLIL representation for module `\p06_bus_cycle'.
+Successfully finished Verilog frontend.
+
+2. Executing Verilog-2005 frontend: rtl/spk286_timing_pilot/p06_clock.sv
+Parsing SystemVerilog input from `rtl/spk286_timing_pilot/p06_clock.sv' to AST representation.
+Generating RTLIL representation for module `\p06_clock'.
+Successfully finished Verilog frontend.
+Parameter \HISTORICAL = 1
+
+3. Executing AST frontend in derive mode using pre-parsed AST for module `\p06_bus_cycle'.
+Parameter \HISTORICAL = 1
+Generating RTLIL representation for module `$paramod\p06_bus_cycle\HISTORICAL=32'00000000000000000000000000000001'.
+
+4. Executing SYNTH pass.
+
+4.1. Executing HIERARCHY pass (managing design hierarchy).
+
+4.1.1. Analyzing design hierarchy..
+Top module:  \p06_bus_cycle
+
+4.1.2. Analyzing design hierarchy..
+Top module:  \p06_bus_cycle
+Removing unused module `\p06_clock'.
+Removed 1 unused modules.
+
+4.2. Executing PROC pass (convert processes to netlists).
+
+4.2.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+4.2.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Marked 2 switch rules as full_case in process $proc$rtl/spk286_timing_pilot/p06_bus_cycle.sv:80$139 in module p06_bus_cycle.
+Removed a total of 0 dead cases.
+
+4.2.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 0 redundant assignments.
+Promoted 0 assignments to connections.
+
+4.2.4. Executing PROC_INIT pass (extract init attributes).
+
+4.2.5. Executing PROC_ARST pass (detect async resets in processes).
+
+4.2.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+<suppressed ~11 debug messages>
+
+4.2.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\p06_bus_cycle.$proc$rtl/spk286_timing_pilot/p06_bus_cycle.sv:80$139'.
+     1/14: $0\historical.lock_q[0:0]
+     2/14: $0\historical.write_q[0:0]
+     3/14: $0\historical.class_q[3:0]
+     4/14: $0\historical.lanes_q[1:0]
+     5/14: $0\historical.response_q[15:0]
+     6/14: $0\historical.data_q[15:0]
+     7/14: $0\historical.address_q[23:0]
+     8/14: $0\historical.state_q[1:0]
+     9/14: $0\historical.canceled_q[0:0]
+    10/14: $0\historical.published_q[0:0]
+    11/14: $0\historical.captured_q[0:0]
+    12/14: $0\historical.issued_q[0:0]
+    13/14: $0\historical.active_q[0:0]
+    14/14: $0\protocol_error[0:0]
+
+4.2.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+
+4.2.9. Executing PROC_DFF pass (convert process syncs to FFs).
+Creating register for signal `\p06_bus_cycle.\protocol_error' using process `\p06_bus_cycle.$proc$rtl/spk286_timing_pilot/p06_bus_cycle.sv:80$139'.
+  created $dff cell `$procdff$278' with positive edge clock.
+Creating register for signal `\p06_bus_cycle.\historical.active_q' using process `\p06_bus_cycle.$proc$rtl/spk286_timing_pilot/p06_bus_cycle.sv:80$139'.
+  created $dff cell `$procdff$279' with positive edge clock.
+Creating register for signal `\p06_bus_cycle.\historical.issued_q' using process `\p06_bus_cycle.$proc$rtl/spk286_timing_pilot/p06_bus_cycle.sv:80$139'.
+  created $dff cell `$procdff$280' with positive edge clock.
+Creating register for signal `\p06_bus_cycle.\historical.captured_q' using process `\p06_bus_cycle.$proc$rtl/spk286_timing_pilot/p06_bus_cycle.sv:80$139'.
+  created $dff cell `$procdff$281' with positive edge clock.
+Creating register for signal `\p06_bus_cycle.\historical.published_q' using process `\p06_bus_cycle.$proc$rtl/spk286_timing_pilot/p06_bus_cycle.sv:80$139'.
+  created $dff cell `$procdff$282' with positive edge clock.
+Creating register for signal `\p06_bus_cycle.\historical.canceled_q' using process `\p06_bus_cycle.$proc$rtl/spk286_timing_pilot/p06_bus_cycle.sv:80$139'.
+  created $dff cell `$procdff$283' with positive edge clock.
+Creating register for signal `\p06_bus_cycle.\historical.state_q' using process `\p06_bus_cycle.$proc$rtl/spk286_timing_pilot/p06_bus_cycle.sv:80$139'.
+  created $dff cell `$procdff$284' with positive edge clock.
+Creating register for signal `\p06_bus_cycle.\historical.address_q' using process `\p06_bus_cycle.$proc$rtl/spk286_timing_pilot/p06_bus_cycle.sv:80$139'.
+  created $dff cell `$procdff$285' with positive edge clock.
+Creating register for signal `\p06_bus_cycle.\historical.data_q' using process `\p06_bus_cycle.$proc$rtl/spk286_timing_pilot/p06_bus_cycle.sv:80$139'.
+  created $dff cell `$procdff$286' with positive edge clock.
+Creating register for signal `\p06_bus_cycle.\historical.response_q' using process `\p06_bus_cycle.$proc$rtl/spk286_timing_pilot/p06_bus_cycle.sv:80$139'.
+  created $dff cell `$procdff$287' with positive edge clock.
+Creating register for signal `\p06_bus_cycle.\historical.lanes_q' using process `\p06_bus_cycle.$proc$rtl/spk286_timing_pilot/p06_bus_cycle.sv:80$139'.
+  created $dff cell `$procdff$288' with positive edge clock.
+Creating register for signal `\p06_bus_cycle.\historical.class_q' using process `\p06_bus_cycle.$proc$rtl/spk286_timing_pilot/p06_bus_cycle.sv:80$139'.
+  created $dff cell `$procdff$289' with positive edge clock.
+Creating register for signal `\p06_bus_cycle.\historical.write_q' using process `\p06_bus_cycle.$proc$rtl/spk286_timing_pilot/p06_bus_cycle.sv:80$139'.
+  created $dff cell `$procdff$290' with positive edge clock.
+Creating register for signal `\p06_bus_cycle.\historical.lock_q' using process `\p06_bus_cycle.$proc$rtl/spk286_timing_pilot/p06_bus_cycle.sv:80$139'.
+  created $dff cell `$procdff$291' with positive edge clock.
+
+4.2.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+4.2.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Found and cleaned up 11 empty switches in `\p06_bus_cycle.$proc$rtl/spk286_timing_pilot/p06_bus_cycle.sv:80$139'.
+Removing empty process `p06_bus_cycle.$proc$rtl/spk286_timing_pilot/p06_bus_cycle.sv:80$139'.
+Cleaned up 11 empty switches.
+
+4.2.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_bus_cycle.
+
+4.3. Executing FLATTEN pass (flatten design).
+
+4.4. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_bus_cycle.
+
+4.5. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_bus_cycle..
+Removed 0 unused cells and 83 unused wires.
+<suppressed ~1 debug messages>
+
+4.6. Executing CHECK pass (checking for obvious problems).
+Checking module p06_bus_cycle...
+Found and reported 0 problems.
+
+4.7. Executing OPT pass (performing simple optimizations).
+
+4.7.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_bus_cycle.
+
+4.7.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\p06_bus_cycle'.
+<suppressed ~51 debug messages>
+Removed a total of 17 cells.
+
+4.7.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \p06_bus_cycle..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~18 debug messages>
+
+4.7.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \p06_bus_cycle.
+Performed a total of 0 changes.
+
+4.7.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\p06_bus_cycle'.
+Removed a total of 0 cells.
+
+4.7.6. Executing OPT_DFF pass (perform DFF optimizations).
+
+4.7.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_bus_cycle..
+Removed 0 unused cells and 17 unused wires.
+<suppressed ~1 debug messages>
+
+4.7.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_bus_cycle.
+
+4.7.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+4.7.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \p06_bus_cycle..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~18 debug messages>
+
+4.7.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \p06_bus_cycle.
+Performed a total of 0 changes.
+
+4.7.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\p06_bus_cycle'.
+Removed a total of 0 cells.
+
+4.7.13. Executing OPT_DFF pass (perform DFF optimizations).
+
+4.7.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_bus_cycle..
+
+4.7.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_bus_cycle.
+
+4.7.16. Finished OPT passes. (There is nothing left to do.)
+
+4.8. Executing FSM pass (extract and optimize FSM).
+
+4.8.1. Executing FSM_DETECT pass (finding FSMs in design).
+Not marking p06_bus_cycle.historical.state_q as FSM state register:
+    Register is connected to module port.
+    Users of register don't seem to benefit from recoding.
+
+4.8.2. Executing FSM_EXTRACT pass (extracting FSM from design).
+
+4.8.3. Executing FSM_OPT pass (simple optimizations of FSMs).
+
+4.8.4. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_bus_cycle..
+
+4.8.5. Executing FSM_OPT pass (simple optimizations of FSMs).
+
+4.8.6. Executing FSM_RECODE pass (re-assigning FSM state encoding).
+
+4.8.7. Executing FSM_INFO pass (dumping all available information on FSM cells).
+
+4.8.8. Executing FSM_MAP pass (mapping FSMs to basic logic).
+
+4.9. Executing OPT pass (performing simple optimizations).
+
+4.9.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_bus_cycle.
+
+4.9.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\p06_bus_cycle'.
+Removed a total of 0 cells.
+
+4.9.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \p06_bus_cycle..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~18 debug messages>
+
+4.9.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \p06_bus_cycle.
+Performed a total of 0 changes.
+
+4.9.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\p06_bus_cycle'.
+Removed a total of 0 cells.
+
+4.9.6. Executing OPT_DFF pass (perform DFF optimizations).
+Adding SRST signal on $procdff$291 ($dff) from module p06_bus_cycle (D = $procmux$154_Y, Q = \historical.lock_q, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$292 ($sdff) from module p06_bus_cycle (D = \request_lock, Q = \historical.lock_q).
+Adding SRST signal on $procdff$290 ($dff) from module p06_bus_cycle (D = $procmux$159_Y, Q = \historical.write_q, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$294 ($sdff) from module p06_bus_cycle (D = \request_write, Q = \historical.write_q).
+Adding SRST signal on $procdff$289 ($dff) from module p06_bus_cycle (D = $procmux$164_Y, Q = \historical.class_q, rval = 4'0000).
+Adding EN signal on $auto$ff.cc:266:slice$296 ($sdff) from module p06_bus_cycle (D = \request_class, Q = \historical.class_q).
+Adding SRST signal on $procdff$288 ($dff) from module p06_bus_cycle (D = $procmux$169_Y, Q = \historical.lanes_q, rval = 2'00).
+Adding EN signal on $auto$ff.cc:266:slice$298 ($sdff) from module p06_bus_cycle (D = \request_lanes, Q = \historical.lanes_q).
+Adding SRST signal on $procdff$287 ($dff) from module p06_bus_cycle (D = $procmux$174_Y, Q = \historical.response_q, rval = 16'0000000000000000).
+Adding EN signal on $auto$ff.cc:266:slice$300 ($sdff) from module p06_bus_cycle (D = \completion_data, Q = \historical.response_q).
+Adding SRST signal on $procdff$286 ($dff) from module p06_bus_cycle (D = $procmux$179_Y, Q = \historical.data_q, rval = 16'0000000000000000).
+Adding EN signal on $auto$ff.cc:266:slice$302 ($sdff) from module p06_bus_cycle (D = \request_data, Q = \historical.data_q).
+Adding SRST signal on $procdff$285 ($dff) from module p06_bus_cycle (D = $procmux$184_Y, Q = \historical.address_q, rval = 24'000000000000000000000000).
+Adding EN signal on $auto$ff.cc:266:slice$304 ($sdff) from module p06_bus_cycle (D = \request_address, Q = \historical.address_q).
+Adding SRST signal on $procdff$284 ($dff) from module p06_bus_cycle (D = $procmux$197_Y [0], Q = \historical.state_q [0], rval = 1'0).
+Adding SRST signal on $procdff$284 ($dff) from module p06_bus_cycle (D = $procmux$189_Y [1], Q = \historical.state_q [1], rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$307 ($sdff) from module p06_bus_cycle (D = 1'1, Q = \historical.state_q [1]).
+Adding EN signal on $auto$ff.cc:266:slice$306 ($sdff) from module p06_bus_cycle (D = $procmux$197_Y [0], Q = \historical.state_q [0]).
+Adding SRST signal on $procdff$283 ($dff) from module p06_bus_cycle (D = $procmux$207_Y, Q = \historical.canceled_q, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$314 ($sdff) from module p06_bus_cycle (D = $procmux$207_Y, Q = \historical.canceled_q).
+Adding SRST signal on $procdff$282 ($dff) from module p06_bus_cycle (D = $procmux$216_Y, Q = \historical.published_q, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$320 ($sdff) from module p06_bus_cycle (D = $procmux$216_Y, Q = \historical.published_q).
+Adding SRST signal on $procdff$281 ($dff) from module p06_bus_cycle (D = $procmux$236_Y, Q = \historical.captured_q, rval = 1'0).
+Adding SRST signal on $procdff$280 ($dff) from module p06_bus_cycle (D = $procmux$252_Y, Q = \historical.issued_q, rval = 1'0).
+Adding SRST signal on $procdff$279 ($dff) from module p06_bus_cycle (D = $procmux$268_Y, Q = \historical.active_q, rval = 1'0).
+Adding SRST signal on $procdff$278 ($dff) from module p06_bus_cycle (D = $procmux$273_Y, Q = \protocol_error, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$333 ($sdff) from module p06_bus_cycle (D = 1'1, Q = \protocol_error).
+
+4.9.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_bus_cycle..
+Removed 27 unused cells and 27 unused wires.
+<suppressed ~28 debug messages>
+
+4.9.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_bus_cycle.
+<suppressed ~3 debug messages>
+
+4.9.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+4.9.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \p06_bus_cycle..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~10 debug messages>
+
+4.9.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \p06_bus_cycle.
+Performed a total of 0 changes.
+
+4.9.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\p06_bus_cycle'.
+<suppressed ~6 debug messages>
+Removed a total of 2 cells.
+
+4.9.13. Executing OPT_DFF pass (perform DFF optimizations).
+
+4.9.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_bus_cycle..
+Removed 0 unused cells and 2 unused wires.
+<suppressed ~1 debug messages>
+
+4.9.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_bus_cycle.
+
+4.9.16. Rerunning OPT passes. (Maybe there is more to do..)
+
+4.9.17. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \p06_bus_cycle..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~10 debug messages>
+
+4.9.18. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \p06_bus_cycle.
+Performed a total of 0 changes.
+
+4.9.19. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\p06_bus_cycle'.
+Removed a total of 0 cells.
+
+4.9.20. Executing OPT_DFF pass (perform DFF optimizations).
+
+4.9.21. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_bus_cycle..
+
+4.9.22. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_bus_cycle.
+
+4.9.23. Finished OPT passes. (There is nothing left to do.)
+
+4.10. Executing WREDUCE pass (reducing word size of cells).
+Removed top 1 bits (of 2) from mux cell p06_bus_cycle.$procmux$197 ($mux).
+Removed top 1 bits (of 2) from mux cell p06_bus_cycle.$procmux$195 ($mux).
+Removed top 1 bits (of 2) from mux cell p06_bus_cycle.$procmux$193 ($mux).
+Removed top 1 bits (of 2) from mux cell p06_bus_cycle.$procmux$191 ($mux).
+Removed top 1 bits (of 2) from mux cell p06_bus_cycle.$procmux$189 ($mux).
+Removed top 1 bits (of 2) from port B of cell p06_bus_cycle.$eq$rtl/spk286_timing_pilot/p06_bus_cycle.sv:101$146 ($eq).
+Removed top 1 bits (of 2) from wire p06_bus_cycle.$procmux$189_Y.
+Removed top 1 bits (of 2) from wire p06_bus_cycle.$procmux$191_Y.
+Removed top 1 bits (of 2) from wire p06_bus_cycle.$procmux$193_Y.
+Removed top 1 bits (of 2) from wire p06_bus_cycle.$procmux$195_Y.
+Removed top 1 bits (of 2) from wire p06_bus_cycle.$procmux$197_Y.
+
+4.11. Executing PEEPOPT pass (run peephole optimizers).
+
+4.12. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_bus_cycle..
+Removed 0 unused cells and 5 unused wires.
+<suppressed ~1 debug messages>
+
+4.13. Executing ALUMACC pass (create $alu and $macc cells).
+Extracting $alu and $macc cells in module p06_bus_cycle:
+  created 0 $alu and 0 $macc cells.
+
+4.14. Executing SHARE pass (SAT-based resource sharing).
+
+4.15. Executing OPT pass (performing simple optimizations).
+
+4.15.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_bus_cycle.
+
+4.15.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\p06_bus_cycle'.
+Removed a total of 0 cells.
+
+4.15.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \p06_bus_cycle..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~10 debug messages>
+
+4.15.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \p06_bus_cycle.
+Performed a total of 0 changes.
+
+4.15.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\p06_bus_cycle'.
+Removed a total of 0 cells.
+
+4.15.6. Executing OPT_DFF pass (perform DFF optimizations).
+
+4.15.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_bus_cycle..
+
+4.15.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_bus_cycle.
+
+4.15.9. Finished OPT passes. (There is nothing left to do.)
+
+4.16. Executing MEMORY pass.
+
+4.16.1. Executing OPT_MEM pass (optimize memories).
+Performed a total of 0 transformations.
+
+4.16.2. Executing OPT_MEM_PRIORITY pass (removing unnecessary memory write priority relations).
+Performed a total of 0 transformations.
+
+4.16.3. Executing OPT_MEM_FEEDBACK pass (finding memory read-to-write feedback paths).
+
+4.16.4. Executing MEMORY_BMUX2ROM pass (converting muxes to ROMs).
+
+4.16.5. Executing MEMORY_DFF pass (merging $dff cells to $memrd).
+
+4.16.6. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_bus_cycle..
+
+4.16.7. Executing MEMORY_SHARE pass (consolidating $memrd/$memwr cells).
+
+4.16.8. Executing OPT_MEM_WIDEN pass (optimize memories where all ports are wide).
+Performed a total of 0 transformations.
+
+4.16.9. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_bus_cycle..
+
+4.16.10. Executing MEMORY_COLLECT pass (generating $mem cells).
+
+4.17. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_bus_cycle..
+
+4.18. Executing OPT pass (performing simple optimizations).
+
+4.18.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_bus_cycle.
+<suppressed ~15 debug messages>
+
+4.18.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\p06_bus_cycle'.
+Removed a total of 0 cells.
+
+4.18.3. Executing OPT_DFF pass (perform DFF optimizations).
+
+4.18.4. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_bus_cycle..
+Removed 0 unused cells and 8 unused wires.
+<suppressed ~1 debug messages>
+
+4.18.5. Finished fast OPT passes.
+
+4.19. Executing MEMORY_MAP pass (converting memories to logic and flip-flops).
+
+4.20. Executing OPT pass (performing simple optimizations).
+
+4.20.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_bus_cycle.
+<suppressed ~2 debug messages>
+
+4.20.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\p06_bus_cycle'.
+Removed a total of 0 cells.
+
+4.20.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \p06_bus_cycle..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~8 debug messages>
+
+4.20.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \p06_bus_cycle.
+Performed a total of 0 changes.
+
+4.20.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\p06_bus_cycle'.
+Removed a total of 0 cells.
+
+4.20.6. Executing OPT_SHARE pass.
+
+4.20.7. Executing OPT_DFF pass (perform DFF optimizations).
+
+4.20.8. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_bus_cycle..
+
+4.20.9. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_bus_cycle.
+
+4.20.10. Finished OPT passes. (There is nothing left to do.)
+
+4.21. Executing TECHMAP pass (map to technology primitives).
+
+4.21.1. Executing Verilog-2005 frontend: /usr/bin/../share/yosys/techmap.v
+Parsing Verilog input from `/usr/bin/../share/yosys/techmap.v' to AST representation.
+Generating RTLIL representation for module `\_90_simplemap_bool_ops'.
+Generating RTLIL representation for module `\_90_simplemap_reduce_ops'.
+Generating RTLIL representation for module `\_90_simplemap_logic_ops'.
+Generating RTLIL representation for module `\_90_simplemap_compare_ops'.
+Generating RTLIL representation for module `\_90_simplemap_various'.
+Generating RTLIL representation for module `\_90_simplemap_registers'.
+Generating RTLIL representation for module `\_90_shift_ops_shr_shl_sshl_sshr'.
+Generating RTLIL representation for module `\_90_shift_shiftx'.
+Generating RTLIL representation for module `\_90_fa'.
+Generating RTLIL representation for module `\_90_lcu'.
+Generating RTLIL representation for module `\_90_alu'.
+Generating RTLIL representation for module `\_90_macc'.
+Generating RTLIL representation for module `\_90_alumacc'.
+Generating RTLIL representation for module `\$__div_mod_u'.
+Generating RTLIL representation for module `\$__div_mod_trunc'.
+Generating RTLIL representation for module `\_90_div'.
+Generating RTLIL representation for module `\_90_mod'.
+Generating RTLIL representation for module `\$__div_mod_floor'.
+Generating RTLIL representation for module `\_90_divfloor'.
+Generating RTLIL representation for module `\_90_modfloor'.
+Generating RTLIL representation for module `\_90_pow'.
+Generating RTLIL representation for module `\_90_pmux'.
+Generating RTLIL representation for module `\_90_demux'.
+Generating RTLIL representation for module `\_90_lut'.
+Successfully finished Verilog frontend.
+
+4.21.2. Continuing TECHMAP pass.
+Using extmapper simplemap for cells of type $sdffe.
+Using extmapper simplemap for cells of type $mux.
+Using extmapper simplemap for cells of type $or.
+Using extmapper simplemap for cells of type $sdff.
+Using extmapper simplemap for cells of type $and.
+Using extmapper simplemap for cells of type $logic_and.
+Using extmapper simplemap for cells of type $logic_or.
+Using extmapper simplemap for cells of type $logic_not.
+Using extmapper simplemap for cells of type $eq.
+Using extmapper simplemap for cells of type $reduce_or.
+Using extmapper simplemap for cells of type $reduce_bool.
+No more expansions possible.
+<suppressed ~166 debug messages>
+
+4.22. Executing OPT pass (performing simple optimizations).
+
+4.22.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_bus_cycle.
+<suppressed ~4 debug messages>
+
+4.22.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\p06_bus_cycle'.
+<suppressed ~6 debug messages>
+Removed a total of 2 cells.
+
+4.22.3. Executing OPT_DFF pass (perform DFF optimizations).
+
+4.22.4. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_bus_cycle..
+Removed 0 unused cells and 11 unused wires.
+<suppressed ~1 debug messages>
+
+4.22.5. Finished fast OPT passes.
+
+4.23. Executing ABC pass (technology mapping using ABC).
+
+4.23.1. Extracting gate netlist of module `\p06_bus_cycle' to `<abc-temp-dir>/input.blif'..
+Extracted 102 gates and 150 wires to a netlist network with 47 inputs and 40 outputs.
+
+4.23.1.1. Executing ABC.
+Running ABC command: "<yosys-exe-dir>/yosys-abc" -s -f <abc-temp-dir>/abc.script 2>&1
+ABC: ABC command line: "source <abc-temp-dir>/abc.script".
+ABC: 
+ABC: + read_blif <abc-temp-dir>/input.blif 
+ABC: + read_library <abc-temp-dir>/stdcells.genlib 
+ABC: Entered genlib library with 13 gates from file "<abc-temp-dir>/stdcells.genlib".
+ABC: + strash 
+ABC: + dretime 
+ABC: + map 
+ABC: + write_blif <abc-temp-dir>/output.blif 
+
+4.23.1.2. Re-integrating ABC results.
+ABC RESULTS:             ORNOT cells:        7
+ABC RESULTS:               AND cells:        3
+ABC RESULTS:              NAND cells:        2
+ABC RESULTS:               NOT cells:        8
+ABC RESULTS:               NOR cells:        8
+ABC RESULTS:               MUX cells:       20
+ABC RESULTS:                OR cells:       24
+ABC RESULTS:            ANDNOT cells:       21
+ABC RESULTS:        internal signals:       63
+ABC RESULTS:           input signals:       47
+ABC RESULTS:          output signals:       40
+Removing temp directory.
+
+4.24. Executing OPT pass (performing simple optimizations).
+
+4.24.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_bus_cycle.
+<suppressed ~3 debug messages>
+
+4.24.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\p06_bus_cycle'.
+Removed a total of 0 cells.
+
+4.24.3. Executing OPT_DFF pass (perform DFF optimizations).
+
+4.24.4. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_bus_cycle..
+Removed 0 unused cells and 148 unused wires.
+<suppressed ~5 debug messages>
+
+4.24.5. Finished fast OPT passes.
+
+4.25. Executing HIERARCHY pass (managing design hierarchy).
+
+4.25.1. Analyzing design hierarchy..
+Top module:  \p06_bus_cycle
+
+4.25.2. Analyzing design hierarchy..
+Top module:  \p06_bus_cycle
+Removed 0 unused modules.
+
+4.26. Printing statistics.
+
+=== p06_bus_cycle ===
+
+   Number of wires:                115
+   Number of wire bits:            288
+   Number of public wires:          49
+   Number of public wire bits:     222
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                165
+     $_ANDNOT_                      21
+     $_AND_                          3
+     $_MUX_                         20
+     $_NAND_                         2
+     $_NOR_                          8
+     $_NOT_                          8
+     $_ORNOT_                        7
+     $_OR_                          24
+     $_SDFFE_PP0P_                  69
+     $_SDFF_PP0_                     3
+
+4.27. Executing CHECK pass (checking for obvious problems).
+Checking module p06_bus_cycle...
+Found and reported 0 problems.
+
+5. Executing JSON backend.
+
+End of script. Logfile hash: 8b090faabd, CPU: user 0.18s system 0.02s, MEM: 17.00 MB peak
+Yosys 0.33 (git sha1 2584903a060)
+Time spent: 22% 16x opt_expr (0 sec), 21% 1x abc (0 sec), ...

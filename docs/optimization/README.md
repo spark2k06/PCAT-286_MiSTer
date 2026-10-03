@@ -22,7 +22,7 @@ frecuencia física no se fija como requisito ni se promete una puntuación final
 | P03 | [Buffer de lectura SDRAM](P03_AT_SDRAM_READ_BUFFER.md) | Memoria PCAT | Amortizar activación y precarga mediante lecturas de varias palabras |
 | P04 | [Perfilado y optimización de ejecución](P04_SPK286_EXECUTION_PROFILING.md) | Verificación y CPU | Separar costes de memoria/ejecución y elegir cambios medidos |
 | P05 | [Cierre de timing FPGA](P05_AT_FPGA_TIMING_CLOSURE.md) | Integración, CPU y constraints | Cumplir los tiempos del diseño físico a la frecuencia declarada |
-| P06 | [Perfiles de velocidad de CPU](P06_CPU_SPEED_PROFILES.md) | Política CPU e integración OSD | 6, 8, 10, 12,5, 16, 20, 25 MHz y MAX; referencia Intel y contrato del piloto preparados, evidencia física pendiente |
+| P06 | [Perfiles de velocidad de CPU](P06_CPU_SPEED_PROFILES.md) | Política CPU e integración OSD | 6, 8, 10, 12,5, 16, 20, 25 MHz y MAX; componentes provisionales del piloto de 6 MHz probados, integración y evidencia física pendientes |
 | P07 | [Camino EGA byte-preservado](P07_EGA_BYTE_PRESERVING_PATH.md) | Vídeo y frontend VRAM | Reducir latencia interna sólo cuando sea seguro, sin convertir EGA en un dispositivo de 16 bits |
 
 P01–P04 corresponden a las cuatro mejoras iniciales. P03 tiene ya una primera

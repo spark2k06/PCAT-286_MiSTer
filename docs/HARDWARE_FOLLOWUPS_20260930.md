@@ -26,6 +26,12 @@ now records this distinction.
 
 ## PERF01 — MiSTer CPU and machine benchmark throughput
 
+2026-10-03 next user instruction: retire the optional CPU optimizations,
+hardware observer and 25 MHz diagnostic divider; retain the active implementation
+at 50 MHz, then close timing. The source-pruning milestone is recorded in
+[P20](optimization/P20_FIXED_CPU_PROFILE_20261003.md). The performance expansion
+proposals below remain parked; timing closure is now active work.
+
 2026-10-03 current scope: the user requests ordinary 86Box 286 speed profiles
 through 25 MHz plus Maximum, preserving FPGA capacity. CHECKNUM on the accepted
 combined RBF is **6906 / 121.6K**, versus the retained native 25 MHz control's

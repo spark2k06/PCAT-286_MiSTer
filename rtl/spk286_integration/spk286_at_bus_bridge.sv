@@ -72,16 +72,8 @@ module spk286_at_bus_bridge #(
     output logic [3:0]   debug_state,
     output logic         protocol_error
 );
-`ifdef SPK286_P01_FAST_MEMORY_START
     localparam logic FAST_MEMORY_START = 1'b1;
-`else
-    localparam logic FAST_MEMORY_START = 1'b0;
-`endif
-`ifdef SPK286_P06_EARLY_MEMORY_ADDRESS
     localparam logic EARLY_MEMORY_ADDRESS = 1'b1;
-`else
-    localparam logic EARLY_MEMORY_ADDRESS = 1'b0;
-`endif
 
     localparam logic [3:0] STATE_IDLE     = 4'd0;
     localparam logic [3:0] STATE_SNAPSHOT = 4'd1;

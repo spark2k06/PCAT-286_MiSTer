@@ -44,6 +44,14 @@ def resources(out):
     return result
 
 
+def fitted_seed(qsf, fit):
+    requested = re.findall(r'^set_global_assignment -name SEED\s+(\d+)\s*$', qsf, re.M)
+    measured = re.findall(r'; Fitter Initial Placement Seed\s*;\s*(\d+)\s*;', fit)
+    assert len(requested) == len(measured) == 1, 'Missing or ambiguous placement seed'
+    assert requested == measured, 'Fitted placement seed differs from frozen QSF'
+    return int(measured[0])
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('run', type=Path)
@@ -77,6 +85,8 @@ def main():
     config = (work / 'config.tcl').read_text()
     assert not re.search(r'SPK286_(?:P\d\d_|AT_(?:NO_DEBUG|DEBUG_CPU_DIV2|CDC|RAM_READ_BUFFER))', config)
     assert 'VERILOG_MACRO "SPK286_AT_CDC"' in (work / 'PCAT-286.qsf').read_text()
+    seed = fitted_seed((work / 'PCAT-286.qsf').read_text(),
+                       (out / 'PCAT-286.fit.rpt').read_text(encoding='latin-1'))
     inventory = (reports / 'collections.txt').read_text()
     assert 'clock=FPGA_CLK2_50 period=20.000' in inventory
     assert 'clock=SDRAM_CLK period=20.000' in inventory
@@ -144,6 +154,7 @@ def main():
     result = dict(status='MEASURED_FIXED50_TIMING_FAIL' if failures else 'MEASURED_FIXED50_TIMING_PASS_UNDER_DECLARED_SCOPE',
                   failures=failures, margins_ns=margins, coverage=coverage,
                   resources=resources(out), generated_sources=generated,
+                  placement_seed=seed, auditor_source_sha256=sha(Path(__file__)),
                   functional_binding_sha256=sha(a.functional_sources),
                   source_count=len(sources), manifest_sha256=sha(run / 'manifest.json'),
                   rbf=dict(path=str(rbf), bytes=rbf.stat().st_size, sha256=sha(rbf)),

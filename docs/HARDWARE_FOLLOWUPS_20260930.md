@@ -7,6 +7,23 @@ The user accepted OS/2 startup on MiSTer after the EGA corrections. See
 This document preserves useful observations from the earlier investigation
 and separates open findings from that resolved boot failure.
 
+## AT motherboard functional review
+
+2026-10-03: the user prioritizes manufacturer-documented AT behavior, compared
+with 86Box, over seeking an idealized benchmark score. The
+[functional reference audit](AT_FUNCTIONAL_REFERENCE_AUDIT_20261003.md)
+records ATF01-ATF07: DMA terminal registers, RTC SET/UIE, the known PIC special
+mask issue, RTC UIP, DMA request modes/cascade and speaker gating. These are
+static source discrepancies with proposed acceptance cases; no new functional
+reproduction or RTL correction is claimed. The audit also identifies a possible
+86Box decrementing word-DMA defect and reference-model omissions.
+
+The intended product retains fast operation without imposed historical
+T-states, followed by optional T-states and speed profiles. Real reductions in
+memory/bridge stalls remain valid. Benchmark work and independent peripheral
+time must remain correct. [P12](optimization/P12_REAL_CHECKNUM_MEMORY_ATTRIBUTION_20261002.md)
+now records this distinction.
+
 ## PERF01 — MiSTer CPU and machine benchmark throughput
 
 2026-10-02 update: [real CHECKNUM memory-control attribution](optimization/P12_REAL_CHECKNUM_MEMORY_ATTRIBUTION_20261002.md)
@@ -151,15 +168,17 @@ cases pass, including separately verified replays, while MRBIOS restart and
 verification/input gaps prevent aggregate acceptance. Original failed attempts
 and unsuccessful diagnostic controls remain retained.
 
-The next measurement priority is common cache-hit read service: combined
+The retained read-service experiment concerns common cache-hit service: combined
 Dhrystone code/data hit rates are 99.9921% / 99.9944%, but reads still wait
 approximately one clock each. Posted writes now average only 1.024723 wait
-clocks. Investigate instruction lookahead/consecutive-hit handling in a private
-86Box prototype first; no further RTL or gain is claimed. The 8 KiB code and
+clocks. Instruction lookahead/consecutive-hit handling is a possible private
+86Box prototype; no further RTL or gain is claimed. The 8 KiB code and
 4 KiB data shadows separately support a Whetstone capacity experiment. See
 the [combined candidate's next experiment](optimization/P18_P19_COMBINED_RBF_20261002.md#next-performance-experiment)
 for counters, coherence requirements and the distinction between shadow
-miss counts and actual throughput.
+miss counts and actual throughput. On 2026-10-03 the user makes the functional
+AT review above the current priority. These experiments are retained proposals;
+matching the immediate-memory score is not a requirement.
 
 Added 2026-10-01. Status: numeric reference accepted; directed memory-path
 attribution and a coherent 1 KiB RAM-read buffer implemented and checked;
@@ -521,7 +540,8 @@ and generated harnesses for this run are in `build/perf01-pcat-20261001/`.
 ## 1. PIC special mask mode: pending functional review
 
 Status: concrete source discrepancy; no focused reproduction or correction
-yet. This is a chipset follow-up, with no CPU H-story assigned.
+yet. This is a chipset follow-up, with no CPU H-story assigned. Reconfirmed as
+ATF03 in the [2026-10-03 audit](AT_FUNCTIONAL_REFERENCE_AUDIT_20261003.md).
 
 In `rtl/KFPC-XT/HDL/KF8259/HDL/KF8259_Control_Logic.sv`:
 

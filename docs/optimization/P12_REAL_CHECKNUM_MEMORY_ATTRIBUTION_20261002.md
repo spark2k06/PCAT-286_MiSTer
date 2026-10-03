@@ -107,6 +107,59 @@ slot. The 8 MHz setting above belongs to 86Box; it must not be presented as
 matched PCAT peripheral timing. A later I/O comparison would need the actual
 device transaction counts and waits in both implementations.
 
+### Fast mode and optional historical timing
+
+2026-10-03 user clarification: retain a fast mode without imposed historical
+T-states, then offer optional T-states and speed profiles. This is the intended
+product direction, not an implemented timing selector. Current CPU optimization
+macros are implementation choices, not the future historical timing mode.
+This direction follows the separation already specified in the
+[SPK286 timing draft](../../vendor/spk286/SPK286_TIMING_MODEL.md); its conceptual
+mode names should not be mistaken for an exposed historical profile today.
+
+Fast mode may reduce actual memory/bridge stalls through coherent buffers,
+posting and overlap. It must preserve architectural work, device register
+semantics, ordering and independently clocked peripherals. Never rescale
+PIT/RTC time, change benchmark work/results or relabel clock units to match an
+emulator score. The immediate-memory 86Box arm is a service-model comparison,
+not a required FPGA score. Native 86Box timing also needs its own reference
+qualification.
+
+The retained PERF01 evidence identifies real service improvements and the P19
+refresh correction; no result manipulation is identified in that review.
+Extra buffering/overlap does not establish stock IBM 5170 cycle behavior.
+Historical timings must specify the chosen CPU and board profile, including
+how caches/posted service obey that observable schedule. Merely delaying
+instruction retirement or altering nominal MHz is insufficient.
+
+86Box is the principal implementation reference for this project, not the sole
+timing authority. Use Intel/IBM diagrams and tables to define the contract,
+86Box to inspect practical instruction/prefetch/wait handling, and real-286
+measurements where available to resolve discrepancies. As another code
+reference, [MAME's 286 implementation](https://github.com/mamedev/mame/blob/master/src/devices/cpu/i86/i286.cpp)
+contains instruction timing tables but explicitly questions some entries;
+it is supplemental evidence, not an exact-bus oracle. Total instruction cycle
+counts and Ts/Tc/READY sequencing need separate specifications.
+
+Real-hardware access is through the user's collaborators, who can execute DOS
+programs on 286 systems at 6 and 12 MHz, including both speeds on the same PC
+as reported by the user. A local 286 or direct signal capture is not available.
+Plan self-contained DOS measurement programs with fixed machine-code blocks,
+known work/signatures, PIT ticks, calibrated measurement overhead and textual
+results. Record the board/BIOS, speed selection, memory and interrupt policy
+alongside the result. Paired runs on one machine are especially useful for
+distinguishing CPU scaling from fixed peripheral or memory-service cost.
+
+Those programs can measure instruction/loop and memory/I/O behavior and expose
+prefetch effects. They cannot by themselves observe individual Ts/Tc pins or
+prove every internal timing transition. Keep that measurement boundary explicit
+and use the manufacturer bus diagrams for the corresponding specification.
+No such new DOS program is implemented or executed in this documentation work.
+
+The next search prioritizes manufacturer-documented AT behavior compared with
+86Box. See the [functional audit](../AT_FUNCTIONAL_REFERENCE_AUDIT_20261003.md)
+for source findings, reference limitations and proposed future cases.
+
 ### Requirements for future cycle accuracy
 
 This is a future specification task. PERF01 currently measures throughput of

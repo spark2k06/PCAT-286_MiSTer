@@ -117,7 +117,8 @@ The combined model gains **21.89% / 13.96%** over the old AT policy. It reaches
 **89.58% / 91.22%** of the same-CPU immediate-memory reference. Reaching that
 reference would require a further **11.63% / 9.62%** rate increase. These are
 empirical workload references, not a promise that all physical platform cost
-can be eliminated. The native 286's separate CPU timing model is a later target.
+can be eliminated. The native 286 uses a separately qualified CPU timing model;
+neither reference supplies a mandatory hardware score.
 
 ### Subsequent user hardware observation
 
@@ -136,15 +137,22 @@ does not establish timing closure or aggregate regression acceptance.
 
 ## Next performance experiment
 
+2026-10-03 priority update: the user requests a manufacturer-led AT functional
+review, including 86Box, and retains fast operation with optional historical
+T-states planned later. The outlines below remain proposals. There is no
+requirement to match an ideal memory model or to change peripheral time to
+improve a score. See the [functional audit](../AT_FUNCTIONAL_REFERENCE_AUDIT_20261003.md)
+and the [P12 mode specification](P12_REAL_CHECKNUM_MEMORY_ATTRIBUTION_20261002.md#fast-mode-and-optional-historical-timing).
+
 The completed combined model's function-phase counters identify the next
-measurement priority. Dhrystone reads already hit almost always: code hit
+possible measurement target. Dhrystone reads already hit almost always: code hit
 rate **99.9921%**, data hit rate **99.9944%**. There are **18,017,746 code
 transfers** at **1.000825 wait clocks** on average and **7,464,837 data reads**
 at **1.000414**. Writes average only **1.024723 wait clocks** after posting.
 These are bus-service counters; prefetch overlaps execution, so summed wait
 clocks are not saved elapsed clocks or a predicted benchmark gain.
 
-First investigate instruction-read lookahead and consecutive-hit response
+A future experiment could investigate instruction-read lookahead and consecutive-hit response
 handling: reuse already obtained instruction-line words or start a synchronous
 lookup early when the address is demonstrably stable. Keep canonical-address
 checks, store invalidation, redirects, reset and external-writer coherence.

@@ -1,0 +1,1784 @@
+
+ /----------------------------------------------------------------------------\
+ |                                                                            |
+ |  yosys -- Yosys Open SYnthesis Suite                                       |
+ |                                                                            |
+ |  Copyright (C) 2012 - 2020  Claire Xenia Wolf <claire@yosyshq.com>         |
+ |                                                                            |
+ |  Permission to use, copy, modify, and/or distribute this software for any  |
+ |  purpose with or without fee is hereby granted, provided that the above    |
+ |  copyright notice and this permission notice appear in all copies.         |
+ |                                                                            |
+ |  THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES  |
+ |  WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF          |
+ |  MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR   |
+ |  ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES    |
+ |  WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN     |
+ |  ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF   |
+ |  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.            |
+ |                                                                            |
+ \----------------------------------------------------------------------------/
+
+ Yosys 0.33 (git sha1 2584903a060)
+
+
+-- Running command `read_verilog -sv -DSYNTHESIS gold_controller.sv gold_owner.sv gate_controller.sv mutant_owner.sv; hierarchy -check; proc; memory; flatten; opt_clean; equiv_make -blacklist blacklist.txt owner_gold owner_gate miter; hierarchy -top miter; async2sync; opt_clean; equiv_simple; equiv_induct -seq 5; equiv_status -assert' --
+
+1. Executing Verilog-2005 frontend: gold_controller.sv
+Parsing SystemVerilog input from `gold_controller.sv' to AST representation.
+Generating RTLIL representation for module `\KFSDRAM_gold'.
+Successfully finished Verilog frontend.
+
+2. Executing Verilog-2005 frontend: gold_owner.sv
+Parsing SystemVerilog input from `gold_owner.sv' to AST representation.
+Generating RTLIL representation for module `\owner_gold'.
+Successfully finished Verilog frontend.
+
+3. Executing Verilog-2005 frontend: gate_controller.sv
+Parsing SystemVerilog input from `gate_controller.sv' to AST representation.
+Generating RTLIL representation for module `\KFSDRAM_gate'.
+Successfully finished Verilog frontend.
+
+4. Executing Verilog-2005 frontend: mutant_owner.sv
+Parsing SystemVerilog input from `mutant_owner.sv' to AST representation.
+Generating RTLIL representation for module `\owner_gate'.
+Successfully finished Verilog frontend.
+
+5. Executing HIERARCHY pass (managing design hierarchy).
+Parameter \sdram_no_refresh = 1'0
+Parameter \sdram_init_wait = 16'0010011100010000
+Parameter \sdram_refresh_cycle = 16'0000000001100100
+Parameter \sdram_force_refresh = 16'0000000110010000
+
+5.1. Executing AST frontend in derive mode using pre-parsed AST for module `\KFSDRAM_gold'.
+Parameter \sdram_no_refresh = 1'0
+Parameter \sdram_init_wait = 16'0010011100010000
+Parameter \sdram_refresh_cycle = 16'0000000001100100
+Parameter \sdram_force_refresh = 16'0000000110010000
+Generating RTLIL representation for module `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold'.
+Parameter \sdram_no_refresh = 1'0
+Parameter \sdram_init_wait = 16'0010011100010000
+Parameter \sdram_refresh_cycle = 16'0000000001100100
+Parameter \sdram_force_refresh = 16'0000000110010000
+Parameter \use_column_address_input = 1'1
+
+5.2. Executing AST frontend in derive mode using pre-parsed AST for module `\KFSDRAM_gate'.
+Parameter \sdram_no_refresh = 1'0
+Parameter \sdram_init_wait = 16'0010011100010000
+Parameter \sdram_refresh_cycle = 16'0000000001100100
+Parameter \sdram_force_refresh = 16'0000000110010000
+Parameter \use_column_address_input = 1'1
+Generating RTLIL representation for module `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate'.
+
+6. Executing PROC pass (convert processes to netlists).
+
+6.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+6.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Marked 4 switch rules as full_case in process $proc$gate_controller.sv:219$420 in module $paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.
+Marked 4 switch rules as full_case in process $proc$gate_controller.sv:195$413 in module $paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.
+Marked 2 switch rules as full_case in process $proc$gate_controller.sv:182$408 in module $paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.
+Marked 3 switch rules as full_case in process $proc$gate_controller.sv:167$399 in module $paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.
+Marked 2 switch rules as full_case in process $proc$gate_controller.sv:154$396 in module $paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.
+Marked 1 switch rules as full_case in process $proc$gate_controller.sv:143$395 in module $paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.
+Marked 15 switch rules as full_case in process $proc$gate_controller.sv:0$376 in module $paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.
+Marked 4 switch rules as full_case in process $proc$gold_controller.sv:212$336 in module $paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.
+Marked 4 switch rules as full_case in process $proc$gold_controller.sv:188$329 in module $paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.
+Marked 2 switch rules as full_case in process $proc$gold_controller.sv:175$324 in module $paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.
+Marked 3 switch rules as full_case in process $proc$gold_controller.sv:160$315 in module $paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.
+Marked 2 switch rules as full_case in process $proc$gold_controller.sv:147$312 in module $paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.
+Marked 1 switch rules as full_case in process $proc$gold_controller.sv:136$311 in module $paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.
+Marked 15 switch rules as full_case in process $proc$gold_controller.sv:0$292 in module $paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.
+Marked 4 switch rules as full_case in process $proc$mutant_owner.sv:219$274 in module owner_gate.
+Marked 3 switch rules as full_case in process $proc$mutant_owner.sv:0$261 in module owner_gate.
+Marked 4 switch rules as full_case in process $proc$gate_controller.sv:219$190 in module KFSDRAM_gate.
+Marked 4 switch rules as full_case in process $proc$gate_controller.sv:195$183 in module KFSDRAM_gate.
+Marked 2 switch rules as full_case in process $proc$gate_controller.sv:182$178 in module KFSDRAM_gate.
+Marked 3 switch rules as full_case in process $proc$gate_controller.sv:167$169 in module KFSDRAM_gate.
+Marked 2 switch rules as full_case in process $proc$gate_controller.sv:154$166 in module KFSDRAM_gate.
+Marked 1 switch rules as full_case in process $proc$gate_controller.sv:143$165 in module KFSDRAM_gate.
+Marked 15 switch rules as full_case in process $proc$gate_controller.sv:0$146 in module KFSDRAM_gate.
+Marked 4 switch rules as full_case in process $proc$gold_owner.sv:214$128 in module owner_gold.
+Marked 3 switch rules as full_case in process $proc$gold_owner.sv:0$116 in module owner_gold.
+Marked 4 switch rules as full_case in process $proc$gold_controller.sv:212$45 in module KFSDRAM_gold.
+Marked 4 switch rules as full_case in process $proc$gold_controller.sv:188$38 in module KFSDRAM_gold.
+Marked 2 switch rules as full_case in process $proc$gold_controller.sv:175$33 in module KFSDRAM_gold.
+Marked 3 switch rules as full_case in process $proc$gold_controller.sv:160$24 in module KFSDRAM_gold.
+Marked 2 switch rules as full_case in process $proc$gold_controller.sv:147$21 in module KFSDRAM_gold.
+Marked 1 switch rules as full_case in process $proc$gold_controller.sv:136$20 in module KFSDRAM_gold.
+Marked 15 switch rules as full_case in process $proc$gold_controller.sv:0$1 in module KFSDRAM_gold.
+Removed a total of 0 dead cases.
+
+6.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 58 redundant assignments.
+Promoted 20 assignments to connections.
+
+6.4. Executing PROC_INIT pass (extract init attributes).
+
+6.5. Executing PROC_ARST pass (detect async resets in processes).
+Found async reset \sdram_reset in `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.$proc$gate_controller.sv:219$420'.
+Found async reset \sdram_reset in `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.$proc$gate_controller.sv:195$413'.
+Found async reset \sdram_reset in `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.$proc$gate_controller.sv:182$408'.
+Found async reset \sdram_reset in `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.$proc$gate_controller.sv:167$399'.
+Found async reset \sdram_reset in `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.$proc$gate_controller.sv:154$396'.
+Found async reset \sdram_reset in `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.$proc$gate_controller.sv:143$395'.
+Found async reset \sdram_reset in `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.$proc$gold_controller.sv:212$336'.
+Found async reset \sdram_reset in `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.$proc$gold_controller.sv:188$329'.
+Found async reset \sdram_reset in `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.$proc$gold_controller.sv:175$324'.
+Found async reset \sdram_reset in `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.$proc$gold_controller.sv:160$315'.
+Found async reset \sdram_reset in `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.$proc$gold_controller.sv:147$312'.
+Found async reset \sdram_reset in `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.$proc$gold_controller.sv:136$311'.
+Found async reset \reset in `\owner_gate.$proc$mutant_owner.sv:219$274'.
+Found async reset \sdram_reset in `\KFSDRAM_gate.$proc$gate_controller.sv:219$190'.
+Found async reset \sdram_reset in `\KFSDRAM_gate.$proc$gate_controller.sv:195$183'.
+Found async reset \sdram_reset in `\KFSDRAM_gate.$proc$gate_controller.sv:182$178'.
+Found async reset \sdram_reset in `\KFSDRAM_gate.$proc$gate_controller.sv:167$169'.
+Found async reset \sdram_reset in `\KFSDRAM_gate.$proc$gate_controller.sv:154$166'.
+Found async reset \sdram_reset in `\KFSDRAM_gate.$proc$gate_controller.sv:143$165'.
+Found async reset \reset in `\owner_gold.$proc$gold_owner.sv:214$128'.
+Found async reset \sdram_reset in `\KFSDRAM_gold.$proc$gold_controller.sv:212$45'.
+Found async reset \sdram_reset in `\KFSDRAM_gold.$proc$gold_controller.sv:188$38'.
+Found async reset \sdram_reset in `\KFSDRAM_gold.$proc$gold_controller.sv:175$33'.
+Found async reset \sdram_reset in `\KFSDRAM_gold.$proc$gold_controller.sv:160$24'.
+Found async reset \sdram_reset in `\KFSDRAM_gold.$proc$gold_controller.sv:147$21'.
+Found async reset \sdram_reset in `\KFSDRAM_gold.$proc$gold_controller.sv:136$20'.
+
+6.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+<suppressed ~120 debug messages>
+
+6.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.$proc$gate_controller.sv:425$459'.
+Creating decoders for process `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.$proc$gate_controller.sv:219$420'.
+     1/12: $0\sdram_address[12:0] [12:11]
+     2/12: $0\sdram_address[12:0] [8:0]
+     3/12: $0\sdram_address[12:0] [10]
+     4/12: $0\sdram_address[12:0] [9]
+     5/12: $0\sdram_dq_out[15:0]
+     6/12: $0\sdram_ba[1:0]
+     7/12: $0\sdram_we[0:0]
+     8/12: $0\sdram_cas[0:0]
+     9/12: $0\sdram_ras[0:0]
+    10/12: $0\sdram_cs[0:0]
+    11/12: $0\sdram_cke[0:0]
+    12/12: $0\sdram_dq_io[0:0]
+Creating decoders for process `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.$proc$gate_controller.sv:195$413'.
+     1/1: $0\read_counter[8:0]
+Creating decoders for process `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.$proc$gate_controller.sv:182$408'.
+     1/1: $0\access_counter[8:0]
+Creating decoders for process `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.$proc$gate_controller.sv:167$399'.
+     1/1: $0\refresh_counter[15:0]
+Creating decoders for process `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.$proc$gate_controller.sv:154$396'.
+     1/1: $0\state_counter[15:0]
+Creating decoders for process `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.$proc$gate_controller.sv:143$395'.
+     1/1: $0\state[31:0]
+Creating decoders for process `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.$proc$gate_controller.sv:0$376'.
+     1/15: $15\next_state[31:0]
+     2/15: $14\next_state[31:0]
+     3/15: $13\next_state[31:0]
+     4/15: $12\next_state[31:0]
+     5/15: $11\next_state[31:0]
+     6/15: $10\next_state[31:0]
+     7/15: $9\next_state[31:0]
+     8/15: $8\next_state[31:0]
+     9/15: $7\next_state[31:0]
+    10/15: $6\next_state[31:0]
+    11/15: $5\next_state[31:0]
+    12/15: $4\next_state[31:0]
+    13/15: $3\next_state[31:0]
+    14/15: $2\next_state[31:0]
+    15/15: $1\next_state[31:0]
+Creating decoders for process `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.$proc$gold_controller.sv:418$375'.
+Creating decoders for process `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.$proc$gold_controller.sv:212$336'.
+     1/12: $0\sdram_address[12:0] [12:11]
+     2/12: $0\sdram_address[12:0] [8:0]
+     3/12: $0\sdram_address[12:0] [10]
+     4/12: $0\sdram_address[12:0] [9]
+     5/12: $0\sdram_dq_out[15:0]
+     6/12: $0\sdram_ba[1:0]
+     7/12: $0\sdram_we[0:0]
+     8/12: $0\sdram_cas[0:0]
+     9/12: $0\sdram_ras[0:0]
+    10/12: $0\sdram_cs[0:0]
+    11/12: $0\sdram_cke[0:0]
+    12/12: $0\sdram_dq_io[0:0]
+Creating decoders for process `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.$proc$gold_controller.sv:188$329'.
+     1/1: $0\read_counter[8:0]
+Creating decoders for process `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.$proc$gold_controller.sv:175$324'.
+     1/1: $0\access_counter[8:0]
+Creating decoders for process `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.$proc$gold_controller.sv:160$315'.
+     1/1: $0\refresh_counter[15:0]
+Creating decoders for process `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.$proc$gold_controller.sv:147$312'.
+     1/1: $0\state_counter[15:0]
+Creating decoders for process `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.$proc$gold_controller.sv:136$311'.
+     1/1: $0\state[31:0]
+Creating decoders for process `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.$proc$gold_controller.sv:0$292'.
+     1/15: $15\next_state[31:0]
+     2/15: $14\next_state[31:0]
+     3/15: $13\next_state[31:0]
+     4/15: $12\next_state[31:0]
+     5/15: $11\next_state[31:0]
+     6/15: $10\next_state[31:0]
+     7/15: $9\next_state[31:0]
+     8/15: $8\next_state[31:0]
+     9/15: $7\next_state[31:0]
+    10/15: $6\next_state[31:0]
+    11/15: $5\next_state[31:0]
+    12/15: $4\next_state[31:0]
+    13/15: $3\next_state[31:0]
+    14/15: $2\next_state[31:0]
+    15/15: $1\next_state[31:0]
+Creating decoders for process `\owner_gate.$proc$mutant_owner.sv:219$274'.
+     1/13: $0\response_data_valid_q[0:0]
+     2/13: $0\read_beat_count_q[2:0]
+     3/13: $0\burst_q[0:0]
+     4/13: $0\response_data_q[15:0]
+     5/13: $0\response_pending_q[0:0]
+     6/13: $0\data_out_q[15:0]
+     7/13: $0\byte_enable_q[1:0]
+     8/13: $0\address_q[24:0]
+     9/13: $0\write_q[0:0]
+    10/13: $0\owner_refresh_q[0:0]
+    11/13: $0\issued_q[0:0]
+    12/13: $0\active_q[0:0]
+    13/13: $0\protocol_error[0:0]
+Creating decoders for process `\owner_gate.$proc$mutant_owner.sv:0$261'.
+     1/6: $2\sdram_udqm[0:0]
+     2/6: $2\sdram_ldqm[0:0]
+     3/6: $1\sdram_udqm[0:0]
+     4/6: $1\sdram_ldqm[0:0]
+     5/6: $1\physical_byte_enable[1:0]
+     6/6: $1\physical_write[0:0]
+Creating decoders for process `\KFSDRAM_gate.$proc$gate_controller.sv:425$229'.
+Creating decoders for process `\KFSDRAM_gate.$proc$gate_controller.sv:219$190'.
+     1/12: $0\sdram_address[12:0] [12:11]
+     2/12: $0\sdram_address[12:0] [8:0]
+     3/12: $0\sdram_address[12:0] [10]
+     4/12: $0\sdram_address[12:0] [9]
+     5/12: $0\sdram_dq_out[15:0]
+     6/12: $0\sdram_ba[1:0]
+     7/12: $0\sdram_we[0:0]
+     8/12: $0\sdram_cas[0:0]
+     9/12: $0\sdram_ras[0:0]
+    10/12: $0\sdram_cs[0:0]
+    11/12: $0\sdram_cke[0:0]
+    12/12: $0\sdram_dq_io[0:0]
+Creating decoders for process `\KFSDRAM_gate.$proc$gate_controller.sv:195$183'.
+     1/1: $0\read_counter[8:0]
+Creating decoders for process `\KFSDRAM_gate.$proc$gate_controller.sv:182$178'.
+     1/1: $0\access_counter[8:0]
+Creating decoders for process `\KFSDRAM_gate.$proc$gate_controller.sv:167$169'.
+     1/1: $0\refresh_counter[15:0]
+Creating decoders for process `\KFSDRAM_gate.$proc$gate_controller.sv:154$166'.
+     1/1: $0\state_counter[15:0]
+Creating decoders for process `\KFSDRAM_gate.$proc$gate_controller.sv:143$165'.
+     1/1: $0\state[31:0]
+Creating decoders for process `\KFSDRAM_gate.$proc$gate_controller.sv:0$146'.
+     1/15: $15\next_state[31:0]
+     2/15: $14\next_state[31:0]
+     3/15: $13\next_state[31:0]
+     4/15: $12\next_state[31:0]
+     5/15: $11\next_state[31:0]
+     6/15: $10\next_state[31:0]
+     7/15: $9\next_state[31:0]
+     8/15: $8\next_state[31:0]
+     9/15: $7\next_state[31:0]
+    10/15: $6\next_state[31:0]
+    11/15: $5\next_state[31:0]
+    12/15: $4\next_state[31:0]
+    13/15: $3\next_state[31:0]
+    14/15: $2\next_state[31:0]
+    15/15: $1\next_state[31:0]
+Creating decoders for process `\owner_gold.$proc$gold_owner.sv:214$128'.
+     1/13: $0\response_data_valid_q[0:0]
+     2/13: $0\read_beat_count_q[2:0]
+     3/13: $0\burst_q[0:0]
+     4/13: $0\response_data_q[15:0]
+     5/13: $0\response_pending_q[0:0]
+     6/13: $0\data_out_q[15:0]
+     7/13: $0\byte_enable_q[1:0]
+     8/13: $0\address_q[24:0]
+     9/13: $0\write_q[0:0]
+    10/13: $0\owner_refresh_q[0:0]
+    11/13: $0\issued_q[0:0]
+    12/13: $0\active_q[0:0]
+    13/13: $0\protocol_error[0:0]
+Creating decoders for process `\owner_gold.$proc$gold_owner.sv:0$116'.
+     1/6: $2\sdram_udqm[0:0]
+     2/6: $2\sdram_ldqm[0:0]
+     3/6: $1\sdram_udqm[0:0]
+     4/6: $1\sdram_ldqm[0:0]
+     5/6: $1\physical_byte_enable[1:0]
+     6/6: $1\physical_write[0:0]
+Creating decoders for process `\KFSDRAM_gold.$proc$gold_controller.sv:418$84'.
+Creating decoders for process `\KFSDRAM_gold.$proc$gold_controller.sv:212$45'.
+     1/12: $0\sdram_address[12:0] [12:11]
+     2/12: $0\sdram_address[12:0] [8:0]
+     3/12: $0\sdram_address[12:0] [10]
+     4/12: $0\sdram_address[12:0] [9]
+     5/12: $0\sdram_dq_out[15:0]
+     6/12: $0\sdram_ba[1:0]
+     7/12: $0\sdram_we[0:0]
+     8/12: $0\sdram_cas[0:0]
+     9/12: $0\sdram_ras[0:0]
+    10/12: $0\sdram_cs[0:0]
+    11/12: $0\sdram_cke[0:0]
+    12/12: $0\sdram_dq_io[0:0]
+Creating decoders for process `\KFSDRAM_gold.$proc$gold_controller.sv:188$38'.
+     1/1: $0\read_counter[8:0]
+Creating decoders for process `\KFSDRAM_gold.$proc$gold_controller.sv:175$33'.
+     1/1: $0\access_counter[8:0]
+Creating decoders for process `\KFSDRAM_gold.$proc$gold_controller.sv:160$24'.
+     1/1: $0\refresh_counter[15:0]
+Creating decoders for process `\KFSDRAM_gold.$proc$gold_controller.sv:147$21'.
+     1/1: $0\state_counter[15:0]
+Creating decoders for process `\KFSDRAM_gold.$proc$gold_controller.sv:136$20'.
+     1/1: $0\state[31:0]
+Creating decoders for process `\KFSDRAM_gold.$proc$gold_controller.sv:0$1'.
+     1/15: $15\next_state[31:0]
+     2/15: $14\next_state[31:0]
+     3/15: $13\next_state[31:0]
+     4/15: $12\next_state[31:0]
+     5/15: $11\next_state[31:0]
+     6/15: $10\next_state[31:0]
+     7/15: $9\next_state[31:0]
+     8/15: $8\next_state[31:0]
+     9/15: $7\next_state[31:0]
+    10/15: $6\next_state[31:0]
+    11/15: $5\next_state[31:0]
+    12/15: $4\next_state[31:0]
+    13/15: $3\next_state[31:0]
+    14/15: $2\next_state[31:0]
+    15/15: $1\next_state[31:0]
+
+6.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+No latch inferred for signal `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.\next_state' from process `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.$proc$gate_controller.sv:0$376'.
+No latch inferred for signal `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.\next_state' from process `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.$proc$gold_controller.sv:0$292'.
+No latch inferred for signal `\owner_gate.\sdram_ldqm' from process `\owner_gate.$proc$mutant_owner.sv:0$261'.
+No latch inferred for signal `\owner_gate.\sdram_udqm' from process `\owner_gate.$proc$mutant_owner.sv:0$261'.
+No latch inferred for signal `\owner_gate.\physical_write' from process `\owner_gate.$proc$mutant_owner.sv:0$261'.
+No latch inferred for signal `\owner_gate.\physical_byte_enable' from process `\owner_gate.$proc$mutant_owner.sv:0$261'.
+No latch inferred for signal `\KFSDRAM_gate.\next_state' from process `\KFSDRAM_gate.$proc$gate_controller.sv:0$146'.
+No latch inferred for signal `\owner_gold.\sdram_ldqm' from process `\owner_gold.$proc$gold_owner.sv:0$116'.
+No latch inferred for signal `\owner_gold.\sdram_udqm' from process `\owner_gold.$proc$gold_owner.sv:0$116'.
+No latch inferred for signal `\owner_gold.\physical_write' from process `\owner_gold.$proc$gold_owner.sv:0$116'.
+No latch inferred for signal `\owner_gold.\physical_byte_enable' from process `\owner_gold.$proc$gold_owner.sv:0$116'.
+No latch inferred for signal `\KFSDRAM_gold.\next_state' from process `\KFSDRAM_gold.$proc$gold_controller.sv:0$1'.
+
+6.9. Executing PROC_DFF pass (convert process syncs to FFs).
+Creating register for signal `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.\data_out' using process `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.$proc$gate_controller.sv:425$459'.
+  created $dff cell `$procdff$2114' with positive edge clock.
+Creating register for signal `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.\read_flag' using process `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.$proc$gate_controller.sv:425$459'.
+  created $dff cell `$procdff$2115' with positive edge clock.
+Creating register for signal `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.\sdram_address' using process `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.$proc$gate_controller.sv:219$420'.
+  created $adff cell `$procdff$2116' with positive edge clock and positive level reset.
+Creating register for signal `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.\sdram_cke' using process `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.$proc$gate_controller.sv:219$420'.
+  created $adff cell `$procdff$2117' with positive edge clock and positive level reset.
+Creating register for signal `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.\sdram_cs' using process `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.$proc$gate_controller.sv:219$420'.
+  created $adff cell `$procdff$2118' with positive edge clock and positive level reset.
+Creating register for signal `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.\sdram_ras' using process `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.$proc$gate_controller.sv:219$420'.
+  created $adff cell `$procdff$2119' with positive edge clock and positive level reset.
+Creating register for signal `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.\sdram_cas' using process `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.$proc$gate_controller.sv:219$420'.
+  created $adff cell `$procdff$2120' with positive edge clock and positive level reset.
+Creating register for signal `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.\sdram_we' using process `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.$proc$gate_controller.sv:219$420'.
+  created $adff cell `$procdff$2121' with positive edge clock and positive level reset.
+Creating register for signal `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.\sdram_ba' using process `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.$proc$gate_controller.sv:219$420'.
+  created $adff cell `$procdff$2122' with positive edge clock and positive level reset.
+Creating register for signal `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.\sdram_dq_out' using process `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.$proc$gate_controller.sv:219$420'.
+  created $adff cell `$procdff$2123' with positive edge clock and positive level reset.
+Creating register for signal `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.\sdram_dq_io' using process `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.$proc$gate_controller.sv:219$420'.
+  created $adff cell `$procdff$2124' with positive edge clock and positive level reset.
+Creating register for signal `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.\read_counter' using process `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.$proc$gate_controller.sv:195$413'.
+  created $adff cell `$procdff$2125' with positive edge clock and positive level reset.
+Creating register for signal `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.\access_counter' using process `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.$proc$gate_controller.sv:182$408'.
+  created $adff cell `$procdff$2126' with positive edge clock and positive level reset.
+Creating register for signal `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.\refresh_counter' using process `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.$proc$gate_controller.sv:167$399'.
+  created $adff cell `$procdff$2127' with positive edge clock and positive level reset.
+Creating register for signal `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.\state_counter' using process `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.$proc$gate_controller.sv:154$396'.
+  created $adff cell `$procdff$2128' with positive edge clock and positive level reset.
+Creating register for signal `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.\state' using process `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.$proc$gate_controller.sv:143$395'.
+  created $adff cell `$procdff$2129' with positive edge clock and positive level reset.
+Creating register for signal `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.\data_out' using process `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.$proc$gold_controller.sv:418$375'.
+  created $dff cell `$procdff$2130' with positive edge clock.
+Creating register for signal `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.\read_flag' using process `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.$proc$gold_controller.sv:418$375'.
+  created $dff cell `$procdff$2131' with positive edge clock.
+Creating register for signal `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.\sdram_address' using process `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.$proc$gold_controller.sv:212$336'.
+  created $adff cell `$procdff$2132' with positive edge clock and positive level reset.
+Creating register for signal `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.\sdram_cke' using process `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.$proc$gold_controller.sv:212$336'.
+  created $adff cell `$procdff$2133' with positive edge clock and positive level reset.
+Creating register for signal `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.\sdram_cs' using process `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.$proc$gold_controller.sv:212$336'.
+  created $adff cell `$procdff$2134' with positive edge clock and positive level reset.
+Creating register for signal `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.\sdram_ras' using process `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.$proc$gold_controller.sv:212$336'.
+  created $adff cell `$procdff$2135' with positive edge clock and positive level reset.
+Creating register for signal `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.\sdram_cas' using process `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.$proc$gold_controller.sv:212$336'.
+  created $adff cell `$procdff$2136' with positive edge clock and positive level reset.
+Creating register for signal `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.\sdram_we' using process `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.$proc$gold_controller.sv:212$336'.
+  created $adff cell `$procdff$2137' with positive edge clock and positive level reset.
+Creating register for signal `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.\sdram_ba' using process `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.$proc$gold_controller.sv:212$336'.
+  created $adff cell `$procdff$2138' with positive edge clock and positive level reset.
+Creating register for signal `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.\sdram_dq_out' using process `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.$proc$gold_controller.sv:212$336'.
+  created $adff cell `$procdff$2139' with positive edge clock and positive level reset.
+Creating register for signal `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.\sdram_dq_io' using process `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.$proc$gold_controller.sv:212$336'.
+  created $adff cell `$procdff$2140' with positive edge clock and positive level reset.
+Creating register for signal `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.\read_counter' using process `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.$proc$gold_controller.sv:188$329'.
+  created $adff cell `$procdff$2141' with positive edge clock and positive level reset.
+Creating register for signal `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.\access_counter' using process `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.$proc$gold_controller.sv:175$324'.
+  created $adff cell `$procdff$2142' with positive edge clock and positive level reset.
+Creating register for signal `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.\refresh_counter' using process `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.$proc$gold_controller.sv:160$315'.
+  created $adff cell `$procdff$2143' with positive edge clock and positive level reset.
+Creating register for signal `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.\state_counter' using process `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.$proc$gold_controller.sv:147$312'.
+  created $adff cell `$procdff$2144' with positive edge clock and positive level reset.
+Creating register for signal `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.\state' using process `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.$proc$gold_controller.sv:136$311'.
+  created $adff cell `$procdff$2145' with positive edge clock and positive level reset.
+Creating register for signal `\owner_gate.\protocol_error' using process `\owner_gate.$proc$mutant_owner.sv:219$274'.
+  created $adff cell `$procdff$2146' with positive edge clock and positive level reset.
+Creating register for signal `\owner_gate.\active_q' using process `\owner_gate.$proc$mutant_owner.sv:219$274'.
+  created $adff cell `$procdff$2147' with positive edge clock and positive level reset.
+Creating register for signal `\owner_gate.\issued_q' using process `\owner_gate.$proc$mutant_owner.sv:219$274'.
+  created $adff cell `$procdff$2148' with positive edge clock and positive level reset.
+Creating register for signal `\owner_gate.\owner_refresh_q' using process `\owner_gate.$proc$mutant_owner.sv:219$274'.
+  created $adff cell `$procdff$2149' with positive edge clock and positive level reset.
+Creating register for signal `\owner_gate.\write_q' using process `\owner_gate.$proc$mutant_owner.sv:219$274'.
+  created $adff cell `$procdff$2150' with positive edge clock and positive level reset.
+Creating register for signal `\owner_gate.\address_q' using process `\owner_gate.$proc$mutant_owner.sv:219$274'.
+  created $adff cell `$procdff$2151' with positive edge clock and positive level reset.
+Creating register for signal `\owner_gate.\byte_enable_q' using process `\owner_gate.$proc$mutant_owner.sv:219$274'.
+  created $adff cell `$procdff$2152' with positive edge clock and positive level reset.
+Creating register for signal `\owner_gate.\data_out_q' using process `\owner_gate.$proc$mutant_owner.sv:219$274'.
+  created $adff cell `$procdff$2153' with positive edge clock and positive level reset.
+Creating register for signal `\owner_gate.\response_pending_q' using process `\owner_gate.$proc$mutant_owner.sv:219$274'.
+  created $adff cell `$procdff$2154' with positive edge clock and positive level reset.
+Creating register for signal `\owner_gate.\response_data_q' using process `\owner_gate.$proc$mutant_owner.sv:219$274'.
+  created $adff cell `$procdff$2155' with positive edge clock and positive level reset.
+Creating register for signal `\owner_gate.\response_data_valid_q' using process `\owner_gate.$proc$mutant_owner.sv:219$274'.
+  created $adff cell `$procdff$2156' with positive edge clock and positive level reset.
+Creating register for signal `\owner_gate.\burst_q' using process `\owner_gate.$proc$mutant_owner.sv:219$274'.
+  created $adff cell `$procdff$2157' with positive edge clock and positive level reset.
+Creating register for signal `\owner_gate.\read_beat_count_q' using process `\owner_gate.$proc$mutant_owner.sv:219$274'.
+  created $adff cell `$procdff$2158' with positive edge clock and positive level reset.
+Creating register for signal `\KFSDRAM_gate.\data_out' using process `\KFSDRAM_gate.$proc$gate_controller.sv:425$229'.
+  created $dff cell `$procdff$2159' with positive edge clock.
+Creating register for signal `\KFSDRAM_gate.\read_flag' using process `\KFSDRAM_gate.$proc$gate_controller.sv:425$229'.
+  created $dff cell `$procdff$2160' with positive edge clock.
+Creating register for signal `\KFSDRAM_gate.\sdram_address' using process `\KFSDRAM_gate.$proc$gate_controller.sv:219$190'.
+  created $adff cell `$procdff$2161' with positive edge clock and positive level reset.
+Creating register for signal `\KFSDRAM_gate.\sdram_cke' using process `\KFSDRAM_gate.$proc$gate_controller.sv:219$190'.
+  created $adff cell `$procdff$2162' with positive edge clock and positive level reset.
+Creating register for signal `\KFSDRAM_gate.\sdram_cs' using process `\KFSDRAM_gate.$proc$gate_controller.sv:219$190'.
+  created $adff cell `$procdff$2163' with positive edge clock and positive level reset.
+Creating register for signal `\KFSDRAM_gate.\sdram_ras' using process `\KFSDRAM_gate.$proc$gate_controller.sv:219$190'.
+  created $adff cell `$procdff$2164' with positive edge clock and positive level reset.
+Creating register for signal `\KFSDRAM_gate.\sdram_cas' using process `\KFSDRAM_gate.$proc$gate_controller.sv:219$190'.
+  created $adff cell `$procdff$2165' with positive edge clock and positive level reset.
+Creating register for signal `\KFSDRAM_gate.\sdram_we' using process `\KFSDRAM_gate.$proc$gate_controller.sv:219$190'.
+  created $adff cell `$procdff$2166' with positive edge clock and positive level reset.
+Creating register for signal `\KFSDRAM_gate.\sdram_ba' using process `\KFSDRAM_gate.$proc$gate_controller.sv:219$190'.
+  created $adff cell `$procdff$2167' with positive edge clock and positive level reset.
+Creating register for signal `\KFSDRAM_gate.\sdram_dq_out' using process `\KFSDRAM_gate.$proc$gate_controller.sv:219$190'.
+  created $adff cell `$procdff$2168' with positive edge clock and positive level reset.
+Creating register for signal `\KFSDRAM_gate.\sdram_dq_io' using process `\KFSDRAM_gate.$proc$gate_controller.sv:219$190'.
+  created $adff cell `$procdff$2169' with positive edge clock and positive level reset.
+Creating register for signal `\KFSDRAM_gate.\read_counter' using process `\KFSDRAM_gate.$proc$gate_controller.sv:195$183'.
+  created $adff cell `$procdff$2170' with positive edge clock and positive level reset.
+Creating register for signal `\KFSDRAM_gate.\access_counter' using process `\KFSDRAM_gate.$proc$gate_controller.sv:182$178'.
+  created $adff cell `$procdff$2171' with positive edge clock and positive level reset.
+Creating register for signal `\KFSDRAM_gate.\refresh_counter' using process `\KFSDRAM_gate.$proc$gate_controller.sv:167$169'.
+  created $adff cell `$procdff$2172' with positive edge clock and positive level reset.
+Creating register for signal `\KFSDRAM_gate.\state_counter' using process `\KFSDRAM_gate.$proc$gate_controller.sv:154$166'.
+  created $adff cell `$procdff$2173' with positive edge clock and positive level reset.
+Creating register for signal `\KFSDRAM_gate.\state' using process `\KFSDRAM_gate.$proc$gate_controller.sv:143$165'.
+  created $adff cell `$procdff$2174' with positive edge clock and positive level reset.
+Creating register for signal `\owner_gold.\protocol_error' using process `\owner_gold.$proc$gold_owner.sv:214$128'.
+  created $adff cell `$procdff$2175' with positive edge clock and positive level reset.
+Creating register for signal `\owner_gold.\active_q' using process `\owner_gold.$proc$gold_owner.sv:214$128'.
+  created $adff cell `$procdff$2176' with positive edge clock and positive level reset.
+Creating register for signal `\owner_gold.\issued_q' using process `\owner_gold.$proc$gold_owner.sv:214$128'.
+  created $adff cell `$procdff$2177' with positive edge clock and positive level reset.
+Creating register for signal `\owner_gold.\owner_refresh_q' using process `\owner_gold.$proc$gold_owner.sv:214$128'.
+  created $adff cell `$procdff$2178' with positive edge clock and positive level reset.
+Creating register for signal `\owner_gold.\write_q' using process `\owner_gold.$proc$gold_owner.sv:214$128'.
+  created $adff cell `$procdff$2179' with positive edge clock and positive level reset.
+Creating register for signal `\owner_gold.\address_q' using process `\owner_gold.$proc$gold_owner.sv:214$128'.
+  created $adff cell `$procdff$2180' with positive edge clock and positive level reset.
+Creating register for signal `\owner_gold.\byte_enable_q' using process `\owner_gold.$proc$gold_owner.sv:214$128'.
+  created $adff cell `$procdff$2181' with positive edge clock and positive level reset.
+Creating register for signal `\owner_gold.\data_out_q' using process `\owner_gold.$proc$gold_owner.sv:214$128'.
+  created $adff cell `$procdff$2182' with positive edge clock and positive level reset.
+Creating register for signal `\owner_gold.\response_pending_q' using process `\owner_gold.$proc$gold_owner.sv:214$128'.
+  created $adff cell `$procdff$2183' with positive edge clock and positive level reset.
+Creating register for signal `\owner_gold.\response_data_q' using process `\owner_gold.$proc$gold_owner.sv:214$128'.
+  created $adff cell `$procdff$2184' with positive edge clock and positive level reset.
+Creating register for signal `\owner_gold.\response_data_valid_q' using process `\owner_gold.$proc$gold_owner.sv:214$128'.
+  created $adff cell `$procdff$2185' with positive edge clock and positive level reset.
+Creating register for signal `\owner_gold.\burst_q' using process `\owner_gold.$proc$gold_owner.sv:214$128'.
+  created $adff cell `$procdff$2186' with positive edge clock and positive level reset.
+Creating register for signal `\owner_gold.\read_beat_count_q' using process `\owner_gold.$proc$gold_owner.sv:214$128'.
+  created $adff cell `$procdff$2187' with positive edge clock and positive level reset.
+Creating register for signal `\KFSDRAM_gold.\data_out' using process `\KFSDRAM_gold.$proc$gold_controller.sv:418$84'.
+  created $dff cell `$procdff$2188' with positive edge clock.
+Creating register for signal `\KFSDRAM_gold.\read_flag' using process `\KFSDRAM_gold.$proc$gold_controller.sv:418$84'.
+  created $dff cell `$procdff$2189' with positive edge clock.
+Creating register for signal `\KFSDRAM_gold.\sdram_address' using process `\KFSDRAM_gold.$proc$gold_controller.sv:212$45'.
+  created $adff cell `$procdff$2190' with positive edge clock and positive level reset.
+Creating register for signal `\KFSDRAM_gold.\sdram_cke' using process `\KFSDRAM_gold.$proc$gold_controller.sv:212$45'.
+  created $adff cell `$procdff$2191' with positive edge clock and positive level reset.
+Creating register for signal `\KFSDRAM_gold.\sdram_cs' using process `\KFSDRAM_gold.$proc$gold_controller.sv:212$45'.
+  created $adff cell `$procdff$2192' with positive edge clock and positive level reset.
+Creating register for signal `\KFSDRAM_gold.\sdram_ras' using process `\KFSDRAM_gold.$proc$gold_controller.sv:212$45'.
+  created $adff cell `$procdff$2193' with positive edge clock and positive level reset.
+Creating register for signal `\KFSDRAM_gold.\sdram_cas' using process `\KFSDRAM_gold.$proc$gold_controller.sv:212$45'.
+  created $adff cell `$procdff$2194' with positive edge clock and positive level reset.
+Creating register for signal `\KFSDRAM_gold.\sdram_we' using process `\KFSDRAM_gold.$proc$gold_controller.sv:212$45'.
+  created $adff cell `$procdff$2195' with positive edge clock and positive level reset.
+Creating register for signal `\KFSDRAM_gold.\sdram_ba' using process `\KFSDRAM_gold.$proc$gold_controller.sv:212$45'.
+  created $adff cell `$procdff$2196' with positive edge clock and positive level reset.
+Creating register for signal `\KFSDRAM_gold.\sdram_dq_out' using process `\KFSDRAM_gold.$proc$gold_controller.sv:212$45'.
+  created $adff cell `$procdff$2197' with positive edge clock and positive level reset.
+Creating register for signal `\KFSDRAM_gold.\sdram_dq_io' using process `\KFSDRAM_gold.$proc$gold_controller.sv:212$45'.
+  created $adff cell `$procdff$2198' with positive edge clock and positive level reset.
+Creating register for signal `\KFSDRAM_gold.\read_counter' using process `\KFSDRAM_gold.$proc$gold_controller.sv:188$38'.
+  created $adff cell `$procdff$2199' with positive edge clock and positive level reset.
+Creating register for signal `\KFSDRAM_gold.\access_counter' using process `\KFSDRAM_gold.$proc$gold_controller.sv:175$33'.
+  created $adff cell `$procdff$2200' with positive edge clock and positive level reset.
+Creating register for signal `\KFSDRAM_gold.\refresh_counter' using process `\KFSDRAM_gold.$proc$gold_controller.sv:160$24'.
+  created $adff cell `$procdff$2201' with positive edge clock and positive level reset.
+Creating register for signal `\KFSDRAM_gold.\state_counter' using process `\KFSDRAM_gold.$proc$gold_controller.sv:147$21'.
+  created $adff cell `$procdff$2202' with positive edge clock and positive level reset.
+Creating register for signal `\KFSDRAM_gold.\state' using process `\KFSDRAM_gold.$proc$gold_controller.sv:136$20'.
+  created $adff cell `$procdff$2203' with positive edge clock and positive level reset.
+
+6.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+6.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Removing empty process `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.$proc$gate_controller.sv:425$459'.
+Found and cleaned up 3 empty switches in `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.$proc$gate_controller.sv:219$420'.
+Removing empty process `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.$proc$gate_controller.sv:219$420'.
+Found and cleaned up 3 empty switches in `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.$proc$gate_controller.sv:195$413'.
+Removing empty process `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.$proc$gate_controller.sv:195$413'.
+Found and cleaned up 1 empty switch in `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.$proc$gate_controller.sv:182$408'.
+Removing empty process `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.$proc$gate_controller.sv:182$408'.
+Found and cleaned up 2 empty switches in `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.$proc$gate_controller.sv:167$399'.
+Removing empty process `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.$proc$gate_controller.sv:167$399'.
+Found and cleaned up 1 empty switch in `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.$proc$gate_controller.sv:154$396'.
+Removing empty process `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.$proc$gate_controller.sv:154$396'.
+Removing empty process `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.$proc$gate_controller.sv:143$395'.
+Found and cleaned up 15 empty switches in `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.$proc$gate_controller.sv:0$376'.
+Removing empty process `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.$proc$gate_controller.sv:0$376'.
+Removing empty process `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.$proc$gold_controller.sv:418$375'.
+Found and cleaned up 3 empty switches in `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.$proc$gold_controller.sv:212$336'.
+Removing empty process `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.$proc$gold_controller.sv:212$336'.
+Found and cleaned up 3 empty switches in `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.$proc$gold_controller.sv:188$329'.
+Removing empty process `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.$proc$gold_controller.sv:188$329'.
+Found and cleaned up 1 empty switch in `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.$proc$gold_controller.sv:175$324'.
+Removing empty process `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.$proc$gold_controller.sv:175$324'.
+Found and cleaned up 2 empty switches in `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.$proc$gold_controller.sv:160$315'.
+Removing empty process `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.$proc$gold_controller.sv:160$315'.
+Found and cleaned up 1 empty switch in `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.$proc$gold_controller.sv:147$312'.
+Removing empty process `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.$proc$gold_controller.sv:147$312'.
+Removing empty process `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.$proc$gold_controller.sv:136$311'.
+Found and cleaned up 15 empty switches in `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.$proc$gold_controller.sv:0$292'.
+Removing empty process `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.$proc$gold_controller.sv:0$292'.
+Found and cleaned up 7 empty switches in `\owner_gate.$proc$mutant_owner.sv:219$274'.
+Removing empty process `owner_gate.$proc$mutant_owner.sv:219$274'.
+Found and cleaned up 3 empty switches in `\owner_gate.$proc$mutant_owner.sv:0$261'.
+Removing empty process `owner_gate.$proc$mutant_owner.sv:0$261'.
+Removing empty process `KFSDRAM_gate.$proc$gate_controller.sv:425$229'.
+Found and cleaned up 3 empty switches in `\KFSDRAM_gate.$proc$gate_controller.sv:219$190'.
+Removing empty process `KFSDRAM_gate.$proc$gate_controller.sv:219$190'.
+Found and cleaned up 3 empty switches in `\KFSDRAM_gate.$proc$gate_controller.sv:195$183'.
+Removing empty process `KFSDRAM_gate.$proc$gate_controller.sv:195$183'.
+Found and cleaned up 1 empty switch in `\KFSDRAM_gate.$proc$gate_controller.sv:182$178'.
+Removing empty process `KFSDRAM_gate.$proc$gate_controller.sv:182$178'.
+Found and cleaned up 2 empty switches in `\KFSDRAM_gate.$proc$gate_controller.sv:167$169'.
+Removing empty process `KFSDRAM_gate.$proc$gate_controller.sv:167$169'.
+Found and cleaned up 1 empty switch in `\KFSDRAM_gate.$proc$gate_controller.sv:154$166'.
+Removing empty process `KFSDRAM_gate.$proc$gate_controller.sv:154$166'.
+Removing empty process `KFSDRAM_gate.$proc$gate_controller.sv:143$165'.
+Found and cleaned up 15 empty switches in `\KFSDRAM_gate.$proc$gate_controller.sv:0$146'.
+Removing empty process `KFSDRAM_gate.$proc$gate_controller.sv:0$146'.
+Found and cleaned up 7 empty switches in `\owner_gold.$proc$gold_owner.sv:214$128'.
+Removing empty process `owner_gold.$proc$gold_owner.sv:214$128'.
+Found and cleaned up 3 empty switches in `\owner_gold.$proc$gold_owner.sv:0$116'.
+Removing empty process `owner_gold.$proc$gold_owner.sv:0$116'.
+Removing empty process `KFSDRAM_gold.$proc$gold_controller.sv:418$84'.
+Found and cleaned up 3 empty switches in `\KFSDRAM_gold.$proc$gold_controller.sv:212$45'.
+Removing empty process `KFSDRAM_gold.$proc$gold_controller.sv:212$45'.
+Found and cleaned up 3 empty switches in `\KFSDRAM_gold.$proc$gold_controller.sv:188$38'.
+Removing empty process `KFSDRAM_gold.$proc$gold_controller.sv:188$38'.
+Found and cleaned up 1 empty switch in `\KFSDRAM_gold.$proc$gold_controller.sv:175$33'.
+Removing empty process `KFSDRAM_gold.$proc$gold_controller.sv:175$33'.
+Found and cleaned up 2 empty switches in `\KFSDRAM_gold.$proc$gold_controller.sv:160$24'.
+Removing empty process `KFSDRAM_gold.$proc$gold_controller.sv:160$24'.
+Found and cleaned up 1 empty switch in `\KFSDRAM_gold.$proc$gold_controller.sv:147$21'.
+Removing empty process `KFSDRAM_gold.$proc$gold_controller.sv:147$21'.
+Removing empty process `KFSDRAM_gold.$proc$gold_controller.sv:136$20'.
+Found and cleaned up 15 empty switches in `\KFSDRAM_gold.$proc$gold_controller.sv:0$1'.
+Removing empty process `KFSDRAM_gold.$proc$gold_controller.sv:0$1'.
+Cleaned up 120 empty switches.
+
+6.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module $paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate.
+<suppressed ~13 debug messages>
+Optimizing module $paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold.
+<suppressed ~13 debug messages>
+Optimizing module owner_gate.
+<suppressed ~7 debug messages>
+Optimizing module KFSDRAM_gate.
+<suppressed ~13 debug messages>
+Optimizing module owner_gold.
+<suppressed ~6 debug messages>
+Optimizing module KFSDRAM_gold.
+<suppressed ~13 debug messages>
+
+7. Executing MEMORY pass.
+
+7.1. Executing OPT_MEM pass (optimize memories).
+Performed a total of 0 transformations.
+
+7.2. Executing OPT_MEM_PRIORITY pass (removing unnecessary memory write priority relations).
+Performed a total of 0 transformations.
+
+7.3. Executing OPT_MEM_FEEDBACK pass (finding memory read-to-write feedback paths).
+
+7.4. Executing MEMORY_BMUX2ROM pass (converting muxes to ROMs).
+
+7.5. Executing MEMORY_DFF pass (merging $dff cells to $memrd).
+
+7.6. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module $paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate..
+Finding unused cells or wires in module $paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold..
+Finding unused cells or wires in module \owner_gate..
+Finding unused cells or wires in module \KFSDRAM_gate..
+Finding unused cells or wires in module \owner_gold..
+Finding unused cells or wires in module \KFSDRAM_gold..
+Removed 14 unused cells and 489 unused wires.
+<suppressed ~24 debug messages>
+
+7.7. Executing MEMORY_SHARE pass (consolidating $memrd/$memwr cells).
+
+7.8. Executing OPT_MEM_WIDEN pass (optimize memories where all ports are wide).
+Performed a total of 0 transformations.
+
+7.9. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module $paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold..
+Finding unused cells or wires in module $paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate..
+Finding unused cells or wires in module \KFSDRAM_gate..
+Finding unused cells or wires in module \KFSDRAM_gold..
+Finding unused cells or wires in module \owner_gate..
+Finding unused cells or wires in module \owner_gold..
+
+7.10. Executing MEMORY_COLLECT pass (generating $mem cells).
+
+7.11. Executing MEMORY_MAP pass (converting memories to logic and flip-flops).
+
+8. Executing FLATTEN pass (flatten design).
+<suppressed ~2 debug messages>
+
+9. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module $paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold..
+Finding unused cells or wires in module $paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate..
+Finding unused cells or wires in module \KFSDRAM_gate..
+Finding unused cells or wires in module \KFSDRAM_gold..
+Finding unused cells or wires in module \owner_gate..
+Finding unused cells or wires in module \owner_gold..
+Removed 0 unused cells and 1 unused wires.
+<suppressed ~1 debug messages>
+
+10. Executing EQUIV_MAKE pass (creating equiv checking module).
+Presumably equivalent wires: active_q_gold (\active_q_gold), active_q_gate (\active_q_gate) -> active_q
+Presumably equivalent wires: address_q_gold (\address_q_gold), address_q_gate (\address_q_gate) -> address_q
+Presumably equivalent wires: burst_q_gold (\burst_q_gold), burst_q_gate (\burst_q_gate) -> burst_q
+Presumably equivalent wires: byte_enable_q_gold (\byte_enable_q_gold), byte_enable_q_gate (\byte_enable_q_gate) -> byte_enable_q
+Presumably equivalent wires: clk_gold (\clk_gold), clk_gate (\clk_gate) -> clk
+Presumably equivalent wires: data_out_q_gold (\data_out_q_gold), data_out_q_gate (\data_out_q_gate) -> data_out_q
+Presumably equivalent wires: debug_state_gold ({ \active_q_gold \write_q_gold \response_pending_q_gold \response_data_valid_q_gold \u_KFSDRAM.idle_gold \u_KFSDRAM.write_flag_gold \u_KFSDRAM.read_flag_gold \u_KFSDRAM.refresh_mode_gold }), debug_state_gate ({ \active_q_gate \write_q_gate \response_pending_q_gate \response_data_valid_q_gate \u_KFSDRAM.idle_gate \u_KFSDRAM.write_flag_gate \u_KFSDRAM.read_flag_gate \u_KFSDRAM.refresh_mode_gate }) -> debug_state
+Presumably equivalent wires: issued_q_gold (\issued_q_gold), issued_q_gate (\issued_q_gate) -> issued_q
+Presumably equivalent wires: kf_data_in_gold (\data_out_q_gold), kf_data_in_gate (\data_out_q_gate) -> kf_data_in
+Presumably equivalent wires: kf_data_out_gold (\u_KFSDRAM.data_out_gold), kf_data_out_gate (\u_KFSDRAM.data_out_gate) -> kf_data_out
+Presumably equivalent wires: kf_dq_io_gold (\u_KFSDRAM.sdram_dq_io_gold), kf_dq_io_gate (\u_KFSDRAM.sdram_dq_io_gate) -> kf_dq_io
+Presumably equivalent wires: kf_dq_out_gold (\u_KFSDRAM.sdram_dq_out_gold), kf_dq_out_gate (\u_KFSDRAM.sdram_dq_out_gate) -> kf_dq_out
+Presumably equivalent wires: kf_read_flag_gold (\u_KFSDRAM.read_flag_gold), kf_read_flag_gate (\u_KFSDRAM.read_flag_gate) -> kf_read_flag
+Presumably equivalent wires: kf_sdram_address_gold (\u_KFSDRAM.sdram_address_gold), kf_sdram_address_gate (\u_KFSDRAM.sdram_address_gate) -> kf_sdram_address
+Presumably equivalent wires: kf_sdram_ba_gold (\u_KFSDRAM.sdram_ba_gold), kf_sdram_ba_gate (\u_KFSDRAM.sdram_ba_gate) -> kf_sdram_ba
+Presumably equivalent wires: kf_sdram_cas_gold (\u_KFSDRAM.sdram_cas_gold), kf_sdram_cas_gate (\u_KFSDRAM.sdram_cas_gate) -> kf_sdram_cas
+Presumably equivalent wires: kf_sdram_cke_gold (\u_KFSDRAM.sdram_cke_gold), kf_sdram_cke_gate (\u_KFSDRAM.sdram_cke_gate) -> kf_sdram_cke
+Presumably equivalent wires: kf_sdram_cs_gold (\u_KFSDRAM.sdram_cs_gold), kf_sdram_cs_gate (\u_KFSDRAM.sdram_cs_gate) -> kf_sdram_cs
+Presumably equivalent wires: kf_sdram_ras_gold (\u_KFSDRAM.sdram_ras_gold), kf_sdram_ras_gate (\u_KFSDRAM.sdram_ras_gate) -> kf_sdram_ras
+Presumably equivalent wires: kf_sdram_we_gold (\u_KFSDRAM.sdram_we_gold), kf_sdram_we_gate (\u_KFSDRAM.sdram_we_gate) -> kf_sdram_we
+Presumably equivalent wires: owner_refresh_q_gold (\owner_refresh_q_gold), owner_refresh_q_gate (\owner_refresh_q_gate) -> owner_refresh_q
+Presumably equivalent wires: physical_idle_gold (\physical_idle_gold), physical_idle_gate (\physical_idle_gate) -> physical_idle
+Presumably equivalent wires: protocol_error_gold (\protocol_error_gold), protocol_error_gate (\protocol_error_gate) -> protocol_error
+Presumably equivalent wires: read_beat_count_q_gold (\read_beat_count_q_gold), read_beat_count_q_gate (\read_beat_count_q_gate) -> read_beat_count_q
+Presumably equivalent wires: request_accept_gold (\request_accept_gold), request_accept_gate (\request_accept_gate) -> request_accept
+Presumably equivalent wires: request_address_gold (\request_address_gold), request_address_gate (\request_address_gate) -> request_address
+Presumably equivalent wires: request_burst_gold (\request_burst_gold), request_burst_gate (\request_burst_gate) -> request_burst
+Presumably equivalent wires: request_byte_enable_gold (\request_byte_enable_gold), request_byte_enable_gate (\request_byte_enable_gate) -> request_byte_enable
+Presumably equivalent wires: request_code_fetch_gold (\request_code_fetch_gold), request_code_fetch_gate (\request_code_fetch_gate) -> request_code_fetch
+Presumably equivalent wires: request_command_valid_gold (\request_command_valid_gold), request_command_valid_gate (\request_command_valid_gate) -> request_command_valid
+Presumably equivalent wires: request_cycle_class_gold (\request_cycle_class_gold), request_cycle_class_gate (\request_cycle_class_gate) -> request_cycle_class
+Presumably equivalent wires: request_data_out_gold (\request_data_out_gold), request_data_out_gate (\request_data_out_gate) -> request_data_out
+Presumably equivalent wires: request_owner_refresh_gold (\request_owner_refresh_gold), request_owner_refresh_gate (\request_owner_refresh_gate) -> request_owner_refresh
+Presumably equivalent wires: request_read_data_gold (\response_data_q_gold), request_read_data_gate (\response_data_q_gate) -> request_read_data
+Presumably equivalent wires: request_read_data_valid_gold (\request_read_data_valid_gold), request_read_data_valid_gate (\request_read_data_valid_gate) -> request_read_data_valid
+Presumably equivalent wires: request_ready_gold (\request_ready_gold), request_ready_gate (\request_ready_gate) -> request_ready
+Presumably equivalent wires: request_valid_gold (\request_valid_gold), request_valid_gate (\request_valid_gate) -> request_valid
+Presumably equivalent wires: request_write_gold (\request_write_gold), request_write_gate (\request_write_gate) -> request_write
+Presumably equivalent wires: reset_gold (\reset_gold), reset_gate (\reset_gate) -> reset
+Presumably equivalent wires: response_data_q_gold (\response_data_q_gold), response_data_q_gate (\response_data_q_gate) -> response_data_q
+Presumably equivalent wires: response_data_valid_q_gold (\response_data_valid_q_gold), response_data_valid_q_gate (\response_data_valid_q_gate) -> response_data_valid_q
+Presumably equivalent wires: response_pending_q_gold (\response_pending_q_gold), response_pending_q_gate (\response_pending_q_gate) -> response_pending_q
+Presumably equivalent wires: sdram_address_gold (\sdram_address_gold), sdram_address_gate (\sdram_address_gate) -> sdram_address
+Presumably equivalent wires: sdram_ba_gold (\u_KFSDRAM.sdram_ba_gold), sdram_ba_gate (\u_KFSDRAM.sdram_ba_gate) -> sdram_ba
+Presumably equivalent wires: sdram_cas_gold (\u_KFSDRAM.sdram_cas_gold), sdram_cas_gate (\u_KFSDRAM.sdram_cas_gate) -> sdram_cas
+Presumably equivalent wires: sdram_cke_gold (\u_KFSDRAM.sdram_cke_gold), sdram_cke_gate (\u_KFSDRAM.sdram_cke_gate) -> sdram_cke
+Presumably equivalent wires: sdram_cs_gold (\u_KFSDRAM.sdram_cs_gold), sdram_cs_gate (\u_KFSDRAM.sdram_cs_gate) -> sdram_cs
+Presumably equivalent wires: sdram_dq_in_gold (\sdram_dq_in_gold), sdram_dq_in_gate (\sdram_dq_in_gate) -> sdram_dq_in
+Presumably equivalent wires: sdram_dq_io_gold (\u_KFSDRAM.sdram_dq_io_gold), sdram_dq_io_gate (\u_KFSDRAM.sdram_dq_io_gate) -> sdram_dq_io
+Presumably equivalent wires: sdram_dq_out_gold (\u_KFSDRAM.sdram_dq_out_gold), sdram_dq_out_gate (\u_KFSDRAM.sdram_dq_out_gate) -> sdram_dq_out
+Presumably equivalent wires: sdram_ldqm_gold (\sdram_ldqm_gold), sdram_ldqm_gate (\sdram_ldqm_gate) -> sdram_ldqm
+Presumably equivalent wires: sdram_ras_gold (\u_KFSDRAM.sdram_ras_gold), sdram_ras_gate (\u_KFSDRAM.sdram_ras_gate) -> sdram_ras
+Presumably equivalent wires: sdram_udqm_gold (\sdram_udqm_gold), sdram_udqm_gate (\sdram_udqm_gate) -> sdram_udqm
+Presumably equivalent wires: sdram_we_gold (\u_KFSDRAM.sdram_we_gold), sdram_we_gate (\u_KFSDRAM.sdram_we_gate) -> sdram_we
+Presumably equivalent wires: u_KFSDRAM.access_counter_gold (\u_KFSDRAM.access_counter_gold), u_KFSDRAM.access_counter_gate (\u_KFSDRAM.access_counter_gate) -> u_KFSDRAM.access_counter
+Presumably equivalent wires: u_KFSDRAM.data_in_gold (\data_out_q_gold), u_KFSDRAM.data_in_gate (\data_out_q_gate) -> u_KFSDRAM.data_in
+Presumably equivalent wires: u_KFSDRAM.data_out_gold (\u_KFSDRAM.data_out_gold), u_KFSDRAM.data_out_gate (\u_KFSDRAM.data_out_gate) -> u_KFSDRAM.data_out
+Presumably equivalent wires: u_KFSDRAM.read_counter_gold (\u_KFSDRAM.read_counter_gold), u_KFSDRAM.read_counter_gate (\u_KFSDRAM.read_counter_gate) -> u_KFSDRAM.read_counter
+Presumably equivalent wires: u_KFSDRAM.read_flag_gold (\u_KFSDRAM.read_flag_gold), u_KFSDRAM.read_flag_gate (\u_KFSDRAM.read_flag_gate) -> u_KFSDRAM.read_flag
+Presumably equivalent wires: u_KFSDRAM.refresh_counter_gold (\u_KFSDRAM.refresh_counter_gold), u_KFSDRAM.refresh_counter_gate (\u_KFSDRAM.refresh_counter_gate) -> u_KFSDRAM.refresh_counter
+Presumably equivalent wires: u_KFSDRAM.sdram_address_gold (\u_KFSDRAM.sdram_address_gold), u_KFSDRAM.sdram_address_gate (\u_KFSDRAM.sdram_address_gate) -> u_KFSDRAM.sdram_address
+Presumably equivalent wires: u_KFSDRAM.sdram_ba_gold (\u_KFSDRAM.sdram_ba_gold), u_KFSDRAM.sdram_ba_gate (\u_KFSDRAM.sdram_ba_gate) -> u_KFSDRAM.sdram_ba
+Presumably equivalent wires: u_KFSDRAM.sdram_cas_gold (\u_KFSDRAM.sdram_cas_gold), u_KFSDRAM.sdram_cas_gate (\u_KFSDRAM.sdram_cas_gate) -> u_KFSDRAM.sdram_cas
+Presumably equivalent wires: u_KFSDRAM.sdram_cke_gold (\u_KFSDRAM.sdram_cke_gold), u_KFSDRAM.sdram_cke_gate (\u_KFSDRAM.sdram_cke_gate) -> u_KFSDRAM.sdram_cke
+Presumably equivalent wires: u_KFSDRAM.sdram_cs_gold (\u_KFSDRAM.sdram_cs_gold), u_KFSDRAM.sdram_cs_gate (\u_KFSDRAM.sdram_cs_gate) -> u_KFSDRAM.sdram_cs
+Presumably equivalent wires: u_KFSDRAM.sdram_dq_io_gold (\u_KFSDRAM.sdram_dq_io_gold), u_KFSDRAM.sdram_dq_io_gate (\u_KFSDRAM.sdram_dq_io_gate) -> u_KFSDRAM.sdram_dq_io
+Presumably equivalent wires: u_KFSDRAM.sdram_dq_out_gold (\u_KFSDRAM.sdram_dq_out_gold), u_KFSDRAM.sdram_dq_out_gate (\u_KFSDRAM.sdram_dq_out_gate) -> u_KFSDRAM.sdram_dq_out
+Presumably equivalent wires: u_KFSDRAM.sdram_ras_gold (\u_KFSDRAM.sdram_ras_gold), u_KFSDRAM.sdram_ras_gate (\u_KFSDRAM.sdram_ras_gate) -> u_KFSDRAM.sdram_ras
+Presumably equivalent wires: u_KFSDRAM.sdram_we_gold (\u_KFSDRAM.sdram_we_gold), u_KFSDRAM.sdram_we_gate (\u_KFSDRAM.sdram_we_gate) -> u_KFSDRAM.sdram_we
+Presumably equivalent wires: u_KFSDRAM.state_gold (\u_KFSDRAM.state_gold), u_KFSDRAM.state_gate (\u_KFSDRAM.state_gate) -> u_KFSDRAM.state
+Presumably equivalent wires: u_KFSDRAM.state_counter_gold (\u_KFSDRAM.state_counter_gold), u_KFSDRAM.state_counter_gate (\u_KFSDRAM.state_counter_gate) -> u_KFSDRAM.state_counter
+Presumably equivalent wires: write_q_gold (\write_q_gold), write_q_gate (\write_q_gate) -> write_q
+Changing input A of cell $auto$opt_expr.cc:706:replace_const_cells$2204_gate ($not): \address_q_gate [1] -> \address_q [1]
+Changing input A of cell $eq$mutant_owner.sv:265$289_gate ($eq): \read_beat_count_q_gate -> \read_beat_count_q
+Changing input A of cell $flatten\u_KFSDRAM.$add$gate_controller.sv:160$398_gate ($add): \u_KFSDRAM.state_counter_gate -> \u_KFSDRAM.state_counter
+Changing input A of cell $flatten\u_KFSDRAM.$add$gate_controller.sv:173$407_gate ($add): \u_KFSDRAM.refresh_counter_gate -> \u_KFSDRAM.refresh_counter
+Changing input A of cell $flatten\u_KFSDRAM.$add$gate_controller.sv:186$412_gate ($add): \u_KFSDRAM.access_counter_gate -> \u_KFSDRAM.access_counter
+Changing input A of cell $flatten\u_KFSDRAM.$add$gate_controller.sv:203$417_gate ($add): \u_KFSDRAM.read_counter_gate -> \u_KFSDRAM.read_counter
+Changing input A of cell $flatten\u_KFSDRAM.$add$gate_controller.sv:351$438_gate ($add): { \address_q_gate [9:2] \u_KFSDRAM.column_address_gate [0] } -> { \address_q [9:2] \u_KFSDRAM.column_address_gate [0] }
+Changing input B of cell $flatten\u_KFSDRAM.$add$gate_controller.sv:351$438_gate ($add): \u_KFSDRAM.access_counter_gate -> \u_KFSDRAM.access_counter
+Changing input A of cell $flatten\u_KFSDRAM.$add$gate_controller.sv:374$440_gate ($add): { \address_q_gate [9:2] \u_KFSDRAM.column_address_gate [0] } -> { \address_q [9:2] \u_KFSDRAM.column_address_gate [0] }
+Changing input B of cell $flatten\u_KFSDRAM.$add$gate_controller.sv:374$440_gate ($add): \u_KFSDRAM.access_counter_gate -> \u_KFSDRAM.access_counter
+Changing input B of cell $flatten\u_KFSDRAM.$and$gate_controller.sv:170$404_gate ($and): \u_KFSDRAM.sdram_we_gate -> \u_KFSDRAM.sdram_we
+Changing input A of cell $flatten\u_KFSDRAM.$eq$gate_controller.sv:101$381_gate ($eq): \u_KFSDRAM.state_counter_gate -> \u_KFSDRAM.state_counter
+Changing input A of cell $flatten\u_KFSDRAM.$eq$gate_controller.sv:105$382_gate ($logic_not): \u_KFSDRAM.state_counter_gate -> \u_KFSDRAM.state_counter
+Changing input A of cell $flatten\u_KFSDRAM.$eq$gate_controller.sv:109$383_gate ($eq): \u_KFSDRAM.state_counter_gate -> \u_KFSDRAM.state_counter
+Changing input A of cell $flatten\u_KFSDRAM.$eq$gate_controller.sv:118$386_gate ($eq): \u_KFSDRAM.refresh_counter_gate -> \u_KFSDRAM.refresh_counter
+Changing input A of cell $flatten\u_KFSDRAM.$eq$gate_controller.sv:122$390_gate ($eq): \u_KFSDRAM.access_counter_gate -> \u_KFSDRAM.access_counter
+Changing input A of cell $flatten\u_KFSDRAM.$eq$gate_controller.sv:126$391_gate ($eq): \u_KFSDRAM.state_counter_gate -> \u_KFSDRAM.state_counter
+Changing input A of cell $flatten\u_KFSDRAM.$eq$gate_controller.sv:130$392_gate ($eq): \u_KFSDRAM.read_counter_gate -> \u_KFSDRAM.read_counter
+Changing input A of cell $flatten\u_KFSDRAM.$eq$gate_controller.sv:134$394_gate ($logic_not): \u_KFSDRAM.state_counter_gate -> \u_KFSDRAM.state_counter
+Changing input A of cell $flatten\u_KFSDRAM.$eq$gate_controller.sv:185$409_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$eq$gate_controller.sv:185$410_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$eq$gate_controller.sv:212$418_gate ($logic_not): \u_KFSDRAM.state_counter_gate -> \u_KFSDRAM.state_counter
+Changing input A of cell $flatten\u_KFSDRAM.$eq$gate_controller.sv:417$449_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$eq$gate_controller.sv:418$450_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$eq$gate_controller.sv:418$451_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$eq$gate_controller.sv:419$453_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$eq$gate_controller.sv:420$454_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$eq$gate_controller.sv:85$377_gate ($eq): \u_KFSDRAM.state_counter_gate -> \u_KFSDRAM.state_counter
+Changing input A of cell $flatten\u_KFSDRAM.$eq$gate_controller.sv:89$378_gate ($logic_not): \u_KFSDRAM.state_counter_gate -> \u_KFSDRAM.state_counter
+Changing input A of cell $flatten\u_KFSDRAM.$eq$gate_controller.sv:93$379_gate ($eq): \u_KFSDRAM.state_counter_gate -> \u_KFSDRAM.state_counter
+Changing input A of cell $flatten\u_KFSDRAM.$eq$gate_controller.sv:97$380_gate ($eq): \u_KFSDRAM.state_counter_gate -> \u_KFSDRAM.state_counter
+Changing input A of cell $flatten\u_KFSDRAM.$ge$gate_controller.sv:118$384_gate ($ge): \u_KFSDRAM.refresh_counter_gate -> \u_KFSDRAM.refresh_counter
+Changing input A of cell $flatten\u_KFSDRAM.$ge$gate_controller.sv:213$419_gate ($ge): \u_KFSDRAM.state_counter_gate -> \u_KFSDRAM.state_counter
+Changing input A of cell $flatten\u_KFSDRAM.$gt$gate_controller.sv:420$457_gate ($gt): \u_KFSDRAM.state_counter_gate -> \u_KFSDRAM.state_counter
+Changing input A of cell $flatten\u_KFSDRAM.$le$gate_controller.sv:200$415_gate ($le): \u_KFSDRAM.state_counter_gate -> \u_KFSDRAM.state_counter
+Changing input B of cell $flatten\u_KFSDRAM.$ne$gate_controller.sv:157$397_gate ($ne): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$ne$gate_controller.sv:172$406_gate ($ne): \u_KFSDRAM.refresh_counter_gate -> \u_KFSDRAM.refresh_counter
+Changing input A of cell $flatten\u_KFSDRAM.$ne$gate_controller.sv:198$414_gate ($ne): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$ne$gate_controller.sv:202$416_gate ($ne): \u_KFSDRAM.read_counter_gate -> \u_KFSDRAM.read_counter
+Changing input A of cell $flatten\u_KFSDRAM.$not$gate_controller.sv:170$400_gate ($not): \u_KFSDRAM.sdram_cs_gate -> \u_KFSDRAM.sdram_cs
+Changing input A of cell $flatten\u_KFSDRAM.$not$gate_controller.sv:170$401_gate ($not): \u_KFSDRAM.sdram_ras_gate -> \u_KFSDRAM.sdram_ras
+Changing input A of cell $flatten\u_KFSDRAM.$not$gate_controller.sv:170$402_gate ($not): \u_KFSDRAM.sdram_cas_gate -> \u_KFSDRAM.sdram_cas
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$472_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$476_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$477_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$484_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$485_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$488_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$495_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$496_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$497_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$510_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$511_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input B of cell $flatten\u_KFSDRAM.$procmux$516_gate ($mux): \data_out_q_gate -> \data_out_q
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$517_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$525_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$526_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$533_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$536_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$537_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$542_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$543_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$544_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$548_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$549_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$554_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$555_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$556_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$557_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$560_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$567_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$568_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$569_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$570_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$571_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$572_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$573_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$576_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$577_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$578_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$579_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$584_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$585_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$586_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$587_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$588_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$589_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$590_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$591_CMP0_gate ($logic_not): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$594_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$595_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$596_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$597_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$602_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$603_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$604_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$605_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$606_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$607_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$608_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$609_CMP0_gate ($logic_not): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$615_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$621_gate ($mux): \u_KFSDRAM.read_counter_gate -> \u_KFSDRAM.read_counter
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$633_gate ($mux): \u_KFSDRAM.refresh_counter_gate -> \u_KFSDRAM.refresh_counter
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$643_gate ($mux): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$646_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$650_gate ($mux): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$653_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$658_gate ($mux): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$661_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$667_gate ($mux): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$670_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$677_gate ($mux): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$686_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$699_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$709_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$717_gate ($mux): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$720_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$729_gate ($mux): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$732_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$742_gate ($mux): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$745_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$756_gate ($mux): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$759_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$771_gate ($mux): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$774_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$787_gate ($mux): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$790_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$804_gate ($mux): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$807_CMP0_gate ($logic_not): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$810_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$811_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$812_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$813_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$814_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$815_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$816_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$817_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$818_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$819_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$820_CMP0_gate ($eq): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$821_CMP0_gate ($logic_not): \u_KFSDRAM.state_gate -> \u_KFSDRAM.state
+Changing input A of cell $logic_and$mutant_owner.sv:100$239_gate ($logic_and): \active_q_gate -> \debug_state [7]
+Changing input B of cell $logic_and$mutant_owner.sv:100$242_gate ($logic_and): \u_KFSDRAM.idle_gate -> \debug_state [3]
+Changing input A of cell $logic_and$mutant_owner.sv:108$243_gate ($logic_and): \request_accept_gate -> \request_accept
+Changing input B of cell $logic_and$mutant_owner.sv:110$246_gate ($logic_and): \write_q_gate -> \write_q
+Changing input A of cell $logic_and$mutant_owner.sv:117$253_gate ($logic_and): \active_q_gate -> \debug_state [7]
+Changing input A of cell $logic_and$mutant_owner.sv:119$250_gate ($logic_and): \issued_q_gate -> \issued_q
+Changing input B of cell $logic_and$mutant_owner.sv:119$250_gate ($logic_and): \u_KFSDRAM.idle_gate -> \debug_state [3]
+Changing input A of cell $logic_and$mutant_owner.sv:121$255_gate ($logic_and): \active_q_gate -> \debug_state [7]
+Changing input B of cell $logic_and$mutant_owner.sv:121$258_gate ($logic_and): \response_data_valid_q_gate -> \response_data_valid_q
+Changing input B of cell $logic_and$mutant_owner.sv:139$263_gate ($logic_and): \write_q_gate -> \write_q
+Changing input A of cell $logic_and$mutant_owner.sv:149$267_gate ($logic_and): \active_q_gate -> \debug_state [7]
+Changing input B of cell $logic_and$mutant_owner.sv:163$269_gate ($logic_and): \u_KFSDRAM.sdram_ras_gate -> \u_KFSDRAM.sdram_ras
+Changing input A of cell $logic_and$mutant_owner.sv:260$280_gate ($logic_and): \active_q_gate -> \debug_state [7]
+Changing input B of cell $logic_and$mutant_owner.sv:260$280_gate ($logic_and): \issued_q_gate -> \issued_q
+Changing input B of cell $logic_and$mutant_owner.sv:260$285_gate ($logic_and): \u_KFSDRAM.read_flag_gate -> \u_KFSDRAM.read_flag
+Changing input A of cell $logic_and$mutant_owner.sv:267$291_gate ($logic_and): \active_q_gate -> \debug_state [7]
+Changing input B of cell $logic_and$mutant_owner.sv:267$291_gate ($logic_and): \request_ready_gate -> \request_ready
+Changing input A of cell $logic_and$mutant_owner.sv:96$231_gate ($logic_and): \u_KFSDRAM.idle_gate -> \debug_state [3]
+Changing input B of cell $logic_and$mutant_owner.sv:97$235_gate ($logic_and): \u_KFSDRAM.idle_gate -> \debug_state [3]
+Changing input A of cell $logic_not$mutant_owner.sv:100$238_gate ($logic_not): \issued_q_gate -> \issued_q
+Changing input A of cell $logic_not$mutant_owner.sv:100$240_gate ($logic_not): \owner_refresh_q_gate -> \owner_refresh_q
+Changing input A of cell $logic_not$mutant_owner.sv:111$248_gate ($logic_not): \write_q_gate -> \write_q
+Changing input A of cell $logic_not$mutant_owner.sv:121$254_gate ($logic_not): \owner_refresh_q_gate -> \owner_refresh_q
+Changing input A of cell $logic_not$mutant_owner.sv:122$256_gate ($logic_not): \write_q_gate -> \write_q
+Changing input A of cell $logic_not$mutant_owner.sv:139$262_gate ($logic_not): \owner_refresh_q_gate -> \owner_refresh_q
+Changing input A of cell $logic_not$mutant_owner.sv:149$266_gate ($logic_not): \owner_refresh_q_gate -> \owner_refresh_q
+Changing input A of cell $logic_not$mutant_owner.sv:163$268_gate ($logic_not): \u_KFSDRAM.sdram_cs_gate -> \u_KFSDRAM.sdram_cs
+Changing input A of cell $logic_not$mutant_owner.sv:163$270_gate ($logic_not): \u_KFSDRAM.sdram_cas_gate -> \u_KFSDRAM.sdram_cas
+Changing input A of cell $logic_not$mutant_owner.sv:260$281_gate ($logic_not): \owner_refresh_q_gate -> \owner_refresh_q
+Changing input A of cell $logic_not$mutant_owner.sv:260$283_gate ($logic_not): \write_q_gate -> \write_q
+Changing input A of cell $logic_not$mutant_owner.sv:261$286_gate ($logic_not): \response_pending_q_gate -> \response_pending_q
+Changing input A of cell $logic_not$mutant_owner.sv:96$230_gate ($logic_not): \active_q_gate -> \debug_state [7]
+Changing input A of cell $logic_not$mutant_owner.sv:97$232_gate ($logic_not): \active_q_gate -> \debug_state [7]
+Changing input S of cell $procmux$1192_gate ($mux): \request_accept_gate -> \request_accept
+Changing input A of cell $procmux$1195_gate ($mux): \read_beat_count_q_gate -> \read_beat_count_q
+Changing input B of cell $procmux$1198_gate ($mux): \read_beat_count_q_gate -> \read_beat_count_q
+Changing input S of cell $procmux$1201_gate ($mux): \request_accept_gate -> \request_accept
+Changing input B of cell $procmux$1203_gate ($mux): \burst_q_gate -> \burst_q
+Changing input S of cell $procmux$1203_gate ($mux): \active_q_gate -> \debug_state [7]
+Changing input A of cell $procmux$1206_gate ($mux): \response_data_q_gate -> \response_data_q
+Changing input B of cell $procmux$1206_gate ($mux): \u_KFSDRAM.data_out_gate -> \u_KFSDRAM.data_out
+Changing input B of cell $procmux$1209_gate ($mux): \response_data_q_gate -> \response_data_q
+Changing input B of cell $procmux$1212_gate ($mux): \response_data_q_gate -> \response_data_q
+Changing input S of cell $procmux$1212_gate ($mux): \request_accept_gate -> \request_accept
+Changing input A of cell $procmux$1214_gate ($mux): \response_pending_q_gate -> \response_pending_q
+Changing input A of cell $procmux$1217_gate ($mux): \response_pending_q_gate -> \response_pending_q
+Changing input B of cell $procmux$1222_gate ($mux): \response_pending_q_gate -> \response_pending_q
+Changing input S of cell $procmux$1225_gate ($mux): \request_accept_gate -> \request_accept
+Changing input B of cell $procmux$1227_gate ($mux): \data_out_q_gate -> \data_out_q
+Changing input S of cell $procmux$1227_gate ($mux): \active_q_gate -> \debug_state [7]
+Changing input B of cell $procmux$1229_gate ($mux): \byte_enable_q_gate -> \byte_enable_q
+Changing input S of cell $procmux$1229_gate ($mux): \active_q_gate -> \debug_state [7]
+Changing input B of cell $procmux$1231_gate ($mux): \address_q_gate -> \address_q
+Changing input S of cell $procmux$1231_gate ($mux): \active_q_gate -> \debug_state [7]
+Changing input A of cell $procmux$1234_gate ($mux): \write_q_gate -> \write_q
+Changing input S of cell $procmux$1234_gate ($mux): \request_accept_gate -> \request_accept
+Changing input A of cell $procmux$1237_gate ($mux): \owner_refresh_q_gate -> \owner_refresh_q
+Changing input S of cell $procmux$1237_gate ($mux): \request_accept_gate -> \request_accept
+Changing input A of cell $procmux$1239_gate ($mux): \issued_q_gate -> \issued_q
+Changing input B of cell $procmux$1242_gate ($mux): \issued_q_gate -> \issued_q
+Changing input S of cell $procmux$1248_gate ($mux): \request_accept_gate -> \request_accept
+Changing input A of cell $procmux$1250_gate ($mux): \active_q_gate -> \debug_state [7]
+Changing input B of cell $procmux$1253_gate ($mux): \active_q_gate -> \debug_state [7]
+Changing input B of cell $procmux$1256_gate ($mux): \active_q_gate -> \debug_state [7]
+Changing input S of cell $procmux$1259_gate ($mux): \request_accept_gate -> \request_accept
+Changing input A of cell $procmux$1261_gate ($mux): \protocol_error_gate -> \protocol_error
+Changing input B of cell $procmux$1282_gate ($mux): \byte_enable_q_gate -> \byte_enable_q
+Changing input S of cell $procmux$1282_gate ($mux): \active_q_gate -> \debug_state [7]
+Changing input S of cell $procmux$1285_gate ($mux): \active_q_gate -> \debug_state [7]
+Changing input B of cell $ternary$mutant_owner.sv:118$252_gate ($mux): \u_KFSDRAM.idle_gate -> \debug_state [3]
+Changing input S of cell $ternary$mutant_owner.sv:118$252_gate ($mux): \owner_refresh_q_gate -> \owner_refresh_q
+Changing input A of cell $ternary$mutant_owner.sv:119$251_gate ($mux): \response_pending_q_gate -> \response_pending_q
+Changing input S of cell $ternary$mutant_owner.sv:119$251_gate ($mux): \write_q_gate -> \write_q
+Changing input S of cell $ternary$mutant_owner.sv:124$259_gate ($mux): \burst_q_gate -> \burst_q
+Changing input A of cell $ternary$mutant_owner.sv:132$260_gate ($mux): \address_q_gate [24:1] -> \address_q [24:1]
+Changing input A of cell $ternary$mutant_owner.sv:163$272_gate ($mux): \u_KFSDRAM.sdram_address_gate -> \u_KFSDRAM.sdram_address
+Changing input B of cell $ternary$mutant_owner.sv:163$272_gate ($mux): { \sdram_udqm_gate \sdram_ldqm_gate \u_KFSDRAM.sdram_address_gate [10:0] } -> { \sdram_udqm \sdram_ldqm \u_KFSDRAM.sdram_address [10:0] }
+Changing input S of cell $ternary$mutant_owner.sv:265$290_gate ($mux): \burst_q_gate -> \burst_q
+Changing input A of cell $add$mutant_owner.sv:264$288_gate ($add): \read_beat_count_q_gate -> \read_beat_count_q
+Changing input A of cell $eq$gold_owner.sv:260$143_gold ($eq): \read_beat_count_q_gold -> \read_beat_count_q
+Changing input A of cell $flatten\u_KFSDRAM.$add$gold_controller.sv:153$314_gold ($add): \u_KFSDRAM.state_counter_gold -> \u_KFSDRAM.state_counter
+Changing input A of cell $flatten\u_KFSDRAM.$add$gold_controller.sv:166$323_gold ($add): \u_KFSDRAM.refresh_counter_gold -> \u_KFSDRAM.refresh_counter
+Changing input A of cell $flatten\u_KFSDRAM.$add$gold_controller.sv:179$328_gold ($add): \u_KFSDRAM.access_counter_gold -> \u_KFSDRAM.access_counter
+Changing input A of cell $flatten\u_KFSDRAM.$add$gold_controller.sv:196$333_gold ($add): \u_KFSDRAM.read_counter_gold -> \u_KFSDRAM.read_counter
+Changing input B of cell $flatten\u_KFSDRAM.$add$gold_controller.sv:344$354_gold ($add): \u_KFSDRAM.access_counter_gold -> \u_KFSDRAM.access_counter
+Changing input B of cell $flatten\u_KFSDRAM.$add$gold_controller.sv:367$356_gold ($add): \u_KFSDRAM.access_counter_gold -> \u_KFSDRAM.access_counter
+Changing input B of cell $flatten\u_KFSDRAM.$and$gold_controller.sv:163$320_gold ($and): \u_KFSDRAM.sdram_we_gold -> \u_KFSDRAM.sdram_we
+Changing input A of cell $flatten\u_KFSDRAM.$eq$gold_controller.sv:102$299_gold ($eq): \u_KFSDRAM.state_counter_gold -> \u_KFSDRAM.state_counter
+Changing input A of cell $flatten\u_KFSDRAM.$eq$gold_controller.sv:111$302_gold ($eq): \u_KFSDRAM.refresh_counter_gold -> \u_KFSDRAM.refresh_counter
+Changing input A of cell $flatten\u_KFSDRAM.$eq$gold_controller.sv:115$306_gold ($eq): \u_KFSDRAM.access_counter_gold -> \u_KFSDRAM.access_counter
+Changing input A of cell $flatten\u_KFSDRAM.$eq$gold_controller.sv:119$307_gold ($eq): \u_KFSDRAM.state_counter_gold -> \u_KFSDRAM.state_counter
+Changing input A of cell $flatten\u_KFSDRAM.$eq$gold_controller.sv:123$308_gold ($eq): \u_KFSDRAM.read_counter_gold -> \u_KFSDRAM.read_counter
+Changing input A of cell $flatten\u_KFSDRAM.$eq$gold_controller.sv:127$310_gold ($logic_not): \u_KFSDRAM.state_counter_gold -> \u_KFSDRAM.state_counter
+Changing input A of cell $flatten\u_KFSDRAM.$eq$gold_controller.sv:178$325_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$eq$gold_controller.sv:178$326_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$eq$gold_controller.sv:205$334_gold ($logic_not): \u_KFSDRAM.state_counter_gold -> \u_KFSDRAM.state_counter
+Changing input A of cell $flatten\u_KFSDRAM.$eq$gold_controller.sv:410$365_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$eq$gold_controller.sv:411$366_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$eq$gold_controller.sv:411$367_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$eq$gold_controller.sv:412$369_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$eq$gold_controller.sv:413$370_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$eq$gold_controller.sv:78$293_gold ($eq): \u_KFSDRAM.state_counter_gold -> \u_KFSDRAM.state_counter
+Changing input A of cell $flatten\u_KFSDRAM.$eq$gold_controller.sv:82$294_gold ($logic_not): \u_KFSDRAM.state_counter_gold -> \u_KFSDRAM.state_counter
+Changing input A of cell $flatten\u_KFSDRAM.$eq$gold_controller.sv:86$295_gold ($eq): \u_KFSDRAM.state_counter_gold -> \u_KFSDRAM.state_counter
+Changing input A of cell $flatten\u_KFSDRAM.$eq$gold_controller.sv:90$296_gold ($eq): \u_KFSDRAM.state_counter_gold -> \u_KFSDRAM.state_counter
+Changing input A of cell $flatten\u_KFSDRAM.$eq$gold_controller.sv:94$297_gold ($eq): \u_KFSDRAM.state_counter_gold -> \u_KFSDRAM.state_counter
+Changing input A of cell $flatten\u_KFSDRAM.$eq$gold_controller.sv:98$298_gold ($logic_not): \u_KFSDRAM.state_counter_gold -> \u_KFSDRAM.state_counter
+Changing input A of cell $flatten\u_KFSDRAM.$ge$gold_controller.sv:111$300_gold ($ge): \u_KFSDRAM.refresh_counter_gold -> \u_KFSDRAM.refresh_counter
+Changing input A of cell $flatten\u_KFSDRAM.$ge$gold_controller.sv:206$335_gold ($ge): \u_KFSDRAM.state_counter_gold -> \u_KFSDRAM.state_counter
+Changing input A of cell $flatten\u_KFSDRAM.$gt$gold_controller.sv:413$373_gold ($gt): \u_KFSDRAM.state_counter_gold -> \u_KFSDRAM.state_counter
+Changing input A of cell $flatten\u_KFSDRAM.$le$gold_controller.sv:193$331_gold ($le): \u_KFSDRAM.state_counter_gold -> \u_KFSDRAM.state_counter
+Changing input B of cell $flatten\u_KFSDRAM.$ne$gold_controller.sv:150$313_gold ($ne): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$ne$gold_controller.sv:165$322_gold ($ne): \u_KFSDRAM.refresh_counter_gold -> \u_KFSDRAM.refresh_counter
+Changing input A of cell $flatten\u_KFSDRAM.$ne$gold_controller.sv:191$330_gold ($ne): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$ne$gold_controller.sv:195$332_gold ($ne): \u_KFSDRAM.read_counter_gold -> \u_KFSDRAM.read_counter
+Changing input A of cell $flatten\u_KFSDRAM.$not$gold_controller.sv:163$316_gold ($not): \u_KFSDRAM.sdram_cs_gold -> \u_KFSDRAM.sdram_cs
+Changing input A of cell $flatten\u_KFSDRAM.$not$gold_controller.sv:163$317_gold ($not): \u_KFSDRAM.sdram_ras_gold -> \u_KFSDRAM.sdram_ras
+Changing input A of cell $flatten\u_KFSDRAM.$not$gold_controller.sv:163$318_gold ($not): \u_KFSDRAM.sdram_cas_gold -> \u_KFSDRAM.sdram_cas
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$1005_gold ($mux): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$1008_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$1012_gold ($mux): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$1015_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$1020_gold ($mux): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$1023_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$1029_gold ($mux): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$1032_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$1039_gold ($mux): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$1048_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$1061_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$1071_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$1079_gold ($mux): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$1082_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$1091_gold ($mux): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$1094_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$1104_gold ($mux): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$1107_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$1118_gold ($mux): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$1121_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$1133_gold ($mux): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$1136_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$1149_gold ($mux): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$1152_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$1166_gold ($mux): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$1169_CMP0_gold ($logic_not): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$1172_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$1173_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$1174_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$1175_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$1176_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$1177_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$1178_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$1179_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$1180_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$1181_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$1182_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$1183_CMP0_gold ($logic_not): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$834_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$838_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$839_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$846_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$847_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$850_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$857_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$858_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$859_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$872_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$873_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input B of cell $flatten\u_KFSDRAM.$procmux$878_gold ($mux): \data_out_q_gold -> \data_out_q
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$879_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$887_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$888_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$895_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$898_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$899_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$904_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$905_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$906_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$910_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$911_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$916_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$917_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$918_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$919_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$922_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$929_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$930_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$931_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$932_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$933_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$934_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$935_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$938_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$939_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$940_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$941_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$946_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$947_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$948_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$949_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$950_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$951_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$952_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$953_CMP0_gold ($logic_not): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$956_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$957_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$958_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$959_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$964_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$965_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$966_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$967_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$968_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$969_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$970_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$971_CMP0_gold ($logic_not): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$977_CMP0_gold ($eq): \u_KFSDRAM.state_gold -> \u_KFSDRAM.state
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$983_gold ($mux): \u_KFSDRAM.read_counter_gold -> \u_KFSDRAM.read_counter
+Changing input A of cell $flatten\u_KFSDRAM.$procmux$995_gold ($mux): \u_KFSDRAM.refresh_counter_gold -> \u_KFSDRAM.refresh_counter
+Changing input A of cell $logic_and$gold_owner.sv:100$94_gold ($logic_and): \active_q_gold -> \debug_state [7]
+Changing input B of cell $logic_and$gold_owner.sv:100$97_gold ($logic_and): \u_KFSDRAM.idle_gold -> \debug_state [3]
+Changing input A of cell $logic_and$gold_owner.sv:108$98_gold ($logic_and): \request_accept_gold -> \request_accept
+Changing input B of cell $logic_and$gold_owner.sv:110$101_gold ($logic_and): \write_q_gold -> \write_q
+Changing input A of cell $logic_and$gold_owner.sv:117$108_gold ($logic_and): \active_q_gold -> \debug_state [7]
+Changing input A of cell $logic_and$gold_owner.sv:119$105_gold ($logic_and): \issued_q_gold -> \issued_q
+Changing input B of cell $logic_and$gold_owner.sv:119$105_gold ($logic_and): \u_KFSDRAM.idle_gold -> \debug_state [3]
+Changing input A of cell $logic_and$gold_owner.sv:121$110_gold ($logic_and): \active_q_gold -> \debug_state [7]
+Changing input B of cell $logic_and$gold_owner.sv:121$113_gold ($logic_and): \response_data_valid_q_gold -> \response_data_valid_q
+Changing input B of cell $logic_and$gold_owner.sv:139$118_gold ($logic_and): \write_q_gold -> \write_q
+Changing input A of cell $logic_and$gold_owner.sv:149$122_gold ($logic_and): \active_q_gold -> \debug_state [7]
+Changing input B of cell $logic_and$gold_owner.sv:163$124_gold ($logic_and): \u_KFSDRAM.sdram_ras_gold -> \u_KFSDRAM.sdram_ras
+Changing input A of cell $logic_and$gold_owner.sv:255$134_gold ($logic_and): \active_q_gold -> \debug_state [7]
+Changing input B of cell $logic_and$gold_owner.sv:255$134_gold ($logic_and): \issued_q_gold -> \issued_q
+Changing input B of cell $logic_and$gold_owner.sv:255$139_gold ($logic_and): \u_KFSDRAM.read_flag_gold -> \u_KFSDRAM.read_flag
+Changing input A of cell $logic_and$gold_owner.sv:262$145_gold ($logic_and): \active_q_gold -> \debug_state [7]
+Changing input B of cell $logic_and$gold_owner.sv:262$145_gold ($logic_and): \request_ready_gold -> \request_ready
+Changing input A of cell $logic_and$gold_owner.sv:96$86_gold ($logic_and): \u_KFSDRAM.idle_gold -> \debug_state [3]
+Changing input B of cell $logic_and$gold_owner.sv:97$90_gold ($logic_and): \u_KFSDRAM.idle_gold -> \debug_state [3]
+Changing input A of cell $logic_not$gold_owner.sv:100$93_gold ($logic_not): \issued_q_gold -> \issued_q
+Changing input A of cell $logic_not$gold_owner.sv:100$95_gold ($logic_not): \owner_refresh_q_gold -> \owner_refresh_q
+Changing input A of cell $logic_not$gold_owner.sv:111$103_gold ($logic_not): \write_q_gold -> \write_q
+Changing input A of cell $logic_not$gold_owner.sv:121$109_gold ($logic_not): \owner_refresh_q_gold -> \owner_refresh_q
+Changing input A of cell $logic_not$gold_owner.sv:122$111_gold ($logic_not): \write_q_gold -> \write_q
+Changing input A of cell $logic_not$gold_owner.sv:139$117_gold ($logic_not): \owner_refresh_q_gold -> \owner_refresh_q
+Changing input A of cell $logic_not$gold_owner.sv:149$121_gold ($logic_not): \owner_refresh_q_gold -> \owner_refresh_q
+Changing input A of cell $logic_not$gold_owner.sv:163$123_gold ($logic_not): \u_KFSDRAM.sdram_cs_gold -> \u_KFSDRAM.sdram_cs
+Changing input A of cell $logic_not$gold_owner.sv:163$125_gold ($logic_not): \u_KFSDRAM.sdram_cas_gold -> \u_KFSDRAM.sdram_cas
+Changing input A of cell $logic_not$gold_owner.sv:255$135_gold ($logic_not): \owner_refresh_q_gold -> \owner_refresh_q
+Changing input A of cell $logic_not$gold_owner.sv:255$137_gold ($logic_not): \write_q_gold -> \write_q
+Changing input A of cell $logic_not$gold_owner.sv:256$140_gold ($logic_not): \response_pending_q_gold -> \response_pending_q
+Changing input A of cell $logic_not$gold_owner.sv:96$85_gold ($logic_not): \active_q_gold -> \debug_state [7]
+Changing input A of cell $logic_not$gold_owner.sv:97$87_gold ($logic_not): \active_q_gold -> \debug_state [7]
+Changing input S of cell $procmux$1657_gold ($mux): \request_accept_gold -> \request_accept
+Changing input A of cell $procmux$1660_gold ($mux): \read_beat_count_q_gold -> \read_beat_count_q
+Changing input B of cell $procmux$1663_gold ($mux): \read_beat_count_q_gold -> \read_beat_count_q
+Changing input S of cell $procmux$1666_gold ($mux): \request_accept_gold -> \request_accept
+Changing input B of cell $procmux$1668_gold ($mux): \burst_q_gold -> \burst_q
+Changing input S of cell $procmux$1668_gold ($mux): \active_q_gold -> \debug_state [7]
+Changing input A of cell $procmux$1671_gold ($mux): \response_data_q_gold -> \response_data_q
+Changing input B of cell $procmux$1671_gold ($mux): \u_KFSDRAM.data_out_gold -> \u_KFSDRAM.data_out
+Changing input B of cell $procmux$1674_gold ($mux): \response_data_q_gold -> \response_data_q
+Changing input B of cell $procmux$1677_gold ($mux): \response_data_q_gold -> \response_data_q
+Changing input S of cell $procmux$1677_gold ($mux): \request_accept_gold -> \request_accept
+Changing input A of cell $procmux$1679_gold ($mux): \response_pending_q_gold -> \response_pending_q
+Changing input A of cell $procmux$1682_gold ($mux): \response_pending_q_gold -> \response_pending_q
+Changing input B of cell $procmux$1687_gold ($mux): \response_pending_q_gold -> \response_pending_q
+Changing input S of cell $procmux$1690_gold ($mux): \request_accept_gold -> \request_accept
+Changing input B of cell $procmux$1692_gold ($mux): \data_out_q_gold -> \data_out_q
+Changing input S of cell $procmux$1692_gold ($mux): \active_q_gold -> \debug_state [7]
+Changing input B of cell $procmux$1694_gold ($mux): \byte_enable_q_gold -> \byte_enable_q
+Changing input S of cell $procmux$1694_gold ($mux): \active_q_gold -> \debug_state [7]
+Changing input B of cell $procmux$1696_gold ($mux): \address_q_gold -> \address_q
+Changing input S of cell $procmux$1696_gold ($mux): \active_q_gold -> \debug_state [7]
+Changing input A of cell $procmux$1699_gold ($mux): \write_q_gold -> \write_q
+Changing input S of cell $procmux$1699_gold ($mux): \request_accept_gold -> \request_accept
+Changing input A of cell $procmux$1702_gold ($mux): \owner_refresh_q_gold -> \owner_refresh_q
+Changing input S of cell $procmux$1702_gold ($mux): \request_accept_gold -> \request_accept
+Changing input A of cell $procmux$1704_gold ($mux): \issued_q_gold -> \issued_q
+Changing input B of cell $procmux$1707_gold ($mux): \issued_q_gold -> \issued_q
+Changing input S of cell $procmux$1713_gold ($mux): \request_accept_gold -> \request_accept
+Changing input A of cell $procmux$1715_gold ($mux): \active_q_gold -> \debug_state [7]
+Changing input B of cell $procmux$1718_gold ($mux): \active_q_gold -> \debug_state [7]
+Changing input B of cell $procmux$1721_gold ($mux): \active_q_gold -> \debug_state [7]
+Changing input S of cell $procmux$1724_gold ($mux): \request_accept_gold -> \request_accept
+Changing input A of cell $procmux$1726_gold ($mux): \protocol_error_gold -> \protocol_error
+Changing input B of cell $procmux$1747_gold ($mux): \byte_enable_q_gold -> \byte_enable_q
+Changing input S of cell $procmux$1747_gold ($mux): \active_q_gold -> \debug_state [7]
+Changing input S of cell $procmux$1750_gold ($mux): \active_q_gold -> \debug_state [7]
+Changing input B of cell $ternary$gold_owner.sv:118$107_gold ($mux): \u_KFSDRAM.idle_gold -> \debug_state [3]
+Changing input S of cell $ternary$gold_owner.sv:118$107_gold ($mux): \owner_refresh_q_gold -> \owner_refresh_q
+Changing input A of cell $ternary$gold_owner.sv:119$106_gold ($mux): \response_pending_q_gold -> \response_pending_q
+Changing input S of cell $ternary$gold_owner.sv:119$106_gold ($mux): \write_q_gold -> \write_q
+Changing input S of cell $ternary$gold_owner.sv:124$114_gold ($mux): \burst_q_gold -> \burst_q
+Changing input A of cell $ternary$gold_owner.sv:132$115_gold ($mux): \address_q_gold [24:1] -> \address_q [24:1]
+Changing input A of cell $ternary$gold_owner.sv:163$127_gold ($mux): \u_KFSDRAM.sdram_address_gold -> \u_KFSDRAM.sdram_address
+Changing input B of cell $ternary$gold_owner.sv:163$127_gold ($mux): { \sdram_udqm_gold \sdram_ldqm_gold \u_KFSDRAM.sdram_address_gold [10:0] } -> { \sdram_udqm \sdram_ldqm \u_KFSDRAM.sdram_address [10:0] }
+Changing input S of cell $ternary$gold_owner.sv:260$144_gold ($mux): \burst_q_gold -> \burst_q
+Changing input A of cell $add$gold_owner.sv:259$142_gold ($add): \read_beat_count_q_gold -> \read_beat_count_q
+
+11. Executing HIERARCHY pass (managing design hierarchy).
+
+11.1. Analyzing design hierarchy..
+Top module:  \miter
+
+11.2. Analyzing design hierarchy..
+Top module:  \miter
+Removing unused module `$paramod$1b04a968897cdaf6b262c589ca4607c8260188d9\KFSDRAM_gold'.
+Removing unused module `$paramod$dce8ac7b49d651f98efdc2afe56c5f7771f53292\KFSDRAM_gate'.
+Removing unused module `\KFSDRAM_gate'.
+Removing unused module `\KFSDRAM_gold'.
+Removing unused module `\owner_gate'.
+Removing unused module `\owner_gold'.
+Removed 6 unused modules.
+
+12. Executing ASYNC2SYNC pass.
+Replacing miter.$flatten\u_KFSDRAM.$procdff$2116_gate ($adff): ARST=\reset_gate, D=$flatten\u_KFSDRAM.$0\sdram_address[12:0]_gate, Q=\u_KFSDRAM.sdram_address_gate
+Replacing miter.$flatten\u_KFSDRAM.$procdff$2117_gate ($adff): ARST=\reset_gate, D=$flatten\u_KFSDRAM.$0\sdram_cke[0:0]_gate, Q=\u_KFSDRAM.sdram_cke_gate
+Replacing miter.$flatten\u_KFSDRAM.$procdff$2118_gate ($adff): ARST=\reset_gate, D=$flatten\u_KFSDRAM.$0\sdram_cs[0:0]_gate, Q=\u_KFSDRAM.sdram_cs_gate
+Replacing miter.$flatten\u_KFSDRAM.$procdff$2119_gate ($adff): ARST=\reset_gate, D=$flatten\u_KFSDRAM.$0\sdram_ras[0:0]_gate, Q=\u_KFSDRAM.sdram_ras_gate
+Replacing miter.$flatten\u_KFSDRAM.$procdff$2120_gate ($adff): ARST=\reset_gate, D=$flatten\u_KFSDRAM.$0\sdram_cas[0:0]_gate, Q=\u_KFSDRAM.sdram_cas_gate
+Replacing miter.$flatten\u_KFSDRAM.$procdff$2121_gate ($adff): ARST=\reset_gate, D=$flatten\u_KFSDRAM.$0\sdram_we[0:0]_gate, Q=\u_KFSDRAM.sdram_we_gate
+Replacing miter.$flatten\u_KFSDRAM.$procdff$2122_gate ($adff): ARST=\reset_gate, D=$flatten\u_KFSDRAM.$0\sdram_ba[1:0]_gate, Q=\u_KFSDRAM.sdram_ba_gate
+Replacing miter.$flatten\u_KFSDRAM.$procdff$2123_gate ($adff): ARST=\reset_gate, D=$flatten\u_KFSDRAM.$0\sdram_dq_out[15:0]_gate, Q=\u_KFSDRAM.sdram_dq_out_gate
+Replacing miter.$flatten\u_KFSDRAM.$procdff$2124_gate ($adff): ARST=\reset_gate, D=$flatten\u_KFSDRAM.$0\sdram_dq_io[0:0]_gate, Q=\u_KFSDRAM.sdram_dq_io_gate
+Replacing miter.$flatten\u_KFSDRAM.$procdff$2125_gate ($adff): ARST=\reset_gate, D=$flatten\u_KFSDRAM.$0\read_counter[8:0]_gate, Q=\u_KFSDRAM.read_counter_gate
+Replacing miter.$flatten\u_KFSDRAM.$procdff$2126_gate ($adff): ARST=\reset_gate, D=$flatten\u_KFSDRAM.$0\access_counter[8:0]_gate, Q=\u_KFSDRAM.access_counter_gate
+Replacing miter.$flatten\u_KFSDRAM.$procdff$2127_gate ($adff): ARST=\reset_gate, D=$flatten\u_KFSDRAM.$0\refresh_counter[15:0]_gate, Q=\u_KFSDRAM.refresh_counter_gate
+Replacing miter.$flatten\u_KFSDRAM.$procdff$2128_gate ($adff): ARST=\reset_gate, D=$flatten\u_KFSDRAM.$0\state_counter[15:0]_gate, Q=\u_KFSDRAM.state_counter_gate
+Replacing miter.$flatten\u_KFSDRAM.$procdff$2129_gate ($adff): ARST=\reset_gate, D=\u_KFSDRAM.next_state_gate, Q=\u_KFSDRAM.state_gate
+Replacing miter.$procdff$2146_gate ($adff): ARST=\reset_gate, D=$0\protocol_error[0:0]_gate, Q=\protocol_error_gate
+Replacing miter.$procdff$2147_gate ($adff): ARST=\reset_gate, D=$0\active_q[0:0]_gate, Q=\active_q_gate
+Replacing miter.$procdff$2148_gate ($adff): ARST=\reset_gate, D=$0\issued_q[0:0]_gate, Q=\issued_q_gate
+Replacing miter.$procdff$2149_gate ($adff): ARST=\reset_gate, D=$0\owner_refresh_q[0:0]_gate, Q=\owner_refresh_q_gate
+Replacing miter.$procdff$2150_gate ($adff): ARST=\reset_gate, D=$0\write_q[0:0]_gate, Q=\write_q_gate
+Replacing miter.$procdff$2151_gate ($adff): ARST=\reset_gate, D=$0\address_q[24:0]_gate, Q=\address_q_gate
+Replacing miter.$procdff$2152_gate ($adff): ARST=\reset_gate, D=$0\byte_enable_q[1:0]_gate, Q=\byte_enable_q_gate
+Replacing miter.$procdff$2153_gate ($adff): ARST=\reset_gate, D=$0\data_out_q[15:0]_gate, Q=\data_out_q_gate
+Replacing miter.$procdff$2154_gate ($adff): ARST=\reset_gate, D=$0\response_pending_q[0:0]_gate, Q=\response_pending_q_gate
+Replacing miter.$procdff$2155_gate ($adff): ARST=\reset_gate, D=$0\response_data_q[15:0]_gate, Q=\response_data_q_gate
+Replacing miter.$procdff$2156_gate ($adff): ARST=\reset_gate, D=$0\response_data_valid_q[0:0]_gate, Q=\response_data_valid_q_gate
+Replacing miter.$procdff$2157_gate ($adff): ARST=\reset_gate, D=$0\burst_q[0:0]_gate, Q=\burst_q_gate
+Replacing miter.$procdff$2158_gate ($adff): ARST=\reset_gate, D=$0\read_beat_count_q[2:0]_gate, Q=\read_beat_count_q_gate
+Replacing miter.$flatten\u_KFSDRAM.$procdff$2132_gold ($adff): ARST=\reset_gold, D=$flatten\u_KFSDRAM.$0\sdram_address[12:0]_gold, Q=\u_KFSDRAM.sdram_address_gold
+Replacing miter.$flatten\u_KFSDRAM.$procdff$2133_gold ($adff): ARST=\reset_gold, D=$flatten\u_KFSDRAM.$0\sdram_cke[0:0]_gold, Q=\u_KFSDRAM.sdram_cke_gold
+Replacing miter.$flatten\u_KFSDRAM.$procdff$2134_gold ($adff): ARST=\reset_gold, D=$flatten\u_KFSDRAM.$0\sdram_cs[0:0]_gold, Q=\u_KFSDRAM.sdram_cs_gold
+Replacing miter.$flatten\u_KFSDRAM.$procdff$2135_gold ($adff): ARST=\reset_gold, D=$flatten\u_KFSDRAM.$0\sdram_ras[0:0]_gold, Q=\u_KFSDRAM.sdram_ras_gold
+Replacing miter.$flatten\u_KFSDRAM.$procdff$2136_gold ($adff): ARST=\reset_gold, D=$flatten\u_KFSDRAM.$0\sdram_cas[0:0]_gold, Q=\u_KFSDRAM.sdram_cas_gold
+Replacing miter.$flatten\u_KFSDRAM.$procdff$2137_gold ($adff): ARST=\reset_gold, D=$flatten\u_KFSDRAM.$0\sdram_we[0:0]_gold, Q=\u_KFSDRAM.sdram_we_gold
+Replacing miter.$flatten\u_KFSDRAM.$procdff$2138_gold ($adff): ARST=\reset_gold, D=$flatten\u_KFSDRAM.$0\sdram_ba[1:0]_gold, Q=\u_KFSDRAM.sdram_ba_gold
+Replacing miter.$flatten\u_KFSDRAM.$procdff$2139_gold ($adff): ARST=\reset_gold, D=$flatten\u_KFSDRAM.$0\sdram_dq_out[15:0]_gold, Q=\u_KFSDRAM.sdram_dq_out_gold
+Replacing miter.$flatten\u_KFSDRAM.$procdff$2140_gold ($adff): ARST=\reset_gold, D=$flatten\u_KFSDRAM.$0\sdram_dq_io[0:0]_gold, Q=\u_KFSDRAM.sdram_dq_io_gold
+Replacing miter.$flatten\u_KFSDRAM.$procdff$2141_gold ($adff): ARST=\reset_gold, D=$flatten\u_KFSDRAM.$0\read_counter[8:0]_gold, Q=\u_KFSDRAM.read_counter_gold
+Replacing miter.$flatten\u_KFSDRAM.$procdff$2142_gold ($adff): ARST=\reset_gold, D=$flatten\u_KFSDRAM.$0\access_counter[8:0]_gold, Q=\u_KFSDRAM.access_counter_gold
+Replacing miter.$flatten\u_KFSDRAM.$procdff$2143_gold ($adff): ARST=\reset_gold, D=$flatten\u_KFSDRAM.$0\refresh_counter[15:0]_gold, Q=\u_KFSDRAM.refresh_counter_gold
+Replacing miter.$flatten\u_KFSDRAM.$procdff$2144_gold ($adff): ARST=\reset_gold, D=$flatten\u_KFSDRAM.$0\state_counter[15:0]_gold, Q=\u_KFSDRAM.state_counter_gold
+Replacing miter.$flatten\u_KFSDRAM.$procdff$2145_gold ($adff): ARST=\reset_gold, D=\u_KFSDRAM.next_state_gold, Q=\u_KFSDRAM.state_gold
+Replacing miter.$procdff$2175_gold ($adff): ARST=\reset_gold, D=$0\protocol_error[0:0]_gold, Q=\protocol_error_gold
+Replacing miter.$procdff$2176_gold ($adff): ARST=\reset_gold, D=$0\active_q[0:0]_gold, Q=\active_q_gold
+Replacing miter.$procdff$2177_gold ($adff): ARST=\reset_gold, D=$0\issued_q[0:0]_gold, Q=\issued_q_gold
+Replacing miter.$procdff$2178_gold ($adff): ARST=\reset_gold, D=$0\owner_refresh_q[0:0]_gold, Q=\owner_refresh_q_gold
+Replacing miter.$procdff$2179_gold ($adff): ARST=\reset_gold, D=$0\write_q[0:0]_gold, Q=\write_q_gold
+Replacing miter.$procdff$2180_gold ($adff): ARST=\reset_gold, D=$0\address_q[24:0]_gold, Q=\address_q_gold
+Replacing miter.$procdff$2181_gold ($adff): ARST=\reset_gold, D=$0\byte_enable_q[1:0]_gold, Q=\byte_enable_q_gold
+Replacing miter.$procdff$2182_gold ($adff): ARST=\reset_gold, D=$0\data_out_q[15:0]_gold, Q=\data_out_q_gold
+Replacing miter.$procdff$2183_gold ($adff): ARST=\reset_gold, D=$0\response_pending_q[0:0]_gold, Q=\response_pending_q_gold
+Replacing miter.$procdff$2184_gold ($adff): ARST=\reset_gold, D=$0\response_data_q[15:0]_gold, Q=\response_data_q_gold
+Replacing miter.$procdff$2185_gold ($adff): ARST=\reset_gold, D=$0\response_data_valid_q[0:0]_gold, Q=\response_data_valid_q_gold
+Replacing miter.$procdff$2186_gold ($adff): ARST=\reset_gold, D=$0\burst_q[0:0]_gold, Q=\burst_q_gold
+Replacing miter.$procdff$2187_gold ($adff): ARST=\reset_gold, D=$0\read_beat_count_q[2:0]_gold, Q=\read_beat_count_q_gold
+
+13. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \miter..
+Removed 107 unused cells and 18 unused wires.
+<suppressed ~125 debug messages>
+
+14. Executing EQUIV_SIMPLE pass.
+Found 252 unproven $equiv cells (41 groups) in miter:
+ Grouping SAT models for \sdram_address:
+  Trying to prove $equiv for \sdram_address [0]: success!
+  Trying to prove $equiv for \sdram_address [1]: success!
+  Trying to prove $equiv for \sdram_address [2]: success!
+  Trying to prove $equiv for \sdram_address [3]: success!
+  Trying to prove $equiv for \sdram_address [4]: success!
+  Trying to prove $equiv for \sdram_address [5]: success!
+  Trying to prove $equiv for \sdram_address [6]: success!
+  Trying to prove $equiv for \sdram_address [7]: success!
+  Trying to prove $equiv for \sdram_address [8]: success!
+  Trying to prove $equiv for \sdram_address [9]: success!
+  Trying to prove $equiv for \sdram_address [10]: success!
+  Trying to prove $equiv for \sdram_address [11]: success!
+  Trying to prove $equiv for \sdram_address [12]: success!
+  Trying to prove $equiv for \sdram_cke: failed.
+  Trying to prove $equiv for \sdram_cs: failed.
+  Trying to prove $equiv for \sdram_ras: failed.
+  Trying to prove $equiv for \sdram_cas: failed.
+  Trying to prove $equiv for \sdram_we: failed.
+ Grouping SAT models for \sdram_ba:
+  Trying to prove $equiv for \sdram_ba [0]: failed.
+  Trying to prove $equiv for \sdram_ba [1]: failed.
+ Grouping SAT models for \sdram_dq_out:
+  Trying to prove $equiv for \sdram_dq_out [0]: failed.
+  Trying to prove $equiv for \sdram_dq_out [1]: failed.
+  Trying to prove $equiv for \sdram_dq_out [2]: failed.
+  Trying to prove $equiv for \sdram_dq_out [3]: failed.
+  Trying to prove $equiv for \sdram_dq_out [4]: failed.
+  Trying to prove $equiv for \sdram_dq_out [5]: failed.
+  Trying to prove $equiv for \sdram_dq_out [6]: failed.
+  Trying to prove $equiv for \sdram_dq_out [7]: failed.
+  Trying to prove $equiv for \sdram_dq_out [8]: failed.
+  Trying to prove $equiv for \sdram_dq_out [9]: failed.
+  Trying to prove $equiv for \sdram_dq_out [10]: failed.
+  Trying to prove $equiv for \sdram_dq_out [11]: failed.
+  Trying to prove $equiv for \sdram_dq_out [12]: failed.
+  Trying to prove $equiv for \sdram_dq_out [13]: failed.
+  Trying to prove $equiv for \sdram_dq_out [14]: failed.
+  Trying to prove $equiv for \sdram_dq_out [15]: failed.
+  Trying to prove $equiv for \sdram_dq_io: failed.
+  Trying to prove $equiv for \request_accept: success!
+  Trying to prove $equiv for \request_ready: success!
+ Grouping SAT models for \request_read_data:
+  Trying to prove $equiv for \request_read_data [0]: failed.
+  Trying to prove $equiv for \request_read_data [1]: failed.
+  Trying to prove $equiv for \request_read_data [2]: failed.
+  Trying to prove $equiv for \request_read_data [3]: failed.
+  Trying to prove $equiv for \request_read_data [4]: failed.
+  Trying to prove $equiv for \request_read_data [5]: failed.
+  Trying to prove $equiv for \request_read_data [6]: failed.
+  Trying to prove $equiv for \request_read_data [7]: failed.
+  Trying to prove $equiv for \request_read_data [8]: failed.
+  Trying to prove $equiv for \request_read_data [9]: failed.
+  Trying to prove $equiv for \request_read_data [10]: failed.
+  Trying to prove $equiv for \request_read_data [11]: failed.
+  Trying to prove $equiv for \request_read_data [12]: failed.
+  Trying to prove $equiv for \request_read_data [13]: failed.
+  Trying to prove $equiv for \request_read_data [14]: failed.
+  Trying to prove $equiv for \request_read_data [15]: failed.
+  Trying to prove $equiv for \request_read_data_valid: success!
+  Trying to prove $equiv for \physical_idle: success!
+ Grouping SAT models for \debug_state:
+  Trying to prove $equiv for \debug_state [0]: success!
+  Trying to prove $equiv for \debug_state [1]: failed.
+  Trying to prove $equiv for \debug_state [2]: success!
+  Trying to prove $equiv for \debug_state [3]: success!
+  Trying to prove $equiv for \debug_state [4]: failed.
+  Trying to prove $equiv for \debug_state [5]: failed.
+  Trying to prove $equiv for \debug_state [6]: failed.
+  Trying to prove $equiv for \debug_state [7]: failed.
+  Trying to prove $equiv for \protocol_error: failed.
+  Trying to prove $equiv for \sdram_ldqm: success!
+  Trying to prove $equiv for \sdram_udqm: success!
+  Trying to prove $equiv for \issued_q: failed.
+  Trying to prove $equiv for \owner_refresh_q: failed.
+  Trying to prove $equiv for \write_q: failed.
+ Grouping SAT models for \address_q:
+  Trying to prove $equiv for \address_q [0]: failed.
+  Trying to prove $equiv for \address_q [1]: failed.
+  Trying to prove $equiv for \address_q [2]: failed.
+  Trying to prove $equiv for \address_q [3]: failed.
+  Trying to prove $equiv for \address_q [4]: failed.
+  Trying to prove $equiv for \address_q [5]: failed.
+  Trying to prove $equiv for \address_q [6]: failed.
+  Trying to prove $equiv for \address_q [7]: failed.
+  Trying to prove $equiv for \address_q [8]: failed.
+  Trying to prove $equiv for \address_q [9]: failed.
+  Trying to prove $equiv for \address_q [10]: failed.
+  Trying to prove $equiv for \address_q [11]: failed.
+  Trying to prove $equiv for \address_q [12]: failed.
+  Trying to prove $equiv for \address_q [13]: failed.
+  Trying to prove $equiv for \address_q [14]: failed.
+  Trying to prove $equiv for \address_q [15]: failed.
+  Trying to prove $equiv for \address_q [16]: failed.
+  Trying to prove $equiv for \address_q [17]: failed.
+  Trying to prove $equiv for \address_q [18]: failed.
+  Trying to prove $equiv for \address_q [19]: failed.
+  Trying to prove $equiv for \address_q [20]: failed.
+  Trying to prove $equiv for \address_q [21]: failed.
+  Trying to prove $equiv for \address_q [22]: failed.
+  Trying to prove $equiv for \address_q [23]: failed.
+  Trying to prove $equiv for \address_q [24]: failed.
+ Grouping SAT models for \byte_enable_q:
+  Trying to prove $equiv for \byte_enable_q [0]: failed.
+  Trying to prove $equiv for \byte_enable_q [1]: failed.
+ Grouping SAT models for \data_out_q:
+  Trying to prove $equiv for \data_out_q [0]: failed.
+  Trying to prove $equiv for \data_out_q [1]: failed.
+  Trying to prove $equiv for \data_out_q [2]: failed.
+  Trying to prove $equiv for \data_out_q [3]: failed.
+  Trying to prove $equiv for \data_out_q [4]: failed.
+  Trying to prove $equiv for \data_out_q [5]: failed.
+  Trying to prove $equiv for \data_out_q [6]: failed.
+  Trying to prove $equiv for \data_out_q [7]: failed.
+  Trying to prove $equiv for \data_out_q [8]: failed.
+  Trying to prove $equiv for \data_out_q [9]: failed.
+  Trying to prove $equiv for \data_out_q [10]: failed.
+  Trying to prove $equiv for \data_out_q [11]: failed.
+  Trying to prove $equiv for \data_out_q [12]: failed.
+  Trying to prove $equiv for \data_out_q [13]: failed.
+  Trying to prove $equiv for \data_out_q [14]: failed.
+  Trying to prove $equiv for \data_out_q [15]: failed.
+  Trying to prove $equiv for \response_pending_q: failed.
+ Grouping SAT models for \response_data_q:
+  Trying to prove $equiv for \response_data_q [0]: failed.
+  Trying to prove $equiv for \response_data_q [1]: failed.
+  Trying to prove $equiv for \response_data_q [2]: failed.
+  Trying to prove $equiv for \response_data_q [3]: failed.
+  Trying to prove $equiv for \response_data_q [4]: failed.
+  Trying to prove $equiv for \response_data_q [5]: failed.
+  Trying to prove $equiv for \response_data_q [6]: failed.
+  Trying to prove $equiv for \response_data_q [7]: failed.
+  Trying to prove $equiv for \response_data_q [8]: failed.
+  Trying to prove $equiv for \response_data_q [9]: failed.
+  Trying to prove $equiv for \response_data_q [10]: failed.
+  Trying to prove $equiv for \response_data_q [11]: failed.
+  Trying to prove $equiv for \response_data_q [12]: failed.
+  Trying to prove $equiv for \response_data_q [13]: failed.
+  Trying to prove $equiv for \response_data_q [14]: failed.
+  Trying to prove $equiv for \response_data_q [15]: failed.
+  Trying to prove $equiv for \response_data_valid_q: failed.
+  Trying to prove $equiv for \burst_q: failed.
+ Grouping SAT models for \read_beat_count_q:
+  Trying to prove $equiv for \read_beat_count_q [0]: failed.
+  Trying to prove $equiv for \read_beat_count_q [1]: failed.
+  Trying to prove $equiv for \read_beat_count_q [2]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.sdram_cs: failed.
+  Trying to prove $equiv for \u_KFSDRAM.sdram_cas: failed.
+ Grouping SAT models for \u_KFSDRAM.sdram_address:
+  Trying to prove $equiv for \u_KFSDRAM.sdram_address [0]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.sdram_address [1]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.sdram_address [2]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.sdram_address [3]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.sdram_address [4]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.sdram_address [5]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.sdram_address [6]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.sdram_address [7]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.sdram_address [8]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.sdram_address [9]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.sdram_address [10]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.sdram_address [11]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.sdram_address [12]: failed.
+ Grouping SAT models for \u_KFSDRAM.state_counter:
+  Trying to prove $equiv for \u_KFSDRAM.state_counter [0]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.state_counter [1]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.state_counter [2]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.state_counter [3]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.state_counter [4]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.state_counter [5]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.state_counter [6]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.state_counter [7]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.state_counter [8]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.state_counter [9]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.state_counter [10]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.state_counter [11]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.state_counter [12]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.state_counter [13]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.state_counter [14]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.state_counter [15]: failed.
+ Grouping SAT models for \u_KFSDRAM.state:
+  Trying to prove $equiv for \u_KFSDRAM.state [0]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.state [1]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.state [2]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.state [3]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.state [4]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.state [5]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.state [6]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.state [7]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.state [8]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.state [9]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.state [10]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.state [11]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.state [12]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.state [13]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.state [14]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.state [15]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.state [16]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.state [17]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.state [18]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.state [19]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.state [20]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.state [21]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.state [22]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.state [23]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.state [24]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.state [25]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.state [26]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.state [27]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.state [28]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.state [29]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.state [30]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.state [31]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.sdram_we: failed.
+  Trying to prove $equiv for \u_KFSDRAM.sdram_ras: failed.
+ Grouping SAT models for \u_KFSDRAM.refresh_counter:
+  Trying to prove $equiv for \u_KFSDRAM.refresh_counter [0]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.refresh_counter [1]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.refresh_counter [2]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.refresh_counter [3]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.refresh_counter [4]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.refresh_counter [5]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.refresh_counter [6]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.refresh_counter [7]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.refresh_counter [8]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.refresh_counter [9]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.refresh_counter [10]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.refresh_counter [11]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.refresh_counter [12]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.refresh_counter [13]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.refresh_counter [14]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.refresh_counter [15]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.read_flag: failed.
+ Grouping SAT models for \u_KFSDRAM.read_counter:
+  Trying to prove $equiv for \u_KFSDRAM.read_counter [0]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.read_counter [1]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.read_counter [2]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.read_counter [3]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.read_counter [4]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.read_counter [5]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.read_counter [6]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.read_counter [7]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.read_counter [8]: failed.
+ Grouping SAT models for \u_KFSDRAM.data_out:
+  Trying to prove $equiv for \u_KFSDRAM.data_out [0]: success!
+  Trying to prove $equiv for \u_KFSDRAM.data_out [1]: success!
+  Trying to prove $equiv for \u_KFSDRAM.data_out [2]: success!
+  Trying to prove $equiv for \u_KFSDRAM.data_out [3]: success!
+  Trying to prove $equiv for \u_KFSDRAM.data_out [4]: success!
+  Trying to prove $equiv for \u_KFSDRAM.data_out [5]: success!
+  Trying to prove $equiv for \u_KFSDRAM.data_out [6]: success!
+  Trying to prove $equiv for \u_KFSDRAM.data_out [7]: success!
+  Trying to prove $equiv for \u_KFSDRAM.data_out [8]: success!
+  Trying to prove $equiv for \u_KFSDRAM.data_out [9]: success!
+  Trying to prove $equiv for \u_KFSDRAM.data_out [10]: success!
+  Trying to prove $equiv for \u_KFSDRAM.data_out [11]: success!
+  Trying to prove $equiv for \u_KFSDRAM.data_out [12]: success!
+  Trying to prove $equiv for \u_KFSDRAM.data_out [13]: success!
+  Trying to prove $equiv for \u_KFSDRAM.data_out [14]: success!
+  Trying to prove $equiv for \u_KFSDRAM.data_out [15]: success!
+ Grouping SAT models for \u_KFSDRAM.access_counter:
+  Trying to prove $equiv for \u_KFSDRAM.access_counter [0]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.access_counter [1]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.access_counter [2]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.access_counter [3]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.access_counter [4]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.access_counter [5]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.access_counter [6]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.access_counter [7]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.access_counter [8]: failed.
+Proved 38 previously unproven $equiv cells.
+
+15. Executing EQUIV_INDUCT pass.
+Found 214 unproven $equiv cells in module miter:
+  Proving existence of base case for step 1. (77536 clauses over 28846 variables)
+  Proving induction step 1. (161459 clauses over 59715 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 2. (161460 clauses over 59715 variables)
+  Proving induction step 2. (245383 clauses over 90584 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 3. (245384 clauses over 90584 variables)
+  Proving induction step 3. (329307 clauses over 121453 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 4. (329308 clauses over 121453 variables)
+  Proving induction step 4. (413231 clauses over 152322 variables)
+  Proof for induction step failed. Extending to next time step.
+  Proving existence of base case for step 5. (413232 clauses over 152322 variables)
+  Proving induction step 5. (497155 clauses over 183191 variables)
+  Proof for induction step failed. Trying to prove individual $equiv from workset.
+  Trying to prove $equiv for \debug_state [4]: success!
+  Trying to prove $equiv for \debug_state [6]: success!
+  Trying to prove $equiv for \address_q [14]: success!
+  Trying to prove $equiv for \address_q [12]: success!
+  Trying to prove $equiv for \address_q [6]: success!
+  Trying to prove $equiv for \sdram_dq_out [13]: success!
+  Trying to prove $equiv for \sdram_dq_out [14]: success!
+  Trying to prove $equiv for \sdram_dq_out [15]: success!
+  Trying to prove $equiv for \data_out_q [4]: success!
+  Trying to prove $equiv for \u_KFSDRAM.read_counter [6]: success!
+  Trying to prove $equiv for \u_KFSDRAM.read_counter [7]: success!
+  Trying to prove $equiv for \u_KFSDRAM.read_counter [8]: success!
+  Trying to prove $equiv for \u_KFSDRAM.read_flag: success!
+  Trying to prove $equiv for \u_KFSDRAM.refresh_counter [1]: success!
+  Trying to prove $equiv for \u_KFSDRAM.refresh_counter [0]: success!
+  Trying to prove $equiv for \sdram_ba [0]: success!
+  Trying to prove $equiv for \sdram_ba [1]: success!
+  Trying to prove $equiv for \request_read_data [8]: success!
+  Trying to prove $equiv for \request_read_data [9]: success!
+  Trying to prove $equiv for \request_read_data [10]: success!
+  Trying to prove $equiv for \sdram_dq_out [5]: success!
+  Trying to prove $equiv for \sdram_dq_out [6]: success!
+  Trying to prove $equiv for \sdram_dq_out [7]: success!
+  Trying to prove $equiv for \sdram_dq_out [8]: success!
+  Trying to prove $equiv for \data_out_q [8]: success!
+  Trying to prove $equiv for \address_q [24]: success!
+  Trying to prove $equiv for \u_KFSDRAM.sdram_address [1]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.sdram_address [2]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.sdram_address [3]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.sdram_address [4]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.sdram_address [5]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.sdram_address [6]: failed.
+  Trying to prove $equiv for \issued_q: success!
+  Trying to prove $equiv for \u_KFSDRAM.access_counter [0]: success!
+  Trying to prove $equiv for \u_KFSDRAM.access_counter [1]: success!
+  Trying to prove $equiv for \u_KFSDRAM.access_counter [2]: success!
+  Trying to prove $equiv for \u_KFSDRAM.access_counter [3]: success!
+  Trying to prove $equiv for \u_KFSDRAM.access_counter [4]: success!
+  Trying to prove $equiv for \u_KFSDRAM.access_counter [5]: success!
+  Trying to prove $equiv for \u_KFSDRAM.access_counter [6]: success!
+  Trying to prove $equiv for \u_KFSDRAM.access_counter [7]: success!
+  Trying to prove $equiv for \u_KFSDRAM.access_counter [8]: success!
+  Trying to prove $equiv for \request_read_data [3]: success!
+  Trying to prove $equiv for \request_read_data [4]: success!
+  Trying to prove $equiv for \u_KFSDRAM.sdram_address [12]: success!
+  Trying to prove $equiv for \u_KFSDRAM.sdram_cas: success!
+  Trying to prove $equiv for \u_KFSDRAM.sdram_cs: success!
+  Trying to prove $equiv for \data_out_q [5]: success!
+  Trying to prove $equiv for \data_out_q [6]: success!
+  Trying to prove $equiv for \data_out_q [7]: success!
+  Trying to prove $equiv for \byte_enable_q [1]: success!
+  Trying to prove $equiv for \response_data_q [15]: success!
+  Trying to prove $equiv for \response_data_valid_q: success!
+  Trying to prove $equiv for \response_pending_q: success!
+  Trying to prove $equiv for \request_read_data [11]: success!
+  Trying to prove $equiv for \request_read_data [12]: success!
+  Trying to prove $equiv for \request_read_data [13]: success!
+  Trying to prove $equiv for \read_beat_count_q [1]: success!
+  Trying to prove $equiv for \read_beat_count_q [2]: success!
+  Trying to prove $equiv for \address_q [7]: success!
+  Trying to prove $equiv for \address_q [10]: success!
+  Trying to prove $equiv for \address_q [13]: success!
+  Trying to prove $equiv for \sdram_ras: success!
+  Trying to prove $equiv for \sdram_we: success!
+  Trying to prove $equiv for \request_read_data [0]: success!
+  Trying to prove $equiv for \address_q [2]: success!
+  Trying to prove $equiv for \address_q [16]: success!
+  Trying to prove $equiv for \address_q [3]: success!
+  Trying to prove $equiv for \address_q [17]: success!
+  Trying to prove $equiv for \u_KFSDRAM.refresh_counter [12]: success!
+  Trying to prove $equiv for \u_KFSDRAM.refresh_counter [13]: success!
+  Trying to prove $equiv for \u_KFSDRAM.refresh_counter [14]: success!
+  Trying to prove $equiv for \u_KFSDRAM.refresh_counter [15]: success!
+  Trying to prove $equiv for \u_KFSDRAM.sdram_address [0]: failed.
+  Trying to prove $equiv for \address_q [5]: success!
+  Trying to prove $equiv for \sdram_dq_out [9]: success!
+  Trying to prove $equiv for \sdram_dq_out [10]: success!
+  Trying to prove $equiv for \sdram_dq_out [11]: success!
+  Trying to prove $equiv for \sdram_dq_out [12]: success!
+  Trying to prove $equiv for \address_q [19]: success!
+  Trying to prove $equiv for \address_q [18]: success!
+  Trying to prove $equiv for \address_q [20]: success!
+  Trying to prove $equiv for \u_KFSDRAM.state_counter [9]: success!
+  Trying to prove $equiv for \u_KFSDRAM.state_counter [10]: success!
+  Trying to prove $equiv for \u_KFSDRAM.state_counter [11]: success!
+  Trying to prove $equiv for \u_KFSDRAM.state_counter [12]: success!
+  Trying to prove $equiv for \u_KFSDRAM.state_counter [13]: success!
+  Trying to prove $equiv for \u_KFSDRAM.state_counter [14]: success!
+  Trying to prove $equiv for \u_KFSDRAM.state_counter [15]: success!
+  Trying to prove $equiv for \address_q [21]: success!
+  Trying to prove $equiv for \sdram_dq_io: success!
+  Trying to prove $equiv for \sdram_dq_out [0]: success!
+  Trying to prove $equiv for \address_q [11]: success!
+  Trying to prove $equiv for \u_KFSDRAM.refresh_counter [2]: success!
+  Trying to prove $equiv for \u_KFSDRAM.refresh_counter [3]: success!
+  Trying to prove $equiv for \u_KFSDRAM.refresh_counter [4]: success!
+  Trying to prove $equiv for \u_KFSDRAM.refresh_counter [5]: success!
+  Trying to prove $equiv for \address_q [0]: success!
+  Trying to prove $equiv for \data_out_q [2]: success!
+  Trying to prove $equiv for \address_q [1]: success!
+  Trying to prove $equiv for \data_out_q [3]: success!
+  Trying to prove $equiv for \data_out_q [9]: success!
+  Trying to prove $equiv for \sdram_dq_out [1]: success!
+  Trying to prove $equiv for \sdram_dq_out [2]: success!
+  Trying to prove $equiv for \sdram_dq_out [3]: success!
+  Trying to prove $equiv for \sdram_dq_out [4]: success!
+  Trying to prove $equiv for \address_q [15]: success!
+  Trying to prove $equiv for \data_out_q [0]: success!
+  Trying to prove $equiv for \data_out_q [1]: success!
+  Trying to prove $equiv for \address_q [4]: success!
+  Trying to prove $equiv for \address_q [23]: success!
+  Trying to prove $equiv for \u_KFSDRAM.sdram_address [7]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.sdram_address [8]: failed.
+  Trying to prove $equiv for \u_KFSDRAM.sdram_address [9]: success!
+  Trying to prove $equiv for \u_KFSDRAM.sdram_address [10]: success!
+  Trying to prove $equiv for \u_KFSDRAM.sdram_address [11]: success!
+  Trying to prove $equiv for \request_read_data [1]: success!
+  Trying to prove $equiv for \request_read_data [2]: success!
+  Trying to prove $equiv for \request_read_data [14]: success!
+  Trying to prove $equiv for \request_read_data [15]: success!
+  Trying to prove $equiv for \response_data_q [0]: success!
+  Trying to prove $equiv for \protocol_error: success!
+  Trying to prove $equiv for \read_beat_count_q [0]: success!
+  Trying to prove $equiv for \response_data_q [1]: success!
+  Trying to prove $equiv for \response_data_q [2]: success!
+  Trying to prove $equiv for \response_data_q [3]: success!
+  Trying to prove $equiv for \response_data_q [8]: success!
+  Trying to prove $equiv for \response_data_q [9]: success!
+  Trying to prove $equiv for \response_data_q [10]: success!
+  Trying to prove $equiv for \response_data_q [11]: success!
+  Trying to prove $equiv for \response_data_q [12]: success!
+  Trying to prove $equiv for \response_data_q [13]: success!
+  Trying to prove $equiv for \response_data_q [14]: success!
+  Trying to prove $equiv for \address_q [8]: success!
+  Trying to prove $equiv for \address_q [22]: success!
+  Trying to prove $equiv for \u_KFSDRAM.state [27]: success!
+  Trying to prove $equiv for \u_KFSDRAM.state [28]: success!
+  Trying to prove $equiv for \u_KFSDRAM.state [29]: success!
+  Trying to prove $equiv for \u_KFSDRAM.state [30]: success!
+  Trying to prove $equiv for \u_KFSDRAM.state [31]: success!
+  Trying to prove $equiv for \u_KFSDRAM.state_counter [1]: success!
+  Trying to prove $equiv for \u_KFSDRAM.state_counter [2]: success!
+  Trying to prove $equiv for \address_q [9]: success!
+  Trying to prove $equiv for \debug_state [5]: success!
+  Trying to prove $equiv for \request_read_data [5]: success!
+  Trying to prove $equiv for \request_read_data [6]: success!
+  Trying to prove $equiv for \request_read_data [7]: success!
+  Trying to prove $equiv for \response_data_q [4]: success!
+  Trying to prove $equiv for \response_data_q [5]: success!
+  Trying to prove $equiv for \response_data_q [6]: success!
+  Trying to prove $equiv for \response_data_q [7]: success!
+  Trying to prove $equiv for \owner_refresh_q: success!
+  Trying to prove $equiv for \write_q: success!
+  Trying to prove $equiv for \burst_q: success!
+  Trying to prove $equiv for \debug_state [7]: success!
+  Trying to prove $equiv for \sdram_cas: success!
+  Trying to prove $equiv for \sdram_cke: success!
+  Trying to prove $equiv for \sdram_cs: success!
+  Trying to prove $equiv for \u_KFSDRAM.read_counter [0]: success!
+  Trying to prove $equiv for \u_KFSDRAM.read_counter [1]: success!
+  Trying to prove $equiv for \u_KFSDRAM.read_counter [2]: success!
+  Trying to prove $equiv for \u_KFSDRAM.read_counter [3]: success!
+  Trying to prove $equiv for \u_KFSDRAM.read_counter [4]: success!
+  Trying to prove $equiv for \u_KFSDRAM.read_counter [5]: success!
+  Trying to prove $equiv for \u_KFSDRAM.state_counter [0]: success!
+  Trying to prove $equiv for \data_out_q [13]: success!
+  Trying to prove $equiv for \data_out_q [11]: success!
+  Trying to prove $equiv for \byte_enable_q [0]: success!
+  Trying to prove $equiv for \debug_state [1]: success!
+  Trying to prove $equiv for \data_out_q [14]: success!
+  Trying to prove $equiv for \data_out_q [15]: success!
+  Trying to prove $equiv for \data_out_q [12]: success!
+  Trying to prove $equiv for \u_KFSDRAM.refresh_counter [6]: success!
+  Trying to prove $equiv for \u_KFSDRAM.refresh_counter [7]: success!
+  Trying to prove $equiv for \u_KFSDRAM.refresh_counter [8]: success!
+  Trying to prove $equiv for \u_KFSDRAM.refresh_counter [9]: success!
+  Trying to prove $equiv for \u_KFSDRAM.refresh_counter [10]: success!
+  Trying to prove $equiv for \u_KFSDRAM.refresh_counter [11]: success!
+  Trying to prove $equiv for \u_KFSDRAM.state_counter [3]: success!
+  Trying to prove $equiv for \u_KFSDRAM.state_counter [4]: success!
+  Trying to prove $equiv for \u_KFSDRAM.state_counter [5]: success!
+  Trying to prove $equiv for \u_KFSDRAM.state_counter [6]: success!
+  Trying to prove $equiv for \u_KFSDRAM.state_counter [7]: success!
+  Trying to prove $equiv for \u_KFSDRAM.state_counter [8]: success!
+  Trying to prove $equiv for \u_KFSDRAM.sdram_ras: success!
+  Trying to prove $equiv for \u_KFSDRAM.sdram_we: success!
+  Trying to prove $equiv for \u_KFSDRAM.state [0]: success!
+  Trying to prove $equiv for \u_KFSDRAM.state [1]: success!
+  Trying to prove $equiv for \u_KFSDRAM.state [2]: success!
+  Trying to prove $equiv for \u_KFSDRAM.state [3]: success!
+  Trying to prove $equiv for \u_KFSDRAM.state [4]: success!
+  Trying to prove $equiv for \u_KFSDRAM.state [5]: success!
+  Trying to prove $equiv for \u_KFSDRAM.state [6]: success!
+  Trying to prove $equiv for \u_KFSDRAM.state [7]: success!
+  Trying to prove $equiv for \u_KFSDRAM.state [8]: success!
+  Trying to prove $equiv for \u_KFSDRAM.state [9]: success!
+  Trying to prove $equiv for \u_KFSDRAM.state [10]: success!
+  Trying to prove $equiv for \u_KFSDRAM.state [11]: success!
+  Trying to prove $equiv for \u_KFSDRAM.state [12]: success!
+  Trying to prove $equiv for \data_out_q [10]: success!
+  Trying to prove $equiv for \u_KFSDRAM.state [13]: success!
+  Trying to prove $equiv for \u_KFSDRAM.state [14]: success!
+  Trying to prove $equiv for \u_KFSDRAM.state [15]: success!
+  Trying to prove $equiv for \u_KFSDRAM.state [16]: success!
+  Trying to prove $equiv for \u_KFSDRAM.state [17]: success!
+  Trying to prove $equiv for \u_KFSDRAM.state [18]: success!
+  Trying to prove $equiv for \u_KFSDRAM.state [19]: success!
+  Trying to prove $equiv for \u_KFSDRAM.state [26]: success!
+  Trying to prove $equiv for \u_KFSDRAM.state [20]: success!
+  Trying to prove $equiv for \u_KFSDRAM.state [21]: success!
+  Trying to prove $equiv for \u_KFSDRAM.state [22]: success!
+  Trying to prove $equiv for \u_KFSDRAM.state [23]: success!
+  Trying to prove $equiv for \u_KFSDRAM.state [24]: success!
+  Trying to prove $equiv for \u_KFSDRAM.state [25]: success!
+Proved 205 previously unproven $equiv cells.
+
+16. Executing EQUIV_STATUS pass.
+ERROR: Found 9 unproven $equiv cells in 'equiv_status -assert'.

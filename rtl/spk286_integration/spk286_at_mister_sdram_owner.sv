@@ -184,12 +184,17 @@ module spk286_at_mister_sdram_owner #(
         .sdram_no_refresh     (SDRAM_NO_REFRESH),
         .sdram_init_wait      (SDRAM_INIT_WAIT),
         .sdram_refresh_cycle  (SDRAM_REFRESH_CYCLE),
-        .sdram_force_refresh  (SDRAM_FORCE_REFRESH)
+        .sdram_force_refresh  (SDRAM_FORCE_REFRESH),
+        .use_column_address_input(1'b1)
     ) u_KFSDRAM (
         .sdram_clock    (clk),
         .sdram_reset    (reset),
         .address        (kf_address),
         .access_num     (kf_access_num),
+        // READ/WRITE cannot admit a new command: request_accept requires
+        // KFSDRAM IDLE. Their column base is the retained address, so this
+        // removes the late live-command mux without a new register/cycle.
+        .column_address (address_q[9:1]),
         .data_in        (kf_data_in),
         .data_out       (kf_data_out),
         .write_request  (kf_write_request),

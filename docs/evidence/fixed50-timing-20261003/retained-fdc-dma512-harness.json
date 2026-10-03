@@ -1,0 +1,27 @@
+{
+  "status": "A5_FDC_BRIDGE_HARNESS_PREPARED",
+  "source_path": "D:\\GitHub\\PCAT-286_MiSTer\\build\\fixed50-data-capture-factored-bridge-seed1-fit-20261003\\work\\sim\\spk286_integration\\spk286_at_devices_tb.sv",
+  "source_sha256": "de3cc2a1c7abc51213be84b3dd31f703d5dab6ea6025038afc8bbc08b73969cd",
+  "bench_sha256": "752d3bf7d30b4d7a266202f0873117aa31a5f0fadaaed9698d9dad46714ba067",
+  "preparation_sha256": "b51d903bed9836112ef67ec6185f5b95f19814805aa4181d33688e012634437b",
+  "original_fdc_bank_sha256": "219bdb5138c7303737b939baf53a6189fde6e2924785fb9d7271051046e3c8ac",
+  "guard": "Complete IBM5170 FDC block including all original commands,512management writes,DMA config,TC,IRQ and result assertions retained exactly. Only preceding unrelated initial cases omitted, CPU transport tasks replaced, actual bridge+grant binding added, full512 score and public trace added.",
+  "task_changes": [
+    {
+      "task": "router_write_lane",
+      "before": "    task automatic router_write_lane(\n        input logic [15:0] port,\n        input logic [15:0] data,\n        input logic [1:0]  lanes\n    );\n        integer cycles;\n        begin\n            @(negedge clk);\n            request_address = {8'h00, port};\n            request_byte_enable = lanes;\n            request_data_out = data;\n            request_valid = 1'b1;\n            request_command_valid = 1'b1;\n            request_write = 1'b1;\n            request_io = 1'b1;\n            #1;\n            check(request_accept, \"AT device write was not accepted\");\n            @(posedge clk);\n            @(negedge clk);\n            request_valid = 1'b0;\n            request_command_valid = 1'b0;\n            request_write = 1'b0;\n            request_io = 1'b0;\n            cycles = 0;\n            while (!request_ready && cycles < 64) begin\n                @(negedge clk);\n                cycles = cycles + 1;\n            end\n            check(request_ready, \"AT device write did not complete\");\n            @(posedge clk);\n        end\n    endtask",
+      "after": "    task automatic router_write_lane(input logic [15:0] port,\n        input logic [15:0] data,input logic [1:0] lanes);\n        logic [15:0] ignored;\n        cpu_io_access(port,data,lanes,1'b1,ignored);\n    endtask"
+    },
+    {
+      "task": "router_read_lane",
+      "before": "    task automatic router_read_lane(\n        input logic [15:0] port,\n        input logic [1:0]  lanes,\n        output logic [7:0]  value\n    );\n        integer cycles;\n        begin\n            @(negedge clk);\n            request_address = {8'h00, port};\n            request_byte_enable = lanes;\n            request_data_out = 16'h0000;\n            request_valid = 1'b1;\n            request_command_valid = 1'b1;\n            request_write = 1'b0;\n            request_io = 1'b1;\n            #1;\n            check(request_accept, \"AT device read was not accepted\");\n            @(posedge clk);\n            @(negedge clk);\n            request_valid = 1'b0;\n            request_command_valid = 1'b0;\n            request_io = 1'b0;\n            cycles = 0;\n            while (!request_ready && cycles < 64) begin\n                @(negedge clk);\n                cycles = cycles + 1;\n            end\n            check(request_ready && request_read_data_valid,\n                  \"AT device read did not return data\");\n            value = lanes[1] ? request_read_data[15:8] : request_read_data[7:0];\n            @(posedge clk);\n        end\n    endtask",
+      "after": "    task automatic router_read_lane(input logic [15:0] port,\n        input logic [1:0] lanes,output logic [7:0] value);\n        logic [15:0] result;\n        begin\n            cpu_io_access(port,16'h0000,lanes,1'b0,result);\n            value=lanes[1] ? result[15:8] : result[7:0];\n        end\n    endtask"
+    },
+    {
+      "task": "router_read_word",
+      "before": "    task automatic router_read_word(input logic [15:0] port,\n                                    output logic [15:0] value);\n        integer cycles;\n        begin\n            @(negedge clk);\n            request_address = {8'h00, port};\n            request_byte_enable = 2'b11;\n            request_data_out = 16'h0000;\n            request_valid = 1'b1;\n            request_command_valid = 1'b1;\n            request_write = 1'b0;\n            request_io = 1'b1;\n            #1;\n            check(request_accept, \"AT device word read was not accepted\");\n            @(posedge clk);\n            @(negedge clk);\n            request_valid = 1'b0;\n            request_command_valid = 1'b0;\n            request_io = 1'b0;\n            cycles = 0;\n            while (!request_ready && cycles < 64) begin\n                @(negedge clk);\n                cycles = cycles + 1;\n            end\n            check(request_ready && request_read_data_valid,\n                  \"AT device word read did not return data\");\n            value = request_read_data;\n            @(posedge clk);\n        end\n    endtask",
+      "after": "    task automatic router_read_word(input logic [15:0] port,\n        output logic [15:0] value);\n        cpu_io_access(port,16'h0000,2'b11,1'b0,value);\n    endtask"
+    }
+  ],
+  "limits": "FDC-only IOx8 fixture; retains real router/storage/video/DMA/arbiter but does not exercise ATA/VGA/keyboard. CPU is an explicit bus driver, not the core. Original 10ns bench clock retained. No physical SDRAM memory owner; DMA sink acknowledges through original A5 handshake."
+}

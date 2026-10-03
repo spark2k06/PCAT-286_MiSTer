@@ -70,6 +70,13 @@ module spk286_at_bus_bridge #(
 
     output logic         bridge_idle,
     output logic [3:0]   debug_state,
+    // Retained transaction view: no new registers or stages.
+    output logic         retained_io_command,
+    output logic [23:0]  retained_io_address,
+    output logic         retained_io_write,
+    output logic [1:0]   retained_io_byte_enable,
+    output logic [15:0]  retained_io_data_out,
+    output logic         retained_io_data_oe,
     output logic         protocol_error
 );
     localparam logic FAST_MEMORY_START = 1'b1;
@@ -422,4 +429,15 @@ module spk286_at_bus_bridge #(
         end
     end
 `endif
+    assign retained_io_command = (state_q == STATE_COMMAND) && request_is_io;
+    assign retained_io_address = beat_address;
+    assign retained_io_write = request_write_q;
+    assign retained_io_byte_enable = beat_byte_enable;
+    assign retained_io_data_out = request_native_word_q ? request_data_q :
+                                  beat_byte_enable[1] ?
+                                  {request_data_q[15:8], 8'h00} :
+                                  {8'h00, request_data_q[7:0]};
+    assign retained_io_data_oe = request_write_q &&
+                                 ((state_q == STATE_COMMAND) || (state_q == STATE_WAIT));
+
 endmodule

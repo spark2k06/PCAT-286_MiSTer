@@ -299,6 +299,12 @@ module spk286_at_machine #(
     logic [3:0]  spk_debug_prefetch_count;
     logic [7:0]  spk_debug_biu_detail;
 
+    // Dedicated retained FDC write record; general/read buses remain intact.
+    logic        retained_io_command;
+    logic [23:0] retained_io_address;
+    logic        retained_io_write;
+    logic [1:0]  retained_io_byte_enable;
+    logic [15:0] retained_io_data_out;
     logic        at_valid;
     logic        at_command_valid;
     logic [2:0]  at_owner;
@@ -788,6 +794,12 @@ module spk286_at_machine #(
         .cpu_io_word_capable    (cpu_io_word_capable),
         .cpu_ready              (cpu_ready_i),
         .cpu_data_in            (cpu_data_in_i),
+        .retained_io_command    (retained_io_command),
+        .retained_io_address    (retained_io_address),
+        .retained_io_write      (retained_io_write),
+        .retained_io_byte_enable(retained_io_byte_enable),
+        .retained_io_data_out   (retained_io_data_out),
+        .retained_io_data_oe    (),
         .at_valid               (at_valid),
         .at_command_valid       (at_command_valid),
         .at_owner               (at_owner),
@@ -852,7 +864,9 @@ module spk286_at_machine #(
                                    rom_write_blocked && !rom_write_sink_active_q;
     assign rom_write_sink_ready = rom_write_sink_active_q;
 
-    spk286_at_device_router u_devices (
+    spk286_at_device_router #(
+        .RETAINED_FDC_WRITE(1'b1)
+    ) u_devices (
         .clk                    (clk),
         .cpu_sample_edge        (cpu_sample_edge),
         .reset                  (reset),
@@ -897,6 +911,12 @@ module spk286_at_machine #(
         .uart2_tx              (uart2_tx),
         .uart2_rts_n           (uart2_rts_n),
         .uart2_dtr_n           (uart2_dtr_n),
+        // Pure I/O COMMAND ownership, independent of the early memory mux.
+        .retained_io_command    (cpu_grant && retained_io_command),
+        .retained_io_address    (retained_io_address),
+        .retained_io_write      (retained_io_write),
+        .retained_io_byte_enable(retained_io_byte_enable),
+        .retained_io_data_out   (retained_io_data_out),
         .request_valid          (device_request_candidate),
         .request_command_valid  (at_command_valid),
         .request_write          (at_write),

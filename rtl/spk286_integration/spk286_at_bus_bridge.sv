@@ -223,9 +223,12 @@ module spk286_at_bus_bridge #(
                                      {at_read_data[15:8], 8'h00} :
                                      {8'h00, at_read_data[7:0]};
 
-    assign at_valid          = early_memory_address || (state_q == STATE_ADDRESS) ||
-                               (state_q == STATE_COMMAND) ||
-                               (state_q == STATE_WAIT);
+    // Early memory is confined to IDLE; I/O and INTA use retained phases.
+    // Keep their qualifiers independent of the live memory-width decode.
+    wire retained_transaction_valid = (state_q == STATE_ADDRESS) ||
+                                      (state_q == STATE_COMMAND) ||
+                                      (state_q == STATE_WAIT);
+    assign at_valid          = early_memory_address || retained_transaction_valid;
     assign at_command_valid  = early_memory_command || (state_q == STATE_COMMAND);
     assign at_owner          = OWNER_CPU;
     assign at_cycle_class    = early_memory_address ? cpu_bus_status : request_status_q;
@@ -242,8 +245,8 @@ module spk286_at_bus_bridge #(
                                ((state_q == STATE_COMMAND) ||
                                 (state_q == STATE_WAIT));
     assign at_write          = at_valid && (early_memory_address ? cpu_bus_write : request_write_q);
-    assign at_io             = at_valid && !early_memory_address && request_is_io;
-    assign at_inta           = at_valid && !early_memory_address && request_is_inta;
+    assign at_io             = retained_transaction_valid && request_is_io;
+    assign at_inta           = retained_transaction_valid && request_is_inta;
     assign at_code_fetch     = at_valid && (early_memory_address ? cpu_bus_status == 4'hD : request_is_code);
     // Keep LOCK asserted through the CPU completion interval.  The owner is
     // released only when the CPU has observed cpu_ready and the bridge returns

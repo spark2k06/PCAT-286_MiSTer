@@ -36,9 +36,22 @@ which is verified to have no consumer after preprocessing.
 
 Recorded checks:
 
-- `FIXED_CPU_ACTIVE_RTL_EQUIVALENCE_PASS files=10`, recorded in
-  `equivalence-cdc.json`. The cleanup-only control preserves the original
-  prefetch and DMA response logic; later timing prototypes are not covered.
+- `FIXED_CPU_ACTIVE_RTL_EQUIVALENCE_PASS files=10 unchanged=461`, recorded
+  against the current clean working sources in `equivalence-clean-current.json`.
+  String literals are preserved, including spaces and comment-like text;
+  only comments/whitespace outside them are ignored. The only normalized
+  declaration removal is the proven unused observer-enable wire.
+  Both simulation and `SYNTHESIS` views agree. The audit also scans unchanged
+  sources for conditional dependencies on the retired macros.
+- All other 461 Verilog/VHDL, ROM/microcode and QIP source files are byte-identical
+  to the frozen reference. Changes outside the cleanup are rejected.
+- `FIXED_CPU_ASSIGNMENT_CONSTRAINT_EQUIVALENCE_PASS commands=130`:
+  configuration/QSF macros agree after retiring the CPU/debug selectors;
+  CDC and sound settings are retained. The QSF changes only by selecting CDC
+  outside `config.tcl`. Other SDCs are byte-identical. Executing the real
+  `SYSTEM.sdc` with symbolic Tcl collections produces the same 130 constraint
+  commands, both with and without the optional boot splash. This is a command
+  comparison, not a fitted-netlist or path-coverage claim.
 - Strict standalone CPU Verilator lint: `LINT PASS`; generated microcode check
   passes with 123 entries, 743 words and a 10-bit address.
 - Actual packed OSD configuration: `AT_CONFIG_NO_DEBUG_PASS bytes=1796`;
@@ -54,6 +67,26 @@ QSF now requires that selection, and the project guard rejects its absence.
 Windows-created build manifests use portable path separators; the frozen-run
 reader also accepts older Windows manifests without changing their contents.
 
+The subsequently corrected DMA/prefetch trial was also stopped and its Docker
+container removed when the user requested a cleanup-only baseline commit
+before timing changes. Its proposed RTL/tools remain in the frozen
+`build/fixed50-dma-prefetch-cdc-fit-20261003` workspace and
+`build/fixed50-pending-tools-20261003`; none are in this baseline's production
+sources. No RBF or timing result from the stopped trial is accepted.
+
+Negative controls reject a changed source outside the cleanup and detect a
+changed SDRAM output-delay budget. The focused bridge/fetch/arbiter/DMA/PIT
+checks, profile elaboration and strict CPU lint are rerun on the clean sources.
+The unchanged platform CDC sources retain their separately executed CDC tests.
+Compact receipts/logs are committed under
+`docs/evidence/fixed-cpu-profile-20261003`.
+
+The fresh cleanup-only snapshot is `build/fixed-cpu-clean-baseline-20261003`.
+Its prepare-only Quartus check passes with `AT_PROFILE` and `SPK286_AT_CDC`,
+without retired CPU/debug macros, retaining the existing SDC set. No mapping,
+fit or bitstream generation runs for that preparation. The preparation log
+and effective Quartus assignment check are retained with the evidence.
+
 The benches retain their former active assertions; obsolete profile-selection
 branches are removed. Simulation runners reject obsolete config overrides,
 rather than label identical implementations as different A/B profiles.
@@ -64,7 +97,8 @@ Timing and fitted resource numbers still belong to P18/P19 until a fresh fit.
 
 ## Next milestone
 
-Perform a fresh full fit and TimeQuest audit at the unchanged physical clocks.
+The user requires this verified baseline commit before any further timing RTL.
+Then perform a fresh full fit and TimeQuest audit at the unchanged physical clocks.
 Use actual path reports to select small structural or placement corrections,
 with source-bound directed checks and measured whole-design resource cost.
 The user requests positive setup and hold without expanding the caches or

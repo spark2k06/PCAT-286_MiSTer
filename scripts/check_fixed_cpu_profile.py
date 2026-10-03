@@ -38,14 +38,40 @@ def normalized_preprocess(root, name, flags):
         cwd=root, text=True, capture_output=True, check=True,
     )
     text = re.sub(r'^\s*`line\b.*$', '', result.stdout, flags=re.M)
-    text = re.sub(r'/\*.*?\*/|//[^\n]*', '', text, flags=re.S)
     # Once the observer is preprocessed out, its OSD enable has no consumer.
     # Permit removal only of that exact unreferenced declaration.
     if name == 'PCAT-286.sv' and 'at_debug_enable' in text:
         if len(re.findall(r'\bat_debug_enable\b', text)) != 1:
             raise SystemExit('Retired observer enable still has a consumer')
         text = re.sub(r'wire\s+at_debug_enable\s*=\s*hps_status\[71\];', '', text)
-    return re.sub(r'\s+', '', text)
+    # Preserve complete string literals, including spaces and comment-like
+    # text in OSD strings. Remove comments/whitespace only outside strings.
+    tokens = re.findall(r'"(?:\\.|[^"\\])*"|/\*[\s\S]*?\*/|//[^\n]*|\s+|[^\s]', text)
+    return tuple(t for t in tokens if not t.isspace() and
+                 not t.startswith(('/*', '//')))
+
+
+def unchanged_sources(reference, candidate):
+    suffixes = {'.sv', '.v', '.vh', '.vhd', '.qip', '.mif', '.mem', '.hex', '.mc'}
+    excluded = {'build', 'db', 'incremental_db', 'obj_dir', '__pycache__'}
+    def inventory(root):
+        return {p.relative_to(root).as_posix() for directory in ('rtl', 'sys', 'vendor')
+                for p in (root / directory).rglob('*')
+                if p.is_file() and p.suffix.lower() in suffixes and
+                not excluded.intersection(p.relative_to(root).parts)} | {
+                    p.name for p in root.iterdir()
+                    if p.is_file() and p.suffix.lower() in suffixes}
+    before, after = inventory(reference), inventory(candidate)
+    if before != after:
+        raise SystemExit('RTL/source inventory differs: ' + str(sorted(before ^ after)))
+    rows = {}
+    for name in sorted(before - set(FILES)):
+        old = (reference / name).read_bytes()
+        new = (candidate / name).read_bytes()
+        if old != new:
+            raise SystemExit('Source outside cleanup changed: ' + name)
+        rows[name] = hashlib.sha256(new).hexdigest()
+    return rows
 
 
 def main():
@@ -55,16 +81,30 @@ def main():
     p.add_argument('--output', type=Path, required=True)
     a = p.parse_args()
     reference, candidate = a.reference.resolve(), a.candidate.resolve()
+    untouched = unchanged_sources(reference, candidate)
+    # Byte identity alone does not establish identity if a preserved source
+    # responds to a removed macro. Check every such conditional dependency.
+    dependencies = set(FILES)
+    for name in untouched:
+        if Path(name).suffix in {'.sv', '.v', '.vh'}:
+            source = (reference / name).read_text()
+            if any(re.search(r'`(?:ifdef|ifndef|elsif)\s+' + re.escape(m) + r'\b', source)
+                   for m in ACTIVE):
+                dependencies.add(name)
     rows = {}
-    for name in FILES:
-        before = normalized_preprocess(reference, name, ['-D' + m for m in ACTIVE])
-        after = normalized_preprocess(candidate, name, ['-DSPK286_AT_CDC'])
-        if before != after:
-            raise SystemExit('Active preprocessed RTL differs: ' + name)
+    for name in sorted(dependencies):
+        views = {}
+        for synthesis in (False, True):
+            extra = ['-DSYNTHESIS'] if synthesis else []
+            before = normalized_preprocess(reference, name, ['-D' + m for m in ACTIVE] + extra)
+            after = normalized_preprocess(candidate, name, ['-DSPK286_AT_CDC'] + extra)
+            if before != after:
+                raise SystemExit('Active preprocessed RTL differs: ' + name + ' SYNTHESIS=' + str(synthesis))
+            views['synthesis' if synthesis else 'simulation'] = hashlib.sha256(json.dumps(after).encode()).hexdigest()
         rows[name] = dict(
             reference_sha256=hashlib.sha256((reference / name).read_bytes()).hexdigest(),
             candidate_sha256=hashlib.sha256((candidate / name).read_bytes()).hexdigest(),
-            preprocessed_sha256=hashlib.sha256(after.encode()).hexdigest(),
+            preprocessed_sha256=views,
         )
     config = (candidate / 'config.tcl').read_text()
     if any(m in config for m in (*(m for m in ACTIVE if m != 'SPK286_AT_CDC'), 'SPK286_AT_DEBUG_CPU_DIV2')):
@@ -75,10 +115,11 @@ def main():
                   reference=str(reference), candidate=str(candidate), files=rows,
                   retired_active_macros=[m for m in ACTIVE if m != 'SPK286_AT_CDC'],
                   required_platform_macro='SPK286_AT_CDC',
-                  note='Exact normalized preprocessor output except the proven unused observer enable; no later timing RTL covered.')
+                  unchanged_source_sha256=untouched,
+                  note='Identical preprocessor tokens, preserving string literals, except the proven unused observer enable; all other RTL/ROM/QIP sources byte-identical. No later timing RTL covered.')
     a.output.parent.mkdir(parents=True, exist_ok=True)
     a.output.write_text(json.dumps(result, indent=2) + '\n')
-    print(result['status'], 'files=' + str(len(rows)))
+    print(result['status'], 'files=' + str(len(rows)), 'unchanged=' + str(len(untouched)), 'views=simulation,synthesis')
 
 
 if __name__ == '__main__':

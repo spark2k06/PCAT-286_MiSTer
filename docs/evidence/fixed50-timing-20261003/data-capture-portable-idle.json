@@ -1,0 +1,196 @@
+{
+  "status": "AT_DATA_IDLE_PORTABLE_PASS",
+  "canonical_root_sources": {
+    "rtl/spk286_integration/spk286_at_sdram_data_buffer.sv": {
+      "before_sha256": "e6724ac5dc81bd195c46d171e5b7d46b6bbac3ff7dc031331c732655ae62da1a",
+      "after_sha256": "a5f02e667748ba028299a18fdc67718d7c63cc9b0db791050bb16e7b7fe5a05b"
+    },
+    "sim/spk286_integration/spk286_at_data_idle_tb.sv": {
+      "sha256": "1ed614501fbea027b5ef508819bfd7482251c2ac4bbea4ca77078476a98e7a35"
+    },
+    "scripts/test_at_data_idle.sh": {
+      "sha256": "197cb53075586956a2a6d29e9ae983983928c94b334a603e3bb16cea30d2061e"
+    }
+  },
+  "frozen_reference_path": "/mnt/d/GitHub/PCAT-286_MiSTer/build/fixed50-active-address-seed1-fit-20261003/work/rtl/spk286_integration/spk286_at_sdram_data_buffer.sv",
+  "fixture_reference_path": "/mnt/d/GitHub/PCAT-286_MiSTer/build/fixed50-data-proof-review-20261003/qualified-idle/idle_metadata_tb.sv",
+  "fixture_reference_sha256": "30ad95cdcebd609f76f996e144341c726c18e67b66cbef5707833d70ab9c6f73",
+  "fixture_source_guard": "Exact qualified build-only fixture except module rename idle_metadata_tb -> spk286_at_data_idle_tb and PASS label QUALIFIED_IDLE_FUTURE_HIT_PASS -> AT_DATA_IDLE_PASS. No stimulus, expectation, assertion, private write, geometry, or timing change.",
+  "harness": "Fresh PCAT_BUILD_DIR; optional PCAT_DATA_BUFFER_RTL; pre/post SHA256 of actual compiled DUT, portable fixture and script. Strict DUT lint with sole existing SYNCASYNCNET waiver; Verilator --binary --timing --assert -j2 -Wno-fatal, runtime timeout30s.",
+  "proof": "Three legal reads2,514,0; public idle inactivity and counters remain unchanged through address-only idle change; resumed real read2 checks A558 and cache hit. Final accepted/completed4, physical3, hits1, miss/fill3, no write updates. All DUT active assertions enabled.",
+  "comparison": "All recorded original public IDLE fields, legitimate-read completion records and final public result are identical. Private IDLE diagnostic observations are read-only and may differ; raw duplicate expression is not required to be true or false.",
+  "runs": [
+    {
+      "phase": "before",
+      "exit_code": 0,
+      "elapsed_seconds": 7.059,
+      "buffer_sha256": "e6724ac5dc81bd195c46d171e5b7d46b6bbac3ff7dc031331c732655ae62da1a",
+      "compiled_source_manifest_sha256": "003f840103ca6aac3ec1d2ba3a19899fdbbd176ebdf8be4dbdb64bae7c0ba252",
+      "run_log_sha256": "b35679f805d1a916251c92f3e60f4e2a5efbbeb4ec7d3226ab001659db1bcc20",
+      "build_log_sha256": "50f795e96cdda63e2e339266e4c0a70b5cac15bb1b06fefd474441b6fdaa3bf7",
+      "driver_sha256": "1f17c0a5afdbf78fe3215f623b6b0b49bcea1487b3ee7ee373bc4b79d8b9df5a",
+      "source_verification_sha256": "da6cf26dd4b46e9c4f4834eea0e9db8b6e502bbbc690d3baa9a5a50d5cd4f1ef",
+      "strict_lint": "CLEAN; existing sole SYNCASYNCNET waiver",
+      "public_idle": [
+        {
+          "edge": "0",
+          "state": "0",
+          "input_valid": "0",
+          "input_command": "0",
+          "accept": "0",
+          "ready": "0",
+          "response_valid": "0",
+          "out_valid": "0",
+          "out_command": "0",
+          "backend": "0",
+          "accepted": "3",
+          "completed": "3",
+          "physical": "3",
+          "fills": "3"
+        },
+        {
+          "edge": "1",
+          "state": "0",
+          "input_valid": "0",
+          "input_command": "0",
+          "accept": "0",
+          "ready": "0",
+          "response_valid": "0",
+          "out_valid": "0",
+          "out_command": "0",
+          "backend": "0",
+          "accepted": "3",
+          "completed": "3",
+          "physical": "3",
+          "fills": "3"
+        },
+        {
+          "edge": "2",
+          "state": "0",
+          "input_valid": "0",
+          "input_command": "0",
+          "accept": "0",
+          "ready": "0",
+          "response_valid": "0",
+          "out_valid": "0",
+          "out_command": "0",
+          "backend": "0",
+          "accepted": "3",
+          "completed": "3",
+          "physical": "3",
+          "fills": "3"
+        },
+        {
+          "edge": "3",
+          "state": "0",
+          "input_valid": "0",
+          "input_command": "0",
+          "accept": "0",
+          "ready": "0",
+          "response_valid": "0",
+          "out_valid": "0",
+          "out_command": "0",
+          "backend": "0",
+          "accepted": "3",
+          "completed": "3",
+          "physical": "3",
+          "fills": "3"
+        }
+      ],
+      "final_public_result": "AT_DATA_IDLE_PASS actual512_geometry no_private_writes no_idle_requests accepted=4 completed=4 physical=3 hits=1 fills=3 cached_read_data_checked=A558",
+      "legitimate_reads": [
+        "LEGITIMATE_READ_COMPLETE address=2 accepted=1 completed=1 physical=1 fills=1",
+        "LEGITIMATE_READ_COMPLETE address=514 accepted=2 completed=2 physical=2 fills=2",
+        "LEGITIMATE_READ_COMPLETE address=0 accepted=3 completed=3 physical=3 fills=3",
+        "LEGITIMATE_READ_COMPLETE address=2 accepted=4 completed=4 physical=3 fills=3"
+      ]
+    },
+    {
+      "phase": "after",
+      "exit_code": 0,
+      "elapsed_seconds": 4.435,
+      "buffer_sha256": "a5f02e667748ba028299a18fdc67718d7c63cc9b0db791050bb16e7b7fe5a05b",
+      "compiled_source_manifest_sha256": "b5693aaa3b9ae0778154241487019c7479ea5c9dc73fd96a5e1b98b792bba6cc",
+      "run_log_sha256": "c9bff06b0568fd99265668554fb34dd0d63bef59bb43e4fba36d7a4ec21d7e97",
+      "build_log_sha256": "1511ec4bcb90d8ba0f586cc4613935213aaeac22a1fa877244b670453e269c0c",
+      "driver_sha256": "e739169084e2a15819eb96d3b75f7656a441ccf88655a24eebf0bdda770358ea",
+      "source_verification_sha256": "800430f7a85dab855c6fd995f3db432860a693ccaee11348e5ffa8889c79c812",
+      "strict_lint": "CLEAN; existing sole SYNCASYNCNET waiver",
+      "public_idle": [
+        {
+          "edge": "0",
+          "state": "0",
+          "input_valid": "0",
+          "input_command": "0",
+          "accept": "0",
+          "ready": "0",
+          "response_valid": "0",
+          "out_valid": "0",
+          "out_command": "0",
+          "backend": "0",
+          "accepted": "3",
+          "completed": "3",
+          "physical": "3",
+          "fills": "3"
+        },
+        {
+          "edge": "1",
+          "state": "0",
+          "input_valid": "0",
+          "input_command": "0",
+          "accept": "0",
+          "ready": "0",
+          "response_valid": "0",
+          "out_valid": "0",
+          "out_command": "0",
+          "backend": "0",
+          "accepted": "3",
+          "completed": "3",
+          "physical": "3",
+          "fills": "3"
+        },
+        {
+          "edge": "2",
+          "state": "0",
+          "input_valid": "0",
+          "input_command": "0",
+          "accept": "0",
+          "ready": "0",
+          "response_valid": "0",
+          "out_valid": "0",
+          "out_command": "0",
+          "backend": "0",
+          "accepted": "3",
+          "completed": "3",
+          "physical": "3",
+          "fills": "3"
+        },
+        {
+          "edge": "3",
+          "state": "0",
+          "input_valid": "0",
+          "input_command": "0",
+          "accept": "0",
+          "ready": "0",
+          "response_valid": "0",
+          "out_valid": "0",
+          "out_command": "0",
+          "backend": "0",
+          "accepted": "3",
+          "completed": "3",
+          "physical": "3",
+          "fills": "3"
+        }
+      ],
+      "final_public_result": "AT_DATA_IDLE_PASS actual512_geometry no_private_writes no_idle_requests accepted=4 completed=4 physical=3 hits=1 fills=3 cached_read_data_checked=A558",
+      "legitimate_reads": [
+        "LEGITIMATE_READ_COMPLETE address=2 accepted=1 completed=1 physical=1 fills=1",
+        "LEGITIMATE_READ_COMPLETE address=514 accepted=2 completed=2 physical=2 fills=2",
+        "LEGITIMATE_READ_COMPLETE address=0 accepted=3 completed=3 physical=3 fills=3",
+        "LEGITIMATE_READ_COMPLETE address=2 accepted=4 completed=4 physical=3 fills=3"
+      ]
+    }
+  ],
+  "helper_sha256": "0d09dbb91532f8cce23ff65402965ddc917320b87f7f16fc8ce0055fdeb5eceb",
+  "scope": "Portable actual512-word directed IDLE/capture regression only. No Quartus, full regression or hardware claim."
+}

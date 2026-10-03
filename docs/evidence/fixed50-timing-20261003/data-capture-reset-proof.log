@@ -1,0 +1,903 @@
+
+ /----------------------------------------------------------------------------\
+ |                                                                            |
+ |  yosys -- Yosys Open SYnthesis Suite                                       |
+ |                                                                            |
+ |  Copyright (C) 2012 - 2020  Claire Xenia Wolf <claire@yosyshq.com>         |
+ |                                                                            |
+ |  Permission to use, copy, modify, and/or distribute this software for any  |
+ |  purpose with or without fee is hereby granted, provided that the above    |
+ |  copyright notice and this permission notice appear in all copies.         |
+ |                                                                            |
+ |  THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES  |
+ |  WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF          |
+ |  MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR   |
+ |  ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES    |
+ |  WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN     |
+ |  ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF   |
+ |  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.            |
+ |                                                                            |
+ \----------------------------------------------------------------------------/
+
+ Yosys 0.33 (git sha1 2584903a060)
+
+
+-- Running command `read_verilog -sv one-step.v invariant.sv; hierarchy -top invariant; proc; flatten; wreduce; opt -full -keepdc; check -assert; sat -verify -set-def-inputs -prove reset_ok 1 -show relation -show outputs_equal -show next_relation -show output_matches -show reset -show previous_state_q -dump_json counterexample.json' --
+
+1. Executing Verilog-2005 frontend: one-step.v
+Parsing SystemVerilog input from `one-step.v' to AST representation.
+Generating RTLIL representation for module `\buffer_gate'.
+Generating RTLIL representation for module `\buffer_gold'.
+Successfully finished Verilog frontend.
+
+2. Executing Verilog-2005 frontend: invariant.sv
+Parsing SystemVerilog input from `invariant.sv' to AST representation.
+Generating RTLIL representation for module `\invariant'.
+Successfully finished Verilog frontend.
+
+3. Executing HIERARCHY pass (managing design hierarchy).
+
+3.1. Analyzing design hierarchy..
+Top module:  \invariant
+Used module:     \buffer_gate
+Used module:     \buffer_gold
+
+3.2. Analyzing design hierarchy..
+Top module:  \invariant
+Used module:     \buffer_gate
+Used module:     \buffer_gold
+Removed 0 unused modules.
+
+4. Executing PROC pass (convert processes to netlists).
+
+4.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+4.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Removed a total of 0 dead cases.
+
+4.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 0 redundant assignments.
+Promoted 80 assignments to connections.
+
+4.4. Executing PROC_INIT pass (extract init attributes).
+
+4.5. Executing PROC_ARST pass (detect async resets in processes).
+
+4.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+<suppressed ~18 debug messages>
+
+4.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\buffer_gold.$proc$one-step.v:0$1222'.
+     1/1: $1\_792_$func$one-step.v:3255$630.$result[0:0]$1227
+Creating decoders for process `\buffer_gold.$proc$one-step.v:0$1215'.
+     1/1: $1\_789_$func$one-step.v:3236$629.$result[15:0]$1221
+Creating decoders for process `\buffer_gold.$proc$one-step.v:0$1209'.
+     1/1: $1\_786_$func$one-step.v:3217$628.$result[0:0]$1214
+Creating decoders for process `\buffer_gold.$proc$one-step.v:0$1203'.
+     1/1: $1\_782_$func$one-step.v:3197$627.$result[0:0]$1208
+Creating decoders for process `\buffer_gold.$proc$one-step.v:0$1197'.
+     1/1: $1\_779_$func$one-step.v:3176$626.$result[0:0]$1202
+Creating decoders for process `\buffer_gold.$proc$one-step.v:0$1190'.
+     1/1: $1\_763_$func$one-step.v:3144$625.$result[24:0]$1196
+Creating decoders for process `\buffer_gold.$proc$one-step.v:0$1183'.
+     1/1: $1\_759_$func$one-step.v:3122$624.$result[1:0]$1189
+Creating decoders for process `\buffer_gold.$proc$one-step.v:0$1177'.
+     1/1: $1\_630_$func$one-step.v:2975$623.$result[1:0]$1182
+Creating decoders for process `\buffer_gold.$proc$one-step.v:0$1170'.
+     1/1: $1\_580_$func$one-step.v:2907$622.$result[255:0]$1176
+Creating decoders for process `\buffer_gate.$proc$one-step.v:0$606'.
+     1/1: $1\_846_$func$one-step.v:1590$18.$result[255:0]$612
+Creating decoders for process `\buffer_gate.$proc$one-step.v:0$600'.
+     1/1: $1\_738_$func$one-step.v:1466$17.$result[0:0]$605
+Creating decoders for process `\buffer_gate.$proc$one-step.v:0$593'.
+     1/1: $1\_735_$func$one-step.v:1447$16.$result[15:0]$599
+Creating decoders for process `\buffer_gate.$proc$one-step.v:0$587'.
+     1/1: $1\_732_$func$one-step.v:1428$15.$result[0:0]$592
+Creating decoders for process `\buffer_gate.$proc$one-step.v:0$581'.
+     1/1: $1\_728_$func$one-step.v:1408$14.$result[0:0]$586
+Creating decoders for process `\buffer_gate.$proc$one-step.v:0$575'.
+     1/1: $1\_725_$func$one-step.v:1387$13.$result[0:0]$580
+Creating decoders for process `\buffer_gate.$proc$one-step.v:0$568'.
+     1/1: $1\_709_$func$one-step.v:1355$12.$result[24:0]$574
+Creating decoders for process `\buffer_gate.$proc$one-step.v:0$561'.
+     1/1: $1\_705_$func$one-step.v:1333$11.$result[1:0]$567
+Creating decoders for process `\buffer_gate.$proc$one-step.v:0$555'.
+     1/1: $1\_576_$func$one-step.v:1186$10.$result[1:0]$560
+
+4.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+No latch inferred for signal `\buffer_gold.\_792_$func$one-step.v:3255$621.$result' from process `\buffer_gold.$proc$one-step.v:0$1222'.
+No latch inferred for signal `\buffer_gold.\_792_$func$one-step.v:3255$630.$result' from process `\buffer_gold.$proc$one-step.v:0$1222'.
+No latch inferred for signal `\buffer_gold.\_792_$func$one-step.v:3255$630.b' from process `\buffer_gold.$proc$one-step.v:0$1222'.
+No latch inferred for signal `\buffer_gold.\_792_$func$one-step.v:3255$630.s' from process `\buffer_gold.$proc$one-step.v:0$1222'.
+No latch inferred for signal `\buffer_gold.\_789_$func$one-step.v:3236$620.$result' from process `\buffer_gold.$proc$one-step.v:0$1215'.
+No latch inferred for signal `\buffer_gold.\_789_$func$one-step.v:3236$629.$result' from process `\buffer_gold.$proc$one-step.v:0$1215'.
+No latch inferred for signal `\buffer_gold.\_789_$func$one-step.v:3236$629.a' from process `\buffer_gold.$proc$one-step.v:0$1215'.
+No latch inferred for signal `\buffer_gold.\_789_$func$one-step.v:3236$629.b' from process `\buffer_gold.$proc$one-step.v:0$1215'.
+No latch inferred for signal `\buffer_gold.\_789_$func$one-step.v:3236$629.s' from process `\buffer_gold.$proc$one-step.v:0$1215'.
+No latch inferred for signal `\buffer_gold.\_786_$func$one-step.v:3217$619.$result' from process `\buffer_gold.$proc$one-step.v:0$1209'.
+No latch inferred for signal `\buffer_gold.\_786_$func$one-step.v:3217$628.$result' from process `\buffer_gold.$proc$one-step.v:0$1209'.
+No latch inferred for signal `\buffer_gold.\_786_$func$one-step.v:3217$628.b' from process `\buffer_gold.$proc$one-step.v:0$1209'.
+No latch inferred for signal `\buffer_gold.\_786_$func$one-step.v:3217$628.s' from process `\buffer_gold.$proc$one-step.v:0$1209'.
+No latch inferred for signal `\buffer_gold.\_782_$func$one-step.v:3197$618.$result' from process `\buffer_gold.$proc$one-step.v:0$1203'.
+No latch inferred for signal `\buffer_gold.\_782_$func$one-step.v:3197$627.$result' from process `\buffer_gold.$proc$one-step.v:0$1203'.
+No latch inferred for signal `\buffer_gold.\_782_$func$one-step.v:3197$627.b' from process `\buffer_gold.$proc$one-step.v:0$1203'.
+No latch inferred for signal `\buffer_gold.\_782_$func$one-step.v:3197$627.s' from process `\buffer_gold.$proc$one-step.v:0$1203'.
+No latch inferred for signal `\buffer_gold.\_779_$func$one-step.v:3176$617.$result' from process `\buffer_gold.$proc$one-step.v:0$1197'.
+No latch inferred for signal `\buffer_gold.\_779_$func$one-step.v:3176$626.$result' from process `\buffer_gold.$proc$one-step.v:0$1197'.
+No latch inferred for signal `\buffer_gold.\_779_$func$one-step.v:3176$626.b' from process `\buffer_gold.$proc$one-step.v:0$1197'.
+No latch inferred for signal `\buffer_gold.\_779_$func$one-step.v:3176$626.s' from process `\buffer_gold.$proc$one-step.v:0$1197'.
+No latch inferred for signal `\buffer_gold.\_763_$func$one-step.v:3144$616.$result' from process `\buffer_gold.$proc$one-step.v:0$1190'.
+No latch inferred for signal `\buffer_gold.\_763_$func$one-step.v:3144$625.$result' from process `\buffer_gold.$proc$one-step.v:0$1190'.
+No latch inferred for signal `\buffer_gold.\_763_$func$one-step.v:3144$625.a' from process `\buffer_gold.$proc$one-step.v:0$1190'.
+No latch inferred for signal `\buffer_gold.\_763_$func$one-step.v:3144$625.b' from process `\buffer_gold.$proc$one-step.v:0$1190'.
+No latch inferred for signal `\buffer_gold.\_763_$func$one-step.v:3144$625.s' from process `\buffer_gold.$proc$one-step.v:0$1190'.
+No latch inferred for signal `\buffer_gold.\_759_$func$one-step.v:3122$615.$result' from process `\buffer_gold.$proc$one-step.v:0$1183'.
+No latch inferred for signal `\buffer_gold.\_759_$func$one-step.v:3122$624.$result' from process `\buffer_gold.$proc$one-step.v:0$1183'.
+No latch inferred for signal `\buffer_gold.\_759_$func$one-step.v:3122$624.a' from process `\buffer_gold.$proc$one-step.v:0$1183'.
+No latch inferred for signal `\buffer_gold.\_759_$func$one-step.v:3122$624.b' from process `\buffer_gold.$proc$one-step.v:0$1183'.
+No latch inferred for signal `\buffer_gold.\_759_$func$one-step.v:3122$624.s' from process `\buffer_gold.$proc$one-step.v:0$1183'.
+No latch inferred for signal `\buffer_gold.\_630_$func$one-step.v:2975$614.$result' from process `\buffer_gold.$proc$one-step.v:0$1177'.
+No latch inferred for signal `\buffer_gold.\_630_$func$one-step.v:2975$623.$result' from process `\buffer_gold.$proc$one-step.v:0$1177'.
+No latch inferred for signal `\buffer_gold.\_630_$func$one-step.v:2975$623.b' from process `\buffer_gold.$proc$one-step.v:0$1177'.
+No latch inferred for signal `\buffer_gold.\_630_$func$one-step.v:2975$623.s' from process `\buffer_gold.$proc$one-step.v:0$1177'.
+No latch inferred for signal `\buffer_gold.\_580_$func$one-step.v:2907$613.$result' from process `\buffer_gold.$proc$one-step.v:0$1170'.
+No latch inferred for signal `\buffer_gold.\_580_$func$one-step.v:2907$622.$result' from process `\buffer_gold.$proc$one-step.v:0$1170'.
+No latch inferred for signal `\buffer_gold.\_580_$func$one-step.v:2907$622.a' from process `\buffer_gold.$proc$one-step.v:0$1170'.
+No latch inferred for signal `\buffer_gold.\_580_$func$one-step.v:2907$622.b' from process `\buffer_gold.$proc$one-step.v:0$1170'.
+No latch inferred for signal `\buffer_gold.\_580_$func$one-step.v:2907$622.s' from process `\buffer_gold.$proc$one-step.v:0$1170'.
+No latch inferred for signal `\buffer_gate.\_846_$func$one-step.v:1590$9.$result' from process `\buffer_gate.$proc$one-step.v:0$606'.
+No latch inferred for signal `\buffer_gate.\_846_$func$one-step.v:1590$18.$result' from process `\buffer_gate.$proc$one-step.v:0$606'.
+No latch inferred for signal `\buffer_gate.\_846_$func$one-step.v:1590$18.a' from process `\buffer_gate.$proc$one-step.v:0$606'.
+No latch inferred for signal `\buffer_gate.\_846_$func$one-step.v:1590$18.b' from process `\buffer_gate.$proc$one-step.v:0$606'.
+No latch inferred for signal `\buffer_gate.\_846_$func$one-step.v:1590$18.s' from process `\buffer_gate.$proc$one-step.v:0$606'.
+No latch inferred for signal `\buffer_gate.\_738_$func$one-step.v:1466$8.$result' from process `\buffer_gate.$proc$one-step.v:0$600'.
+No latch inferred for signal `\buffer_gate.\_738_$func$one-step.v:1466$17.$result' from process `\buffer_gate.$proc$one-step.v:0$600'.
+No latch inferred for signal `\buffer_gate.\_738_$func$one-step.v:1466$17.b' from process `\buffer_gate.$proc$one-step.v:0$600'.
+No latch inferred for signal `\buffer_gate.\_738_$func$one-step.v:1466$17.s' from process `\buffer_gate.$proc$one-step.v:0$600'.
+No latch inferred for signal `\buffer_gate.\_735_$func$one-step.v:1447$7.$result' from process `\buffer_gate.$proc$one-step.v:0$593'.
+No latch inferred for signal `\buffer_gate.\_735_$func$one-step.v:1447$16.$result' from process `\buffer_gate.$proc$one-step.v:0$593'.
+No latch inferred for signal `\buffer_gate.\_735_$func$one-step.v:1447$16.a' from process `\buffer_gate.$proc$one-step.v:0$593'.
+No latch inferred for signal `\buffer_gate.\_735_$func$one-step.v:1447$16.b' from process `\buffer_gate.$proc$one-step.v:0$593'.
+No latch inferred for signal `\buffer_gate.\_735_$func$one-step.v:1447$16.s' from process `\buffer_gate.$proc$one-step.v:0$593'.
+No latch inferred for signal `\buffer_gate.\_732_$func$one-step.v:1428$6.$result' from process `\buffer_gate.$proc$one-step.v:0$587'.
+No latch inferred for signal `\buffer_gate.\_732_$func$one-step.v:1428$15.$result' from process `\buffer_gate.$proc$one-step.v:0$587'.
+No latch inferred for signal `\buffer_gate.\_732_$func$one-step.v:1428$15.b' from process `\buffer_gate.$proc$one-step.v:0$587'.
+No latch inferred for signal `\buffer_gate.\_732_$func$one-step.v:1428$15.s' from process `\buffer_gate.$proc$one-step.v:0$587'.
+No latch inferred for signal `\buffer_gate.\_728_$func$one-step.v:1408$5.$result' from process `\buffer_gate.$proc$one-step.v:0$581'.
+No latch inferred for signal `\buffer_gate.\_728_$func$one-step.v:1408$14.$result' from process `\buffer_gate.$proc$one-step.v:0$581'.
+No latch inferred for signal `\buffer_gate.\_728_$func$one-step.v:1408$14.b' from process `\buffer_gate.$proc$one-step.v:0$581'.
+No latch inferred for signal `\buffer_gate.\_728_$func$one-step.v:1408$14.s' from process `\buffer_gate.$proc$one-step.v:0$581'.
+No latch inferred for signal `\buffer_gate.\_725_$func$one-step.v:1387$4.$result' from process `\buffer_gate.$proc$one-step.v:0$575'.
+No latch inferred for signal `\buffer_gate.\_725_$func$one-step.v:1387$13.$result' from process `\buffer_gate.$proc$one-step.v:0$575'.
+No latch inferred for signal `\buffer_gate.\_725_$func$one-step.v:1387$13.b' from process `\buffer_gate.$proc$one-step.v:0$575'.
+No latch inferred for signal `\buffer_gate.\_725_$func$one-step.v:1387$13.s' from process `\buffer_gate.$proc$one-step.v:0$575'.
+No latch inferred for signal `\buffer_gate.\_709_$func$one-step.v:1355$3.$result' from process `\buffer_gate.$proc$one-step.v:0$568'.
+No latch inferred for signal `\buffer_gate.\_709_$func$one-step.v:1355$12.$result' from process `\buffer_gate.$proc$one-step.v:0$568'.
+No latch inferred for signal `\buffer_gate.\_709_$func$one-step.v:1355$12.a' from process `\buffer_gate.$proc$one-step.v:0$568'.
+No latch inferred for signal `\buffer_gate.\_709_$func$one-step.v:1355$12.b' from process `\buffer_gate.$proc$one-step.v:0$568'.
+No latch inferred for signal `\buffer_gate.\_709_$func$one-step.v:1355$12.s' from process `\buffer_gate.$proc$one-step.v:0$568'.
+No latch inferred for signal `\buffer_gate.\_705_$func$one-step.v:1333$2.$result' from process `\buffer_gate.$proc$one-step.v:0$561'.
+No latch inferred for signal `\buffer_gate.\_705_$func$one-step.v:1333$11.$result' from process `\buffer_gate.$proc$one-step.v:0$561'.
+No latch inferred for signal `\buffer_gate.\_705_$func$one-step.v:1333$11.a' from process `\buffer_gate.$proc$one-step.v:0$561'.
+No latch inferred for signal `\buffer_gate.\_705_$func$one-step.v:1333$11.b' from process `\buffer_gate.$proc$one-step.v:0$561'.
+No latch inferred for signal `\buffer_gate.\_705_$func$one-step.v:1333$11.s' from process `\buffer_gate.$proc$one-step.v:0$561'.
+No latch inferred for signal `\buffer_gate.\_576_$func$one-step.v:1186$1.$result' from process `\buffer_gate.$proc$one-step.v:0$555'.
+No latch inferred for signal `\buffer_gate.\_576_$func$one-step.v:1186$10.$result' from process `\buffer_gate.$proc$one-step.v:0$555'.
+No latch inferred for signal `\buffer_gate.\_576_$func$one-step.v:1186$10.b' from process `\buffer_gate.$proc$one-step.v:0$555'.
+No latch inferred for signal `\buffer_gate.\_576_$func$one-step.v:1186$10.s' from process `\buffer_gate.$proc$one-step.v:0$555'.
+
+4.9. Executing PROC_DFF pass (convert process syncs to FFs).
+
+4.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+4.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Found and cleaned up 1 empty switch in `\buffer_gold.$proc$one-step.v:0$1222'.
+Removing empty process `buffer_gold.$proc$one-step.v:0$1222'.
+Found and cleaned up 1 empty switch in `\buffer_gold.$proc$one-step.v:0$1215'.
+Removing empty process `buffer_gold.$proc$one-step.v:0$1215'.
+Found and cleaned up 1 empty switch in `\buffer_gold.$proc$one-step.v:0$1209'.
+Removing empty process `buffer_gold.$proc$one-step.v:0$1209'.
+Found and cleaned up 1 empty switch in `\buffer_gold.$proc$one-step.v:0$1203'.
+Removing empty process `buffer_gold.$proc$one-step.v:0$1203'.
+Found and cleaned up 1 empty switch in `\buffer_gold.$proc$one-step.v:0$1197'.
+Removing empty process `buffer_gold.$proc$one-step.v:0$1197'.
+Found and cleaned up 1 empty switch in `\buffer_gold.$proc$one-step.v:0$1190'.
+Removing empty process `buffer_gold.$proc$one-step.v:0$1190'.
+Found and cleaned up 1 empty switch in `\buffer_gold.$proc$one-step.v:0$1183'.
+Removing empty process `buffer_gold.$proc$one-step.v:0$1183'.
+Found and cleaned up 1 empty switch in `\buffer_gold.$proc$one-step.v:0$1177'.
+Removing empty process `buffer_gold.$proc$one-step.v:0$1177'.
+Found and cleaned up 1 empty switch in `\buffer_gold.$proc$one-step.v:0$1170'.
+Removing empty process `buffer_gold.$proc$one-step.v:0$1170'.
+Found and cleaned up 1 empty switch in `\buffer_gate.$proc$one-step.v:0$606'.
+Removing empty process `buffer_gate.$proc$one-step.v:0$606'.
+Found and cleaned up 1 empty switch in `\buffer_gate.$proc$one-step.v:0$600'.
+Removing empty process `buffer_gate.$proc$one-step.v:0$600'.
+Found and cleaned up 1 empty switch in `\buffer_gate.$proc$one-step.v:0$593'.
+Removing empty process `buffer_gate.$proc$one-step.v:0$593'.
+Found and cleaned up 1 empty switch in `\buffer_gate.$proc$one-step.v:0$587'.
+Removing empty process `buffer_gate.$proc$one-step.v:0$587'.
+Found and cleaned up 1 empty switch in `\buffer_gate.$proc$one-step.v:0$581'.
+Removing empty process `buffer_gate.$proc$one-step.v:0$581'.
+Found and cleaned up 1 empty switch in `\buffer_gate.$proc$one-step.v:0$575'.
+Removing empty process `buffer_gate.$proc$one-step.v:0$575'.
+Found and cleaned up 1 empty switch in `\buffer_gate.$proc$one-step.v:0$568'.
+Removing empty process `buffer_gate.$proc$one-step.v:0$568'.
+Found and cleaned up 1 empty switch in `\buffer_gate.$proc$one-step.v:0$561'.
+Removing empty process `buffer_gate.$proc$one-step.v:0$561'.
+Found and cleaned up 1 empty switch in `\buffer_gate.$proc$one-step.v:0$555'.
+Removing empty process `buffer_gate.$proc$one-step.v:0$555'.
+Cleaned up 18 empty switches.
+
+4.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module invariant.
+<suppressed ~2 debug messages>
+Optimizing module buffer_gold.
+Optimizing module buffer_gate.
+
+5. Executing FLATTEN pass (flatten design).
+Deleting now unused module buffer_gold.
+Deleting now unused module buffer_gate.
+<suppressed ~2 debug messages>
+
+6. Executing WREDUCE pass (reducing word size of cells).
+Removed top 23 bits (of 32) from port A of cell invariant.$flatten\u_gold.$sub$one-step.v:3344$1114 ($sub).
+Removed top 31 bits (of 32) from port B of cell invariant.$flatten\u_gold.$sub$one-step.v:3344$1114 ($sub).
+Converting cell invariant.$flatten\u_gold.$sub$one-step.v:3344$1114 ($sub) from signed to unsigned.
+Removed top 22 bits (of 32) from port Y of cell invariant.$flatten\u_gold.$sub$one-step.v:3344$1114 ($sub).
+Removed top 1 bits (of 9) from port A of cell invariant.$flatten\u_gold.$sub$one-step.v:3344$1114 ($sub).
+Removed top 1 bits (of 10) from port Y of cell invariant.$flatten\u_gold.$sub$one-step.v:3344$1114 ($sub).
+Removed top 23 bits (of 32) from port A of cell invariant.$flatten\u_gold.$sub$one-step.v:3343$1113 ($sub).
+Removed top 31 bits (of 32) from port B of cell invariant.$flatten\u_gold.$sub$one-step.v:3343$1113 ($sub).
+Converting cell invariant.$flatten\u_gold.$sub$one-step.v:3343$1113 ($sub) from signed to unsigned.
+Removed top 22 bits (of 32) from port Y of cell invariant.$flatten\u_gold.$sub$one-step.v:3343$1113 ($sub).
+Removed top 1 bits (of 9) from port A of cell invariant.$flatten\u_gold.$sub$one-step.v:3343$1113 ($sub).
+Removed top 1 bits (of 10) from port Y of cell invariant.$flatten\u_gold.$sub$one-step.v:3343$1113 ($sub).
+Removed top 23 bits (of 32) from port A of cell invariant.$flatten\u_gold.$sub$one-step.v:3342$1112 ($sub).
+Removed top 31 bits (of 32) from port B of cell invariant.$flatten\u_gold.$sub$one-step.v:3342$1112 ($sub).
+Converting cell invariant.$flatten\u_gold.$sub$one-step.v:3342$1112 ($sub) from signed to unsigned.
+Removed top 22 bits (of 32) from port Y of cell invariant.$flatten\u_gold.$sub$one-step.v:3342$1112 ($sub).
+Removed top 1 bits (of 9) from port A of cell invariant.$flatten\u_gold.$sub$one-step.v:3342$1112 ($sub).
+Removed top 1 bits (of 10) from port Y of cell invariant.$flatten\u_gold.$sub$one-step.v:3342$1112 ($sub).
+Removed top 23 bits (of 32) from port A of cell invariant.$flatten\u_gold.$sub$one-step.v:3341$1111 ($sub).
+Removed top 31 bits (of 32) from port B of cell invariant.$flatten\u_gold.$sub$one-step.v:3341$1111 ($sub).
+Converting cell invariant.$flatten\u_gold.$sub$one-step.v:3341$1111 ($sub) from signed to unsigned.
+Removed top 22 bits (of 32) from port Y of cell invariant.$flatten\u_gold.$sub$one-step.v:3341$1111 ($sub).
+Removed top 1 bits (of 9) from port A of cell invariant.$flatten\u_gold.$sub$one-step.v:3341$1111 ($sub).
+Removed top 1 bits (of 10) from port Y of cell invariant.$flatten\u_gold.$sub$one-step.v:3341$1111 ($sub).
+Removed top 23 bits (of 32) from port A of cell invariant.$flatten\u_gold.$sub$one-step.v:3340$1110 ($sub).
+Removed top 31 bits (of 32) from port B of cell invariant.$flatten\u_gold.$sub$one-step.v:3340$1110 ($sub).
+Converting cell invariant.$flatten\u_gold.$sub$one-step.v:3340$1110 ($sub) from signed to unsigned.
+Removed top 22 bits (of 32) from port Y of cell invariant.$flatten\u_gold.$sub$one-step.v:3340$1110 ($sub).
+Removed top 1 bits (of 9) from port A of cell invariant.$flatten\u_gold.$sub$one-step.v:3340$1110 ($sub).
+Removed top 1 bits (of 10) from port Y of cell invariant.$flatten\u_gold.$sub$one-step.v:3340$1110 ($sub).
+Removed top 23 bits (of 32) from port A of cell invariant.$flatten\u_gold.$sub$one-step.v:3339$1109 ($sub).
+Removed top 31 bits (of 32) from port B of cell invariant.$flatten\u_gold.$sub$one-step.v:3339$1109 ($sub).
+Converting cell invariant.$flatten\u_gold.$sub$one-step.v:3339$1109 ($sub) from signed to unsigned.
+Removed top 22 bits (of 32) from port Y of cell invariant.$flatten\u_gold.$sub$one-step.v:3339$1109 ($sub).
+Removed top 1 bits (of 9) from port A of cell invariant.$flatten\u_gold.$sub$one-step.v:3339$1109 ($sub).
+Removed top 1 bits (of 10) from port Y of cell invariant.$flatten\u_gold.$sub$one-step.v:3339$1109 ($sub).
+Removed top 23 bits (of 32) from port A of cell invariant.$flatten\u_gold.$sub$one-step.v:3338$1108 ($sub).
+Removed top 31 bits (of 32) from port B of cell invariant.$flatten\u_gold.$sub$one-step.v:3338$1108 ($sub).
+Converting cell invariant.$flatten\u_gold.$sub$one-step.v:3338$1108 ($sub) from signed to unsigned.
+Removed top 22 bits (of 32) from port Y of cell invariant.$flatten\u_gold.$sub$one-step.v:3338$1108 ($sub).
+Removed top 1 bits (of 9) from port A of cell invariant.$flatten\u_gold.$sub$one-step.v:3338$1108 ($sub).
+Removed top 1 bits (of 10) from port Y of cell invariant.$flatten\u_gold.$sub$one-step.v:3338$1108 ($sub).
+Removed top 23 bits (of 32) from port A of cell invariant.$flatten\u_gold.$sub$one-step.v:3337$1107 ($sub).
+Removed top 31 bits (of 32) from port B of cell invariant.$flatten\u_gold.$sub$one-step.v:3337$1107 ($sub).
+Converting cell invariant.$flatten\u_gold.$sub$one-step.v:3337$1107 ($sub) from signed to unsigned.
+Removed top 22 bits (of 32) from port Y of cell invariant.$flatten\u_gold.$sub$one-step.v:3337$1107 ($sub).
+Removed top 1 bits (of 9) from port A of cell invariant.$flatten\u_gold.$sub$one-step.v:3337$1107 ($sub).
+Removed top 1 bits (of 10) from port Y of cell invariant.$flatten\u_gold.$sub$one-step.v:3337$1107 ($sub).
+Removed top 24 bits (of 32) from port A of cell invariant.$flatten\u_gold.$add$one-step.v:0$1105 ($add).
+Removed top 31 bits (of 32) from port B of cell invariant.$flatten\u_gold.$add$one-step.v:0$1105 ($add).
+Removed top 23 bits (of 32) from port Y of cell invariant.$flatten\u_gold.$add$one-step.v:0$1105 ($add).
+Removed top 24 bits (of 32) from port A of cell invariant.$flatten\u_gold.$add$one-step.v:0$1103 ($add).
+Removed top 31 bits (of 32) from port B of cell invariant.$flatten\u_gold.$add$one-step.v:0$1103 ($add).
+Removed top 23 bits (of 32) from port Y of cell invariant.$flatten\u_gold.$add$one-step.v:0$1103 ($add).
+Removed top 24 bits (of 32) from port A of cell invariant.$flatten\u_gold.$add$one-step.v:0$1101 ($add).
+Removed top 31 bits (of 32) from port B of cell invariant.$flatten\u_gold.$add$one-step.v:0$1101 ($add).
+Removed top 23 bits (of 32) from port Y of cell invariant.$flatten\u_gold.$add$one-step.v:0$1101 ($add).
+Removed top 24 bits (of 32) from port A of cell invariant.$flatten\u_gold.$add$one-step.v:0$1099 ($add).
+Removed top 31 bits (of 32) from port B of cell invariant.$flatten\u_gold.$add$one-step.v:0$1099 ($add).
+Removed top 23 bits (of 32) from port Y of cell invariant.$flatten\u_gold.$add$one-step.v:0$1099 ($add).
+Removed top 24 bits (of 32) from port A of cell invariant.$flatten\u_gold.$add$one-step.v:0$1097 ($add).
+Removed top 31 bits (of 32) from port B of cell invariant.$flatten\u_gold.$add$one-step.v:0$1097 ($add).
+Removed top 23 bits (of 32) from port Y of cell invariant.$flatten\u_gold.$add$one-step.v:0$1097 ($add).
+Removed top 31 bits (of 32) from port B of cell invariant.$flatten\u_gold.$lt$one-step.v:3326$1092 ($lt).
+Removed top 31 bits (of 32) from port B of cell invariant.$flatten\u_gold.$lt$one-step.v:3325$1087 ($lt).
+Removed top 31 bits (of 32) from port B of cell invariant.$flatten\u_gold.$lt$one-step.v:3324$1082 ($lt).
+Removed top 31 bits (of 32) from port B of cell invariant.$flatten\u_gold.$lt$one-step.v:3323$1077 ($lt).
+Removed top 31 bits (of 32) from port B of cell invariant.$flatten\u_gold.$lt$one-step.v:3322$1072 ($lt).
+Removed top 31 bits (of 32) from port B of cell invariant.$flatten\u_gold.$lt$one-step.v:3321$1067 ($lt).
+Removed top 31 bits (of 32) from port B of cell invariant.$flatten\u_gold.$lt$one-step.v:3320$1062 ($lt).
+Removed top 31 bits (of 32) from port B of cell invariant.$flatten\u_gold.$lt$one-step.v:3319$1057 ($lt).
+Removed top 1 bits (of 2) from port B of cell invariant.$flatten\u_gold.$eq$one-step.v:3257$995 ($eq).
+Removed top 1 bits (of 2) from port B of cell invariant.$flatten\u_gold.$eq$one-step.v:3238$993 ($eq).
+Removed top 1 bits (of 2) from port B of cell invariant.$flatten\u_gold.$eq$one-step.v:3219$991 ($eq).
+Removed top 1 bits (of 2) from port B of cell invariant.$flatten\u_gold.$eq$one-step.v:3199$988 ($eq).
+Removed top 1 bits (of 2) from port B of cell invariant.$flatten\u_gold.$eq$one-step.v:3177$985 ($eq).
+Removed top 1 bits (of 2) from port B of cell invariant.$flatten\u_gold.$eq$one-step.v:3146$971 ($eq).
+Removed top 1 bits (of 2) from port B of cell invariant.$flatten\u_gold.$eq$one-step.v:3124$968 ($eq).
+Removed top 1 bits (of 2) from port B of cell invariant.$flatten\u_gold.$eq$one-step.v:3024$887 ($eq).
+Removed top 1 bits (of 2) from port B of cell invariant.$flatten\u_gold.$eq$one-step.v:3021$884 ($eq).
+Removed top 1 bits (of 2) from port B of cell invariant.$flatten\u_gold.$eq$one-step.v:3018$881 ($eq).
+Removed top 24 bits (of 25) from mux cell invariant.$flatten\u_gold.$ternary$one-step.v:3016$879 ($mux).
+Removed top 1 bits (of 2) from port B of cell invariant.$flatten\u_gold.$eq$one-step.v:3015$878 ($eq).
+Removed top 1 bits (of 2) from port B of cell invariant.$flatten\u_gold.$eq$one-step.v:3012$875 ($eq).
+Removed top 1 bits (of 2) from port B of cell invariant.$flatten\u_gold.$eq$one-step.v:3009$872 ($eq).
+Removed top 1 bits (of 2) from port B of cell invariant.$flatten\u_gold.$eq$one-step.v:3006$869 ($eq).
+Removed top 24 bits (of 25) from mux cell invariant.$flatten\u_gold.$ternary$one-step.v:3001$864 ($mux).
+Removed top 1 bits (of 2) from port B of cell invariant.$flatten\u_gold.$eq$one-step.v:2997$860 ($eq).
+Removed top 1 bits (of 2) from port B of cell invariant.$flatten\u_gold.$eq$one-step.v:2993$856 ($eq).
+Removed top 1 bits (of 2) from port B of cell invariant.$flatten\u_gold.$eq$one-step.v:2979$842 ($eq).
+Removed top 1 bits (of 2) from port B of cell invariant.$flatten\u_gold.$eq$one-step.v:2909$791 ($eq).
+Removed top 1 bits (of 2) from port B of cell invariant.$flatten\u_gold.$eq$one-step.v:2886$785 ($eq).
+Removed top 1 bits (of 2) from port B of cell invariant.$flatten\u_gold.$eq$one-step.v:2883$782 ($eq).
+Removed top 23 bits (of 32) from port A of cell invariant.$flatten\u_gold.$neg$one-step.v:2837$736 ($neg).
+Removed top 23 bits (of 32) from port A of cell invariant.$flatten\u_gold.$neg$one-step.v:2836$735 ($neg).
+Removed top 23 bits (of 32) from port A of cell invariant.$flatten\u_gold.$neg$one-step.v:2835$734 ($neg).
+Removed top 23 bits (of 32) from port A of cell invariant.$flatten\u_gold.$neg$one-step.v:2834$733 ($neg).
+Removed top 23 bits (of 32) from port A of cell invariant.$flatten\u_gold.$neg$one-step.v:2833$732 ($neg).
+Removed top 23 bits (of 32) from port A of cell invariant.$flatten\u_gold.$neg$one-step.v:2832$731 ($neg).
+Removed top 23 bits (of 32) from port A of cell invariant.$flatten\u_gold.$neg$one-step.v:2831$730 ($neg).
+Removed top 23 bits (of 32) from port A of cell invariant.$flatten\u_gold.$neg$one-step.v:2830$729 ($neg).
+Removed top 5 bits (of 25) from port B of cell invariant.$flatten\u_gold.$lt$one-step.v:2827$726 ($lt).
+Removed top 4 bits (of 25) from port B of cell invariant.$flatten\u_gold.$ge$one-step.v:2753$652 ($ge).
+Removed top 1 bits (of 4) from port B of cell invariant.$flatten\u_gold.$eq$one-step.v:2747$646 ($eq).
+Removed top 31 bits (of 32) from port B of cell invariant.$flatten\u_gold.$add$one-step.v:2735$634 ($add).
+Removed top 31 bits (of 32) from port B of cell invariant.$flatten\u_gold.$add$one-step.v:2734$633 ($add).
+Removed top 31 bits (of 32) from port B of cell invariant.$flatten\u_gold.$add$one-step.v:2733$632 ($add).
+Removed top 31 bits (of 32) from port B of cell invariant.$flatten\u_gold.$add$one-step.v:2732$631 ($add).
+Removed top 23 bits (of 32) from port A of cell invariant.$flatten\u_gate.$sub$one-step.v:1619$499 ($sub).
+Removed top 31 bits (of 32) from port B of cell invariant.$flatten\u_gate.$sub$one-step.v:1619$499 ($sub).
+Converting cell invariant.$flatten\u_gate.$sub$one-step.v:1619$499 ($sub) from signed to unsigned.
+Removed top 22 bits (of 32) from port Y of cell invariant.$flatten\u_gate.$sub$one-step.v:1619$499 ($sub).
+Removed top 1 bits (of 9) from port A of cell invariant.$flatten\u_gate.$sub$one-step.v:1619$499 ($sub).
+Removed top 1 bits (of 10) from port Y of cell invariant.$flatten\u_gate.$sub$one-step.v:1619$499 ($sub).
+Removed top 23 bits (of 32) from port A of cell invariant.$flatten\u_gate.$sub$one-step.v:1618$498 ($sub).
+Removed top 31 bits (of 32) from port B of cell invariant.$flatten\u_gate.$sub$one-step.v:1618$498 ($sub).
+Converting cell invariant.$flatten\u_gate.$sub$one-step.v:1618$498 ($sub) from signed to unsigned.
+Removed top 22 bits (of 32) from port Y of cell invariant.$flatten\u_gate.$sub$one-step.v:1618$498 ($sub).
+Removed top 1 bits (of 9) from port A of cell invariant.$flatten\u_gate.$sub$one-step.v:1618$498 ($sub).
+Removed top 1 bits (of 10) from port Y of cell invariant.$flatten\u_gate.$sub$one-step.v:1618$498 ($sub).
+Removed top 23 bits (of 32) from port A of cell invariant.$flatten\u_gate.$sub$one-step.v:1617$497 ($sub).
+Removed top 31 bits (of 32) from port B of cell invariant.$flatten\u_gate.$sub$one-step.v:1617$497 ($sub).
+Converting cell invariant.$flatten\u_gate.$sub$one-step.v:1617$497 ($sub) from signed to unsigned.
+Removed top 22 bits (of 32) from port Y of cell invariant.$flatten\u_gate.$sub$one-step.v:1617$497 ($sub).
+Removed top 1 bits (of 9) from port A of cell invariant.$flatten\u_gate.$sub$one-step.v:1617$497 ($sub).
+Removed top 1 bits (of 10) from port Y of cell invariant.$flatten\u_gate.$sub$one-step.v:1617$497 ($sub).
+Removed top 23 bits (of 32) from port A of cell invariant.$flatten\u_gate.$sub$one-step.v:1616$496 ($sub).
+Removed top 31 bits (of 32) from port B of cell invariant.$flatten\u_gate.$sub$one-step.v:1616$496 ($sub).
+Converting cell invariant.$flatten\u_gate.$sub$one-step.v:1616$496 ($sub) from signed to unsigned.
+Removed top 22 bits (of 32) from port Y of cell invariant.$flatten\u_gate.$sub$one-step.v:1616$496 ($sub).
+Removed top 1 bits (of 9) from port A of cell invariant.$flatten\u_gate.$sub$one-step.v:1616$496 ($sub).
+Removed top 1 bits (of 10) from port Y of cell invariant.$flatten\u_gate.$sub$one-step.v:1616$496 ($sub).
+Removed top 23 bits (of 32) from port A of cell invariant.$flatten\u_gate.$sub$one-step.v:1615$495 ($sub).
+Removed top 31 bits (of 32) from port B of cell invariant.$flatten\u_gate.$sub$one-step.v:1615$495 ($sub).
+Converting cell invariant.$flatten\u_gate.$sub$one-step.v:1615$495 ($sub) from signed to unsigned.
+Removed top 22 bits (of 32) from port Y of cell invariant.$flatten\u_gate.$sub$one-step.v:1615$495 ($sub).
+Removed top 1 bits (of 9) from port A of cell invariant.$flatten\u_gate.$sub$one-step.v:1615$495 ($sub).
+Removed top 1 bits (of 10) from port Y of cell invariant.$flatten\u_gate.$sub$one-step.v:1615$495 ($sub).
+Removed top 23 bits (of 32) from port A of cell invariant.$flatten\u_gate.$sub$one-step.v:1614$494 ($sub).
+Removed top 31 bits (of 32) from port B of cell invariant.$flatten\u_gate.$sub$one-step.v:1614$494 ($sub).
+Converting cell invariant.$flatten\u_gate.$sub$one-step.v:1614$494 ($sub) from signed to unsigned.
+Removed top 22 bits (of 32) from port Y of cell invariant.$flatten\u_gate.$sub$one-step.v:1614$494 ($sub).
+Removed top 1 bits (of 9) from port A of cell invariant.$flatten\u_gate.$sub$one-step.v:1614$494 ($sub).
+Removed top 1 bits (of 10) from port Y of cell invariant.$flatten\u_gate.$sub$one-step.v:1614$494 ($sub).
+Removed top 23 bits (of 32) from port A of cell invariant.$flatten\u_gate.$sub$one-step.v:1613$493 ($sub).
+Removed top 31 bits (of 32) from port B of cell invariant.$flatten\u_gate.$sub$one-step.v:1613$493 ($sub).
+Converting cell invariant.$flatten\u_gate.$sub$one-step.v:1613$493 ($sub) from signed to unsigned.
+Removed top 22 bits (of 32) from port Y of cell invariant.$flatten\u_gate.$sub$one-step.v:1613$493 ($sub).
+Removed top 1 bits (of 9) from port A of cell invariant.$flatten\u_gate.$sub$one-step.v:1613$493 ($sub).
+Removed top 1 bits (of 10) from port Y of cell invariant.$flatten\u_gate.$sub$one-step.v:1613$493 ($sub).
+Removed top 23 bits (of 32) from port A of cell invariant.$flatten\u_gate.$sub$one-step.v:1612$492 ($sub).
+Removed top 31 bits (of 32) from port B of cell invariant.$flatten\u_gate.$sub$one-step.v:1612$492 ($sub).
+Converting cell invariant.$flatten\u_gate.$sub$one-step.v:1612$492 ($sub) from signed to unsigned.
+Removed top 22 bits (of 32) from port Y of cell invariant.$flatten\u_gate.$sub$one-step.v:1612$492 ($sub).
+Removed top 1 bits (of 9) from port A of cell invariant.$flatten\u_gate.$sub$one-step.v:1612$492 ($sub).
+Removed top 1 bits (of 10) from port Y of cell invariant.$flatten\u_gate.$sub$one-step.v:1612$492 ($sub).
+Removed top 24 bits (of 32) from port A of cell invariant.$flatten\u_gate.$add$one-step.v:0$490 ($add).
+Removed top 31 bits (of 32) from port B of cell invariant.$flatten\u_gate.$add$one-step.v:0$490 ($add).
+Removed top 23 bits (of 32) from port Y of cell invariant.$flatten\u_gate.$add$one-step.v:0$490 ($add).
+Removed top 24 bits (of 32) from port A of cell invariant.$flatten\u_gate.$add$one-step.v:0$488 ($add).
+Removed top 31 bits (of 32) from port B of cell invariant.$flatten\u_gate.$add$one-step.v:0$488 ($add).
+Removed top 23 bits (of 32) from port Y of cell invariant.$flatten\u_gate.$add$one-step.v:0$488 ($add).
+Removed top 24 bits (of 32) from port A of cell invariant.$flatten\u_gate.$add$one-step.v:0$486 ($add).
+Removed top 31 bits (of 32) from port B of cell invariant.$flatten\u_gate.$add$one-step.v:0$486 ($add).
+Removed top 23 bits (of 32) from port Y of cell invariant.$flatten\u_gate.$add$one-step.v:0$486 ($add).
+Removed top 24 bits (of 32) from port A of cell invariant.$flatten\u_gate.$add$one-step.v:0$484 ($add).
+Removed top 31 bits (of 32) from port B of cell invariant.$flatten\u_gate.$add$one-step.v:0$484 ($add).
+Removed top 23 bits (of 32) from port Y of cell invariant.$flatten\u_gate.$add$one-step.v:0$484 ($add).
+Removed top 24 bits (of 32) from port A of cell invariant.$flatten\u_gate.$add$one-step.v:0$482 ($add).
+Removed top 31 bits (of 32) from port B of cell invariant.$flatten\u_gate.$add$one-step.v:0$482 ($add).
+Removed top 23 bits (of 32) from port Y of cell invariant.$flatten\u_gate.$add$one-step.v:0$482 ($add).
+Removed top 31 bits (of 32) from port B of cell invariant.$flatten\u_gate.$lt$one-step.v:1601$477 ($lt).
+Removed top 31 bits (of 32) from port B of cell invariant.$flatten\u_gate.$lt$one-step.v:1600$472 ($lt).
+Removed top 31 bits (of 32) from port B of cell invariant.$flatten\u_gate.$lt$one-step.v:1599$467 ($lt).
+Removed top 31 bits (of 32) from port B of cell invariant.$flatten\u_gate.$lt$one-step.v:1598$462 ($lt).
+Removed top 31 bits (of 32) from port B of cell invariant.$flatten\u_gate.$lt$one-step.v:1597$457 ($lt).
+Removed top 31 bits (of 32) from port B of cell invariant.$flatten\u_gate.$lt$one-step.v:1596$452 ($lt).
+Removed top 31 bits (of 32) from port B of cell invariant.$flatten\u_gate.$lt$one-step.v:1595$447 ($lt).
+Removed top 31 bits (of 32) from port B of cell invariant.$flatten\u_gate.$lt$one-step.v:1594$442 ($lt).
+Removed top 1 bits (of 2) from port B of cell invariant.$flatten\u_gate.$eq$one-step.v:1592$440 ($eq).
+Removed top 1 bits (of 2) from port B of cell invariant.$flatten\u_gate.$eq$one-step.v:1569$434 ($eq).
+Removed top 1 bits (of 2) from port B of cell invariant.$flatten\u_gate.$eq$one-step.v:1566$431 ($eq).
+Removed top 1 bits (of 2) from port B of cell invariant.$flatten\u_gate.$eq$one-step.v:1468$333 ($eq).
+Removed top 1 bits (of 2) from port B of cell invariant.$flatten\u_gate.$eq$one-step.v:1449$331 ($eq).
+Removed top 1 bits (of 2) from port B of cell invariant.$flatten\u_gate.$eq$one-step.v:1430$329 ($eq).
+Removed top 1 bits (of 2) from port B of cell invariant.$flatten\u_gate.$eq$one-step.v:1410$326 ($eq).
+Removed top 1 bits (of 2) from port B of cell invariant.$flatten\u_gate.$eq$one-step.v:1388$323 ($eq).
+Removed top 1 bits (of 2) from port B of cell invariant.$flatten\u_gate.$eq$one-step.v:1357$309 ($eq).
+Removed top 1 bits (of 2) from port B of cell invariant.$flatten\u_gate.$eq$one-step.v:1335$306 ($eq).
+Removed top 1 bits (of 2) from port B of cell invariant.$flatten\u_gate.$eq$one-step.v:1235$225 ($eq).
+Removed top 1 bits (of 2) from port B of cell invariant.$flatten\u_gate.$eq$one-step.v:1232$222 ($eq).
+Removed top 1 bits (of 2) from port B of cell invariant.$flatten\u_gate.$eq$one-step.v:1229$219 ($eq).
+Removed top 24 bits (of 25) from mux cell invariant.$flatten\u_gate.$ternary$one-step.v:1227$217 ($mux).
+Removed top 1 bits (of 2) from port B of cell invariant.$flatten\u_gate.$eq$one-step.v:1226$216 ($eq).
+Removed top 1 bits (of 2) from port B of cell invariant.$flatten\u_gate.$eq$one-step.v:1223$213 ($eq).
+Removed top 1 bits (of 2) from port B of cell invariant.$flatten\u_gate.$eq$one-step.v:1220$210 ($eq).
+Removed top 1 bits (of 2) from port B of cell invariant.$flatten\u_gate.$eq$one-step.v:1217$207 ($eq).
+Removed top 24 bits (of 25) from mux cell invariant.$flatten\u_gate.$ternary$one-step.v:1212$202 ($mux).
+Removed top 1 bits (of 2) from port B of cell invariant.$flatten\u_gate.$eq$one-step.v:1208$198 ($eq).
+Removed top 1 bits (of 2) from port B of cell invariant.$flatten\u_gate.$eq$one-step.v:1204$194 ($eq).
+Removed top 1 bits (of 2) from port B of cell invariant.$flatten\u_gate.$eq$one-step.v:1190$180 ($eq).
+Removed top 23 bits (of 32) from port A of cell invariant.$flatten\u_gate.$neg$one-step.v:1115$124 ($neg).
+Removed top 23 bits (of 32) from port A of cell invariant.$flatten\u_gate.$neg$one-step.v:1114$123 ($neg).
+Removed top 23 bits (of 32) from port A of cell invariant.$flatten\u_gate.$neg$one-step.v:1113$122 ($neg).
+Removed top 23 bits (of 32) from port A of cell invariant.$flatten\u_gate.$neg$one-step.v:1112$121 ($neg).
+Removed top 23 bits (of 32) from port A of cell invariant.$flatten\u_gate.$neg$one-step.v:1111$120 ($neg).
+Removed top 23 bits (of 32) from port A of cell invariant.$flatten\u_gate.$neg$one-step.v:1110$119 ($neg).
+Removed top 23 bits (of 32) from port A of cell invariant.$flatten\u_gate.$neg$one-step.v:1109$118 ($neg).
+Removed top 23 bits (of 32) from port A of cell invariant.$flatten\u_gate.$neg$one-step.v:1108$117 ($neg).
+Removed top 5 bits (of 25) from port B of cell invariant.$flatten\u_gate.$lt$one-step.v:1105$114 ($lt).
+Removed top 4 bits (of 25) from port B of cell invariant.$flatten\u_gate.$ge$one-step.v:1031$40 ($ge).
+Removed top 1 bits (of 4) from port B of cell invariant.$flatten\u_gate.$eq$one-step.v:1025$34 ($eq).
+Removed top 31 bits (of 32) from port B of cell invariant.$flatten\u_gate.$add$one-step.v:1013$22 ($add).
+Removed top 31 bits (of 32) from port B of cell invariant.$flatten\u_gate.$add$one-step.v:1012$21 ($add).
+Removed top 31 bits (of 32) from port B of cell invariant.$flatten\u_gate.$add$one-step.v:1011$20 ($add).
+Removed top 31 bits (of 32) from port B of cell invariant.$flatten\u_gate.$add$one-step.v:1010$19 ($add).
+Removed top 255 bits (of 256) from wire invariant.$flatten\u_gate.$logic_not$one-step.v:1084$93_Y.
+Removed top 255 bits (of 256) from wire invariant.$flatten\u_gate.$logic_not$one-step.v:1085$94_Y.
+Removed top 23 bits (of 32) from wire invariant.$flatten\u_gate.$add$one-step.v:0$482_Y.
+Removed top 28 bits (of 32) from wire invariant.$flatten\u_gate.$add$one-step.v:0$484_Y.
+Removed top 23 bits (of 32) from wire invariant.$flatten\u_gate.$add$one-step.v:0$486_Y.
+Removed top 23 bits (of 32) from wire invariant.$flatten\u_gate.$add$one-step.v:0$488_Y.
+Removed top 23 bits (of 32) from wire invariant.$flatten\u_gate.$add$one-step.v:0$490_Y.
+Removed top 24 bits (of 32) from wire invariant.$flatten\u_gate.$sub$one-step.v:1612$492_Y.
+Removed top 24 bits (of 32) from wire invariant.$flatten\u_gate.$sub$one-step.v:1613$493_Y.
+Removed top 26 bits (of 32) from wire invariant.$flatten\u_gate.$sub$one-step.v:1614$494_Y.
+Removed top 24 bits (of 32) from wire invariant.$flatten\u_gate.$sub$one-step.v:1615$495_Y.
+Removed top 24 bits (of 32) from wire invariant.$flatten\u_gate.$sub$one-step.v:1616$496_Y.
+Removed top 24 bits (of 32) from wire invariant.$flatten\u_gate.$sub$one-step.v:1617$497_Y.
+Removed top 24 bits (of 32) from wire invariant.$flatten\u_gate.$sub$one-step.v:1618$498_Y.
+Removed top 24 bits (of 32) from wire invariant.$flatten\u_gate.$sub$one-step.v:1619$499_Y.
+Removed top 2 bits (of 16) from wire invariant.$flatten\u_gate.$ternary$one-step.v:1620$500_Y.
+Removed top 4 bits (of 16) from wire invariant.$flatten\u_gate.$ternary$one-step.v:1621$501_Y.
+Removed top 255 bits (of 256) from wire invariant.$flatten\u_gold.$logic_not$one-step.v:2806$705_Y.
+Removed top 255 bits (of 256) from wire invariant.$flatten\u_gold.$logic_not$one-step.v:2807$706_Y.
+Removed top 23 bits (of 32) from wire invariant.$flatten\u_gold.$add$one-step.v:0$1097_Y.
+Removed top 23 bits (of 32) from wire invariant.$flatten\u_gold.$add$one-step.v:0$1099_Y.
+Removed top 23 bits (of 32) from wire invariant.$flatten\u_gold.$add$one-step.v:0$1101_Y.
+Removed top 24 bits (of 32) from wire invariant.$flatten\u_gold.$add$one-step.v:0$1103_Y.
+Removed top 23 bits (of 32) from wire invariant.$flatten\u_gold.$add$one-step.v:0$1105_Y.
+Removed top 24 bits (of 32) from wire invariant.$flatten\u_gold.$sub$one-step.v:3337$1107_Y.
+Removed top 24 bits (of 32) from wire invariant.$flatten\u_gold.$sub$one-step.v:3338$1108_Y.
+Removed top 26 bits (of 32) from wire invariant.$flatten\u_gold.$sub$one-step.v:3339$1109_Y.
+Removed top 24 bits (of 32) from wire invariant.$flatten\u_gold.$sub$one-step.v:3340$1110_Y.
+Removed top 24 bits (of 32) from wire invariant.$flatten\u_gold.$sub$one-step.v:3341$1111_Y.
+Removed top 24 bits (of 32) from wire invariant.$flatten\u_gold.$sub$one-step.v:3342$1112_Y.
+Removed top 24 bits (of 32) from wire invariant.$flatten\u_gold.$sub$one-step.v:3343$1113_Y.
+Removed top 24 bits (of 32) from wire invariant.$flatten\u_gold.$sub$one-step.v:3344$1114_Y.
+Removed top 2 bits (of 16) from wire invariant.$flatten\u_gold.$ternary$one-step.v:3345$1115_Y.
+Removed top 4 bits (of 16) from wire invariant.$flatten\u_gold.$ternary$one-step.v:3346$1116_Y.
+
+7. Executing OPT pass (performing simple optimizations).
+
+7.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module invariant.
+<suppressed ~277 debug messages>
+
+7.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\invariant'.
+<suppressed ~933 debug messages>
+Removed a total of 311 cells.
+
+7.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \invariant..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~164 debug messages>
+
+7.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \invariant.
+    New input vector for $reduce_and cell $reduce_and$invariant.sv:437$1332: { $eqx$invariant.sv:436$1331_Y $eqx$invariant.sv:436$1330_Y $eqx$invariant.sv:436$1329_Y $eqx$invariant.sv:436$1328_Y $eqx$invariant.sv:436$1327_Y $eqx$invariant.sv:436$1326_Y $eqx$invariant.sv:436$1325_Y $eqx$invariant.sv:436$1324_Y $eqx$invariant.sv:436$1323_Y $eqx$invariant.sv:436$1322_Y $eqx$invariant.sv:436$1321_Y $eqx$invariant.sv:436$1320_Y $eqx$invariant.sv:436$1319_Y $eqx$invariant.sv:436$1318_Y $eqx$invariant.sv:436$1317_Y $eqx$invariant.sv:436$1316_Y $eqx$invariant.sv:436$1315_Y $eqx$invariant.sv:436$1314_Y $eqx$invariant.sv:436$1313_Y $eqx$invariant.sv:436$1312_Y $eqx$invariant.sv:436$1311_Y $eqx$invariant.sv:436$1310_Y $eqx$invariant.sv:436$1309_Y $eqx$invariant.sv:436$1308_Y $eqx$invariant.sv:436$1303_Y $eqx$invariant.sv:436$1302_Y $eqx$invariant.sv:436$1301_Y $eqx$invariant.sv:436$1298_Y $eqx$invariant.sv:436$1290_Y $eqx$invariant.sv:436$1287_Y }
+    Consolidated identical input bits for $mux cell $flatten\u_gate.$ternary$one-step.v:1469$334:
+      Old ports: A=0, B=32'11111111111111111111111111111111, Y=$flatten\u_gate.$ternary$one-step.v:1469$334_Y
+      New ports: A=1'0, B=1'1, Y=$flatten\u_gate.$ternary$one-step.v:1469$334_Y [0]
+      New connections: $flatten\u_gate.$ternary$one-step.v:1469$334_Y [31:1] = { $flatten\u_gate.$ternary$one-step.v:1469$334_Y [0] $flatten\u_gate.$ternary$one-step.v:1469$334_Y [0] $flatten\u_gate.$ternary$one-step.v:1469$334_Y [0] $flatten\u_gate.$ternary$one-step.v:1469$334_Y [0] $flatten\u_gate.$ternary$one-step.v:1469$334_Y [0] $flatten\u_gate.$ternary$one-step.v:1469$334_Y [0] $flatten\u_gate.$ternary$one-step.v:1469$334_Y [0] $flatten\u_gate.$ternary$one-step.v:1469$334_Y [0] $flatten\u_gate.$ternary$one-step.v:1469$334_Y [0] $flatten\u_gate.$ternary$one-step.v:1469$334_Y [0] $flatten\u_gate.$ternary$one-step.v:1469$334_Y [0] $flatten\u_gate.$ternary$one-step.v:1469$334_Y [0] $flatten\u_gate.$ternary$one-step.v:1469$334_Y [0] $flatten\u_gate.$ternary$one-step.v:1469$334_Y [0] $flatten\u_gate.$ternary$one-step.v:1469$334_Y [0] $flatten\u_gate.$ternary$one-step.v:1469$334_Y [0] $flatten\u_gate.$ternary$one-step.v:1469$334_Y [0] $flatten\u_gate.$ternary$one-step.v:1469$334_Y [0] $flatten\u_gate.$ternary$one-step.v:1469$334_Y [0] $flatten\u_gate.$ternary$one-step.v:1469$334_Y [0] $flatten\u_gate.$ternary$one-step.v:1469$334_Y [0] $flatten\u_gate.$ternary$one-step.v:1469$334_Y [0] $flatten\u_gate.$ternary$one-step.v:1469$334_Y [0] $flatten\u_gate.$ternary$one-step.v:1469$334_Y [0] $flatten\u_gate.$ternary$one-step.v:1469$334_Y [0] $flatten\u_gate.$ternary$one-step.v:1469$334_Y [0] $flatten\u_gate.$ternary$one-step.v:1469$334_Y [0] $flatten\u_gate.$ternary$one-step.v:1469$334_Y [0] $flatten\u_gate.$ternary$one-step.v:1469$334_Y [0] $flatten\u_gate.$ternary$one-step.v:1469$334_Y [0] $flatten\u_gate.$ternary$one-step.v:1469$334_Y [0] }
+    Consolidated identical input bits for $mux cell $flatten\u_gate.$ternary$one-step.v:1478$343:
+      Old ports: A=0, B=32'11111111111111111111111111111111, Y=$flatten\u_gate.$ternary$one-step.v:1478$343_Y
+      New ports: A=1'0, B=1'1, Y=$flatten\u_gate.$ternary$one-step.v:1478$343_Y [0]
+      New connections: $flatten\u_gate.$ternary$one-step.v:1478$343_Y [31:1] = { $flatten\u_gate.$ternary$one-step.v:1478$343_Y [0] $flatten\u_gate.$ternary$one-step.v:1478$343_Y [0] $flatten\u_gate.$ternary$one-step.v:1478$343_Y [0] $flatten\u_gate.$ternary$one-step.v:1478$343_Y [0] $flatten\u_gate.$ternary$one-step.v:1478$343_Y [0] $flatten\u_gate.$ternary$one-step.v:1478$343_Y [0] $flatten\u_gate.$ternary$one-step.v:1478$343_Y [0] $flatten\u_gate.$ternary$one-step.v:1478$343_Y [0] $flatten\u_gate.$ternary$one-step.v:1478$343_Y [0] $flatten\u_gate.$ternary$one-step.v:1478$343_Y [0] $flatten\u_gate.$ternary$one-step.v:1478$343_Y [0] $flatten\u_gate.$ternary$one-step.v:1478$343_Y [0] $flatten\u_gate.$ternary$one-step.v:1478$343_Y [0] $flatten\u_gate.$ternary$one-step.v:1478$343_Y [0] $flatten\u_gate.$ternary$one-step.v:1478$343_Y [0] $flatten\u_gate.$ternary$one-step.v:1478$343_Y [0] $flatten\u_gate.$ternary$one-step.v:1478$343_Y [0] $flatten\u_gate.$ternary$one-step.v:1478$343_Y [0] $flatten\u_gate.$ternary$one-step.v:1478$343_Y [0] $flatten\u_gate.$ternary$one-step.v:1478$343_Y [0] $flatten\u_gate.$ternary$one-step.v:1478$343_Y [0] $flatten\u_gate.$ternary$one-step.v:1478$343_Y [0] $flatten\u_gate.$ternary$one-step.v:1478$343_Y [0] $flatten\u_gate.$ternary$one-step.v:1478$343_Y [0] $flatten\u_gate.$ternary$one-step.v:1478$343_Y [0] $flatten\u_gate.$ternary$one-step.v:1478$343_Y [0] $flatten\u_gate.$ternary$one-step.v:1478$343_Y [0] $flatten\u_gate.$ternary$one-step.v:1478$343_Y [0] $flatten\u_gate.$ternary$one-step.v:1478$343_Y [0] $flatten\u_gate.$ternary$one-step.v:1478$343_Y [0] $flatten\u_gate.$ternary$one-step.v:1478$343_Y [0] }
+    Consolidated identical input bits for $mux cell $flatten\u_gate.$ternary$one-step.v:1490$355:
+      Old ports: A=0, B=32'11111111111111111111111111111111, Y=$flatten\u_gate.$ternary$one-step.v:1490$355_Y
+      New ports: A=1'0, B=1'1, Y=$flatten\u_gate.$ternary$one-step.v:1490$355_Y [0]
+      New connections: $flatten\u_gate.$ternary$one-step.v:1490$355_Y [31:1] = { $flatten\u_gate.$ternary$one-step.v:1490$355_Y [0] $flatten\u_gate.$ternary$one-step.v:1490$355_Y [0] $flatten\u_gate.$ternary$one-step.v:1490$355_Y [0] $flatten\u_gate.$ternary$one-step.v:1490$355_Y [0] $flatten\u_gate.$ternary$one-step.v:1490$355_Y [0] $flatten\u_gate.$ternary$one-step.v:1490$355_Y [0] $flatten\u_gate.$ternary$one-step.v:1490$355_Y [0] $flatten\u_gate.$ternary$one-step.v:1490$355_Y [0] $flatten\u_gate.$ternary$one-step.v:1490$355_Y [0] $flatten\u_gate.$ternary$one-step.v:1490$355_Y [0] $flatten\u_gate.$ternary$one-step.v:1490$355_Y [0] $flatten\u_gate.$ternary$one-step.v:1490$355_Y [0] $flatten\u_gate.$ternary$one-step.v:1490$355_Y [0] $flatten\u_gate.$ternary$one-step.v:1490$355_Y [0] $flatten\u_gate.$ternary$one-step.v:1490$355_Y [0] $flatten\u_gate.$ternary$one-step.v:1490$355_Y [0] $flatten\u_gate.$ternary$one-step.v:1490$355_Y [0] $flatten\u_gate.$ternary$one-step.v:1490$355_Y [0] $flatten\u_gate.$ternary$one-step.v:1490$355_Y [0] $flatten\u_gate.$ternary$one-step.v:1490$355_Y [0] $flatten\u_gate.$ternary$one-step.v:1490$355_Y [0] $flatten\u_gate.$ternary$one-step.v:1490$355_Y [0] $flatten\u_gate.$ternary$one-step.v:1490$355_Y [0] $flatten\u_gate.$ternary$one-step.v:1490$355_Y [0] $flatten\u_gate.$ternary$one-step.v:1490$355_Y [0] $flatten\u_gate.$ternary$one-step.v:1490$355_Y [0] $flatten\u_gate.$ternary$one-step.v:1490$355_Y [0] $flatten\u_gate.$ternary$one-step.v:1490$355_Y [0] $flatten\u_gate.$ternary$one-step.v:1490$355_Y [0] $flatten\u_gate.$ternary$one-step.v:1490$355_Y [0] $flatten\u_gate.$ternary$one-step.v:1490$355_Y [0] }
+    Consolidated identical input bits for $mux cell $flatten\u_gate.$ternary$one-step.v:1499$364:
+      Old ports: A=0, B=32'11111111111111111111111111111111, Y=$flatten\u_gate.$ternary$one-step.v:1499$364_Y
+      New ports: A=1'0, B=1'1, Y=$flatten\u_gate.$ternary$one-step.v:1499$364_Y [0]
+      New connections: $flatten\u_gate.$ternary$one-step.v:1499$364_Y [31:1] = { $flatten\u_gate.$ternary$one-step.v:1499$364_Y [0] $flatten\u_gate.$ternary$one-step.v:1499$364_Y [0] $flatten\u_gate.$ternary$one-step.v:1499$364_Y [0] $flatten\u_gate.$ternary$one-step.v:1499$364_Y [0] $flatten\u_gate.$ternary$one-step.v:1499$364_Y [0] $flatten\u_gate.$ternary$one-step.v:1499$364_Y [0] $flatten\u_gate.$ternary$one-step.v:1499$364_Y [0] $flatten\u_gate.$ternary$one-step.v:1499$364_Y [0] $flatten\u_gate.$ternary$one-step.v:1499$364_Y [0] $flatten\u_gate.$ternary$one-step.v:1499$364_Y [0] $flatten\u_gate.$ternary$one-step.v:1499$364_Y [0] $flatten\u_gate.$ternary$one-step.v:1499$364_Y [0] $flatten\u_gate.$ternary$one-step.v:1499$364_Y [0] $flatten\u_gate.$ternary$one-step.v:1499$364_Y [0] $flatten\u_gate.$ternary$one-step.v:1499$364_Y [0] $flatten\u_gate.$ternary$one-step.v:1499$364_Y [0] $flatten\u_gate.$ternary$one-step.v:1499$364_Y [0] $flatten\u_gate.$ternary$one-step.v:1499$364_Y [0] $flatten\u_gate.$ternary$one-step.v:1499$364_Y [0] $flatten\u_gate.$ternary$one-step.v:1499$364_Y [0] $flatten\u_gate.$ternary$one-step.v:1499$364_Y [0] $flatten\u_gate.$ternary$one-step.v:1499$364_Y [0] $flatten\u_gate.$ternary$one-step.v:1499$364_Y [0] $flatten\u_gate.$ternary$one-step.v:1499$364_Y [0] $flatten\u_gate.$ternary$one-step.v:1499$364_Y [0] $flatten\u_gate.$ternary$one-step.v:1499$364_Y [0] $flatten\u_gate.$ternary$one-step.v:1499$364_Y [0] $flatten\u_gate.$ternary$one-step.v:1499$364_Y [0] $flatten\u_gate.$ternary$one-step.v:1499$364_Y [0] $flatten\u_gate.$ternary$one-step.v:1499$364_Y [0] $flatten\u_gate.$ternary$one-step.v:1499$364_Y [0] }
+    Consolidated identical input bits for $mux cell $flatten\u_gold.$ternary$one-step.v:3258$996:
+      Old ports: A=0, B=32'11111111111111111111111111111111, Y=$flatten\u_gold.$ternary$one-step.v:3258$996_Y
+      New ports: A=1'0, B=1'1, Y=$flatten\u_gold.$ternary$one-step.v:3258$996_Y [0]
+      New connections: $flatten\u_gold.$ternary$one-step.v:3258$996_Y [31:1] = { $flatten\u_gold.$ternary$one-step.v:3258$996_Y [0] $flatten\u_gold.$ternary$one-step.v:3258$996_Y [0] $flatten\u_gold.$ternary$one-step.v:3258$996_Y [0] $flatten\u_gold.$ternary$one-step.v:3258$996_Y [0] $flatten\u_gold.$ternary$one-step.v:3258$996_Y [0] $flatten\u_gold.$ternary$one-step.v:3258$996_Y [0] $flatten\u_gold.$ternary$one-step.v:3258$996_Y [0] $flatten\u_gold.$ternary$one-step.v:3258$996_Y [0] $flatten\u_gold.$ternary$one-step.v:3258$996_Y [0] $flatten\u_gold.$ternary$one-step.v:3258$996_Y [0] $flatten\u_gold.$ternary$one-step.v:3258$996_Y [0] $flatten\u_gold.$ternary$one-step.v:3258$996_Y [0] $flatten\u_gold.$ternary$one-step.v:3258$996_Y [0] $flatten\u_gold.$ternary$one-step.v:3258$996_Y [0] $flatten\u_gold.$ternary$one-step.v:3258$996_Y [0] $flatten\u_gold.$ternary$one-step.v:3258$996_Y [0] $flatten\u_gold.$ternary$one-step.v:3258$996_Y [0] $flatten\u_gold.$ternary$one-step.v:3258$996_Y [0] $flatten\u_gold.$ternary$one-step.v:3258$996_Y [0] $flatten\u_gold.$ternary$one-step.v:3258$996_Y [0] $flatten\u_gold.$ternary$one-step.v:3258$996_Y [0] $flatten\u_gold.$ternary$one-step.v:3258$996_Y [0] $flatten\u_gold.$ternary$one-step.v:3258$996_Y [0] $flatten\u_gold.$ternary$one-step.v:3258$996_Y [0] $flatten\u_gold.$ternary$one-step.v:3258$996_Y [0] $flatten\u_gold.$ternary$one-step.v:3258$996_Y [0] $flatten\u_gold.$ternary$one-step.v:3258$996_Y [0] $flatten\u_gold.$ternary$one-step.v:3258$996_Y [0] $flatten\u_gold.$ternary$one-step.v:3258$996_Y [0] $flatten\u_gold.$ternary$one-step.v:3258$996_Y [0] $flatten\u_gold.$ternary$one-step.v:3258$996_Y [0] }
+    Consolidated identical input bits for $mux cell $flatten\u_gold.$ternary$one-step.v:3267$1005:
+      Old ports: A=0, B=32'11111111111111111111111111111111, Y=$flatten\u_gold.$ternary$one-step.v:3267$1005_Y
+      New ports: A=1'0, B=1'1, Y=$flatten\u_gold.$ternary$one-step.v:3267$1005_Y [0]
+      New connections: $flatten\u_gold.$ternary$one-step.v:3267$1005_Y [31:1] = { $flatten\u_gold.$ternary$one-step.v:3267$1005_Y [0] $flatten\u_gold.$ternary$one-step.v:3267$1005_Y [0] $flatten\u_gold.$ternary$one-step.v:3267$1005_Y [0] $flatten\u_gold.$ternary$one-step.v:3267$1005_Y [0] $flatten\u_gold.$ternary$one-step.v:3267$1005_Y [0] $flatten\u_gold.$ternary$one-step.v:3267$1005_Y [0] $flatten\u_gold.$ternary$one-step.v:3267$1005_Y [0] $flatten\u_gold.$ternary$one-step.v:3267$1005_Y [0] $flatten\u_gold.$ternary$one-step.v:3267$1005_Y [0] $flatten\u_gold.$ternary$one-step.v:3267$1005_Y [0] $flatten\u_gold.$ternary$one-step.v:3267$1005_Y [0] $flatten\u_gold.$ternary$one-step.v:3267$1005_Y [0] $flatten\u_gold.$ternary$one-step.v:3267$1005_Y [0] $flatten\u_gold.$ternary$one-step.v:3267$1005_Y [0] $flatten\u_gold.$ternary$one-step.v:3267$1005_Y [0] $flatten\u_gold.$ternary$one-step.v:3267$1005_Y [0] $flatten\u_gold.$ternary$one-step.v:3267$1005_Y [0] $flatten\u_gold.$ternary$one-step.v:3267$1005_Y [0] $flatten\u_gold.$ternary$one-step.v:3267$1005_Y [0] $flatten\u_gold.$ternary$one-step.v:3267$1005_Y [0] $flatten\u_gold.$ternary$one-step.v:3267$1005_Y [0] $flatten\u_gold.$ternary$one-step.v:3267$1005_Y [0] $flatten\u_gold.$ternary$one-step.v:3267$1005_Y [0] $flatten\u_gold.$ternary$one-step.v:3267$1005_Y [0] $flatten\u_gold.$ternary$one-step.v:3267$1005_Y [0] $flatten\u_gold.$ternary$one-step.v:3267$1005_Y [0] $flatten\u_gold.$ternary$one-step.v:3267$1005_Y [0] $flatten\u_gold.$ternary$one-step.v:3267$1005_Y [0] $flatten\u_gold.$ternary$one-step.v:3267$1005_Y [0] $flatten\u_gold.$ternary$one-step.v:3267$1005_Y [0] $flatten\u_gold.$ternary$one-step.v:3267$1005_Y [0] }
+    Consolidated identical input bits for $mux cell $flatten\u_gold.$ternary$one-step.v:3279$1017:
+      Old ports: A=0, B=32'11111111111111111111111111111111, Y=$flatten\u_gold.$ternary$one-step.v:3279$1017_Y
+      New ports: A=1'0, B=1'1, Y=$flatten\u_gold.$ternary$one-step.v:3279$1017_Y [0]
+      New connections: $flatten\u_gold.$ternary$one-step.v:3279$1017_Y [31:1] = { $flatten\u_gold.$ternary$one-step.v:3279$1017_Y [0] $flatten\u_gold.$ternary$one-step.v:3279$1017_Y [0] $flatten\u_gold.$ternary$one-step.v:3279$1017_Y [0] $flatten\u_gold.$ternary$one-step.v:3279$1017_Y [0] $flatten\u_gold.$ternary$one-step.v:3279$1017_Y [0] $flatten\u_gold.$ternary$one-step.v:3279$1017_Y [0] $flatten\u_gold.$ternary$one-step.v:3279$1017_Y [0] $flatten\u_gold.$ternary$one-step.v:3279$1017_Y [0] $flatten\u_gold.$ternary$one-step.v:3279$1017_Y [0] $flatten\u_gold.$ternary$one-step.v:3279$1017_Y [0] $flatten\u_gold.$ternary$one-step.v:3279$1017_Y [0] $flatten\u_gold.$ternary$one-step.v:3279$1017_Y [0] $flatten\u_gold.$ternary$one-step.v:3279$1017_Y [0] $flatten\u_gold.$ternary$one-step.v:3279$1017_Y [0] $flatten\u_gold.$ternary$one-step.v:3279$1017_Y [0] $flatten\u_gold.$ternary$one-step.v:3279$1017_Y [0] $flatten\u_gold.$ternary$one-step.v:3279$1017_Y [0] $flatten\u_gold.$ternary$one-step.v:3279$1017_Y [0] $flatten\u_gold.$ternary$one-step.v:3279$1017_Y [0] $flatten\u_gold.$ternary$one-step.v:3279$1017_Y [0] $flatten\u_gold.$ternary$one-step.v:3279$1017_Y [0] $flatten\u_gold.$ternary$one-step.v:3279$1017_Y [0] $flatten\u_gold.$ternary$one-step.v:3279$1017_Y [0] $flatten\u_gold.$ternary$one-step.v:3279$1017_Y [0] $flatten\u_gold.$ternary$one-step.v:3279$1017_Y [0] $flatten\u_gold.$ternary$one-step.v:3279$1017_Y [0] $flatten\u_gold.$ternary$one-step.v:3279$1017_Y [0] $flatten\u_gold.$ternary$one-step.v:3279$1017_Y [0] $flatten\u_gold.$ternary$one-step.v:3279$1017_Y [0] $flatten\u_gold.$ternary$one-step.v:3279$1017_Y [0] $flatten\u_gold.$ternary$one-step.v:3279$1017_Y [0] }
+    Consolidated identical input bits for $mux cell $flatten\u_gold.$ternary$one-step.v:3288$1026:
+      Old ports: A=0, B=32'11111111111111111111111111111111, Y=$flatten\u_gold.$ternary$one-step.v:3288$1026_Y
+      New ports: A=1'0, B=1'1, Y=$flatten\u_gold.$ternary$one-step.v:3288$1026_Y [0]
+      New connections: $flatten\u_gold.$ternary$one-step.v:3288$1026_Y [31:1] = { $flatten\u_gold.$ternary$one-step.v:3288$1026_Y [0] $flatten\u_gold.$ternary$one-step.v:3288$1026_Y [0] $flatten\u_gold.$ternary$one-step.v:3288$1026_Y [0] $flatten\u_gold.$ternary$one-step.v:3288$1026_Y [0] $flatten\u_gold.$ternary$one-step.v:3288$1026_Y [0] $flatten\u_gold.$ternary$one-step.v:3288$1026_Y [0] $flatten\u_gold.$ternary$one-step.v:3288$1026_Y [0] $flatten\u_gold.$ternary$one-step.v:3288$1026_Y [0] $flatten\u_gold.$ternary$one-step.v:3288$1026_Y [0] $flatten\u_gold.$ternary$one-step.v:3288$1026_Y [0] $flatten\u_gold.$ternary$one-step.v:3288$1026_Y [0] $flatten\u_gold.$ternary$one-step.v:3288$1026_Y [0] $flatten\u_gold.$ternary$one-step.v:3288$1026_Y [0] $flatten\u_gold.$ternary$one-step.v:3288$1026_Y [0] $flatten\u_gold.$ternary$one-step.v:3288$1026_Y [0] $flatten\u_gold.$ternary$one-step.v:3288$1026_Y [0] $flatten\u_gold.$ternary$one-step.v:3288$1026_Y [0] $flatten\u_gold.$ternary$one-step.v:3288$1026_Y [0] $flatten\u_gold.$ternary$one-step.v:3288$1026_Y [0] $flatten\u_gold.$ternary$one-step.v:3288$1026_Y [0] $flatten\u_gold.$ternary$one-step.v:3288$1026_Y [0] $flatten\u_gold.$ternary$one-step.v:3288$1026_Y [0] $flatten\u_gold.$ternary$one-step.v:3288$1026_Y [0] $flatten\u_gold.$ternary$one-step.v:3288$1026_Y [0] $flatten\u_gold.$ternary$one-step.v:3288$1026_Y [0] $flatten\u_gold.$ternary$one-step.v:3288$1026_Y [0] $flatten\u_gold.$ternary$one-step.v:3288$1026_Y [0] $flatten\u_gold.$ternary$one-step.v:3288$1026_Y [0] $flatten\u_gold.$ternary$one-step.v:3288$1026_Y [0] $flatten\u_gold.$ternary$one-step.v:3288$1026_Y [0] $flatten\u_gold.$ternary$one-step.v:3288$1026_Y [0] }
+  Optimizing cells in module \invariant.
+    Consolidated identical input bits for $mux cell $flatten\u_gate.$ternary$one-step.v:1484$349:
+      Old ports: A=\u_gate._062_, B=0, Y=$flatten\u_gate.$ternary$one-step.v:1484$349_Y
+      New ports: A=$flatten\u_gate.$ternary$one-step.v:1469$334_Y [0], B=1'0, Y=$flatten\u_gate.$ternary$one-step.v:1484$349_Y [0]
+      New connections: $flatten\u_gate.$ternary$one-step.v:1484$349_Y [31:1] = { $flatten\u_gate.$ternary$one-step.v:1484$349_Y [0] $flatten\u_gate.$ternary$one-step.v:1484$349_Y [0] $flatten\u_gate.$ternary$one-step.v:1484$349_Y [0] $flatten\u_gate.$ternary$one-step.v:1484$349_Y [0] $flatten\u_gate.$ternary$one-step.v:1484$349_Y [0] $flatten\u_gate.$ternary$one-step.v:1484$349_Y [0] $flatten\u_gate.$ternary$one-step.v:1484$349_Y [0] $flatten\u_gate.$ternary$one-step.v:1484$349_Y [0] $flatten\u_gate.$ternary$one-step.v:1484$349_Y [0] $flatten\u_gate.$ternary$one-step.v:1484$349_Y [0] $flatten\u_gate.$ternary$one-step.v:1484$349_Y [0] $flatten\u_gate.$ternary$one-step.v:1484$349_Y [0] $flatten\u_gate.$ternary$one-step.v:1484$349_Y [0] $flatten\u_gate.$ternary$one-step.v:1484$349_Y [0] $flatten\u_gate.$ternary$one-step.v:1484$349_Y [0] $flatten\u_gate.$ternary$one-step.v:1484$349_Y [0] $flatten\u_gate.$ternary$one-step.v:1484$349_Y [0] $flatten\u_gate.$ternary$one-step.v:1484$349_Y [0] $flatten\u_gate.$ternary$one-step.v:1484$349_Y [0] $flatten\u_gate.$ternary$one-step.v:1484$349_Y [0] $flatten\u_gate.$ternary$one-step.v:1484$349_Y [0] $flatten\u_gate.$ternary$one-step.v:1484$349_Y [0] $flatten\u_gate.$ternary$one-step.v:1484$349_Y [0] $flatten\u_gate.$ternary$one-step.v:1484$349_Y [0] $flatten\u_gate.$ternary$one-step.v:1484$349_Y [0] $flatten\u_gate.$ternary$one-step.v:1484$349_Y [0] $flatten\u_gate.$ternary$one-step.v:1484$349_Y [0] $flatten\u_gate.$ternary$one-step.v:1484$349_Y [0] $flatten\u_gate.$ternary$one-step.v:1484$349_Y [0] $flatten\u_gate.$ternary$one-step.v:1484$349_Y [0] $flatten\u_gate.$ternary$one-step.v:1484$349_Y [0] }
+    Consolidated identical input bits for $mux cell $flatten\u_gate.$ternary$one-step.v:1505$370:
+      Old ports: A=\u_gate._059_, B=0, Y=$flatten\u_gate.$ternary$one-step.v:1505$370_Y
+      New ports: A=$flatten\u_gate.$ternary$one-step.v:1490$355_Y [0], B=1'0, Y=$flatten\u_gate.$ternary$one-step.v:1505$370_Y [0]
+      New connections: $flatten\u_gate.$ternary$one-step.v:1505$370_Y [31:1] = { $flatten\u_gate.$ternary$one-step.v:1505$370_Y [0] $flatten\u_gate.$ternary$one-step.v:1505$370_Y [0] $flatten\u_gate.$ternary$one-step.v:1505$370_Y [0] $flatten\u_gate.$ternary$one-step.v:1505$370_Y [0] $flatten\u_gate.$ternary$one-step.v:1505$370_Y [0] $flatten\u_gate.$ternary$one-step.v:1505$370_Y [0] $flatten\u_gate.$ternary$one-step.v:1505$370_Y [0] $flatten\u_gate.$ternary$one-step.v:1505$370_Y [0] $flatten\u_gate.$ternary$one-step.v:1505$370_Y [0] $flatten\u_gate.$ternary$one-step.v:1505$370_Y [0] $flatten\u_gate.$ternary$one-step.v:1505$370_Y [0] $flatten\u_gate.$ternary$one-step.v:1505$370_Y [0] $flatten\u_gate.$ternary$one-step.v:1505$370_Y [0] $flatten\u_gate.$ternary$one-step.v:1505$370_Y [0] $flatten\u_gate.$ternary$one-step.v:1505$370_Y [0] $flatten\u_gate.$ternary$one-step.v:1505$370_Y [0] $flatten\u_gate.$ternary$one-step.v:1505$370_Y [0] $flatten\u_gate.$ternary$one-step.v:1505$370_Y [0] $flatten\u_gate.$ternary$one-step.v:1505$370_Y [0] $flatten\u_gate.$ternary$one-step.v:1505$370_Y [0] $flatten\u_gate.$ternary$one-step.v:1505$370_Y [0] $flatten\u_gate.$ternary$one-step.v:1505$370_Y [0] $flatten\u_gate.$ternary$one-step.v:1505$370_Y [0] $flatten\u_gate.$ternary$one-step.v:1505$370_Y [0] $flatten\u_gate.$ternary$one-step.v:1505$370_Y [0] $flatten\u_gate.$ternary$one-step.v:1505$370_Y [0] $flatten\u_gate.$ternary$one-step.v:1505$370_Y [0] $flatten\u_gate.$ternary$one-step.v:1505$370_Y [0] $flatten\u_gate.$ternary$one-step.v:1505$370_Y [0] $flatten\u_gate.$ternary$one-step.v:1505$370_Y [0] $flatten\u_gate.$ternary$one-step.v:1505$370_Y [0] }
+    Consolidated identical input bits for $mux cell $flatten\u_gate.$ternary$one-step.v:1514$379:
+      Old ports: A=\u_gate._036_, B=0, Y=$flatten\u_gate.$ternary$one-step.v:1514$379_Y
+      New ports: A=$flatten\u_gate.$ternary$one-step.v:1478$343_Y [0], B=1'0, Y=$flatten\u_gate.$ternary$one-step.v:1514$379_Y [0]
+      New connections: $flatten\u_gate.$ternary$one-step.v:1514$379_Y [31:1] = { $flatten\u_gate.$ternary$one-step.v:1514$379_Y [0] $flatten\u_gate.$ternary$one-step.v:1514$379_Y [0] $flatten\u_gate.$ternary$one-step.v:1514$379_Y [0] $flatten\u_gate.$ternary$one-step.v:1514$379_Y [0] $flatten\u_gate.$ternary$one-step.v:1514$379_Y [0] $flatten\u_gate.$ternary$one-step.v:1514$379_Y [0] $flatten\u_gate.$ternary$one-step.v:1514$379_Y [0] $flatten\u_gate.$ternary$one-step.v:1514$379_Y [0] $flatten\u_gate.$ternary$one-step.v:1514$379_Y [0] $flatten\u_gate.$ternary$one-step.v:1514$379_Y [0] $flatten\u_gate.$ternary$one-step.v:1514$379_Y [0] $flatten\u_gate.$ternary$one-step.v:1514$379_Y [0] $flatten\u_gate.$ternary$one-step.v:1514$379_Y [0] $flatten\u_gate.$ternary$one-step.v:1514$379_Y [0] $flatten\u_gate.$ternary$one-step.v:1514$379_Y [0] $flatten\u_gate.$ternary$one-step.v:1514$379_Y [0] $flatten\u_gate.$ternary$one-step.v:1514$379_Y [0] $flatten\u_gate.$ternary$one-step.v:1514$379_Y [0] $flatten\u_gate.$ternary$one-step.v:1514$379_Y [0] $flatten\u_gate.$ternary$one-step.v:1514$379_Y [0] $flatten\u_gate.$ternary$one-step.v:1514$379_Y [0] $flatten\u_gate.$ternary$one-step.v:1514$379_Y [0] $flatten\u_gate.$ternary$one-step.v:1514$379_Y [0] $flatten\u_gate.$ternary$one-step.v:1514$379_Y [0] $flatten\u_gate.$ternary$one-step.v:1514$379_Y [0] $flatten\u_gate.$ternary$one-step.v:1514$379_Y [0] $flatten\u_gate.$ternary$one-step.v:1514$379_Y [0] $flatten\u_gate.$ternary$one-step.v:1514$379_Y [0] $flatten\u_gate.$ternary$one-step.v:1514$379_Y [0] $flatten\u_gate.$ternary$one-step.v:1514$379_Y [0] $flatten\u_gate.$ternary$one-step.v:1514$379_Y [0] }
+    Consolidated identical input bits for $mux cell $flatten\u_gate.$ternary$one-step.v:1520$385:
+      Old ports: A=\u_gate._030_, B=0, Y=$flatten\u_gate.$ternary$one-step.v:1520$385_Y
+      New ports: A=$flatten\u_gate.$ternary$one-step.v:1499$364_Y [0], B=1'0, Y=$flatten\u_gate.$ternary$one-step.v:1520$385_Y [0]
+      New connections: $flatten\u_gate.$ternary$one-step.v:1520$385_Y [31:1] = { $flatten\u_gate.$ternary$one-step.v:1520$385_Y [0] $flatten\u_gate.$ternary$one-step.v:1520$385_Y [0] $flatten\u_gate.$ternary$one-step.v:1520$385_Y [0] $flatten\u_gate.$ternary$one-step.v:1520$385_Y [0] $flatten\u_gate.$ternary$one-step.v:1520$385_Y [0] $flatten\u_gate.$ternary$one-step.v:1520$385_Y [0] $flatten\u_gate.$ternary$one-step.v:1520$385_Y [0] $flatten\u_gate.$ternary$one-step.v:1520$385_Y [0] $flatten\u_gate.$ternary$one-step.v:1520$385_Y [0] $flatten\u_gate.$ternary$one-step.v:1520$385_Y [0] $flatten\u_gate.$ternary$one-step.v:1520$385_Y [0] $flatten\u_gate.$ternary$one-step.v:1520$385_Y [0] $flatten\u_gate.$ternary$one-step.v:1520$385_Y [0] $flatten\u_gate.$ternary$one-step.v:1520$385_Y [0] $flatten\u_gate.$ternary$one-step.v:1520$385_Y [0] $flatten\u_gate.$ternary$one-step.v:1520$385_Y [0] $flatten\u_gate.$ternary$one-step.v:1520$385_Y [0] $flatten\u_gate.$ternary$one-step.v:1520$385_Y [0] $flatten\u_gate.$ternary$one-step.v:1520$385_Y [0] $flatten\u_gate.$ternary$one-step.v:1520$385_Y [0] $flatten\u_gate.$ternary$one-step.v:1520$385_Y [0] $flatten\u_gate.$ternary$one-step.v:1520$385_Y [0] $flatten\u_gate.$ternary$one-step.v:1520$385_Y [0] $flatten\u_gate.$ternary$one-step.v:1520$385_Y [0] $flatten\u_gate.$ternary$one-step.v:1520$385_Y [0] $flatten\u_gate.$ternary$one-step.v:1520$385_Y [0] $flatten\u_gate.$ternary$one-step.v:1520$385_Y [0] $flatten\u_gate.$ternary$one-step.v:1520$385_Y [0] $flatten\u_gate.$ternary$one-step.v:1520$385_Y [0] $flatten\u_gate.$ternary$one-step.v:1520$385_Y [0] $flatten\u_gate.$ternary$one-step.v:1520$385_Y [0] }
+    Consolidated identical input bits for $mux cell $flatten\u_gold.$ternary$one-step.v:3273$1011:
+      Old ports: A=\u_gold._062_, B=0, Y=$flatten\u_gold.$ternary$one-step.v:3273$1011_Y
+      New ports: A=$flatten\u_gold.$ternary$one-step.v:3258$996_Y [0], B=1'0, Y=$flatten\u_gold.$ternary$one-step.v:3273$1011_Y [0]
+      New connections: $flatten\u_gold.$ternary$one-step.v:3273$1011_Y [31:1] = { $flatten\u_gold.$ternary$one-step.v:3273$1011_Y [0] $flatten\u_gold.$ternary$one-step.v:3273$1011_Y [0] $flatten\u_gold.$ternary$one-step.v:3273$1011_Y [0] $flatten\u_gold.$ternary$one-step.v:3273$1011_Y [0] $flatten\u_gold.$ternary$one-step.v:3273$1011_Y [0] $flatten\u_gold.$ternary$one-step.v:3273$1011_Y [0] $flatten\u_gold.$ternary$one-step.v:3273$1011_Y [0] $flatten\u_gold.$ternary$one-step.v:3273$1011_Y [0] $flatten\u_gold.$ternary$one-step.v:3273$1011_Y [0] $flatten\u_gold.$ternary$one-step.v:3273$1011_Y [0] $flatten\u_gold.$ternary$one-step.v:3273$1011_Y [0] $flatten\u_gold.$ternary$one-step.v:3273$1011_Y [0] $flatten\u_gold.$ternary$one-step.v:3273$1011_Y [0] $flatten\u_gold.$ternary$one-step.v:3273$1011_Y [0] $flatten\u_gold.$ternary$one-step.v:3273$1011_Y [0] $flatten\u_gold.$ternary$one-step.v:3273$1011_Y [0] $flatten\u_gold.$ternary$one-step.v:3273$1011_Y [0] $flatten\u_gold.$ternary$one-step.v:3273$1011_Y [0] $flatten\u_gold.$ternary$one-step.v:3273$1011_Y [0] $flatten\u_gold.$ternary$one-step.v:3273$1011_Y [0] $flatten\u_gold.$ternary$one-step.v:3273$1011_Y [0] $flatten\u_gold.$ternary$one-step.v:3273$1011_Y [0] $flatten\u_gold.$ternary$one-step.v:3273$1011_Y [0] $flatten\u_gold.$ternary$one-step.v:3273$1011_Y [0] $flatten\u_gold.$ternary$one-step.v:3273$1011_Y [0] $flatten\u_gold.$ternary$one-step.v:3273$1011_Y [0] $flatten\u_gold.$ternary$one-step.v:3273$1011_Y [0] $flatten\u_gold.$ternary$one-step.v:3273$1011_Y [0] $flatten\u_gold.$ternary$one-step.v:3273$1011_Y [0] $flatten\u_gold.$ternary$one-step.v:3273$1011_Y [0] $flatten\u_gold.$ternary$one-step.v:3273$1011_Y [0] }
+    Consolidated identical input bits for $mux cell $flatten\u_gold.$ternary$one-step.v:3294$1032:
+      Old ports: A=\u_gold._059_, B=0, Y=$flatten\u_gold.$ternary$one-step.v:3294$1032_Y
+      New ports: A=$flatten\u_gold.$ternary$one-step.v:3279$1017_Y [0], B=1'0, Y=$flatten\u_gold.$ternary$one-step.v:3294$1032_Y [0]
+      New connections: $flatten\u_gold.$ternary$one-step.v:3294$1032_Y [31:1] = { $flatten\u_gold.$ternary$one-step.v:3294$1032_Y [0] $flatten\u_gold.$ternary$one-step.v:3294$1032_Y [0] $flatten\u_gold.$ternary$one-step.v:3294$1032_Y [0] $flatten\u_gold.$ternary$one-step.v:3294$1032_Y [0] $flatten\u_gold.$ternary$one-step.v:3294$1032_Y [0] $flatten\u_gold.$ternary$one-step.v:3294$1032_Y [0] $flatten\u_gold.$ternary$one-step.v:3294$1032_Y [0] $flatten\u_gold.$ternary$one-step.v:3294$1032_Y [0] $flatten\u_gold.$ternary$one-step.v:3294$1032_Y [0] $flatten\u_gold.$ternary$one-step.v:3294$1032_Y [0] $flatten\u_gold.$ternary$one-step.v:3294$1032_Y [0] $flatten\u_gold.$ternary$one-step.v:3294$1032_Y [0] $flatten\u_gold.$ternary$one-step.v:3294$1032_Y [0] $flatten\u_gold.$ternary$one-step.v:3294$1032_Y [0] $flatten\u_gold.$ternary$one-step.v:3294$1032_Y [0] $flatten\u_gold.$ternary$one-step.v:3294$1032_Y [0] $flatten\u_gold.$ternary$one-step.v:3294$1032_Y [0] $flatten\u_gold.$ternary$one-step.v:3294$1032_Y [0] $flatten\u_gold.$ternary$one-step.v:3294$1032_Y [0] $flatten\u_gold.$ternary$one-step.v:3294$1032_Y [0] $flatten\u_gold.$ternary$one-step.v:3294$1032_Y [0] $flatten\u_gold.$ternary$one-step.v:3294$1032_Y [0] $flatten\u_gold.$ternary$one-step.v:3294$1032_Y [0] $flatten\u_gold.$ternary$one-step.v:3294$1032_Y [0] $flatten\u_gold.$ternary$one-step.v:3294$1032_Y [0] $flatten\u_gold.$ternary$one-step.v:3294$1032_Y [0] $flatten\u_gold.$ternary$one-step.v:3294$1032_Y [0] $flatten\u_gold.$ternary$one-step.v:3294$1032_Y [0] $flatten\u_gold.$ternary$one-step.v:3294$1032_Y [0] $flatten\u_gold.$ternary$one-step.v:3294$1032_Y [0] $flatten\u_gold.$ternary$one-step.v:3294$1032_Y [0] }
+    Consolidated identical input bits for $mux cell $flatten\u_gold.$ternary$one-step.v:3303$1041:
+      Old ports: A=\u_gold._036_, B=0, Y=$flatten\u_gold.$ternary$one-step.v:3303$1041_Y
+      New ports: A=$flatten\u_gold.$ternary$one-step.v:3267$1005_Y [0], B=1'0, Y=$flatten\u_gold.$ternary$one-step.v:3303$1041_Y [0]
+      New connections: $flatten\u_gold.$ternary$one-step.v:3303$1041_Y [31:1] = { $flatten\u_gold.$ternary$one-step.v:3303$1041_Y [0] $flatten\u_gold.$ternary$one-step.v:3303$1041_Y [0] $flatten\u_gold.$ternary$one-step.v:3303$1041_Y [0] $flatten\u_gold.$ternary$one-step.v:3303$1041_Y [0] $flatten\u_gold.$ternary$one-step.v:3303$1041_Y [0] $flatten\u_gold.$ternary$one-step.v:3303$1041_Y [0] $flatten\u_gold.$ternary$one-step.v:3303$1041_Y [0] $flatten\u_gold.$ternary$one-step.v:3303$1041_Y [0] $flatten\u_gold.$ternary$one-step.v:3303$1041_Y [0] $flatten\u_gold.$ternary$one-step.v:3303$1041_Y [0] $flatten\u_gold.$ternary$one-step.v:3303$1041_Y [0] $flatten\u_gold.$ternary$one-step.v:3303$1041_Y [0] $flatten\u_gold.$ternary$one-step.v:3303$1041_Y [0] $flatten\u_gold.$ternary$one-step.v:3303$1041_Y [0] $flatten\u_gold.$ternary$one-step.v:3303$1041_Y [0] $flatten\u_gold.$ternary$one-step.v:3303$1041_Y [0] $flatten\u_gold.$ternary$one-step.v:3303$1041_Y [0] $flatten\u_gold.$ternary$one-step.v:3303$1041_Y [0] $flatten\u_gold.$ternary$one-step.v:3303$1041_Y [0] $flatten\u_gold.$ternary$one-step.v:3303$1041_Y [0] $flatten\u_gold.$ternary$one-step.v:3303$1041_Y [0] $flatten\u_gold.$ternary$one-step.v:3303$1041_Y [0] $flatten\u_gold.$ternary$one-step.v:3303$1041_Y [0] $flatten\u_gold.$ternary$one-step.v:3303$1041_Y [0] $flatten\u_gold.$ternary$one-step.v:3303$1041_Y [0] $flatten\u_gold.$ternary$one-step.v:3303$1041_Y [0] $flatten\u_gold.$ternary$one-step.v:3303$1041_Y [0] $flatten\u_gold.$ternary$one-step.v:3303$1041_Y [0] $flatten\u_gold.$ternary$one-step.v:3303$1041_Y [0] $flatten\u_gold.$ternary$one-step.v:3303$1041_Y [0] $flatten\u_gold.$ternary$one-step.v:3303$1041_Y [0] }
+    Consolidated identical input bits for $mux cell $flatten\u_gold.$ternary$one-step.v:3309$1047:
+      Old ports: A=\u_gold._030_, B=0, Y=$flatten\u_gold.$ternary$one-step.v:3309$1047_Y
+      New ports: A=$flatten\u_gold.$ternary$one-step.v:3288$1026_Y [0], B=1'0, Y=$flatten\u_gold.$ternary$one-step.v:3309$1047_Y [0]
+      New connections: $flatten\u_gold.$ternary$one-step.v:3309$1047_Y [31:1] = { $flatten\u_gold.$ternary$one-step.v:3309$1047_Y [0] $flatten\u_gold.$ternary$one-step.v:3309$1047_Y [0] $flatten\u_gold.$ternary$one-step.v:3309$1047_Y [0] $flatten\u_gold.$ternary$one-step.v:3309$1047_Y [0] $flatten\u_gold.$ternary$one-step.v:3309$1047_Y [0] $flatten\u_gold.$ternary$one-step.v:3309$1047_Y [0] $flatten\u_gold.$ternary$one-step.v:3309$1047_Y [0] $flatten\u_gold.$ternary$one-step.v:3309$1047_Y [0] $flatten\u_gold.$ternary$one-step.v:3309$1047_Y [0] $flatten\u_gold.$ternary$one-step.v:3309$1047_Y [0] $flatten\u_gold.$ternary$one-step.v:3309$1047_Y [0] $flatten\u_gold.$ternary$one-step.v:3309$1047_Y [0] $flatten\u_gold.$ternary$one-step.v:3309$1047_Y [0] $flatten\u_gold.$ternary$one-step.v:3309$1047_Y [0] $flatten\u_gold.$ternary$one-step.v:3309$1047_Y [0] $flatten\u_gold.$ternary$one-step.v:3309$1047_Y [0] $flatten\u_gold.$ternary$one-step.v:3309$1047_Y [0] $flatten\u_gold.$ternary$one-step.v:3309$1047_Y [0] $flatten\u_gold.$ternary$one-step.v:3309$1047_Y [0] $flatten\u_gold.$ternary$one-step.v:3309$1047_Y [0] $flatten\u_gold.$ternary$one-step.v:3309$1047_Y [0] $flatten\u_gold.$ternary$one-step.v:3309$1047_Y [0] $flatten\u_gold.$ternary$one-step.v:3309$1047_Y [0] $flatten\u_gold.$ternary$one-step.v:3309$1047_Y [0] $flatten\u_gold.$ternary$one-step.v:3309$1047_Y [0] $flatten\u_gold.$ternary$one-step.v:3309$1047_Y [0] $flatten\u_gold.$ternary$one-step.v:3309$1047_Y [0] $flatten\u_gold.$ternary$one-step.v:3309$1047_Y [0] $flatten\u_gold.$ternary$one-step.v:3309$1047_Y [0] $flatten\u_gold.$ternary$one-step.v:3309$1047_Y [0] $flatten\u_gold.$ternary$one-step.v:3309$1047_Y [0] }
+  Optimizing cells in module \invariant.
+    Consolidated identical input bits for $mux cell $flatten\u_gate.$ternary$one-step.v:1511$376:
+      Old ports: A=\u_gate._039_, B=0, Y=$flatten\u_gate.$ternary$one-step.v:1511$376_Y
+      New ports: A=$flatten\u_gate.$ternary$one-step.v:1484$349_Y [0], B=1'0, Y=$flatten\u_gate.$ternary$one-step.v:1511$376_Y [0]
+      New connections: $flatten\u_gate.$ternary$one-step.v:1511$376_Y [31:1] = { $flatten\u_gate.$ternary$one-step.v:1511$376_Y [0] $flatten\u_gate.$ternary$one-step.v:1511$376_Y [0] $flatten\u_gate.$ternary$one-step.v:1511$376_Y [0] $flatten\u_gate.$ternary$one-step.v:1511$376_Y [0] $flatten\u_gate.$ternary$one-step.v:1511$376_Y [0] $flatten\u_gate.$ternary$one-step.v:1511$376_Y [0] $flatten\u_gate.$ternary$one-step.v:1511$376_Y [0] $flatten\u_gate.$ternary$one-step.v:1511$376_Y [0] $flatten\u_gate.$ternary$one-step.v:1511$376_Y [0] $flatten\u_gate.$ternary$one-step.v:1511$376_Y [0] $flatten\u_gate.$ternary$one-step.v:1511$376_Y [0] $flatten\u_gate.$ternary$one-step.v:1511$376_Y [0] $flatten\u_gate.$ternary$one-step.v:1511$376_Y [0] $flatten\u_gate.$ternary$one-step.v:1511$376_Y [0] $flatten\u_gate.$ternary$one-step.v:1511$376_Y [0] $flatten\u_gate.$ternary$one-step.v:1511$376_Y [0] $flatten\u_gate.$ternary$one-step.v:1511$376_Y [0] $flatten\u_gate.$ternary$one-step.v:1511$376_Y [0] $flatten\u_gate.$ternary$one-step.v:1511$376_Y [0] $flatten\u_gate.$ternary$one-step.v:1511$376_Y [0] $flatten\u_gate.$ternary$one-step.v:1511$376_Y [0] $flatten\u_gate.$ternary$one-step.v:1511$376_Y [0] $flatten\u_gate.$ternary$one-step.v:1511$376_Y [0] $flatten\u_gate.$ternary$one-step.v:1511$376_Y [0] $flatten\u_gate.$ternary$one-step.v:1511$376_Y [0] $flatten\u_gate.$ternary$one-step.v:1511$376_Y [0] $flatten\u_gate.$ternary$one-step.v:1511$376_Y [0] $flatten\u_gate.$ternary$one-step.v:1511$376_Y [0] $flatten\u_gate.$ternary$one-step.v:1511$376_Y [0] $flatten\u_gate.$ternary$one-step.v:1511$376_Y [0] $flatten\u_gate.$ternary$one-step.v:1511$376_Y [0] }
+    Consolidated identical input bits for $mux cell $flatten\u_gate.$ternary$one-step.v:1517$382:
+      Old ports: A=\u_gate._033_, B=0, Y=$flatten\u_gate.$ternary$one-step.v:1517$382_Y
+      New ports: A=$flatten\u_gate.$ternary$one-step.v:1505$370_Y [0], B=1'0, Y=$flatten\u_gate.$ternary$one-step.v:1517$382_Y [0]
+      New connections: $flatten\u_gate.$ternary$one-step.v:1517$382_Y [31:1] = { $flatten\u_gate.$ternary$one-step.v:1517$382_Y [0] $flatten\u_gate.$ternary$one-step.v:1517$382_Y [0] $flatten\u_gate.$ternary$one-step.v:1517$382_Y [0] $flatten\u_gate.$ternary$one-step.v:1517$382_Y [0] $flatten\u_gate.$ternary$one-step.v:1517$382_Y [0] $flatten\u_gate.$ternary$one-step.v:1517$382_Y [0] $flatten\u_gate.$ternary$one-step.v:1517$382_Y [0] $flatten\u_gate.$ternary$one-step.v:1517$382_Y [0] $flatten\u_gate.$ternary$one-step.v:1517$382_Y [0] $flatten\u_gate.$ternary$one-step.v:1517$382_Y [0] $flatten\u_gate.$ternary$one-step.v:1517$382_Y [0] $flatten\u_gate.$ternary$one-step.v:1517$382_Y [0] $flatten\u_gate.$ternary$one-step.v:1517$382_Y [0] $flatten\u_gate.$ternary$one-step.v:1517$382_Y [0] $flatten\u_gate.$ternary$one-step.v:1517$382_Y [0] $flatten\u_gate.$ternary$one-step.v:1517$382_Y [0] $flatten\u_gate.$ternary$one-step.v:1517$382_Y [0] $flatten\u_gate.$ternary$one-step.v:1517$382_Y [0] $flatten\u_gate.$ternary$one-step.v:1517$382_Y [0] $flatten\u_gate.$ternary$one-step.v:1517$382_Y [0] $flatten\u_gate.$ternary$one-step.v:1517$382_Y [0] $flatten\u_gate.$ternary$one-step.v:1517$382_Y [0] $flatten\u_gate.$ternary$one-step.v:1517$382_Y [0] $flatten\u_gate.$ternary$one-step.v:1517$382_Y [0] $flatten\u_gate.$ternary$one-step.v:1517$382_Y [0] $flatten\u_gate.$ternary$one-step.v:1517$382_Y [0] $flatten\u_gate.$ternary$one-step.v:1517$382_Y [0] $flatten\u_gate.$ternary$one-step.v:1517$382_Y [0] $flatten\u_gate.$ternary$one-step.v:1517$382_Y [0] $flatten\u_gate.$ternary$one-step.v:1517$382_Y [0] $flatten\u_gate.$ternary$one-step.v:1517$382_Y [0] }
+    Consolidated identical input bits for $mux cell $flatten\u_gold.$ternary$one-step.v:3300$1038:
+      Old ports: A=\u_gold._039_, B=0, Y=$flatten\u_gold.$ternary$one-step.v:3300$1038_Y
+      New ports: A=$flatten\u_gold.$ternary$one-step.v:3273$1011_Y [0], B=1'0, Y=$flatten\u_gold.$ternary$one-step.v:3300$1038_Y [0]
+      New connections: $flatten\u_gold.$ternary$one-step.v:3300$1038_Y [31:1] = { $flatten\u_gold.$ternary$one-step.v:3300$1038_Y [0] $flatten\u_gold.$ternary$one-step.v:3300$1038_Y [0] $flatten\u_gold.$ternary$one-step.v:3300$1038_Y [0] $flatten\u_gold.$ternary$one-step.v:3300$1038_Y [0] $flatten\u_gold.$ternary$one-step.v:3300$1038_Y [0] $flatten\u_gold.$ternary$one-step.v:3300$1038_Y [0] $flatten\u_gold.$ternary$one-step.v:3300$1038_Y [0] $flatten\u_gold.$ternary$one-step.v:3300$1038_Y [0] $flatten\u_gold.$ternary$one-step.v:3300$1038_Y [0] $flatten\u_gold.$ternary$one-step.v:3300$1038_Y [0] $flatten\u_gold.$ternary$one-step.v:3300$1038_Y [0] $flatten\u_gold.$ternary$one-step.v:3300$1038_Y [0] $flatten\u_gold.$ternary$one-step.v:3300$1038_Y [0] $flatten\u_gold.$ternary$one-step.v:3300$1038_Y [0] $flatten\u_gold.$ternary$one-step.v:3300$1038_Y [0] $flatten\u_gold.$ternary$one-step.v:3300$1038_Y [0] $flatten\u_gold.$ternary$one-step.v:3300$1038_Y [0] $flatten\u_gold.$ternary$one-step.v:3300$1038_Y [0] $flatten\u_gold.$ternary$one-step.v:3300$1038_Y [0] $flatten\u_gold.$ternary$one-step.v:3300$1038_Y [0] $flatten\u_gold.$ternary$one-step.v:3300$1038_Y [0] $flatten\u_gold.$ternary$one-step.v:3300$1038_Y [0] $flatten\u_gold.$ternary$one-step.v:3300$1038_Y [0] $flatten\u_gold.$ternary$one-step.v:3300$1038_Y [0] $flatten\u_gold.$ternary$one-step.v:3300$1038_Y [0] $flatten\u_gold.$ternary$one-step.v:3300$1038_Y [0] $flatten\u_gold.$ternary$one-step.v:3300$1038_Y [0] $flatten\u_gold.$ternary$one-step.v:3300$1038_Y [0] $flatten\u_gold.$ternary$one-step.v:3300$1038_Y [0] $flatten\u_gold.$ternary$one-step.v:3300$1038_Y [0] $flatten\u_gold.$ternary$one-step.v:3300$1038_Y [0] }
+    Consolidated identical input bits for $mux cell $flatten\u_gold.$ternary$one-step.v:3306$1044:
+      Old ports: A=\u_gold._033_, B=0, Y=$flatten\u_gold.$ternary$one-step.v:3306$1044_Y
+      New ports: A=$flatten\u_gold.$ternary$one-step.v:3294$1032_Y [0], B=1'0, Y=$flatten\u_gold.$ternary$one-step.v:3306$1044_Y [0]
+      New connections: $flatten\u_gold.$ternary$one-step.v:3306$1044_Y [31:1] = { $flatten\u_gold.$ternary$one-step.v:3306$1044_Y [0] $flatten\u_gold.$ternary$one-step.v:3306$1044_Y [0] $flatten\u_gold.$ternary$one-step.v:3306$1044_Y [0] $flatten\u_gold.$ternary$one-step.v:3306$1044_Y [0] $flatten\u_gold.$ternary$one-step.v:3306$1044_Y [0] $flatten\u_gold.$ternary$one-step.v:3306$1044_Y [0] $flatten\u_gold.$ternary$one-step.v:3306$1044_Y [0] $flatten\u_gold.$ternary$one-step.v:3306$1044_Y [0] $flatten\u_gold.$ternary$one-step.v:3306$1044_Y [0] $flatten\u_gold.$ternary$one-step.v:3306$1044_Y [0] $flatten\u_gold.$ternary$one-step.v:3306$1044_Y [0] $flatten\u_gold.$ternary$one-step.v:3306$1044_Y [0] $flatten\u_gold.$ternary$one-step.v:3306$1044_Y [0] $flatten\u_gold.$ternary$one-step.v:3306$1044_Y [0] $flatten\u_gold.$ternary$one-step.v:3306$1044_Y [0] $flatten\u_gold.$ternary$one-step.v:3306$1044_Y [0] $flatten\u_gold.$ternary$one-step.v:3306$1044_Y [0] $flatten\u_gold.$ternary$one-step.v:3306$1044_Y [0] $flatten\u_gold.$ternary$one-step.v:3306$1044_Y [0] $flatten\u_gold.$ternary$one-step.v:3306$1044_Y [0] $flatten\u_gold.$ternary$one-step.v:3306$1044_Y [0] $flatten\u_gold.$ternary$one-step.v:3306$1044_Y [0] $flatten\u_gold.$ternary$one-step.v:3306$1044_Y [0] $flatten\u_gold.$ternary$one-step.v:3306$1044_Y [0] $flatten\u_gold.$ternary$one-step.v:3306$1044_Y [0] $flatten\u_gold.$ternary$one-step.v:3306$1044_Y [0] $flatten\u_gold.$ternary$one-step.v:3306$1044_Y [0] $flatten\u_gold.$ternary$one-step.v:3306$1044_Y [0] $flatten\u_gold.$ternary$one-step.v:3306$1044_Y [0] $flatten\u_gold.$ternary$one-step.v:3306$1044_Y [0] $flatten\u_gold.$ternary$one-step.v:3306$1044_Y [0] }
+  Optimizing cells in module \invariant.
+Performed a total of 21 changes.
+
+7.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\invariant'.
+<suppressed ~522 debug messages>
+Removed a total of 174 cells.
+
+7.6. Executing OPT_SHARE pass.
+
+7.7. Executing OPT_DFF pass (perform DFF optimizations).
+
+7.8. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \invariant..
+Removed 0 unused cells and 1338 unused wires.
+<suppressed ~1 debug messages>
+
+7.9. Executing OPT_EXPR pass (perform const folding).
+Optimizing module invariant.
+<suppressed ~57 debug messages>
+
+7.10. Rerunning OPT passes. (Maybe there is more to do..)
+
+7.11. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \invariant..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:1133$142.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:1133$142.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:1136$145.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:1136$145.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:1137$146.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:1137$146.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:1138$147.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:1138$147.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:1150$159.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:1150$159.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:1155$164.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:1155$164.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:1156$165.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:1156$165.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:1158$167.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:1158$167.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:1248$238.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:1248$238.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:1260$250.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:1260$250.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:1264$254.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:1264$254.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:1268$258.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:1268$258.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:1289$279.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:1289$279.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:1292$282.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:1292$282.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:1295$285.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:1295$285.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:1298$288.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:1298$288.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:1359$311.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:1359$311.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:1361$313.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:1361$313.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:1363$315.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:1363$315.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:1365$317.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:1365$317.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:1367$319.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:1367$319.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:1369$321.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:1369$321.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:1523$388.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:1523$388.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:1524$389.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:1524$389.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:1525$390.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:1525$390.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:1526$391.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:1526$391.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:1631$511.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:1631$511.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:1633$513.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:1633$513.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:1634$514.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:1634$514.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:1652$532.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:1652$532.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:1653$533.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:1653$533.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:1654$534.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:1654$534.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:1655$535.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:1655$535.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:1656$536.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:1656$536.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:1657$537.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:1657$537.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:1658$538.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:1658$538.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:1659$539.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:1659$539.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:1663$543.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:1663$543.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:1664$544.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:1664$544.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:1667$547.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:1667$547.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:1668$548.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:1668$548.
+    dead port 1/2 on $mux $flatten\u_gate.$ternary$one-step.v:1674$554.
+    dead port 2/2 on $mux $flatten\u_gate.$ternary$one-step.v:1674$554.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:2910$792.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:2910$792.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:2911$793.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:2911$793.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:2913$795.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:2913$795.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:2914$796.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:2914$796.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:2916$798.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:2916$798.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:2917$799.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:2917$799.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:2920$802.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:2920$802.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:2926$808.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:2926$808.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:2927$809.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:2927$809.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:2929$811.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:2929$811.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:2930$812.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:2930$812.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:2932$814.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:2932$814.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:2933$815.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:2933$815.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:2935$817.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:2935$817.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:2938$820.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:2938$820.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:2939$821.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:2939$821.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:2945$827.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:2945$827.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:2986$849.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:2986$849.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:2987$850.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:2987$850.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:2988$851.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:2988$851.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:3025$888.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:3025$888.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:3041$904.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:3041$904.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:3045$908.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:3045$908.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:3069$932.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:3069$932.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:3090$953.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:3090$953.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:3093$956.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:3093$956.
+    dead port 1/2 on $mux $flatten\u_gold.$ternary$one-step.v:3102$965.
+    dead port 2/2 on $mux $flatten\u_gold.$ternary$one-step.v:3102$965.
+Removed 138 multiplexer ports.
+<suppressed ~99 debug messages>
+
+7.12. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \invariant.
+Performed a total of 0 changes.
+
+7.13. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\invariant'.
+Removed a total of 0 cells.
+
+7.14. Executing OPT_SHARE pass.
+
+7.15. Executing OPT_DFF pass (perform DFF optimizations).
+
+7.16. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \invariant..
+Removed 6 unused cells and 234 unused wires.
+<suppressed ~211 debug messages>
+
+7.17. Executing OPT_EXPR pass (perform const folding).
+Optimizing module invariant.
+<suppressed ~66 debug messages>
+
+7.18. Rerunning OPT passes. (Maybe there is more to do..)
+
+7.19. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \invariant..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~94 debug messages>
+
+7.20. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \invariant.
+Performed a total of 0 changes.
+
+7.21. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\invariant'.
+Removed a total of 0 cells.
+
+7.22. Executing OPT_SHARE pass.
+
+7.23. Executing OPT_DFF pass (perform DFF optimizations).
+
+7.24. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \invariant..
+
+7.25. Executing OPT_EXPR pass (perform const folding).
+Optimizing module invariant.
+
+7.26. Finished OPT passes. (There is nothing left to do.)
+
+8. Executing CHECK pass (checking for obvious problems).
+Checking module invariant...
+Found and reported 0 problems.
+
+9. Executing SAT pass (solving SAT problems in the circuit).
+
+Setting up SAT problem:
+Final constraint equation: { } = { }
+Import def constraint for this timestep: \out_read_data_valid
+Import def constraint for this timestep: \out_ready
+Import def constraint for this timestep: \previous_burst_q
+Import def constraint for this timestep: \previous_allocate_q
+Import def constraint for this timestep: \previous_cancelled_q
+Import def constraint for this timestep: \previous_code_q
+Import def constraint for this timestep: \previous_refresh_q
+Import def constraint for this timestep: \out_accept
+Import def constraint for this timestep: \previous_write_q
+Import def constraint for this timestep: \reset
+Import def constraint for this timestep: \clk
+Import def constraint for this timestep: \cancel_cpu
+Import def constraint for this timestep: \enable
+Import def constraint for this timestep: \in_code_fetch
+Import def constraint for this timestep: \in_command_valid
+Import def constraint for this timestep: \in_burst
+Import def constraint for this timestep: \in_refresh
+Import def constraint for this timestep: \in_write
+Import def constraint for this timestep: \in_valid
+Import def constraint for this timestep: \previous_lookup_valid1_q_gate
+Import def constraint for this timestep: \previous_lookup_valid1_q_gold
+Import def constraint for this timestep: \previous_replace_way_q_gate
+Import def constraint for this timestep: \previous_replace_way_q_gold
+Import def constraint for this timestep: \previous_lookup_valid0_q_gate
+Import def constraint for this timestep: \previous_lookup_valid0_q_gold
+Import def constraint for this timestep: \previous_lanes_q
+Import def constraint for this timestep: \previous_owner_q
+Import def constraint for this timestep: \previous_state_q
+Import def constraint for this timestep: \in_byte_enable
+Import def constraint for this timestep: \in_owner
+Import def constraint for this timestep: \previous_class_q
+Import def constraint for this timestep: \in_cycle_class
+Import def constraint for this timestep: \previous_index_q
+Import def constraint for this timestep: \out_read_data
+Import def constraint for this timestep: \previous_data_q
+Import def constraint for this timestep: \in_data_out
+Import def constraint for this timestep: \previous_address_q
+Import def constraint for this timestep: \in_address
+Import def constraint for this timestep: \previous_debug_write_update_count
+Import def constraint for this timestep: \previous_debug_miss_count
+Import def constraint for this timestep: \previous_debug_hit_count
+Import def constraint for this timestep: \previous_debug_fill_count
+Import def constraint for this timestep: \previous_lookup1_q
+Import def constraint for this timestep: \previous_lookup0_q
+Import def constraint for this timestep: \memory_words0_q_RD_DATA
+Import def constraint for this timestep: \memory_words1_q_RD_DATA
+Import def constraint for this timestep: \previous_replace_q
+Import def constraint for this timestep: \previous_valid0_q
+Import def constraint for this timestep: \previous_valid1_q
+Imported 353 cells to SAT database.
+Import proof-constraint: \reset_ok = 1'1
+Final proof equation: \reset_ok = 1'1
+Import show expression: \relation
+Import show expression: \outputs_equal
+Import show expression: \next_relation
+Import show expression: \output_matches
+Import show expression: \reset
+Import show expression: \previous_state_q
+
+Solving problem with 544811 variables and 1511547 clauses..
+SAT proof finished - no model found: SUCCESS!
+
+                  /$$$$$$      /$$$$$$$$     /$$$$$$$    
+                 /$$__  $$    | $$_____/    | $$__  $$   
+                | $$  \ $$    | $$          | $$  \ $$   
+                | $$  | $$    | $$$$$       | $$  | $$   
+                | $$  | $$    | $$__/       | $$  | $$   
+                | $$/$$ $$    | $$          | $$  | $$   
+                |  $$$$$$/ /$$| $$$$$$$$ /$$| $$$$$$$//$$
+                 \____ $$$|__/|________/|__/|_______/|__/
+                       \__/                              
+
+End of script. Logfile hash: d110cc5978, CPU: user 7.44s system 0.35s, MEM: 439.23 MB peak
+Yosys 0.33 (git sha1 2584903a060)
+Time spent: 58% 1x sat (4 sec), 17% 3x opt_clean (1 sec), ...

@@ -1,0 +1,60 @@
+{
+  "status": "AT_DATA_QUALIFIED_IDLE_FUTURE_HIT_PASS",
+  "sources": {
+    "/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_integration/spk286_at_sdram_data_buffer.sv": "e6724ac5dc81bd195c46d171e5b7d46b6bbac3ff7dc031331c732655ae62da1a",
+    "/mnt/d/GitHub/PCAT-286_MiSTer/build/fixed50-data-proof-review-20261003/qualified-source/spk286_at_sdram_data_buffer.sv": "a5f02e667748ba028299a18fdc67718d7c63cc9b0db791050bb16e7b7fe5a05b",
+    "/mnt/d/GitHub/PCAT-286_MiSTer/build/fixed50-data-proof-review-20261003/qualified-idle/idle_metadata_tb.sv": "30ad95cdcebd609f76f996e144341c726c18e67b66cbef5707833d70ab9c6f73",
+    "/mnt/d/GitHub/PCAT-286_MiSTer/build/fixed50-data-proof-review-20261003/idle-tag-assertion/idle_metadata_tb.sv": "7882dbb5cf926505cb707a70e1906cb6ce386d28f76210e34cfd0379c1a46350",
+    "/mnt/d/GitHub/PCAT-286_MiSTer/build/fixed50-data-proof-review-20261003/qualified-tests/run.py": "5b34e6553754ac6149b93530a098e5a3ad762cef2b276c9f7603dbc0e267dfae"
+  },
+  "bench_delta_guard": "Exact original reproducer except final PASS block adds read_word(2), asserts accepted/completed4 physical3 hits1 miss/fill3, then reports PASS. Original read-data checks, all inactive-IDLE handshake/counter guards, and all DUT active assertions preserved.",
+  "scope": "Actual512-word baseline and qualified candidate with assertions enabled. Three initial physical reads2,514,0, unowned-IDLE address change, then legitimate cache-hit read2. No private writes, forces, or explicit RAM initialization.",
+  "runs": [
+    {
+      "name": "baseline",
+      "exit_code": 0,
+      "build_command": [
+        "verilator",
+        "--binary",
+        "--timing",
+        "--assert",
+        "-j",
+        "2",
+        "-Wno-fatal",
+        "--top-module",
+        "idle_metadata_tb",
+        "--Mdir",
+        "/mnt/d/GitHub/PCAT-286_MiSTer/build/fixed50-data-proof-review-20261003/qualified-idle/baseline/obj",
+        "-o",
+        "idle_hit",
+        "/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_integration/spk286_at_sdram_data_buffer.sv",
+        "/mnt/d/GitHub/PCAT-286_MiSTer/build/fixed50-data-proof-review-20261003/qualified-idle/idle_metadata_tb.sv"
+      ],
+      "build_log_sha256": "5bd321ee709e09020aa87a4d1e7917c9490f6c682a5cf43487c5f17f304787b6",
+      "run_log_sha256": "4d602ef3bb38bd95cd500c3a3435d2215378fae89a63f7459a7811ea50079156"
+    },
+    {
+      "name": "qualified",
+      "exit_code": 0,
+      "build_command": [
+        "verilator",
+        "--binary",
+        "--timing",
+        "--assert",
+        "-j",
+        "2",
+        "-Wno-fatal",
+        "--top-module",
+        "idle_metadata_tb",
+        "--Mdir",
+        "/mnt/d/GitHub/PCAT-286_MiSTer/build/fixed50-data-proof-review-20261003/qualified-idle/qualified/obj",
+        "-o",
+        "idle_hit",
+        "/mnt/d/GitHub/PCAT-286_MiSTer/build/fixed50-data-proof-review-20261003/qualified-source/spk286_at_sdram_data_buffer.sv",
+        "/mnt/d/GitHub/PCAT-286_MiSTer/build/fixed50-data-proof-review-20261003/qualified-idle/idle_metadata_tb.sv"
+      ],
+      "build_log_sha256": "45ad4e9c2f491d5ff495d770df0bb812d9bf1caf6dabd098f1695269bd744bb6",
+      "run_log_sha256": "88e4dcd7e9a4841694a35ce789eb84bfaa1d3a809fc68224dd939390f5c51b6c"
+    }
+  ]
+}

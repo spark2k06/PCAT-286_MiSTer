@@ -1,0 +1,62 @@
+{
+  "status": "AT_DATA_METADATA_IDLE_ASSERTION_COUNTEREXAMPLE_REPRODUCED",
+  "sources": {
+    "/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_integration/spk286_at_sdram_data_buffer.sv": "e6724ac5dc81bd195c46d171e5b7d46b6bbac3ff7dc031331c732655ae62da1a",
+    "/mnt/d/GitHub/PCAT-286_MiSTer/build/fixed50-data-proof-review-20261003/candidate.sv": "d386a62809000e5f2e25a3eb3b9f382ef9265b77d3893a7e05acefb80151568d",
+    "/mnt/d/GitHub/PCAT-286_MiSTer/build/fixed50-data-proof-review-20261003/candidate-source/spk286_at_sdram_data_buffer.sv": "d386a62809000e5f2e25a3eb3b9f382ef9265b77d3893a7e05acefb80151568d",
+    "/mnt/d/GitHub/PCAT-286_MiSTer/build/fixed50-data-proof-review-20261003/idle-tag-assertion/idle_metadata_tb.sv": "7882dbb5cf926505cb707a70e1906cb6ce386d28f76210e34cfd0379c1a46350",
+    "/mnt/d/GitHub/PCAT-286_MiSTer/build/fixed50-data-proof-review-20261003/idle-tag-assertion/run.py": "220d6f3f9056a25ebb75ed5908cbe1f7834da663b9c31c014df597645c700a4c"
+  },
+  "scope": "Exploratory IDLE-only private tag-qualification assertion counterexample, using actual512-word DUTs and actual assertions enabled. Three legitimate public request/response reads prepopulate the cache. No hierarchical writes or forces; read-only observations of private tags/metadata. Verilator default zero power-up uninitialized tag RAM is one allowed arbitrary initial storage pattern.",
+  "runs": [
+    {
+      "name": "baseline",
+      "exit_code": 0,
+      "elapsed_seconds": 0.024,
+      "build_command": [
+        "verilator",
+        "--binary",
+        "--timing",
+        "--assert",
+        "-j",
+        "2",
+        "-Wno-fatal",
+        "--top-module",
+        "idle_metadata_tb",
+        "--Mdir",
+        "/mnt/d/GitHub/PCAT-286_MiSTer/build/fixed50-data-proof-review-20261003/idle-tag-assertion/baseline/obj",
+        "-o",
+        "idle_assertion",
+        "/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_integration/spk286_at_sdram_data_buffer.sv",
+        "/mnt/d/GitHub/PCAT-286_MiSTer/build/fixed50-data-proof-review-20261003/idle-tag-assertion/idle_metadata_tb.sv"
+      ],
+      "build_log_sha256": "b01e672f06b9b0e0f0a613bd53a60f661708cbdf143b01c42a4898b3e0638f47",
+      "run_log_sha256": "eb2d1a140557cb4882d3e58d71a6264a1a9e45d88b7a5dc3c8036395372416b1"
+    },
+    {
+      "name": "candidate",
+      "exit_code": -6,
+      "elapsed_seconds": 0.828,
+      "build_command": [
+        "verilator",
+        "--binary",
+        "--timing",
+        "--assert",
+        "-j",
+        "2",
+        "-Wno-fatal",
+        "--top-module",
+        "idle_metadata_tb",
+        "--Mdir",
+        "/mnt/d/GitHub/PCAT-286_MiSTer/build/fixed50-data-proof-review-20261003/idle-tag-assertion/candidate/obj",
+        "-o",
+        "idle_assertion",
+        "/mnt/d/GitHub/PCAT-286_MiSTer/build/fixed50-data-proof-review-20261003/candidate-source/spk286_at_sdram_data_buffer.sv",
+        "/mnt/d/GitHub/PCAT-286_MiSTer/build/fixed50-data-proof-review-20261003/idle-tag-assertion/idle_metadata_tb.sv"
+      ],
+      "build_log_sha256": "d13d7f24140d208a8dfe15e8e8075c169efb34821872fd9b7fbe2557371b6514",
+      "run_log_sha256": "db41af12ffae40d46e46e9baa34c824180356b1904d518f6c9b998477cdf5842"
+    }
+  ],
+  "conclusion": "Baseline passes; candidate trips unchanged unqualified tag_hit0&&tag_hit1 assertion only during IDLE after raw input-address change without request, acceptance, completion, or backend side effect. This is not a demonstrated architectural/data-path mismatch; it is an actual assertion incompatibility of the exploratory candidate."
+}

@@ -129,7 +129,11 @@ module spk286_at_mister_sdram_owner #(
     // packed word layout.  The old {mapped_address[23:1], 1'b0} expression
     // aligned a byte address down and produced a sparse word layout; it was
     // not a left shift.  Loader and CPU share this mapper in either layout.
-    assign kf_address = write_admission ? request_address[24:1] : address_q[24:1];
+    // An idle inactive owner uses the live payload for immediate write
+    // admission; launched commands use the retained record. Outside IDLE,
+    // retain the address even after early read completion.
+    assign kf_address = (kf_idle && !active_q)
+                      ? request_address[24:1] : address_q[24:1];
     assign kf_data_in = data_out_q;
 
     always_comb begin

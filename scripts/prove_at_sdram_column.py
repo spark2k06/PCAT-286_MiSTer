@@ -16,13 +16,16 @@ def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('reference', type=Path)
     p.add_argument('--output', type=Path, required=True)
+    p.add_argument('--candidate-root', type=Path, default=ROOT)
+    p.add_argument('--rewrite', choices=('column', 'active-address'), default='column')
     a = p.parse_args()
     out = a.output.resolve()
     out.mkdir(parents=True, exist_ok=False)
     before_owner = (a.reference.resolve() / OWNER).read_text()
-    after_owner = (ROOT / OWNER).read_text()
+    candidate_root = a.candidate_root.resolve()
+    after_owner = (candidate_root / OWNER).read_text()
     before_controller = (a.reference.resolve() / CONTROLLER).read_text()
-    after_controller = (ROOT / CONTROLLER).read_text()
+    after_controller = (candidate_root / CONTROLLER).read_text()
     owner_changes = [
         ('.sdram_force_refresh  (SDRAM_FORCE_REFRESH),\n        .use_column_address_input(1\'b1)',
          '.sdram_force_refresh  (SDRAM_FORCE_REFRESH)'),
@@ -41,6 +44,15 @@ def main():
         ('    wire [sdram_col_width-1:0] column_base = use_column_address_input\n'
          '        ? column_address : address[sdram_col_width-1:0];\n', ''),
         ('column_base + access_counter', 'address[sdram_col_width-1:0] + access_counter')]
+    if a.rewrite == 'active-address':
+        owner_changes = [
+            ('    // An idle inactive owner uses the live payload for immediate write\n'
+             '    // admission; launched commands use the retained record. Outside IDLE,\n'
+             '    // retain the address even after early read completion.\n'
+             '    assign kf_address = (kf_idle && !active_q)\n'
+             '                      ? request_address[24:1] : address_q[24:1];',
+             '    assign kf_address = write_admission ? request_address[24:1] : address_q[24:1];')]
+        controller_changes = []
     for candidate, reference, changes in ((after_owner, before_owner, owner_changes),
                                            (after_controller, before_controller, controller_changes)):
         for old, new in changes:
@@ -48,7 +60,7 @@ def main():
             candidate = candidate.replace(old, new)
         assert candidate == reference, 'Other controller/owner behavior changed'
     sources = {}
-    for label, root in (('gold', a.reference.resolve()), ('gate', ROOT)):
+    for label, root in (('gold', a.reference.resolve()), ('gate', candidate_root)):
         for kind, name in (('owner', OWNER), ('controller', CONTROLLER)):
             source = (root / name).read_text()
             source = re.sub(r'\bKFSDRAM\b', 'KFSDRAM_' + label, source)
@@ -85,8 +97,12 @@ def main():
     # Break the actual production binding, not a handwritten model.
     gate_owner = out / 'gate_owner.sv'
     good_source = gate_owner.read_text()
-    mutant = good_source.replace('.column_address (address_q[9:1])',
-                                ".column_address (address_q[9:1] ^ 9'd1)", 1)
+    if a.rewrite == 'column':
+        mutant = good_source.replace('.column_address (address_q[9:1])',
+                                    ".column_address (address_q[9:1] ^ 9'd1)", 1)
+    else:
+        mutant = good_source.replace('.address        (kf_address)',
+                                    ".address        (kf_address ^ 24'h800000)", 1)
     assert mutant != good_source
     (out / 'mutant_owner.sv').write_text(mutant)
     mutant_command = (preparation.replace('gate_owner.sv', 'mutant_owner.sv') +
@@ -97,11 +113,13 @@ def main():
         negative = subprocess.run(['yosys', '-p', mutant_command], cwd=out,
                                   stdout=log, stderr=subprocess.STDOUT)
     assert negative.returncode != 0 and 'unproven $equiv cells' in (out / 'negative-control.log').read_text()
-    result = dict(status='AT_SDRAM_OWNER_COLUMN_EQUIVALENCE_PASS',
+    result = dict(status=('AT_SDRAM_OWNER_COLUMN_EQUIVALENCE_PASS' if a.rewrite == 'column'
+                          else 'AT_SDRAM_OWNER_ADDRESS_EQUIVALENCE_PASS'),
                   source_sha256=sources,
                   proof_script_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
-                  negative_control='Actual column binding with low bit inverted is rejected.',
-                  unchanged='All owner/controller source except the explicit column selection rewrite, including reset declarations, counters, timings, states and all other pins.',
+                  rewrite=a.rewrite,
+                  negative_control='Actual controller binding with an address bit inverted is rejected.',
+                  unchanged='All owner/controller source except the explicit address selection rewrite, including reset declarations, counters, timings, states and all other pins.',
                   scope='Whole actual owner and controller sampled-clock sequential equivalence; same public inputs and matched registers. async2sync models sampled reset; asynchronous reset declarations are unchanged. No new pipeline stage or timing assumption.')
     (out / 'receipt.json').write_text(json.dumps(result, indent=2) + '\n')
     print(result['status'])

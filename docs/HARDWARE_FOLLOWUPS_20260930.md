@@ -32,6 +32,16 @@ at 50 MHz, then close timing. The source-pruning milestone is recorded in
 [P20](optimization/P20_FIXED_CPU_PROFILE_20261003.md). The performance expansion
 proposals below remain parked; timing closure is now active work.
 
+2026-10-03 final bounded P21 outcome: the best selected fit is
+`build/fixed50-admission-retained-fdc-seed1-fit-20261003`. Worst setup is
+-0.022 ns; minimum hold is +0.073 ns. CPU setup/hold and HDMI pass all four
+models, but global cold setup remains open. Placed ALMs are 35,698 (85.18%),
+with unchanged 416 M10Ks. The checkout is aligned to this measured source;
+all containers are closed and no further fit is started. See
+[the final selection](optimization/P21_FIXED50_TIMING_20261003.md#final-bounded-fit-and-selected-delivery).
+P06/P12 reference specifications and DOS measurements are the next authorized
+parallel work; historical timing and selectable profiles remain unimplemented.
+
 2026-10-03 current scope: the user requests ordinary 86Box 286 speed profiles
 through 25 MHz plus Maximum, preserving FPGA capacity. CHECKNUM on the accepted
 combined RBF is **6906 / 121.6K**, versus the retained native 25 MHz control's

@@ -219,9 +219,6 @@ module spk286_at_sdram_data_buffer #(
                 cancelled_q <= 1'b1;
             case (state_q)
                 STATE_IDLE: begin
-                    lookup_valid0_q <= valid0_q[input_index];
-                    lookup_valid1_q <= valid1_q[input_index];
-                    replace_way_q <= replace_q[input_index];
                     if (in_accept) begin
                         owner_q <= in_owner;
                         write_q <= in_write;
@@ -233,6 +230,9 @@ module spk286_at_sdram_data_buffer #(
                         lanes_q <= in_byte_enable;
                         data_q <= in_data_out;
                         index_q <= input_index;
+                        lookup_valid0_q <= valid0_q[input_index];
+                        lookup_valid1_q <= valid1_q[input_index];
+                        replace_way_q <= replace_q[input_index];
                         allocate_q <= candidate;
                         cancelled_q <= 1'b0;
                         state_q <= candidate ? STATE_LOOKUP : STATE_PHYSICAL;
@@ -292,9 +292,7 @@ module spk286_at_sdram_data_buffer #(
                 else $error("RAM buffer launched a cancelled CPU miss");
             assert (!fill_word || !burst_q)
                 else $error("RAM buffer allocated a burst/device request");
-            // Eager metadata can follow a new index in IDLE while tag/data is
-            // still retained. Check duplicate tags only in consuming phases.
-            assert (state_q == STATE_IDLE || !(tag_hit0 && tag_hit1))
+            assert (!(tag_hit0 && tag_hit1))
                 else $error("RAM buffer has duplicate physical tags in both ways");
         end
     end

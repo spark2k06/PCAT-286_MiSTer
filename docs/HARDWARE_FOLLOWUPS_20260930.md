@@ -39,8 +39,12 @@ models, but global cold setup remains open. Placed ALMs are 35,698 (85.18%),
 with unchanged 416 M10Ks. The checkout is aligned to this measured source;
 all containers are closed and no further fit is started. See
 [the final selection](optimization/P21_FIXED50_TIMING_20261003.md#final-bounded-fit-and-selected-delivery).
-P06/P12 reference specifications and DOS measurements are the next authorized
-parallel work; historical timing and selectable profiles remain unimplemented.
+P06/P12's initial reference milestone is now complete: the same DOS executable
+passed the original native 286 controls at actual 6/12.5 MHz, with host/guest
+exit 0 and all 42 samples/six summaries validated. See
+[the native reference results](optimization/P06_NATIVE_REFERENCE_RESULTS_20261003.md).
+Physical 6/12 MHz measurements remain NOT_MEASURED, timer calibration remains
+open, and historical timing/selectable profiles remain unimplemented.
 
 2026-10-03 current scope: the user requests ordinary 86Box 286 speed profiles
 through 25 MHz plus Maximum, preserving FPGA capacity. CHECKNUM on the accepted

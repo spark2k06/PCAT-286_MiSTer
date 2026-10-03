@@ -1,15 +1,33 @@
 # P06 — Perfiles de CPU 6–25 MHz y MAX
 
-Estado: especificación de temporización e integración futura. Base: `4a05f97`,
-2026-09-13. Aplican los [requisitos comunes](README.md) y el
+Estado: especificación futura, actualizada el 2026-10-03. Base: implementación
+única tras la limpieza P20, con CPU/puente/SDRAM sobre el reloj común de 50 MHz;
+P21 mantiene pendiente la aceptación del cierre de tiempos. No hay perfiles
+históricos implementados ni precisión temporal validada. Aplican los
+[requisitos comunes](README.md) y el
 [modelo de temporización SPK286](../../vendor/spk286/SPK286_TIMING_MODEL.md).
+
+El primer hito es definir y medir la referencia antes de modificar RTL/OSD:
+[plan P06-M1](P06_TIMING_REFERENCE_PLAN_20261003.md). P12 documenta el
+[contrato de referencia y la atribución de rendimiento](P12_REAL_CHECKNUM_MEMORY_ATTRIBUTION_20261002.md).
+La parte nativa de 86Box está completada en
+[los resultados P06-M1](P06_NATIVE_REFERENCE_RESULTS_20261003.md); las mediciones
+físicas a 6/12 MHz permanecen `NOT_MEASURED` y el alcance histórico de M1 sigue abierto.
 
 ## 1. Objetivo y alcance de precisión
 
-Ofrecer las selecciones solicitadas: **6, 8, 10, 12, 16, 20, 25 MHz y MAX**,
-con una única CPU funcional y una política de temporización separada.
-La lista solicitada usa 12 MHz; no se sustituye por el candidato 12,5 MHz que
-aparece en documentación conceptual anterior de SPK286.
+Ofrecer las velocidades de la familia Intel 286 de 86Box:
+**6, 8, 10, 12,5, 16, 20, 25 MHz y MAX**, con una única CPU funcional y una
+política de temporización separada. La entrada de 86Box etiquetada `12` usa
+12.500.000 Hz; una futura selección se identificará como 12,5 MHz. La referencia
+física de 12 MHz ofrecida por el colaborador se registra por separado: no es una
+medición a 12,5 MHz ni añade automáticamente un perfil de producto.
+
+La intención de producto es conservar el modo rápido sin retardos históricos
+añadidos y permitir activar T-states históricos con perfiles de velocidad.
+`Fast` aquí describe esa intención; no presupone la BIU histórica del modo
+conceptual Fast de SPK286 ni una nueva codificación de OSD. Ninguna política
+puede eliminar dependencias reales, trabajo de instrucciones o accesos visibles.
 
 P06-R01. Una frecuencia nominal no demuestra exactitud. Para cada perfil se
 deben declarar y validar separadamente:
@@ -28,16 +46,22 @@ que exista una implementación y evidencia específica.
 
 ## 2. Estado de los perfiles
 
-| Selección prevista | Política | Estado en la base de esta especificación |
+| Selección prevista | Política | Estado al 2026-10-03 |
 | --- | --- | --- |
-| 6 MHz | Histórica, evidencia de CPU/placa identificada | Pendiente |
-| 8 MHz | Histórica, evidencia de CPU/placa identificada | Pendiente |
-| 10 MHz | Histórica, evidencia de CPU/placa identificada | Pendiente |
-| 12 MHz | Histórica, evidencia de CPU/placa identificada | Pendiente |
-| 16 MHz | Histórica, variante rápida identificada | Pendiente |
-| 20 MHz | Histórica, variante rápida identificada | Pendiente |
-| 25 MHz | Histórica, variante rápida identificada | Pendiente |
-| MAX | Avance por dependencias reales | Integración acelerada actual, aún en desarrollo |
+| 6 MHz | Histórica; requiere evidencia de CPU/placa | Pendiente; primer candidato |
+| 8 MHz | Histórica; requiere evidencia de CPU/placa | Pendiente |
+| 10 MHz | Histórica; requiere evidencia de CPU/placa | Pendiente |
+| 12,5 MHz | Histórica, entrada Intel 286 de 86Box etiquetada `12` | Pendiente; no sustituye la referencia física de 12 MHz |
+| 16 MHz | Histórica; requiere variante rápida identificada | Pendiente |
+| 20 MHz | Histórica; requiere variante rápida identificada | Pendiente |
+| 25 MHz | Histórica; requiere variante rápida identificada | Pendiente |
+| MAX | Avance por dependencias reales, sin padding histórico | Comportamiento acelerado actual; aceptación física final por P21 |
+
+La precisión estimada de todos los perfiles históricos es **no validada**.
+Las cifras de CheckIT/CHECKNUM sólo acreditan rendimiento en sus cargas. En la
+integración actual, `execute_enable` está fijo a 1 y `timing_policy_request` a 0;
+SPK286 acepta las políticas internas 0 y 2 con el mismo calendario funcional.
+Esto no implementa un selector histórico ni demuestra ciclos de un 286 real.
 
 P06-R02. Cada fila tendrá CPU de referencia, contrato de bus/placa, política de
 wait states, versión de tabla temporal y evidencia. Si se extrapola la misma
@@ -68,6 +92,13 @@ prefetch, BIU ni las respuestas aceptadas. Debe existir un protocolo de avance
 que capture respuestas físicas y permita publicarlas en el instante correcto,
 sin perderlas entre ticks virtuales.
 
+La interfaz actual lo usa también para seleccionar el camino de ejecución
+nativo frente al control externo de verificación. La BIU y la cola de prefetch
+siguen recibiendo el reloj físico; el enable del microsecuenciador tampoco es
+un protocolo global de pausa. Las trazas temporales existentes son observadores,
+no un planificador. El nuevo contrato debe separar captura/retención de
+respuestas y habilitación de hitos CPU antes de reutilizar esas interfaces.
+
 ## 4. Modelo de tiempo propuesto
 
 Mantener tres magnitudes independientes:
@@ -91,7 +122,16 @@ Una secuencia de enables puede obtener la frecuencia media correcta, pero sus
 intervalos estarán cuantizados. Eso no es igualdad de flancos con un oscilador
 independiente. Indicar resolución, patrón/jitter y nivel de exactitud permitido.
 Si una prueba exige otra relación de fase, resolver el plan de reloj por P05,
-sin fijar de antemano una nueva frecuencia maestra.
+sin fijar de antemano una nueva frecuencia maestra. La primera propuesta conserva
+los 50 MHz comunes mediante enables/política pequeña, sin nuevas PLL, dominios,
+copias de CPU, buffers mayores ni aumento de colas.
+
+P06-R07a. El STA sigue presupuestando **20 ns en cada camino del dominio físico
+de 50 MHz**, aunque el perfil emulado sea de 6 MHz. Un tick virtual no convierte
+por sí solo un camino en multiciclo. Cualquier excepción temporal exige demostrar
+los enables y relaciones reales de lanzamiento/captura. Medir antes/después
+ALM equivalentes, ALM colocados, FF y M10K con el mismo alcance y herramienta;
+el coste compartido debe aceptarse antes de adoptar RTL. No se promete coste cero.
 
 ## 5. Planificación de instrucciones, bus y eventos
 
@@ -142,8 +182,10 @@ del instante permitido por el modelo histórico.
 P06-R15. La actividad extra de llenado físico de un buffer no se publica como
 tráfico CPU histórico. Se conservan, sin embargo, el arbitraje y capacidad
 física para DMA/refresco; no puede fingirse que el recurso está libre si está
-ocupado por una operación real. Si no se demuestra transparencia temporal,
-desactivar el buffer para los perfiles exactos inicialmente.
+ocupado por una operación real. Si no se demuestra transparencia temporal, el
+perfil no se acepta. Los buffers actuales forman parte de la implementación
+única; esta especificación no presupone que existan variantes desactivables ni
+propone restaurar opciones de configuración retiradas.
 
 ## 8. Bases de tiempo de periféricos
 
@@ -157,14 +199,18 @@ XT-IDE de 8 bits conservan la secuencia de bytes, latch y tiempos requeridos.
 
 ## 9. OSD, estado guardado y cambio de modo
 
-P06-R17. Mostrar `CPU Speed` con las ocho opciones solicitadas. Distinguir
-selección pendiente de perfil activo hasta aplicar reset. MAX no se convierte
-en una promesa de una frecuencia concreta.
+P06-R17. Antes del RTL, definir la relación entre selección de velocidad y
+T-states opcionales: qué significa una frecuencia con temporización histórica
+apagada y qué niveles están certificados al activarla. Mostrar sólo perfiles
+con el estado de validación declarado. Distinguir selección pendiente de perfil
+activo hasta aplicar reset. MAX no promete una frecuencia histórica concreta.
 
 La selección necesita al menos tres bits. Antes de asignarlos, producir un
-inventario de `CONF_STR`, usos `hps_status` y compatibilidad AT/XT. El bloque de
-debug actual utiliza bits 71–84 y hay selecciones existentes de almacenamiento;
-no se reutilizan a ciegas. Los números definitivos son una decisión de
+inventario de `CONF_STR`, usos `hps_status` y compatibilidad AT/XT. El overlay
+hardware de debug y la opción CPU de 25 MHz fueron retirados en P20: no son una
+base para asignar perfiles. Actualmente el bit 71 figura reservado y 74:72
+selecciona RAM instalada; también existen selecciones de almacenamiento.
+Los números definitivos son una decisión de
 integración pendiente, que deberá quedar escrita antes del RTL/OSD.
 
 P06-R18. Definir codificación y valor predeterminado compatibles con configuraciones
@@ -183,6 +229,12 @@ Usar documentación Intel y evidencia física/hardware-derived identificada.
 SingleStepTests/80286 sirve donde su captura temporal y alcance lo permiten;
 un PASS de registros/FLAGS no demuestra una traza temporal correcta. El modelo
 de 86Box sirve de contraste, no de autoridad única para los ciclos históricos.
+En su CPU nativa, sin overrides de cache, `cpu_waitstates=0` selecciona la tabla
+automática de memoria;
+no desactiva los ciclos intrínsecos de instrucciones (`CLOCK_CYCLES`). La tabla
+Intel 286 local asigna memoria de 2 ciclos al perfil 6 MHz y de 3 al perfil
+etiquetado `12` (12,5 MHz). Se registra esa configuración al medir, sin tratar
+esos valores como captura física del bus de una placa real.
 
 Para cada dato temporal registrar fuente, revisión/página o ID de traza, CPU,
 condiciones iniciales, señales observadas y ambigüedades. No inventar constantes
@@ -213,8 +265,23 @@ tabla temporal versionada, métricas de ticks/deadlines, suite CPU/bus/eventos,
 integración OSD, STA y RBF probado. Un perfil parcialmente validado se identifica
 como tal; no se extrapola su aprobación al resto de frecuencias o a todo PM.
 
-Entregar primero infraestructura temporal y un perfil con evidencia suficiente;
-añadir los demás mediante sus propias matrices. Mantener MAX disponible para
-desarrollo, sin retardos históricos artificiales y con todas las dependencias
-reales. No se introduce un modo FAST adicional en OSD en esta propuesta; la
-arquitectura puede conservarlo como política interna para futuras pruebas.
+P06-M1 ya dispone del programa DOS canónico
+`build/p06-timing-reference-20261003/T286REF.COM`, con fuentes en `SW/CPUTIME`,
+y de [resultados aceptados del 286 ORIGINAL nativo de 86Box](P06_NATIVE_REFERENCE_RESULTS_20261003.md)
+a 6 MHz y en su entrada `12`/12,5 MHz: host RC0, guest RC0 y validación estricta
+de 42 muestras y seis resúmenes por perfil. Este paso previo al colaborador está
+completado. Las mediciones físicas a 6 y 12 MHz en el mismo PC siguen
+`NOT_MEASURED`; el temporizador mantiene `NOT_CALIBRATED`. La aceptación RAW del
+programa no acepta temporización histórica de SPK286 ni cierra M1 completo.
+
+El primer perfil candidato será **6 MHz**, empezando por casos dirigidos de
+Real Mode de registro, branch/prefetch y RAM alineada con referencias calificadas.
+Su alcance inicial no cubre todas las instrucciones, PM ni flancos de pines.
+Antes de implementarlo deben estar fijados los hitos EU/BIU, READY y arbitraje,
+la captura de respuestas entre ticks, el coste previsto y la frontera de prueba.
+La falta de mediciones físicas se declara pendiente, nunca como PASS. Los otros
+perfiles requieren sus propias matrices; no basta escalar un benchmark.
+
+Mantener el modo rápido disponible, sin retardos históricos artificiales y con
+todas las dependencias reales. La codificación OSD de Fast/T-states/velocidad se
+decidirá tras ese contrato; esta actualización sólo introduce documentación.

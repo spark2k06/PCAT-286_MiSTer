@@ -1,0 +1,800 @@
+     1                                  ; T286REF: fixed-work real-mode timing reference, DOS .COM, 8086 instructions.
+     2                                  ; Assemble with NASM -f bin. No PIT divisor/mode or PIC programming occurs.
+     3                                  bits 16
+     4                                  cpu 8086
+     5                                  org 100h
+     6                                  
+     7                                  %define ITERATIONS 256
+     8                                  %define REPETITIONS 7
+     9                                  %define WINDOW_LOW 8192
+    10                                  %define WINDOW_HIGH 16384
+    11                                  %define MAX_TICKS 10000
+    12                                  %define POLL_LIMIT 32768
+    13                                  
+    14                                  start:
+    15 00000000 0E                          push cs
+    16 00000001 1F                          pop ds
+    17 00000002 9C                          pushf
+    18 00000003 58                          pop ax
+    19 00000004 A3[C609]                    mov [entry_flags], ax
+    20 00000007 FA                          cli
+    21 00000008 8CC8                        mov ax, cs
+    22 0000000A 8ED0                        mov ss, ax
+    23 0000000C BC[180B]                    mov sp, stack_top
+    24 0000000F FF36[C609]                  push word [entry_flags]
+    25 00000013 9D                          popf
+    26 00000014 FC                          cld
+    27 00000015 F706[C609]0002              test word [entry_flags], 0200h
+    28 0000001B 7507                        jnz .if_ok
+    29 0000001D FB                          sti                      ; unsupported entry: DOS must not run under CLI
+    30 0000001E BA[F708]                    mov dx, err_if
+    31 00000021 E92405                      jmp fatal
+    32                                  .if_ok:
+    33                                      ; The first command-tail token is metadata, never a loop calibrator.
+    34 00000024 31C9                        xor cx, cx
+    35 00000026 8A0E8000                    mov cl, [80h]
+    36 0000002A BE8100                      mov si, 81h
+    37 0000002D BF[C908]                    mov di, nominal
+    38                                  .skip:
+    39 00000030 E325                        jcxz .default
+    40 00000032 AC                          lodsb
+    41 00000033 49                          dec cx
+    42 00000034 3C20                        cmp al, ' '
+    43 00000036 74F8                        je .skip
+    44 00000038 BB1000                      mov bx, 16
+    45                                  .copy:
+    46 0000003B 3C20                        cmp al, ' '
+    47 0000003D 7620                        jbe .end_token
+    48 0000003F 3C2C                        cmp al, ','
+    49 00000041 740E                        je .bad_token
+    50 00000043 3C24                        cmp al, '$'
+    51 00000045 740A                        je .bad_token
+    52 00000047 AA                          stosb
+    53 00000048 4B                          dec bx
+    54 00000049 7414                        jz .end_token
+    55 0000004B E312                        jcxz .end_token
+    56 0000004D AC                          lodsb
+    57 0000004E 49                          dec cx
+    58 0000004F EBEA                        jmp .copy
+    59                                  .bad_token:
+    60 00000051 BA[1909]                    mov dx, err_label
+    61 00000054 E9F104                      jmp fatal
+    62                                  .default:
+    63 00000057 BE[C208]                    mov si, unknown_label
+    64 0000005A B90700                      mov cx, 7
+    65 0000005D F3A4                        rep movsb
+    66                                  .end_token:
+    67 0000005F C60524                      mov byte [di], '$'
+    68 00000062 BA[5005]                    mov dx, banner
+    69 00000065 E87C04                      call puts
+    70 00000068 BA[E906]                    mov dx, meta_nominal
+    71 0000006B E87604                      call puts
+    72 0000006E BA[C908]                    mov dx, nominal
+    73 00000071 E87004                      call puts
+    74 00000074 E8C804                      call newline
+    75 00000077 BA[FB06]                    mov dx, meta_segment
+    76 0000007A E86704                      call puts
+    77 0000007D 8CC8                        mov ax, cs
+    78 0000007F E88C04                      call decimal
+    79 00000082 E8BA04                      call newline
+    80 00000085 BA[1607]                    mov dx, meta_address
+    81 00000088 E85904                      call puts
+    82 0000008B B8[100A]                    mov ax, data_words
+    83 0000008E E87D04                      call decimal
+    84 00000091 E8AB04                      call newline
+    85 00000094 E8B301                      call pit_probe
+    86 00000097 7303E94D01                  jc .timer_bad
+    87 0000009C BA[3807]                    mov dx, meta_mode
+    88 0000009F E84204                      call puts
+    89 000000A2 31C0                        xor ax, ax
+    90 000000A4 A0[D909]                    mov al, [pit_mode]
+    91 000000A7 E86404                      call decimal
+    92 000000AA E89204                      call newline
+    93 000000AD BA[4707]                    mov dx, meta_status
+    94 000000B0 E83104                      call puts
+    95 000000B3 31C0                        xor ax, ax
+    96 000000B5 A0[DA09]                    mov al, [pit_status]
+    97 000000B8 E85304                      call decimal
+    98 000000BB E88104                      call newline
+    99 000000BE BA[6407]                    mov dx, meta_probe_max
+   100 000000C1 E82004                      call puts
+   101 000000C4 A1[E009]                    mov ax, [probe_max]
+   102 000000C7 E84404                      call decimal
+   103 000000CA E87204                      call newline
+   104 000000CD BA[7E07]                    mov dx, meta_probe_zero
+   105 000000D0 E81104                      call puts
+   106 000000D3 31C0                        xor ax, ax
+   107 000000D5 A0[DB09]                    mov al, [probe_zero]
+   108 000000D8 E83304                      call decimal
+   109 000000DB E86104                      call newline
+   110 000000DE BA[9C07]                    mov dx, headers
+   111 000000E1 E80004                      call puts
+   112 000000E4 C606[D609]00                mov byte [case_index], 0
+   113                                  .case:
+   114 000000E9 C606[D709]00                mov byte [kind_index], 0
+   115                                  .kind:
+   116 000000EE C606[D809]00                mov byte [rep_index], 0
+   117                                  .repeat:
+   118 000000F3 C706[100A]3412              mov word [data_words], 1234h
+   119 000000F9 C706[120A]7856              mov word [data_words+2], 5678h
+   120 000000FF C706[140A]0000              mov word [data_words+4], 0
+   121 00000105 C706[160A]3C3C              mov word [data_words+6], 3c3ch
+   122 0000010B C706[C809][8803]            mov word [kernel_ptr], kernel_baseline
+   123 00000111 803E[D709]00                cmp byte [kind_index], 0
+   124 00000116 740F                        je .selected
+   125 00000118 31DB                        xor bx, bx
+   126 0000011A 8A1E[D609]                  mov bl, [case_index]
+   127 0000011E D1E3                        shl bx, 1
+   128 00000120 8B87[CA09]                  mov ax, [kernel_table+bx]
+   129 00000124 A3[C809]                    mov [kernel_ptr], ax
+   130                                  .selected:
+   131 00000127 E8B401                      call measure
+   132 0000012A 7303E9C000                  jc .sample_bad
+   133                                      ; Stored before the end latch, with identical overhead for every sample.
+   134 0000012F 833E[F409]00                cmp word [result_cx], 0
+   135 00000134 7403E9BC00                  jne .functional_bad
+   136 00000139 813E[F609]BC9A              cmp word [result_dx], 9abch
+   137 0000013F 7403E9B100                  jne .functional_bad
+   138 00000144 813E[F809]F0DE              cmp word [result_di], 0def0h
+   139 0000014A 7403E9A600                  jne .functional_bad
+   140 0000014F B83412                      mov ax, 1234h
+   141 00000152 BB7856                      mov bx, 5678h
+   142 00000155 803E[D709]00                cmp byte [kind_index], 0
+   143 0000015A 7419                        je .check_registers
+   144 0000015C 803E[D609]00                cmp byte [case_index], 0
+   145 00000161 7508                        jne .other_case
+   146 00000163 B8B409                      mov ax, 09b4h
+   147 00000166 BB7857                      mov bx, 5778h
+   148 00000169 EB0A                        jmp short .check_registers
+   149                                  .other_case:
+   150 0000016B 803E[D609]02                cmp byte [case_index], 2
+   151 00000170 7503                        jne .check_registers
+   152 00000172 B8AC68                      mov ax, 68ach
+   153                                  .check_registers:
+   154 00000175 3B06[F009]                  cmp ax, [result_ax]
+   155 00000179 757A                        jne .functional_bad
+   156 0000017B 3B1E[F209]                  cmp bx, [result_bx]
+   157 0000017F 7574                        jne .functional_bad
+   158 00000181 803E[D609]02                cmp byte [case_index], 2
+   159 00000186 7517                        jne .functional_ok
+   160 00000188 803E[D709]01                cmp byte [kind_index], 1
+   161 0000018D 7510                        jne .functional_ok
+   162 0000018F 813E[140A]AC68              cmp word [data_words+4], 68ach
+   163 00000195 755E                        jne .functional_bad
+   164 00000197 813E[160A]3C3C              cmp word [data_words+6], 3c3ch
+   165 0000019D 7556                        jne .functional_bad
+   166                                  .functional_ok:
+   167 0000019F 31DB                        xor bx, bx
+   168 000001A1 8A1E[D809]                  mov bl, [rep_index]
+   169 000001A5 D1E3                        shl bx, 1
+   170 000001A7 A1[EC09]                    mov ax, [sample_ticks]
+   171 000001AA 8987[FA09]                  mov [ticks+bx], ax
+   172 000001AE E82B02                      call emit_sample
+   173 000001B1 FE06[D809]                  inc byte [rep_index]
+   174 000001B5 803E[D809]07                cmp byte [rep_index], REPETITIONS
+   175 000001BA 7303E934FF                  jb .repeat
+   176 000001BF E8D502                      call emit_summary
+   177 000001C2 FE06[D709]                  inc byte [kind_index]
+   178 000001C6 803E[D709]02                cmp byte [kind_index], 2
+   179 000001CB 7303E91EFF                  jb .kind
+   180 000001D0 FE06[D609]                  inc byte [case_index]
+   181 000001D4 803E[D609]03                cmp byte [case_index], 3
+   182 000001D9 7303E90BFF                  jb .case
+   183 000001DE BA[DA08]                    mov dx, done
+   184 000001E1 E80003                      call puts
+   185 000001E4 B8004C                      mov ax, 4c00h
+   186 000001E7 CD21                        int 21h
+   187                                  .timer_bad:
+   188 000001E9 BA[3709]                    mov dx, err_timer
+   189 000001EC E95903                      jmp fatal
+   190                                  .sample_bad:
+   191 000001EF BA[6709]                    mov dx, err_window
+   192 000001F2 E95303                      jmp fatal
+   193                                  .functional_bad:
+   194 000001F5 BA[9509]                    mov dx, err_function
+   195 000001F8 E94D03                      jmp fatal
+   196                                  
+   197                                  ; Coherent counter0 status+count: Intel8254 Read-Back 11000010b.
+   198                                  ; The status is returned before the low and high count bytes. Atomic even if
+   199                                  ; called with IF=1. Preserve the caller's flags (including IF), BX/CX/SI/DI.
+   200                                  pit_read:
+   201 000001FB 9C                          pushf
+   202 000001FC FA                          cli
+   203 000001FD B0C2                        mov al, 0c2h
+   204 000001FF E643                        out 43h, al
+   205 00000201 EB00                        jmp short .delay0
+   206                                  .delay0:
+   207 00000203 E440                        in al, 40h
+   208 00000205 88C2                        mov dl, al
+   209 00000207 EB00                        jmp short .delay1
+   210                                  .delay1:
+   211 00000209 E440                        in al, 40h
+   212 0000020B 88C4                        mov ah, al
+   213 0000020D EB00                        jmp short .delay2
+   214                                  .delay2:
+   215 0000020F E440                        in al, 40h
+   216 00000211 86C4                        xchg al, ah
+   217 00000213 9D                          popf
+   218 00000214 C3                          ret
+   219                                  
+   220                                  ; AX=count, DL=status. CF=error. Neither changes the timer nor reads a divisor.
+   221                                  pit_validate:
+   222 00000215 53                          push bx
+   223 00000216 88D3                        mov bl, dl
+   224 00000218 80E37F                      and bl, 7fh
+   225 0000021B 3A1E[DA09]                  cmp bl, [pit_status]
+   226 0000021F 750F                        jne .bad
+   227 00000221 803E[D909]03                cmp byte [pit_mode], 3
+   228 00000226 7505                        jne .ok
+   229 00000228 A90100                      test ax, 1
+   230 0000022B 7503                        jnz .bad
+   231                                  .ok:
+   232 0000022D 5B                          pop bx
+   233 0000022E F8                          clc
+   234 0000022F C3                          ret
+   235                                  .bad:
+   236 00000230 5B                          pop bx
+   237 00000231 F9                          stc
+   238 00000232 C3                          ret
+   239                                  
+   240                                  ; AX=count, DL=status -> BX=phase in PIT input ticks, conditional on the
+   241                                  ; documented EVEN divisor65536 assumption. In mode3 CE decreases by2 and
+   242                                  ; reloads at both OUT edges: (-count mod65536)/2 + (OUT ? 0 : 32768).
+   243                                  pit_phase:
+   244 00000233 89C3                        mov bx, ax
+   245 00000235 F7DB                        neg bx
+   246 00000237 803E[D909]03                cmp byte [pit_mode], 3
+   247 0000023C 750B                        jne .done
+   248 0000023E D1EB                        shr bx, 1
+   249 00000240 F6C280                      test dl, 80h
+   250 00000243 7504                        jnz .done
+   251 00000245 81CB0080                    or bx, 8000h
+   252                                  .done:
+   253 00000249 C3                          ret
+   254                                  
+   255                                  ; Observe mode/status, two mode3 OUT transitions or two mode2 reloads, and
+   256                                  ; a count near65536. IF stays enabled between each atomic read-back. This
+   257                                  ; compatibility probe does NOT establish the exact programmed reload value.
+   258                                  pit_probe:
+   259 0000024A E8AEFF                      call pit_read
+   260 0000024D 88D3                        mov bl, dl
+   261 0000024F 80E371                      and bl, 71h             ; null0, RW=LSB/MSB, binary
+   262 00000252 80FB30                      cmp bl, 30h
+   263 00000255 7403E98200                  jne .bad
+   264 0000025A 88D3                        mov bl, dl
+   265 0000025C 80E37F                      and bl, 7fh
+   266 0000025F 881E[DA09]                  mov [pit_status], bl
+   267 00000263 88D3                        mov bl, dl
+   268 00000265 D0EB                        shr bl, 1
+   269 00000267 80E303                      and bl, 3               ; Intel modes6/7 alias2/3
+   270 0000026A 80FB02                      cmp bl, 2
+   271 0000026D 726D                        jb .bad
+   272 0000026F 881E[D909]                  mov [pit_mode], bl
+   273 00000273 A3[E209]                    mov [probe_previous_count], ax
+   274 00000276 8816[DD09]                  mov [probe_previous_status], dl
+   275 0000027A B90080                      mov cx, POLL_LIMIT
+   276                                  .loop:
+   277 0000027D E87BFF                      call pit_read
+   278 00000280 E892FF                      call pit_validate
+   279 00000283 7257                        jc .bad
+   280 00000285 09C0                        or ax, ax
+   281 00000287 7505                        jnz .nonzero
+   282 00000289 C606[DB09]01                mov byte [probe_zero], 1
+   283                                  .nonzero:
+   284 0000028E 3B06[E009]                  cmp ax, [probe_max]
+   285 00000292 7603                        jbe .edges
+   286 00000294 A3[E009]                    mov [probe_max], ax
+   287                                  .edges:
+   288 00000297 803E[D909]03                cmp byte [pit_mode], 3
+   289 0000029C 7511                        jne .mode2
+   290 0000029E 88D3                        mov bl, dl
+   291 000002A0 321E[DD09]                  xor bl, [probe_previous_status]
+   292 000002A4 F6C380                      test bl, 80h
+   293 000002A7 7410                        jz .no_edge
+   294 000002A9 FE06[DC09]                  inc byte [probe_edges]
+   295 000002AD EB0A                        jmp short .no_edge
+   296                                  .mode2:
+   297 000002AF 3B06[E209]                  cmp ax, [probe_previous_count]
+   298 000002B3 7604                        jbe .no_edge
+   299 000002B5 FE06[DC09]                  inc byte [probe_edges]
+   300                                  .no_edge:
+   301 000002B9 A3[E209]                    mov [probe_previous_count], ax
+   302 000002BC 8816[DD09]                  mov [probe_previous_status], dl
+   303 000002C0 803E[DC09]02                cmp byte [probe_edges], 2
+   304 000002C5 7304                        jae .observed
+   305 000002C7 E2B4                        loop .loop
+   306 000002C9 EB11                        jmp short .bad
+   307                                  .observed:
+   308 000002CB 803E[DB09]01                cmp byte [probe_zero], 1
+   309 000002D0 7408                        je .ok
+   310 000002D2 813E[E009]00FF              cmp word [probe_max], 0ff00h
+   311 000002D8 7202                        jb .bad
+   312                                  .ok:
+   313 000002DA F8                          clc
+   314 000002DB C3                          ret
+   315                                  .bad:
+   316 000002DC F9                          stc
+   317 000002DD C3                          ret
+   318                                  
+   319                                  ; Start away from IRQ0 and the mode3 half-period reload. IF is enabled during
+   320                                  ; polling; the timed CLI interval has a fixed256-iteration kernel. Post-check
+   321                                  ; requires an increasing phase and <=10000ticks, without a half-period edge.
+   322                                  ; An abnormally stalled interval spanning whole periods cannot be certified
+   323                                  ; from endpoints alone; README explicitly excludes that unsupported case.
+   324                                  measure:
+   325 000002DE B90080                      mov cx, POLL_LIMIT
+   326                                  .wait:
+   327 000002E1 E817FF                      call pit_read
+   328 000002E4 E82EFF                      call pit_validate
+   329 000002E7 7211                        jc .bad
+   330 000002E9 E847FF                      call pit_phase
+   331 000002EC 81FB0020                    cmp bx, WINDOW_LOW
+   332 000002F0 7206                        jb .next
+   333 000002F2 81FB0040                    cmp bx, WINDOW_HIGH
+   334 000002F6 7204                        jb .start
+   335                                  .next:
+   336 000002F8 E2E7                        loop .wait
+   337                                  .bad:
+   338 000002FA F9                          stc
+   339 000002FB C3                          ret
+   340                                  .start:
+   341 000002FC 9C                          pushf
+   342 000002FD FA                          cli
+   343 000002FE E8FAFE                      call pit_read
+   344 00000301 E811FF                      call pit_validate
+   345 00000304 727F                        jc .abort
+   346 00000306 E82AFF                      call pit_phase
+   347 00000309 81FB0020                    cmp bx, WINDOW_LOW
+   348 0000030D 7276                        jb .abort
+   349 0000030F 81FB0040                    cmp bx, WINDOW_HIGH
+   350 00000313 7370                        jae .abort
+   351 00000315 A3[E409]                    mov [start_count], ax
+   352 00000318 8816[DE09]                  mov [start_status], dl
+   353 0000031C 891E[E809]                  mov [start_phase], bx
+   354 00000320 B83412                      mov ax, 1234h
+   355 00000323 BB7856                      mov bx, 5678h
+   356 00000326 BABC9A                      mov dx, 9abch
+   357 00000329 BFF0DE                      mov di, 0def0h
+   358 0000032C B90001                      mov cx, ITERATIONS
+   359 0000032F FF16[C809]                  call word [kernel_ptr]
+   360 00000333 A3[F009]                    mov [result_ax], ax
+   361 00000336 891E[F209]                  mov [result_bx], bx
+   362 0000033A 890E[F409]                  mov [result_cx], cx
+   363 0000033E 8916[F609]                  mov [result_dx], dx
+   364 00000342 893E[F809]                  mov [result_di], di
+   365 00000346 E8B2FE                      call pit_read
+   366 00000349 A3[E609]                    mov [end_count], ax
+   367 0000034C 8816[DF09]                  mov [end_status], dl
+   368 00000350 E8C2FE                      call pit_validate
+   369 00000353 7230                        jc .abort
+   370 00000355 E8DBFE                      call pit_phase
+   371 00000358 891E[EA09]                  mov [end_phase], bx
+   372 0000035C 2B1E[E809]                  sub bx, [start_phase]
+   373 00000360 7223                        jc .abort
+   374 00000362 81FB1027                    cmp bx, MAX_TICKS
+   375 00000366 771D                        ja .abort
+   376 00000368 891E[EC09]                  mov [sample_ticks], bx
+   377 0000036C 803E[D909]03                cmp byte [pit_mode], 3
+   378 00000371 7505                        jne .good
+   379 00000373 F6C280                      test dl, 80h
+   380 00000376 740D                        jz .abort
+   381                                  .good:
+   382 00000378 A1[E409]                    mov ax, [start_count]
+   383 0000037B 2B06[E609]                  sub ax, [end_count]
+   384 0000037F A3[EE09]                    mov [raw_delta], ax
+   385 00000382 9D                          popf                     ; restore caller IF before any DOS output
+   386 00000383 F8                          clc
+   387 00000384 C3                          ret
+   388                                  .abort:
+   389 00000385 9D                          popf
+   390 00000386 F9                          stc
+   391 00000387 C3                          ret
+   392                                  
+   393                                  ; These exact kernels, including the outer LOOP, are identical at all clocks.
+   394                                  kernel_baseline:
+   395                                  .loop:
+   396 00000388 E2FE                        loop .loop
+   397 0000038A C3                          ret
+   398                                  kernel_r0:
+   399                                  .loop:
+   400 0000038B 01D8                        add ax, bx
+   401 0000038D 31FA                        xor dx, di
+   402 0000038F 83C301                      add bx, 1
+   403 00000392 81F7AA55                    xor di, 55aah
+   404 00000396 E2F3                        loop .loop
+   405 00000398 C3                          ret
+   406                                  kernel_b0:
+   407                                  .loop:
+   408 00000399 39C0                        cmp ax, ax
+   409 0000039B 7502                        jne .never
+   410 0000039D 7401                        je .taken
+   411                                  .never:
+   412 0000039F 40                          inc ax
+   413                                  .taken:
+   414 000003A0 EB01                        jmp short .join
+   415 000003A2 90                          nop
+   416                                  .join:
+   417 000003A3 E2F4                        loop .loop
+   418 000003A5 C3                          ret
+   419                                  kernel_m0:
+   420                                  .loop:
+   421 000003A6 A1[100A]                    mov ax, [data_words]
+   422 000003A9 0306[120A]                  add ax, [data_words+2]
+   423 000003AD A3[140A]                    mov [data_words+4], ax
+   424 000003B0 8136[160A]5A5A              xor word [data_words+6], 5a5ah
+   425 000003B6 E2EE                        loop .loop
+   426 000003B8 C3                          ret
+   427                                  
+   428                                  emit_case_kind:
+   429 000003B9 31DB                        xor bx, bx
+   430 000003BB 8A1E[D609]                  mov bl, [case_index]
+   431 000003BF D1E3                        shl bx, 1
+   432 000003C1 8B97[D009]                  mov dx, [case_table+bx]
+   433 000003C5 E81C01                      call puts
+   434 000003C8 E86B01                      call comma
+   435 000003CB BA[AA08]                    mov dx, label_baseline
+   436 000003CE 803E[D709]00                cmp byte [kind_index], 0
+   437 000003D3 7403                        je .kind
+   438 000003D5 BA[B308]                    mov dx, label_gross
+   439                                  .kind:
+   440 000003D8 E80901                      call puts
+   441 000003DB C3                          ret
+   442                                  emit_sample:
+   443 000003DC BA[9908]                    mov dx, label_sample
+   444 000003DF E80201                      call puts
+   445 000003E2 E8D4FF                      call emit_case_kind
+   446 000003E5 E84E01                      call comma
+   447 000003E8 31C0                        xor ax, ax
+   448 000003EA A0[D809]                    mov al, [rep_index]
+   449 000003ED 40                          inc ax
+   450 000003EE E81D01                      call decimal
+   451 000003F1 E84201                      call comma
+   452 000003F4 B80001                      mov ax, ITERATIONS
+   453 000003F7 E81401                      call decimal
+   454 000003FA E83901                      call comma
+   455 000003FD 31C0                        xor ax, ax
+   456 000003FF A0[DE09]                    mov al, [start_status]
+   457 00000402 E80901                      call decimal
+   458 00000405 E82E01                      call comma
+   459 00000408 A1[E409]                    mov ax, [start_count]
+   460 0000040B E80001                      call decimal
+   461 0000040E E82501                      call comma
+   462 00000411 31C0                        xor ax, ax
+   463 00000413 F606[DE09]80                test byte [start_status], 80h
+   464 00000418 7401                        jz .out0
+   465 0000041A 40                          inc ax
+   466                                  .out0:
+   467 0000041B E8F000                      call decimal
+   468 0000041E E81501                      call comma
+   469 00000421 A1[E809]                    mov ax, [start_phase]
+   470 00000424 E8E700                      call decimal
+   471 00000427 E80C01                      call comma
+   472 0000042A 31C0                        xor ax, ax
+   473 0000042C A0[DF09]                    mov al, [end_status]
+   474 0000042F E8DC00                      call decimal
+   475 00000432 E80101                      call comma
+   476 00000435 A1[E609]                    mov ax, [end_count]
+   477 00000438 E8D300                      call decimal
+   478 0000043B E8F800                      call comma
+   479 0000043E 31C0                        xor ax, ax
+   480 00000440 F606[DF09]80                test byte [end_status], 80h
+   481 00000445 7401                        jz .out1
+   482 00000447 40                          inc ax
+   483                                  .out1:
+   484 00000448 E8C300                      call decimal
+   485 0000044B E8E800                      call comma
+   486 0000044E A1[EA09]                    mov ax, [end_phase]
+   487 00000451 E8BA00                      call decimal
+   488 00000454 E8DF00                      call comma
+   489 00000457 A1[EE09]                    mov ax, [raw_delta]
+   490 0000045A E8B100                      call decimal
+   491 0000045D E8D600                      call comma
+   492 00000460 A1[EC09]                    mov ax, [sample_ticks]
+   493 00000463 E8A800                      call decimal
+   494 00000466 E8CD00                      call comma
+   495 00000469 A1[F009]                    mov ax, [result_ax]
+   496 0000046C E89F00                      call decimal
+   497 0000046F E8C400                      call comma
+   498 00000472 A1[F209]                    mov ax, [result_bx]
+   499 00000475 E89600                      call decimal
+   500 00000478 E8BB00                      call comma
+   501 0000047B A1[F409]                    mov ax, [result_cx]
+   502 0000047E E88D00                      call decimal
+   503 00000481 E8B200                      call comma
+   504 00000484 A1[F609]                    mov ax, [result_dx]
+   505 00000487 E88400                      call decimal
+   506 0000048A E8A900                      call comma
+   507 0000048D A1[F809]                    mov ax, [result_di]
+   508 00000490 E87B00                      call decimal
+   509 00000493 E8A900                      call newline
+   510 00000496 C3                          ret
+   511                                  emit_summary:
+   512                                      ; Bubble sort just seven unsigned tick counts, outside timing/CLI.
+   513 00000497 B90600                      mov cx, REPETITIONS-1
+   514                                  .outer:
+   515 0000049A BE[FA09]                    mov si, ticks
+   516 0000049D 89CB                        mov bx, cx
+   517                                  .inner:
+   518 0000049F 8B04                        mov ax, [si]
+   519 000004A1 3B4402                      cmp ax, [si+2]
+   520 000004A4 7605                        jbe .ordered
+   521 000004A6 874402                      xchg ax, [si+2]
+   522 000004A9 8904                        mov [si], ax
+   523                                  .ordered:
+   524 000004AB 83C602                      add si, 2
+   525 000004AE 4B                          dec bx
+   526 000004AF 75EE                        jnz .inner
+   527 000004B1 E2E7                        loop .outer
+   528 000004B3 BA[A108]                    mov dx, label_summary
+   529 000004B6 E82B00                      call puts
+   530 000004B9 E8FDFE                      call emit_case_kind
+   531 000004BC E87700                      call comma
+   532 000004BF B80001                      mov ax, ITERATIONS
+   533 000004C2 E84900                      call decimal
+   534 000004C5 E86E00                      call comma
+   535 000004C8 A1[FA09]                    mov ax, [ticks]
+   536 000004CB E84000                      call decimal
+   537 000004CE E86500                      call comma
+   538 000004D1 A1[000A]                    mov ax, [ticks+6]
+   539 000004D4 E83700                      call decimal
+   540 000004D7 E85C00                      call comma
+   541 000004DA A1[060A]                    mov ax, [ticks+12]
+   542 000004DD E82E00                      call decimal
+   543 000004E0 E85C00                      call newline
+   544 000004E3 C3                          ret
+   545                                  
+   546                                  ; DOS standard-output writes permit >REF.CSV. No output happens under CLI.
+   547                                  puts:
+   548 000004E4 50                          push ax
+   549 000004E5 53                          push bx
+   550 000004E6 51                          push cx
+   551 000004E7 52                          push dx
+   552 000004E8 56                          push si
+   553 000004E9 89D6                        mov si, dx
+   554 000004EB 31C9                        xor cx, cx
+   555                                  .length:
+   556 000004ED 803C24                      cmp byte [si], '$'
+   557 000004F0 7404                        je .write
+   558 000004F2 46                          inc si
+   559 000004F3 41                          inc cx
+   560 000004F4 EBF7                        jmp short .length
+   561                                  .write:
+   562 000004F6 BB0100                      mov bx, 1
+   563 000004F9 B440                        mov ah, 40h
+   564 000004FB CD21                        int 21h
+   565 000004FD 720A                        jc .failed
+   566 000004FF 39C8                        cmp ax, cx
+   567 00000501 7506                        jne .failed
+   568 00000503 5E                          pop si
+   569 00000504 5A                          pop dx
+   570 00000505 59                          pop cx
+   571 00000506 5B                          pop bx
+   572 00000507 58                          pop ax
+   573 00000508 C3                          ret
+   574                                  .failed:
+   575                                      ; Do not try to report an error recursively to an unusable stdout.
+   576 00000509 B8014C                      mov ax, 4c01h
+   577 0000050C CD21                        int 21h
+   578                                  decimal:
+   579 0000050E 50                          push ax
+   580 0000050F 53                          push bx
+   581 00000510 51                          push cx
+   582 00000511 52                          push dx
+   583 00000512 31C9                        xor cx, cx
+   584 00000514 BB0A00                      mov bx, 10
+   585                                  .divide:
+   586 00000517 31D2                        xor dx, dx
+   587 00000519 F7F3                        div bx
+   588 0000051B 52                          push dx
+   589 0000051C 41                          inc cx
+   590 0000051D 09C0                        or ax, ax
+   591 0000051F 75F6                        jnz .divide
+   592                                  .digit:
+   593 00000521 58                          pop ax
+   594 00000522 0430                        add al, '0'
+   595 00000524 A2[C309]                    mov [character], al
+   596 00000527 51                          push cx
+   597 00000528 BA[C309]                    mov dx, character
+   598 0000052B E8B6FF                      call puts
+   599 0000052E 59                          pop cx
+   600 0000052F E2F0                        loop .digit
+   601 00000531 5A                          pop dx
+   602 00000532 59                          pop cx
+   603 00000533 5B                          pop bx
+   604 00000534 58                          pop ax
+   605 00000535 C3                          ret
+   606                                  comma:
+   607 00000536 52                          push dx
+   608 00000537 BA[BE09]                    mov dx, comma_text
+   609 0000053A E8A7FF                      call puts
+   610 0000053D 5A                          pop dx
+   611 0000053E C3                          ret
+   612                                  newline:
+   613 0000053F 52                          push dx
+   614 00000540 BA[C009]                    mov dx, newline_text
+   615 00000543 E89EFF                      call puts
+   616 00000546 5A                          pop dx
+   617 00000547 C3                          ret
+   618                                  fatal:
+   619 00000548 E899FF                      call puts
+   620 0000054B B8014C                      mov ax, 4c01h
+   621 0000054E CD21                        int 21h
+   622                                  
+   623 00000550 6D6574612C76657273-     banner db 'meta,version,T286REF2',13,10
+   623 00000559 696F6E2C5432383652-
+   623 00000562 4546320D0A         
+   624 00000567 6D6574612C6370755F-         db 'meta,cpu_contract,REAL_MODE_8086_INSTRUCTIONS_286_TARGET',13,10
+   624 00000570 636F6E74726163742C-
+   624 00000579 5245414C5F4D4F4445-
+   624 00000582 5F383038365F494E53-
+   624 0000058B 5452554354494F4E53-
+   624 00000594 5F3238365F54415247-
+   624 0000059D 45540D0A           
+   625 000005A1 6D6574612C74696D65-         db 'meta,timer_qualification,NOT_CALIBRATED',13,10
+   625 000005AA 725F7175616C696669-
+   625 000005B3 636174696F6E2C4E4F-
+   625 000005BC 545F43414C49425241-
+   625 000005C5 5445440D0A         
+   626 000005CA 6D6574612C74696D65-         db 'meta,timer_divisor,65536',13,10
+   626 000005D3 725F64697669736F72-
+   626 000005DC 2C36353533360D0A   
+   627 000005E4 6D6574612C64697669-         db 'meta,divisor_source,ASSUMED_STANDARD_BIOS',13,10
+   627 000005ED 736F725F736F757263-
+   627 000005F6 652C415353554D4544-
+   627 000005FF 5F5354414E44415244-
+   627 00000608 5F42494F530D0A     
+   628 0000060F 6D6574612C7069745F-         db 'meta,pit_input_hz,1193182_NOMINAL',13,10
+   628 00000618 696E7075745F687A2C-
+   628 00000621 313139333138325F4E-
+   628 0000062A 4F4D494E414C0D0A   
+   629 00000632 6D6574612C696E7465-         db 'meta,interrupt_policy,IF_PRESERVED_SHORT_CLI_NO_IRQ_TIMING_CLAIM',13,10
+   629 0000063B 72727570745F706F6C-
+   629 00000644 6963792C49465F5052-
+   629 0000064D 455345525645445F53-
+   629 00000656 484F52545F434C495F-
+   629 0000065F 4E4F5F4952515F5449-
+   629 00000668 4D494E475F434C4149-
+   629 00000671 4D0D0A             
+   630 00000674 6D6574612C77696E64-         db 'meta,window_phase_min,8192',13,10
+   630 0000067D 6F775F70686173655F-
+   630 00000686 6D696E2C383139320D-
+   630 0000068F 0A                 
+   631 00000690 6D6574612C77696E64-         db 'meta,window_phase_max_exclusive,16384',13,10
+   631 00000699 6F775F70686173655F-
+   631 000006A2 6D61785F6578636C75-
+   631 000006AB 736976652C31363338-
+   631 000006B4 340D0A             
+   632 000006B7 6D6574612C6D61785F-         db 'meta,max_sample_ticks,10000',13,10
+   632 000006C0 73616D706C655F7469-
+   632 000006C9 636B732C3130303030-
+   632 000006D2 0D0A               
+   633 000006D4 6D6574612C72657065-         db 'meta,repetitions,7',13,10,'$'
+   633 000006DD 746974696F6E732C37-
+   633 000006E6 0D0A24             
+   634 000006E9 6D6574612C6E6F6D69-     meta_nominal db 'meta,nominal_mhz,$'
+   634 000006F2 6E616C5F6D687A2C24 
+   635 000006FB 6D6574612C636F6465-     meta_segment db 'meta,code_segment_decimal,$'
+   635 00000704 5F7365676D656E745F-
+   635 0000070D 646563696D616C2C24 
+   636 00000716 6D6574612C616C6967-     meta_address db 'meta,aligned_word_offset_decimal,$'
+   636 0000071F 6E65645F776F72645F-
+   636 00000728 6F66667365745F6465-
+   636 00000731 63696D616C2C24     
+   637 00000738 6D6574612C7069745F-     meta_mode db 'meta,pit_mode,$'
+   637 00000741 6D6F64652C24       
+   638 00000747 6D6574612C7069745F-     meta_status db 'meta,pit_status_without_out,$'
+   638 00000750 7374617475735F7769-
+   638 00000759 74686F75745F6F7574-
+   638 00000762 2C24               
+   639 00000764 6D6574612C70726F62-     meta_probe_max db 'meta,probe_max_raw_count,$'
+   639 0000076D 655F6D61785F726177-
+   639 00000776 5F636F756E742C24   
+   640 0000077E 6D6574612C70726F62-     meta_probe_zero db 'meta,probe_observed_raw_zero,$'
+   640 00000787 655F6F627365727665-
+   640 00000790 645F7261775F7A6572-
+   640 00000799 6F2C24             
+   641 0000079C 6865616465725F7361-     headers db 'header_sample,case,kind,rep,loops,status_start,count_start,out_start,phase_start,status_end,count_end,out_end,phase_end,raw_delta,ticks,result_ax,result_bx,result_cx,result_dx,result_di',13,10
+   641 000007A5 6D706C652C63617365-
+   641 000007AE 2C6B696E642C726570-
+   641 000007B7 2C6C6F6F70732C7374-
+   641 000007C0 617475735F73746172-
+   641 000007C9 742C636F756E745F73-
+   641 000007D2 746172742C6F75745F-
+   641 000007DB 73746172742C706861-
+   641 000007E4 73655F73746172742C-
+   641 000007ED 7374617475735F656E-
+   641 000007F6 642C636F756E745F65-
+   641 000007FF 6E642C6F75745F656E-
+   641 00000808 642C70686173655F65-
+   641 00000811 6E642C7261775F6465-
+   641 0000081A 6C74612C7469636B73-
+   641 00000823 2C726573756C745F61-
+   641 0000082C 782C726573756C745F-
+   641 00000835 62782C726573756C74-
+   641 0000083E 5F63782C726573756C-
+   641 00000847 745F64782C72657375-
+   641 00000850 6C745F64690D0A     
+   642 00000857 6865616465725F7375-         db 'header_summary,case,kind,loops,min_ticks,median_ticks,max_ticks',13,10,'$'
+   642 00000860 6D6D6172792C636173-
+   642 00000869 652C6B696E642C6C6F-
+   642 00000872 6F70732C6D696E5F74-
+   642 0000087B 69636B732C6D656469-
+   642 00000884 616E5F7469636B732C-
+   642 0000088D 6D61785F7469636B73-
+   642 00000896 0D0A24             
+   643 00000899 73616D706C652C24        label_sample db 'sample,$'
+   644 000008A1 73756D6D6172792C24      label_summary db 'summary,$'
+   645 000008AA 626173656C696E6524      label_baseline db 'baseline$'
+   646 000008B3 67726F737324            label_gross db 'gross$'
+   647 000008B9 523024                  label_r0 db 'R0$'
+   648 000008BC 423024                  label_b0 db 'B0$'
+   649 000008BF 4D3024                  label_m0 db 'M0$'
+   650 000008C2 554E4B4E4F574E          unknown_label db 'UNKNOWN'
+   651 000008C9 00<rep 11h>             nominal times 17 db 0
+   652 000008DA 726573756C742C5041-     done db 'result,PASS_RAW_FIXED_WORK',13,10,'$'
+   652 000008E3 53535F5241575F4649-
+   652 000008EC 5845445F574F524B0D-
+   652 000008F5 0A24               
+   653 000008F7 726573756C742C5245-     err_if db 'result,REJECT_ENTRY_IF_DISABLED',13,10,'$'
+   653 00000900 4A4543545F454E5452-
+   653 00000909 595F49465F44495341-
+   653 00000912 424C45440D0A24     
+   654 00000919 726573756C742C5245-     err_label db 'result,REJECT_NOMINAL_LABEL',13,10,'$'
+   654 00000922 4A4543545F4E4F4D49-
+   654 0000092B 4E414C5F4C4142454C-
+   654 00000934 0D0A24             
+   655 00000937 726573756C742C5245-     err_timer db 'result,REJECT_PIT_MODE_STATUS_OR_RELOAD_PROBE',13,10,'$'
+   655 00000940 4A4543545F5049545F-
+   655 00000949 4D4F44455F53544154-
+   655 00000952 55535F4F525F52454C-
+   655 0000095B 4F41445F50524F4245-
+   655 00000964 0D0A24             
+   656 00000967 726573756C742C5245-     err_window db 'result,REJECT_SAMPLE_WINDOW_OR_TIMER_STATUS',13,10,'$'
+   656 00000970 4A4543545F53414D50-
+   656 00000979 4C455F57494E444F57-
+   656 00000982 5F4F525F54494D4552-
+   656 0000098B 5F5354415455530D0A-
+   656 00000994 24                 
+   657 00000995 726573756C742C5245-     err_function db 'result,REJECT_KERNEL_FUNCTIONAL_RESULT',13,10,'$'
+   657 0000099E 4A4543545F4B45524E-
+   657 000009A7 454C5F46554E435449-
+   657 000009B0 4F4E414C5F52455355-
+   657 000009B9 4C540D0A24         
+   658 000009BE 2C24                    comma_text db ',$'
+   659 000009C0 0D0A24                  newline_text db 13,10,'$'
+   660 000009C3 3024                    character db '0$'
+   661 000009C5 00                      align 2, db 0
+   662 000009C6 0000                    entry_flags dw 0
+   663 000009C8 0000                    kernel_ptr dw 0
+   664 000009CA [8B03][9903][A603]      kernel_table dw kernel_r0, kernel_b0, kernel_m0
+   665 000009D0 [B908][BC08][BF08]      case_table dw label_r0, label_b0, label_m0
+   666 000009D6 00                      case_index db 0
+   667 000009D7 00                      kind_index db 0
+   668 000009D8 00                      rep_index db 0
+   669 000009D9 00                      pit_mode db 0
+   670 000009DA 00                      pit_status db 0
+   671 000009DB 00                      probe_zero db 0
+   672 000009DC 00                      probe_edges db 0
+   673 000009DD 00                      probe_previous_status db 0
+   674 000009DE 00                      start_status db 0
+   675 000009DF 00                      end_status db 0
+   676                                  align 2, db 0
+   677 000009E0 0000                    probe_max dw 0
+   678 000009E2 0000                    probe_previous_count dw 0
+   679 000009E4 0000                    start_count dw 0
+   680 000009E6 0000                    end_count dw 0
+   681 000009E8 0000                    start_phase dw 0
+   682 000009EA 0000                    end_phase dw 0
+   683 000009EC 0000                    sample_ticks dw 0
+   684 000009EE 0000                    raw_delta dw 0
+   685 000009F0 0000                    result_ax dw 0
+   686 000009F2 0000                    result_bx dw 0
+   687 000009F4 0000                    result_cx dw 0
+   688 000009F6 0000                    result_dx dw 0
+   689 000009F8 0000                    result_di dw 0
+   690 000009FA 0000<rep 7h>            ticks times REPETITIONS dw 0
+   691 00000A08 00<rep 8h>              align 16, db 0
+   692 00000A10 3412785600003C3C        data_words dw 1234h, 5678h, 0, 3c3ch
+   693                                  align 2, db 0
+   694 00000A18 00<rep 100h>            stack_bottom times 256 db 0
+   695                                  stack_top:

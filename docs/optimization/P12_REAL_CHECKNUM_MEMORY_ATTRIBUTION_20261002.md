@@ -392,3 +392,130 @@ Exact AT cycle accounting remains open: service occupancy, CPU boundary/HLDA
 latency, wait-state policy and PIT/PIC/DMA behavior need measured traces for a
 cycle-accurate platform. Corrected functionality and a matched throughput
 observation do not establish complete cycle accuracy.
+
+## Appendix: physical 6/12 MHz reference contract (2026-10-03)
+
+This defines the measurement prerequisite for
+[P06 speed profiles](P06_CPU_SPEED_PROFILES.md). PERF01's revised throughput
+goal is already satisfied by the accepted
+MiSTer measurements above. Maximum keeps the functional dependencies and the
+actual implementation clock; historical profiles need their own evidence.
+Neither PIT/RTC scaling nor relabelling a frequency is a timing correction.
+
+### Reference identity and unknowns
+
+The available collaborator can run DOS programs on the **same physical PC at
+6 MHz and 12 MHz**. No oscilloscope or bus capture is available. Each result
+must retain this manifest; an unknown field stays unknown instead of inheriting
+an emulator default.
+
+| Field | Required record |
+| --- | --- |
+| CPU | Manufacturer, package marking/model, rated speed and stepping if identifiable; photograph or reported identity, with provenance |
+| Clock | Selected 6/12 MHz mode, turbo mechanism and how the frequency is known; processor frequency distinguished from the CPU CLK input |
+| Timer | PIT part/read-back support, input-clock basis, channel-0 mode/status and reload assumptions; record any TSR that changes the timer |
+| Machine | Board/chipset, BIOS/version, RAM size/type, conventional-memory location of code/data |
+| Memory | Configured read/write wait states and parity/refresh settings, if documented; external cache, shadow RAM and buffering settings |
+| Bus/devices | ISA clock/divider if known, video/storage cards and installed drivers; record whether turbo also changes peripheral timing |
+| DOS/run | DOS version, memory managers/TSRs, boot configuration, command line, program binary hash and interrupt policy |
+
+Two speed settings on one board control many variables, but do not prove that
+RAM waits, ISA timing or refresh occupancy remain identical. A result from an
+unknown clone CPU/board is a reference for that recorded system. It does not
+establish all Intel/Harris/AMD 286 variants. In particular, the Harris
+N80C286-12 functional capture identity in
+[SOURCE_NOTES](../../vendor/spk286/docs/SOURCE_NOTES.md) is a different source of
+evidence from the collaborator's as-yet unidentified CPU.
+
+### What native 86Box actually times
+
+Read-only inspection used local 86Box revision
+`fa3343da5b551bc937114c1e3ab3a8e16aed9e79`, also recorded by [P11](P11_86BOX_50MHZ_COMPARISON_20261002.md).
+These are implementation observations, not a physical timing certification.
+
+| Observation point in `D:/GitHub/86Box_dev` | Meaning for the reference |
+| --- | --- |
+| `src/config.c:587`; `src/cpu/cpu.c:4483` | Default `cpu_waitstates=0` selects automatic table memory timings when cache timing overrides are absent. A nonzero override uses the setting plus one. Zero does not remove instruction cycles. |
+| `src/cpu/cpu_table.c:1040` | Intel entry `6` is 6,000,000 Hz with two memory read/write cycles; entry `12` is **12,500,000 Hz** with three. Those are service-cycle fields, not counts of extra wait states. |
+| `src/cpu/cpu.c:904`; `src/cpu/x86_ops_mov.h:1`; `src/cpu/386.c:198` | The 286 has `timing_rr=2`; the inspected immediate MOV handler charges that latency through `CLOCK_CYCLES` and invokes `PREFETCH_RUN`. |
+| `src/cpu/cpu.c:1869`; `src/cpu/386.c:225` | The native 286 dispatcher is `exec386_2386`; the SPK backend is a separate compile-time dispatcher. Native execution accumulates charged instruction cycles into `tsc` at lines 404-415 before timer service. |
+| `src/cpu/386_common.c:503` | Its explicitly simplified prefetch model accounts for instruction bytes, operand-memory occupancy and refill opportunities, with a **16-byte** ceiling. It is not a direct model of the physical six-byte 286 queue. |
+
+The native controls must record actual `rspeed`, memory/prefetch timing fields,
+cache flags, dispatcher and ISA configuration. The ordinary `12` control is
+labelled **12.5 MHz**, separately from physical 12 MHz. An exact 12 MHz
+experimental entry would need an explicit source/configuration receipt; its
+existence or its timing accuracy is not assumed here. The old 50 MHz test entry
+is attribution evidence only. Host wall time and fast-forward pacing do not
+replace guest timer measurements.
+
+Inspected source SHA-256 values, in the row order above:
+
+| File | SHA-256 |
+| --- | --- |
+| `src/config.c` | `6a24845f679013f26d8d8445ae8942621f12f4511c8cfb17612f0e448d7583d8` |
+| `src/cpu/cpu.c` | `4ee45609c7eda91f74526e4f1d955b65acd36a18123878b0529f76c5aea5f069` |
+| `src/cpu/cpu_table.c` | `57dcba2746fe4d119bec2b78b729fc05a87757124b9eeff11fce106a9e512fcd` |
+| `src/cpu/x86_ops_mov.h` | `e4919cd8ae1cd4d559b355989ffec8a88e5020c0a7f8269a8d2a90c3b4772e48` |
+| `src/cpu/386.c` | `fbfa6080f9744294b679d119fb4df9b03b97b646e4b9977e48b23645848b7426` |
+| `src/cpu/386_common.c` | `610fc8c7760a39df32e5c054706a351fff270ab0ec6e5ce1e6adb6c0160272a7` |
+
+### Intel constraints and attribution units
+
+Intel's [210498-005 programmer reference](https://www.bitsavers.org/components/intel/80286/210498-005_80286_and_80287_Programmers_Reference_Manual_1987.pdf),
+**B-6 / PDF page 214**, defines the instruction clocks in processor-clock
+units. It distinguishes operand forms, odd word addresses, complex effective
+addresses and read wait states. It explicitly notes that fetch/write waits
+need not extend execution by their whole duration. Its estimated aggregate
+fetch overhead is not a constant to add to every instruction or benchmark.
+The inspected scan matches SOURCE_NOTES SHA-256
+`ad487ba99b48cd9f61b14c0fe912a04c7cdb4c7c14a18419aa9faf62d8962460`.
+
+Intel's [210760-002 hardware reference](https://www.bitsavers.org/components/intel/80286/210760-002_80286_Hardware_Reference_Manual_1987.pdf),
+**3-15 through 3-19, 3-24/3-25 and 3-32 / PDF pages 65-69, 74/75 and 82**,
+separates processor clocks from the double-frequency CLK input, describes
+Ts/Tc and READY, and specifies the six-byte queue and local-bus priorities.
+Data requests outrank a new prefetch but cannot interrupt an accepted one;
+one pending write can allow EU progress. Scan SHA-256:
+`d3ece037a200b17ef32d78a055d0d96c3e47474d755d94569b9576a9a68c6915`.
+
+For future SPK/PCAT attribution, timestamp request, acceptance, response,
+retirement, queue consume/redirect, execution blocked/unblocked and HOLD/HLDA
+events on one declared clock basis. Retain address/lane/type and reset epoch.
+The existing timing trace's busy, READY-wait, operand-wait and queue-empty
+counters overlap; total blocked time requires the union of relevant intervals,
+not their sum. Native `cycles`/prefetch accounting is an additional model to
+inspect at these points, not a substitute for a physical bus trace. DOS can
+measure fixed-work elapsed time and signatures, but cannot observe those
+internal event timestamps on the collaborator's machine.
+
+### First DOS measurement milestone
+
+The first executable is `build/p06-timing-reference-20261003/T286REF.COM`
+(source/tools in `SW/CPUTIME`): fixed machine-code R0 register,
+B0 branch/prefetch and M0 aligned conventional-RAM cases, with a known work count
+and result signature. Its measurement contract is PIT0 read-back without
+reprogramming the timer; a mode-3 reader must qualify status/OUT and count
+phase rather than treating the raw decrement as elapsed input ticks. Retain
+gross and matched baseline measurements, seven raw repetitions and rejection
+reasons. Unsupported timer/read-back configurations must be rejected explicitly.
+Baseline subtraction is an estimate: the control stream has its own prefetch
+and memory behaviour. Report timer mode/reload assumptions, wrap handling,
+interrupt policy and sampling overhead alongside any converted duration.
+
+Before collaborator use, run the same binary with the **native 286** dispatcher
+in 86Box at 6 MHz and its explicitly labelled 12.5 MHz control. Qualify its
+signatures, work counts, timer transitions and failure handling; publish the
+binary/configuration receipts. Then collect repeated 6/12 MHz physical runs
+with the manifest above. A 2:1 throughput ratio is a hypothesis, not a required
+answer. Promote a P06 timing family only after its physical evidence and
+declared uncertainty support it; branch/prefetch, memory waits, ISA and
+interrupt/DMA timing remain separate gaps. These first samples do not establish
+pin-level or whole-system cycle accuracy.
+
+The initial native controls are now complete in
+[P06 native reference results](P06_NATIVE_REFERENCE_RESULTS_20261003.md):
+actual 6/12.5 MHz, automatic effective memory costs 2/3, ISA 6/8 MHz, guest and
+host exit 0 and 42 validated raw samples per control. Both observed PIT mode 2;
+mode 3 has host/source coverage only. Physical 6/12 MHz remains NOT_MEASURED,
+and neither timer calibration nor historical cycle accuracy is established.

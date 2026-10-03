@@ -1,0 +1,82 @@
+{
+  "status": "T286REF_PARSER_DIRECTED_PASS",
+  "cases": {
+    "positive_mode2": "PASS",
+    "positive_mode3": "PASS",
+    "missing_sample": {
+      "status": "REJECT_EXPECTED_PASS",
+      "reason": "Expected exactly 42 unique samples (3 cases x 2 kinds x 7)"
+    },
+    "duplicate_sample": {
+      "status": "REJECT_EXPECTED_PASS",
+      "reason": "line 22: duplicate sample ('R0', 'baseline', 1)"
+    },
+    "corrupt_ticks": {
+      "status": "REJECT_EXPECTED_PASS",
+      "reason": "('R0', 'baseline', 1): tick delta differs"
+    },
+    "truncated_pass": {
+      "status": "REJECT_EXPECTED_PASS",
+      "reason": "line 69: missing/rejected/truncated raw PASS result"
+    },
+    "truncated_newline": {
+      "status": "REJECT_EXPECTED_PASS",
+      "reason": "CSV is truncated: final newline is missing"
+    },
+    "wrong_signature": {
+      "status": "REJECT_EXPECTED_PASS",
+      "reason": "('R0', 'baseline', 1): functional register signature differs"
+    },
+    "out_status_disagree": {
+      "status": "REJECT_EXPECTED_PASS",
+      "reason": "('R0', 'baseline', 1): status/OUT disagree or status changed"
+    },
+    "wrong_summary": {
+      "status": "REJECT_EXPECTED_PASS",
+      "reason": "('R0', 'baseline'): summary differs from raw samples"
+    },
+    "claimed_calibration": {
+      "status": "REJECT_EXPECTED_PASS",
+      "reason": "Wrong metadata timer_qualification"
+    },
+    "reject_result": {
+      "status": "REJECT_EXPECTED_PASS",
+      "reason": "line 69: missing/rejected/truncated raw PASS result"
+    },
+    "unsupported_mode": {
+      "status": "REJECT_EXPECTED_PASS",
+      "reason": "Only PIT modes 2/3 are supported"
+    },
+    "zero_interval": {
+      "status": "REJECT_EXPECTED_PASS",
+      "reason": "('R0', 'baseline', 1): zero/backwards/overlong interval"
+    },
+    "wrong_requested_nominal": {
+      "status": "REJECT_EXPECTED_PASS",
+      "reason": "Nominal metadata differs from requested reference"
+    }
+  },
+  "sha256": {
+    "SW\\CPUTIME\\validate_t286ref.py": "71d976caa0c2ee265e42fc3d8feb299537129367a3839647cd1da12715e904b3",
+    "SW\\CPUTIME\\test_t286ref_parser.py": "7c45d0fa1965dfa3c448243f8726bea521f8fa736d7f6f421b5a13b55acda3b0",
+    "build\\p06-timing-reference-20261003\\parser-repro-final\\claimed_calibration.csv": "57835d50ec4ddbf7b0e538c410ca2a0bfadef5885cef8d8891e9c7b4e5c1e63b",
+    "build\\p06-timing-reference-20261003\\parser-repro-final\\corrupt_ticks.csv": "f6b49482410f091d173a9d1e878460e4ac8aa7de4efe3764473577db6966fe1f",
+    "build\\p06-timing-reference-20261003\\parser-repro-final\\duplicate_sample.csv": "f5320c47434cb52736e1b31ee8dc43b88c642ed2c5aa951f8897113fae5ffe58",
+    "build\\p06-timing-reference-20261003\\parser-repro-final\\missing_sample.csv": "e622d8cbf1d422aea9101f6d9f645a219d68934cc61db8aaeadcf6153e8c691c",
+    "build\\p06-timing-reference-20261003\\parser-repro-final\\out_status_disagree.csv": "51bde4365a59ea0f18f7f54d2747bda85db15989e0fd0fd39fa3161127a41e7f",
+    "build\\p06-timing-reference-20261003\\parser-repro-final\\positive-mode2.csv": "1fa280021c5eaf998df9b90463edc9ebde15c4ce9717054366911ae87edb8f31",
+    "build\\p06-timing-reference-20261003\\parser-repro-final\\positive-mode3.csv": "3b46ac3ed6cae09a7e35063c5367bd21c6a1fa6dd7957c994e9c20005aecf1c4",
+    "build\\p06-timing-reference-20261003\\parser-repro-final\\reject_result.csv": "629566f64233de51a486edb1a627b5b155c0c29faeee4d5af3d909cb3c03043b",
+    "build\\p06-timing-reference-20261003\\parser-repro-final\\truncated_newline.csv": "a5448f870d728e3b52fb97e7af2d16b50ab3fa564f1c80ba3ea382b232e844e6",
+    "build\\p06-timing-reference-20261003\\parser-repro-final\\truncated_pass.csv": "3cdeaa0d230b7ac1fca2fd120e4045e0c08d60bf7762ce70670ece0103992fcf",
+    "build\\p06-timing-reference-20261003\\parser-repro-final\\unsupported_mode.csv": "fc08496396db7e7d78e86bd240637ae89ec21d953916ed2d613b0fb742dee88b",
+    "build\\p06-timing-reference-20261003\\parser-repro-final\\wrong_signature.csv": "805a64f2a012fdbc563f95b2b75cabdbbe5e8943995ae11cfa7df4b9df5ff152",
+    "build\\p06-timing-reference-20261003\\parser-repro-final\\wrong_summary.csv": "c67d21d593cebef3e9076b1b9b78898bb95fb3ef6c00b661088c53411e6ff213",
+    "build\\p06-timing-reference-20261003\\parser-repro-final\\zero_interval.csv": "63e57312d2783fd0a88f1013b40b18ebca09599bb8025a8e0ce74a979f62c5e6",
+    "build\\p06-timing-reference-20261003\\parser-repro-final\\cli-mode2.stdout.json": "c89cbf4ca7fd93d0036b9f1e1b4edc64b31a2ba927c02bc96d6c0ef31cd7680b",
+    "build\\p06-timing-reference-20261003\\parser-repro-final\\cli-mode3.stdout.json": "af0c827366ce2c18a9faa217aee4fad34c3e244ba51acd33a1f4539b9e4ddff7",
+    "build\\p06-timing-reference-20261003\\parser-repro-final\\cli-mode2.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "build\\p06-timing-reference-20261003\\parser-repro-final\\cli-mode3.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "scope": "Synthetic mode2/mode3 parser/API/CLI checks only; no DOS or emulator runtime"
+}

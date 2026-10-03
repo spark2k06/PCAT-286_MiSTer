@@ -137,6 +137,17 @@ does not establish timing closure or aggregate regression acceptance.
 
 ## Next performance experiment
 
+Current 2026-10-03 scope: the measured hardware throughput exceeds the retained
+native 25 MHz control by 66.69% / 71.51%. Recommend retaining this implementation,
+parking further performance hardware, and developing ordinary speed profiles
+plus Maximum within a small shared-control resource budget. Physical timing
+must close at the selected clocks; 50 MHz itself is not mandatory if its cost
+is excessive. Preserve the current CPU/bridge/SDRAM clock relationships as the
+first choice: another CPU frequency is not a free fix and may add CDC/latency.
+Seek timing improvements with neutral or small measured area cost first.
+The hypotheses below are retained for possible future attribution,
+rather than scheduled implementation. See the [current P12 specification](P12_REAL_CHECKNUM_MEMORY_ATTRIBUTION_20261002.md#performance-target-and-fpga-resource-budget).
+
 2026-10-03 priority update: the user requests a manufacturer-led AT functional
 review, including 86Box, and retains fast operation with optional historical
 T-states planned later. The outlines below remain proposals. There is no

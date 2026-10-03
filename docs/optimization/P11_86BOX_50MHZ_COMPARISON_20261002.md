@@ -2,6 +2,14 @@
 
 Date: 2026-10-02. PERF01 measurement milestone.
 
+2026-10-03 scope update: this is a retained historical attribution experiment.
+Its custom 50 MHz emulator result is no longer a required throughput target.
+The user now specifies ordinary speed profiles through 25 MHz plus Maximum,
+with limited additional FPGA cost. The accepted combined MiSTer result exceeds
+the 25 MHz control below; see the
+[current specification](P12_REAL_CHECKNUM_MEMORY_ATTRIBUTION_20261002.md#performance-target-and-fpga-resource-budget).
+The original measurements and original attribution plan remain below.
+
 The primary performance comparison is **SPK286 in 86Box versus the same SPK286
 in PCAT/MiSTer**, both at 50 MHz with matching CPU sources/options. The native
 86Box 286 supplies an additional control. PCAT reaches

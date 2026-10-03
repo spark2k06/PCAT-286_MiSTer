@@ -52,6 +52,15 @@ combined hardware CHECKNUM observation is 6906 / 121.6K. Its agreement with the
 corresponding PCAT platform model is useful attribution, not proof of an exact
 historical AT. The native 86Box 286 also has a separate CPU timing model.
 
+Subsequent user scope clarification sets ordinary speed profiles through
+25 MHz plus Maximum, with limited additional FPGA cost. Current throughput
+exceeds the retained 25 MHz control, so further performance hardware is parked.
+Maximum will depend on validated physical timings and the resource budget.
+Preserve the current common 50 MHz CPU/bridge/memory relationship as the first
+choice, seeking timing improvements with neutral or small measured area cost.
+Other frequencies require a complete clock-domain and SDRAM evaluation. See the
+[current P12 specification](optimization/P12_REAL_CHECKNUM_MEMORY_ATTRIBUTION_20261002.md#performance-target-and-fpga-resource-budget).
+
 In the retained PERF01 evidence, improvements come from memory service and
 the corrected PIT-driven AT refresh cadence; no score manipulation is
 identified by this review. Buffers, posting and extra overlap are fast-mode

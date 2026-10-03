@@ -26,6 +26,29 @@ now records this distinction.
 
 ## PERF01 — MiSTer CPU and machine benchmark throughput
 
+2026-10-03 current scope: the user requests ordinary 86Box 286 speed profiles
+through 25 MHz plus Maximum, preserving FPGA capacity. CHECKNUM on the accepted
+combined RBF is **6906 / 121.6K**, versus the retained native 25 MHz control's
+**4143 / 70.9K**: **+66.69% / +71.51%**. Measured peak throughput is sufficient
+for this scope; matching the custom 50 MHz emulator profile is not required.
+This does not certify the future 25 MHz hardware profile or the whole platform.
+
+The fit occupies **72% equivalent ALMs, 85.13% physically placed ALMs and
+75% M10Ks**. Retain current buffers/posting and park expansions or additional
+performance hardware. Future speed/T-state selection should use one CPU and
+minimal shared control, with measured resource cost.
+
+Timing must close at the chosen operating frequencies, but 50 MHz itself is
+not mandatory. The current combined RBF still has -1.519 ns worst setup. If
+closure is costly, do not assume a lower CPU clock is a cheap replacement:
+it can introduce CDC, synchronization and latency relative to SDRAM. Preserve
+the existing common CPU/bridge/memory clock relationship and first seek timing
+improvements with neutral or small measured resource cost. Those paths still
+must close at 50 MHz while physically clocked there; OSD throttling does not
+establish closure. Functional findings and physical
+timing compliance remain open. See the
+[current performance and resource specification](optimization/P12_REAL_CHECKNUM_MEMORY_ATTRIBUTION_20261002.md#performance-target-and-fpga-resource-budget).
+
 2026-10-02 update: [real CHECKNUM memory-control attribution](optimization/P12_REAL_CHECKNUM_MEMORY_ATTRIBUTION_20261002.md)
 now records 4804 / 88.6K with production PCAT READY timing in 86Box, against
 7709 / 133.3K with immediate READY on the same CPU. Actual code-buffer hit rates

@@ -107,6 +107,86 @@ slot. The 8 MHz setting above belongs to 86Box; it must not be presented as
 matched PCAT peripheral timing. A later I/O comparison would need the actual
 device transaction counts and waits in both implementations.
 
+### Performance target and FPGA resource budget
+
+2026-10-03 scope clarification: offer the ordinary 86Box 286 speed profiles
+through 25 MHz, plus a maximum mode using the core's validated capability.
+Further peak-throughput work must respect the user's limited FPGA headroom.
+The retained 50 MHz emulator entry is a custom attribution profile, not a
+required product speed or score target.
+
+| CHECKNUM observation | Dhrystones per second | K Whetstones per second |
+| --- | ---: | ---: |
+| Native 86Box 286 at 25 MHz, retained P11 control | 4143 | 70.9 |
+| User-confirmed MiSTer combined P18/P19 RBF, maximum mode | 6906 | 121.6 |
+| Improvement over the 25 MHz control | 66.69% | 71.51% |
+
+These use the same numeric benchmark at different configured clock rates.
+Measured peak throughput is sufficient for the revised scope; it does not
+calibrate a selectable 25 MHz hardware profile or establish instruction timing
+equivalence. Separate CheckIT reports 6765 / 121.6K on this MiSTer RBF and
+must not replace the CHECKNUM row.
+
+The combined fit uses 30,039 / 41,910 equivalent ALMs (72%), 35,676 physically
+placed ALMs (85.13%), and 416 / 553 M10Ks (75%). Placement and routing headroom
+is limited; the equivalent logic count alone should not describe the reserve.
+See the [combined fit](P18_P19_COMBINED_RBF_20261002.md) for provenance.
+
+Recommendation: retain the current implementation and treat measured throughput
+as sufficient for this scope. Park cache-capacity, deeper-queue and extra
+lookahead experiments. Functional compatibility and physical timing compliance
+remain separate unfinished work.
+
+Future speed selection should share one CPU and reuse timing-policy/control
+where feasible, keeping PIT/RTC and required SDRAM service independent of CPU
+selection. Prefer execution enables and a shared timing policy over adding new
+physical clock domains; CPU/BIU timing and prefetch still need a consistent
+profile contract. The ordinary Intel-family reference entries are 6, 8, 10, 12.5,
+16, 20 and 25 MHz. Its display label "12" actually sets 12,500,000 Hz in the
+inspected 86Box table; preserve explicit units when naming/calibrating profiles.
+Add Maximum, bypassing optional historical delays while retaining real
+dependencies. Prefer resource-neutral changes or small shared control logic;
+no zero-cost implementation or fitted profile overhead is established yet.
+Measure added ALMs/registers/M10Ks and critical paths before adopting profile
+logic; do not duplicate CPUs or increase buffers just to select a speed.
+
+### Physical timing compliance and maximum speed
+
+Closing timing at 50 MHz is not a product requirement. Positive setup and hold
+at every actual operating clock, under the relevant constraints and models,
+remain required for a validated implementation. Benchmark success measures
+throughput and does not replace that physical timing requirement.
+
+The current RBF runs at a configured 50 MHz, with worst setup -1.519 ns and
+reported Fmax 46.47 MHz. That report is not a validated lower-frequency RBF.
+The current common 50 MHz CPU/bridge/memory clock relationship is valuable.
+Following the user's concern about SDRAM clock alignment, preserve it as the
+first choice and seek structural timing improvements with neutral or small
+measured resource cost, without additional cache capacity or clock domains.
+Do not require an expensive redesign just to match an emulator score.
+
+A lower physical frequency remains a possible architecture alternative, not a
+cheap assumed fix or an action authorized by this specification. Changing CPU
+frequency alone may require additional domain crossings, synchronization and
+latency. Changing a larger domain also affects SDRAM, clock constraints and
+device time bases. Its full cost must be evaluated before selecting it. Maximum
+means the fastest validated setting within the resource budget; while the
+current physical domains remain at 50 MHz, those paths must close at 50 MHz.
+
+CPU, bridge, devices and CDC relationships must be considered together. The
+current worst system paths include CPU BIU admission into Sound Blaster DSP;
+other paths stay in the 50 MHz system domain. Lowering only the CPU cannot be
+assumed to close them. The existing /2 debug clock is a specific related-clock
+path, not acceptance for arbitrary frequencies or all system timing. An OSD
+throttle or added historical waits also does not
+automatically relax the physical register clock period. Preserve independent
+device time bases when changing clocks and specify any legitimate timing
+exceptions from actual control behavior.
+
+No replacement frequency or proportional benchmark gain/loss is validated by
+this documentation update. No new profile, RTL, benchmark, functional test or
+synthesis is introduced.
+
 ### Fast mode and optional historical timing
 
 2026-10-03 user clarification: retain a fast mode without imposed historical

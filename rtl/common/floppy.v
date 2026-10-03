@@ -781,10 +781,14 @@ always @(posedge clk) begin
 	else if(state == S_COUNT_LOGICAL) mult_b <= { 1'b0, mult_b[7:1] };
 end
 
+// Calculate each drive's sector before the late command-drive selection.
+// Preserve the capture edge without adding a register or cycle.
+wire [15:0] logical_sector_prepare0 = (head[0] ? {8'd0, media_sectors_per_track[0]} : 16'd0) + {8'd0, sector[0]} - 16'd1;
+wire [15:0] logical_sector_prepare1 = (head[1] ? {8'd0, media_sectors_per_track[1]} : 16'd0) + {8'd0, sector[1]} - 16'd1;
 reg [15:0] logical_sector;
 always @(posedge clk) begin
 	if(~rst_n)                                     logical_sector <= 16'd0;
-	else if(state == S_PREPARE_COUNT)              logical_sector <= (head[selected_drive[0]] ? {8'd0, media_sectors_per_track[selected_drive[0]]} : 16'd0) + {8'd0, sector[selected_drive[0]]} - 16'd1;
+	else if(state == S_PREPARE_COUNT)              logical_sector <= selected_drive[0] ? logical_sector_prepare1 : logical_sector_prepare0;
 	else if(state == S_COUNT_LOGICAL && mult_b[0]) logical_sector <= logical_sector + mult_a;
 end
 

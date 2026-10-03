@@ -9,6 +9,13 @@ The native 86Box reference portion is complete; see the
 6/12 MHz measurements remain `NOT_MEASURED`, so the historical/physical M1
 scope is still open.
 
+The [Intel instruction extraction](P06_INTEL_TIMING_REFERENCE_20261003.md)
+and [fixed-50 MHz pilot contract](P06_TIMING_CONTRACT_20261003.md) now complete
+the kernel reference/design preparation. They identify native-86Box timing
+differences, capture/publication rules, the 6 MHz rational generator and
+directed acceptance cases. They introduce no historical RTL and do not close
+the physical/board or complete instruction-timeline evidence gates.
+
 ## 1. Current boundary and intended product
 
 PCAT currently uses one functional SPK286 implementation, with CPU, bridge and
@@ -33,9 +40,9 @@ metadata; do not silently treat them as measurements at the same frequency.
 
 | Evidence | Identified source/boundary | Required result before historical RTL |
 | --- | --- | --- |
-| Current implementation | `config.tcl`, `PCAT-286.sv`, `rtl/spk286_integration/spk286_machine_cpu.sv`, `vendor/spk286/rtl/spk286{,_biu,_timing_policy,_timing_trace}.sv` | Source hashes, physical clocks, public acceptance/completion events; identify advance/capture interface still to be designed |
-| CPU instruction timing | Intel 80286 instruction timing tables; primary reference catalogue in `vendor/spk286/docs/PROTECTED_MODE_GLOBAL_REVIEW_20260929.md` | Exact manual revision/pages, units and operand/branch/prefetch conditions for R0/B0/M0; extraction remains pending |
-| CPU/bus and board timing | Qualified Intel hardware timing documentation and the selected board's IBM/other manufacturer reference | CPU-clock definition, EU/BIU overlap, READY/waits, ISA/device cadence and reference buffering; identification/extraction pending |
+| Current implementation | `config.tcl`, `PCAT-286.sv`, CPU wrapper, fetch/BIU/queue/policy/trace and AT bridge/memory/posted-write boundaries | Source hashes frozen in the [contract manifest](../evidence/p06-intel-contract-20261003/manifest.json); advance/capture/publication contract specified. Ports and RTL remain unimplemented |
+| CPU instruction timing | Intel 210498-005, B-6 and the exact R0/B0/M0 opcode forms | [Kernel extraction complete](P06_INTEL_TIMING_REFERENCE_20261003.md), including branch target-length notes. Timer/setup/return coverage and exact intra-instruction milestone mapping remain to qualify |
+| CPU/bus and board timing | Intel 210760-002, 3-3, 3-15 through 3-19, 3-24/3-25, 3-32; selected board's manufacturer reference still pending | CPU units, phases, six-byte prefetch plus three decoded instructions, one write buffer, priorities and active-low pin READY extracted. P06-IU01 records missing decoded lookahead; actual board memory/ISA/READY policy remains unidentified |
 | Native 86Box | Separate `86box_dev` checkout: `src/cpu/cpu_table.c`, `src/cpu/cpu.c`, instruction handlers and prefetch implementation | Native raw runs at 6 and 12.5 MHz accepted; frozen executable/CPU/config/result evidence in [the native results](P06_NATIVE_REFERENCE_RESULTS_20261003.md). Historical timing calibration remains open |
 | Physical 286 | Collaborator's same PC at nominal 6 and 12 MHz | CPU/stepping if available, board/BIOS, speed-switch method, RAM/waits/cache and raw DOS output; measurements pending |
 | SPK286 / MiSTer | Current accelerated CPU and PCAT integration | Functional signatures and identified measurement environment; useful contrast, not a historical cycle oracle |
@@ -125,3 +132,8 @@ before/after under identical constraints and scope, including MAX behavior.
 Resource cost is unmeasured, not zero; the baseline receipt must identify the
 latest accepted RBF/source set rather than an older fit. Agree the measured cost
 and validation scope before accepting the first implementation.
+
+The detailed [pilot contract](P06_TIMING_CONTRACT_20261003.md) binds the selected
+`b14e54b` fixed50 fit as that baseline and prepares C01-C16 directed cases.
+Its source/design preparation can proceed while physical results are pending;
+historical/physical acceptance still requires the declared missing evidence.

@@ -519,3 +519,26 @@ actual 6/12.5 MHz, automatic effective memory costs 2/3, ISA 6/8 MHz, guest and
 host exit 0 and 42 validated raw samples per control. Both observed PIT mode 2;
 mode 3 has host/source coverage only. Physical 6/12 MHz remains NOT_MEASURED,
 and neither timer calibration nor historical cycle accuracy is established.
+
+### Intel extraction and pilot contract (2026-10-03)
+
+The [kernel extraction](P06_INTEL_TIMING_REFERENCE_20261003.md) now pins the
+actual COM bytes and Intel timings for R0/B0/M0. Native differences include
+LOOP's 11/11 handler charge versus Intel 8/4, register immediates 2 versus 3,
+A1/A3 base charges 4/2 versus 5/3, and the simplified 16-byte prefetch ceiling.
+These are source-level contrasts, not a new elapsed-time prediction or a
+reason to modify the accepted raw measurements.
+
+Intel also documents a separate three-entry decoded-instruction queue beyond
+the six-byte prefetch queue. Current SPK286 lacks that decoded lookahead;
+P06-IU01 records the coverage gap. This could affect pipelining, but no measured
+share of the remaining performance difference or FPGA implementation cost is
+attributed to it. A simulation-only comparison comes before a hardware change.
+
+The [6 MHz pilot contract](P06_TIMING_CONTRACT_20261003.md) separates physical
+capture, logical bus completion, architectural publication, explicit board
+waits and implementation deadline misses. It retains common physical 50 MHz
+and the six-byte CPU queue, records the selected fit's resource baseline and
+prepares C01-C16 directed acceptance cases. Actual board timing, physical
+6/12 MHz measurements and historical RTL remain pending. This closes the
+reference/design preparation, not the complete physical M1 or P06/P12 scope.

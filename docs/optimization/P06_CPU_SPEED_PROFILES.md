@@ -14,6 +14,14 @@ La parte nativa de 86Box está completada en
 [los resultados P06-M1](P06_NATIVE_REFERENCE_RESULTS_20261003.md); las mediciones
 físicas a 6/12 MHz permanecen `NOT_MEASURED` y el alcance histórico de M1 sigue abierto.
 
+Ya están completadas la [extracción Intel de los kernels](P06_INTEL_TIMING_REFERENCE_20261003.md)
+y la [especificación del piloto de 6 MHz](P06_TIMING_CONTRACT_20261003.md), con
+captura/publicación de respuestas, unidades temporales, pruebas dirigidas y
+base de recursos del fit seleccionado. Se han identificado diferencias entre
+las tablas Intel y los handlers nativos de 86Box; sus medidas se conservan como
+contraste. Falta implementar y validar el piloto, completar los hitos internos
+de cada instrucción y obtener la referencia de placa/CPU física.
+
 ## 1. Objetivo y alcance de precisión
 
 Ofrecer las velocidades de la familia Intel 286 de 86Box:

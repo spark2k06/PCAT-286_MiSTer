@@ -31,13 +31,13 @@ privado y no incluye datos/INTA/HOLD/LOCK ni toda la planificación de instrucci
 Tras reanudar la pausa de M5, el [piloto M6a de lecturas](P06_CORE_DATA_READ_PILOT_20261004.md)
 califica Ts/Tc de byte y palabra par en la BIU y servicio de operandos reales,
 con CODE desactivado y reutilizando la respuesta retenida. Es un componente
-privado: faltan propiedad lógica compartida CODE/DATA, temporización de
-instrucciones de memoria en la CPU completa y las restantes operaciones.
+privado: M6b ya valida la propiedad lógica compartida CODE/DATA y M6c conecta
+una primera lectura alineada a la CPU completa. Faltan las restantes operaciones.
 
 El desarrollo provisional de componentes temporales y sus pruebas dirigidas
 se registra en [el progreso del piloto](P06_PILOT_PROGRESS_20261003.md).
-La conexión privada cubre únicamente instrucciones de registro calificadas;
-todavía no hay un perfil histórico completo integrado al RBF.
+La conexión privada cubre instrucciones de registro calificadas y una primera
+lectura alineada A1; todavía no hay un perfil histórico completo integrado al RBF.
 
 ## 1. Objetivo y alcance de precisión
 
@@ -330,3 +330,13 @@ casos en ambos simuladores, con 972 cambios de propietario en el mismo Tc.
 MAX conserva sus trazas originales. Esto no habilita todavía perfiles en el
 core: falta integrar y validar los hitos de instrucciones completas de
 memoria, los servicios restantes y cada velocidad declarada.
+
+El [hito privado M6c](P06_CORE_MEMORY_CPU_PILOT_20261004.md) añade ejecución
+real de `MOV AX,[moffs16]` alineado en Real Mode, con retención en TMP0 y
+escritura de AX al primer límite permitido. Pasan 1.782 casos temporizados
+en ambos simuladores; las trazas MAX y los streams de registro previos se
+conservan. No se ha modificado el RBF ni habilitado un perfil público.
+El mínimo de cinco relojes más esperas READ no certifica todavía todas las
+fases de ejecución Intel: dependencias físicas y de fetch pueden alargarlo.
+Palabras impares, escrituras, read/modify/write y los servicios restantes
+siguen pendientes, al igual que los perfiles completos y la calibración física.

@@ -245,3 +245,33 @@ unchanged; no complete regression or Quartus fit was run.
 Next is private full-CPU aligned READ issue/result/architectural commit.
 Consecutive DATA reuse, odd words, writes/write-buffer overlap, I/O, events,
 EU-demand lookahead and full speed/machine integration remain open.
+
+## 2026-10-04 M6c: aligned A1 READ in a real full CPU
+
+The [M6c private CPU milestone](P06_CORE_MEMORY_CPU_PILOT_20261004.md)
+connects actual prefix-free Real Mode `MOV AX,[moffs16]` to the shared
+CODE/READ bus, retained TMP0, qualified AX commit and retirement. The accepted
+instruction uses an aligned word; the minimum is five processor clocks plus
+actual extra READ waits, with real fetch/physical dependency extensions.
+It does not certify exact Intel issue phasing or a complete historical profile.
+
+Both simulators pass 534 aligned warm/cold and 1,248 directed cases, with
+48 byte-identical CPU trace pairs and seven required negative failures.
+267 memory and 208 register MAX traces match the original CPU; eleven MAX
+unit benches pass. 688 M5 register streams/1,448 instructions preserve their
+warm and cold traces exactly. Strict full CPU lint, microcode consistency,
+BIU/fetch MAX sequential proofs and all five ancestral evidence audits pass.
+
+The original functional TMP0/MOVE phase supplies pending readiness and
+payload; no new result buffer or register bank is introduced. The new
+executor pending/retire assignments map to eleven generic cells and zero
+register bits. The READ-wait export adds six generic BIU cells over M6b,
+without registers. These isolated measurements exclude complete top-level
+qualification and are not Quartus ALMs or full FPGA overhead.
+
+Production, config and selected RBF remain unchanged. There is no full
+regression, fit or new RBF. Next qualify the remaining memory services and
+their actual instruction issue/results: consecutive DATA reuse, odd words,
+writes/write-buffer overlap and read/modify/write. Branches, bus/events,
+decoded IU lookahead, the DOS wrapper, complete public speeds and physical
+collaborator calibration remain open.

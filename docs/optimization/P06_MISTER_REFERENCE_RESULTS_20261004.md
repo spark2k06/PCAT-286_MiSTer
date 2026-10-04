@@ -155,3 +155,26 @@ The unchanged validator recomputes every sample and summary. The analyzer
 also revalidates the archived native/physical CSVs and their hashes before
 performing comparisons. Existing raw archives cannot be replaced by changed
 bytes. This command refreshes derived JSON; screenshot archives remain intact.
+
+## Repeated 25 MHz capture
+
+The user supplied `D:/Desktop/REF_25.CSV` and explicitly confirmed the 25 MHz
+selection after reset. The new file validates all 42 raw samples. All six
+medians match the previous capture exactly:
+
+| Case | Baseline ticks | Gross ticks | Change from previous 25 MHz |
+| --- | ---: | ---: | ---: |
+| R0 | 118 | 316 | 0 |
+| B0 | 118 | 390 | 0 |
+| M0 | 118 | 598 | 0 |
+
+R0 gross is again **6.04% slower than the 298-tick median at 20 MHz**. The
+repeat therefore rules out the proposed wrongly assigned CSV explanation
+under the user's confirmed selection. It does not identify whether deadline
+extension, fetch/admission phasing or physical lateness causes the anomaly.
+No native 86Box 25 MHz T286REF run is available for a direct comparison.
+
+The new raw file, unchanged validator output and comparison are archived
+separately in `docs/evidence/p06-mister-repeat25-20261004`; the original
+capture is preserved. CPU/profile adjustment remains pending while the
+floppy correction is compiled and validated.

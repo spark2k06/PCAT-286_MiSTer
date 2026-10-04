@@ -286,10 +286,19 @@ impact require acceptance before adopting production RTL.
    timer/wait assumptions, investigate disagreements with discriminating cases.
    The ordinary native 12.5 MHz control remains a distinct frequency.
 4. **Production pilot adoption:** measured FPGA cost, MAX equivalence, P21
-   timing acceptance and the declared physical/reference scope. Only then
-   consider other speeds and broader instruction/event coverage.
+   timing acceptance and the declared reference/coverage scope. Expand other
+   speeds and instruction/event coverage with directed acceptance for each.
 
-The collaborator's results are not required to finish this contract or to
-build a clearly provisional simulation fixture. They are required before
-claiming the physical accuracy promised by M1. No scalar benchmark fitting
-can substitute for the missing board/bus evidence.
+User decision, 2026-10-04: complete the necessary development and initial
+validation using native 86Box as reference while collaborator results are
+pending. Physical measurements are a later calibration/review input, not a
+blocker for completing profiles or provisional adoption with an explicit
+reference scope. Intel remains the architectural contract; record known
+native differences instead of copying its approximations silently. Physical M1
+and pin accuracy cannot be certified from emulator results. No scalar
+benchmark fitting substitutes for board/bus evidence.
+
+The product has one speed selector: MAX / 6 / 8 / 10 / 12.5 / 16 / 20 / 25 MHz.
+MAX is the existing dependency-driven accelerated path; named frequencies use
+the historical policy. Board waits belong inside a versioned machine profile,
+not a second public T-states option. Test-only 0/1/2 wait fixtures remain useful.

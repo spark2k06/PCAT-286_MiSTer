@@ -136,5 +136,9 @@ and validation scope before accepting the first implementation.
 
 The detailed [pilot contract](P06_TIMING_CONTRACT_20261003.md) binds the selected
 `b14e54b` fixed50 fit as that baseline and prepares C01-C16 directed cases.
-Its source/design preparation can proceed while physical results are pending;
-historical/physical acceptance still requires the declared missing evidence.
+User decision, 2026-10-04: complete development and initial validation with
+86Box as reference while physical results are pending. Provisional profile
+acceptance declares that reference and known Intel/native differences; it does
+not require the collaborator to arrive first. The physical/reference portion
+of M1 remains open and later measurements can refine calibration. Physical or
+pin-exact certification still requires the declared missing evidence.

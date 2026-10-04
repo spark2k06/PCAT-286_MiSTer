@@ -187,11 +187,13 @@ No replacement frequency or proportional benchmark gain/loss is validated by
 this documentation update. No new profile, RTL, benchmark, functional test or
 synthesis is introduced.
 
-### Fast mode and optional historical timing
+### MAX and historical speed profiles
 
-2026-10-03 user clarification: retain a fast mode without imposed historical
-T-states, then offer optional T-states and speed profiles. This is the intended
-product direction, not an implemented timing selector. Current CPU optimization
+2026-10-04 confirmed user decision: retain MAX without imposed historical
+delays and offer named MHz profiles with their historical timing policy.
+One public speed selector includes MAX and 6/8/10/12.5/16/20/25 MHz; board waits
+belong inside each versioned profile, with no separate T-states setting.
+This is the intended product direction, not an implemented timing selector. Current CPU optimization
 macros are implementation choices, not the future historical timing mode.
 This direction follows the separation already specified in the
 [SPK286 timing draft](../../vendor/spk286/SPK286_TIMING_MODEL.md); its conceptual
@@ -508,10 +510,12 @@ in 86Box at 6 MHz and its explicitly labelled 12.5 MHz control. Qualify its
 signatures, work counts, timer transitions and failure handling; publish the
 binary/configuration receipts. Then collect repeated 6/12 MHz physical runs
 with the manifest above. A 2:1 throughput ratio is a hypothesis, not a required
-answer. Promote a P06 timing family only after its physical evidence and
-declared uncertainty support it; branch/prefetch, memory waits, ISA and
-interrupt/DMA timing remain separate gaps. These first samples do not establish
-pin-level or whole-system cycle accuracy.
+answer. Initial development and provisional family acceptance can use 86Box
+with explicit Intel/native differences and declared uncertainty, as authorized
+by the user on 2026-10-04. Complete the necessary tasks without waiting for the
+collaborator; physical evidence later reviews calibration. Branch/prefetch,
+memory waits, ISA and interrupt/DMA timing retain separate acceptance coverage.
+These first samples do not establish pin-level or whole-system cycle accuracy.
 
 The initial native controls are now complete in
 [P06 native reference results](P06_NATIVE_REFERENCE_RESULTS_20261003.md):
@@ -558,3 +562,10 @@ tests. It exposes one extra dispatch clock in a repeated ADD stream as
 P06-IU01 coverage. This is not a DOS benchmark or a measured share of MAX's
 remaining performance gap. Production MAX traces stay identical; historical
 BIU/fetch, full instruction/event coverage and physical calibration stay open.
+
+Product decision, 2026-10-04: one public selector MAX / 6 / 8 / 10 / 12.5 /
+16 / 20 / 25 MHz. MAX preserves accelerated execution; named MHz profiles apply
+historical CPU/board timing. No independent public T-states setting is planned.
+Versioned profiles carry their wait policy, while test tools retain 0/1/2
+variants. The physical pair remains NOT_MEASURED and can refine the initial
+86Box-based calibration later without blocking development now.

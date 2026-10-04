@@ -39,11 +39,22 @@ política de temporización separada. La entrada de 86Box etiquetada `12` usa
 física de 12 MHz ofrecida por el colaborador se registra por separado: no es una
 medición a 12,5 MHz ni añade automáticamente un perfil de producto.
 
-La intención de producto es conservar el modo rápido sin retardos históricos
-añadidos y permitir activar T-states históricos con perfiles de velocidad.
-`Fast` aquí describe esa intención; no presupone la BIU histórica del modo
-conceptual Fast de SPK286 ni una nueva codificación de OSD. Ninguna política
-puede eliminar dependencias reales, trabajo de instrucciones o accesos visibles.
+Decisión de producto confirmada el 2026-10-04: un único selector
+**MAX / 6 / 8 / 10 / 12,5 / 16 / 20 / 25 MHz**. MAX conserva el comportamiento
+rápido actual, sin retardos históricos añadidos. Las selecciones en MHz aplican
+la política histórica del perfil CPU/placa correspondiente. No habrá un segundo
+selector público de T-states: las esperas forman parte de ese perfil. Las
+herramientas conservan variantes 0/1/2 para comparar y calibrar referencias.
+Ninguna política puede eliminar dependencias reales, trabajo de instrucciones
+o accesos visibles.
+
+El usuario autoriza completar el desarrollo y la validación inicial de todas
+las tareas necesarias con 86Box como referencia, sin esperar las mediciones
+del colaborador. Intel fija el contrato arquitectónico y las diferencias
+conocidas del emulador se registran expresamente. Un perfil podrá aceptarse
+provisionalmente contra esa referencia con su alcance declarado; la posterior
+evidencia física servirá para revisar calibración y discrepancias. Esta decisión
+no convierte resultados ausentes en PASS ni certifica precisión de pines.
 
 P06-R01. Una frecuencia nominal no demuestra exactitud. Para cada perfil se
 deben declarar y validar separadamente:
@@ -215,11 +226,12 @@ XT-IDE de 8 bits conservan la secuencia de bytes, latch y tiempos requeridos.
 
 ## 9. OSD, estado guardado y cambio de modo
 
-P06-R17. Antes del RTL, definir la relación entre selección de velocidad y
-T-states opcionales: qué significa una frecuencia con temporización histórica
-apagada y qué niveles están certificados al activarla. Mostrar sólo perfiles
-con el estado de validación declarado. Distinguir selección pendiente de perfil
-activo hasta aplicar reset. MAX no promete una frecuencia histórica concreta.
+P06-R17. Un único selector relaciona MAX con avance por dependencias y las
+frecuencias en MHz con temporización histórica. Las esperas CPU/placa se
+definen dentro del perfil versionado; no son un ajuste público independiente.
+Mostrar sólo perfiles con el estado de validación declarado. Distinguir
+selección pendiente de perfil activo hasta aplicar reset. MAX no promete una
+frecuencia histórica concreta.
 
 La selección necesita al menos tres bits. Antes de asignarlos, producir un
 inventario de `CONF_STR`, usos `hps_status` y compatibilidad AT/XT. El overlay
@@ -298,6 +310,7 @@ la captura de respuestas entre ticks, el coste previsto y la frontera de prueba.
 La falta de mediciones físicas se declara pendiente, nunca como PASS. Los otros
 perfiles requieren sus propias matrices; no basta escalar un benchmark.
 
-Mantener el modo rápido disponible, sin retardos históricos artificiales y con
-todas las dependencias reales. La codificación OSD de Fast/T-states/velocidad se
-decidirá tras ese contrato; esta actualización sólo introduce documentación.
+Mantener MAX disponible, sin retardos históricos artificiales y con todas las
+dependencias reales. La asignación de bits OSD del único selector de velocidad
+sigue pendiente del inventario de integración. La referencia física pendiente
+no bloquea el desarrollo ni su aceptación provisional frente a 86Box.

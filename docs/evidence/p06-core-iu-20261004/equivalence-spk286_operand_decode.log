@@ -1,0 +1,790 @@
+
+-- Executing script file `/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/equivalence-spk286_operand_decode.ys' --
+
+1. Executing Verilog-2005 frontend: /mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_modrm.sv
+Parsing SystemVerilog input from `/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_modrm.sv' to AST representation.
+Generating RTLIL representation for module `\spk286_modrm'.
+Successfully finished Verilog frontend.
+
+2. Executing Verilog-2005 frontend: /mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_effective_address.sv
+Parsing SystemVerilog input from `/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_effective_address.sv' to AST representation.
+Generating RTLIL representation for module `\spk286_effective_address'.
+Successfully finished Verilog frontend.
+
+3. Executing Verilog-2005 frontend: /mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_operand_decode.sv
+Parsing SystemVerilog input from `/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_operand_decode.sv' to AST representation.
+Generating RTLIL representation for module `\spk286_operand_decode'.
+Successfully finished Verilog frontend.
+
+4. Executing PROC pass (convert processes to netlists).
+
+4.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+4.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Marked 4 switch rules as full_case in process $proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_operand_decode.sv:44$40 in module spk286_operand_decode.
+Removed 1 dead cases from process $proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_effective_address.sv:0$10 in module spk286_effective_address.
+Marked 1 switch rules as full_case in process $proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_effective_address.sv:0$10 in module spk286_effective_address.
+Removed a total of 1 dead cases.
+
+4.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 0 redundant assignments.
+Promoted 2 assignments to connections.
+
+4.4. Executing PROC_INIT pass (extract init attributes).
+
+4.5. Executing PROC_ARST pass (detect async resets in processes).
+
+4.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+<suppressed ~8 debug messages>
+
+4.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\spk286_operand_decode.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_operand_decode.sv:44$40'.
+     1/11: $0\displacement[15:0] [15:8]
+     2/11: $0\displacement[15:0] [7:0]
+     3/11: $0\size_q[1:0]
+     4/11: $0\state_q[2:0]
+     5/11: $0\effective_offset[15:0]
+     6/11: $0\segment_index[1:0]
+     7/11: $0\reuse_q[0:0]
+     8/11: $0\register_direct[0:0]
+     9/11: $0\rm_index[2:0]
+    10/11: $0\reg_index[2:0]
+    11/11: $0\mode[1:0]
+Creating decoders for process `\spk286_effective_address.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_effective_address.sv:0$10'.
+     1/2: $1\base_offset[15:0]
+     2/2: $1\uses_bp[0:0]
+
+4.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+No latch inferred for signal `\spk286_effective_address.\base_offset' from process `\spk286_effective_address.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_effective_address.sv:0$10'.
+No latch inferred for signal `\spk286_effective_address.\uses_bp' from process `\spk286_effective_address.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_effective_address.sv:0$10'.
+
+4.9. Executing PROC_DFF pass (convert process syncs to FFs).
+Creating register for signal `\spk286_operand_decode.\mode' using process `\spk286_operand_decode.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_operand_decode.sv:44$40'.
+  created $dff cell `$procdff$238' with positive edge clock.
+Creating register for signal `\spk286_operand_decode.\reg_index' using process `\spk286_operand_decode.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_operand_decode.sv:44$40'.
+  created $dff cell `$procdff$239' with positive edge clock.
+Creating register for signal `\spk286_operand_decode.\rm_index' using process `\spk286_operand_decode.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_operand_decode.sv:44$40'.
+  created $dff cell `$procdff$240' with positive edge clock.
+Creating register for signal `\spk286_operand_decode.\register_direct' using process `\spk286_operand_decode.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_operand_decode.sv:44$40'.
+  created $dff cell `$procdff$241' with positive edge clock.
+Creating register for signal `\spk286_operand_decode.\displacement' using process `\spk286_operand_decode.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_operand_decode.sv:44$40'.
+  created $dff cell `$procdff$242' with positive edge clock.
+Creating register for signal `\spk286_operand_decode.\segment_index' using process `\spk286_operand_decode.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_operand_decode.sv:44$40'.
+  created $dff cell `$procdff$243' with positive edge clock.
+Creating register for signal `\spk286_operand_decode.\effective_offset' using process `\spk286_operand_decode.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_operand_decode.sv:44$40'.
+  created $dff cell `$procdff$244' with positive edge clock.
+Creating register for signal `\spk286_operand_decode.\state_q' using process `\spk286_operand_decode.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_operand_decode.sv:44$40'.
+  created $dff cell `$procdff$245' with positive edge clock.
+Creating register for signal `\spk286_operand_decode.\size_q' using process `\spk286_operand_decode.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_operand_decode.sv:44$40'.
+  created $dff cell `$procdff$246' with positive edge clock.
+Creating register for signal `\spk286_operand_decode.\reuse_q' using process `\spk286_operand_decode.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_operand_decode.sv:44$40'.
+  created $dff cell `$procdff$247' with positive edge clock.
+
+4.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+4.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Found and cleaned up 7 empty switches in `\spk286_operand_decode.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_operand_decode.sv:44$40'.
+Removing empty process `spk286_operand_decode.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_operand_decode.sv:44$40'.
+Found and cleaned up 1 empty switch in `\spk286_effective_address.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_effective_address.sv:0$10'.
+Removing empty process `spk286_effective_address.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_effective_address.sv:0$10'.
+Cleaned up 8 empty switches.
+
+4.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spk286_operand_decode.
+<suppressed ~9 debug messages>
+Optimizing module spk286_effective_address.
+<suppressed ~4 debug messages>
+Optimizing module spk286_modrm.
+<suppressed ~1 debug messages>
+
+5. Executing OPT pass (performing simple optimizations).
+
+5.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spk286_operand_decode.
+Optimizing module spk286_effective_address.
+Optimizing module spk286_modrm.
+
+5.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spk286_operand_decode'.
+<suppressed ~48 debug messages>
+Finding identical cells in module `\spk286_effective_address'.
+<suppressed ~24 debug messages>
+Finding identical cells in module `\spk286_modrm'.
+Removed a total of 24 cells.
+
+5.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \spk286_operand_decode..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \spk286_effective_address..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \spk286_modrm..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~17 debug messages>
+
+5.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \spk286_operand_decode.
+  Optimizing cells in module \spk286_effective_address.
+    New ctrl vector for $pmux cell $procmux$229: { $auto$opt_reduce.cc:134:opt_pmux$251 $procmux$231_CMP $auto$opt_reduce.cc:134:opt_pmux$249 }
+  Optimizing cells in module \spk286_effective_address.
+  Optimizing cells in module \spk286_modrm.
+Performed a total of 1 changes.
+
+5.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spk286_operand_decode'.
+Finding identical cells in module `\spk286_effective_address'.
+Finding identical cells in module `\spk286_modrm'.
+Removed a total of 0 cells.
+
+5.6. Executing OPT_DFF pass (perform DFF optimizations).
+Adding SRST signal on $procdff$238 ($dff) from module spk286_operand_decode (D = $procmux$215_Y, Q = \mode, rval = 2'00).
+Adding EN signal on $auto$ff.cc:266:slice$252 ($sdff) from module spk286_operand_decode (D = \decoded_mode, Q = \mode).
+Adding SRST signal on $procdff$239 ($dff) from module spk286_operand_decode (D = $procmux$199_Y, Q = \reg_index, rval = 3'000).
+Adding EN signal on $auto$ff.cc:266:slice$258 ($sdff) from module spk286_operand_decode (D = \decoded_reg, Q = \reg_index).
+Adding SRST signal on $procdff$240 ($dff) from module spk286_operand_decode (D = $procmux$183_Y, Q = \rm_index, rval = 3'000).
+Adding EN signal on $auto$ff.cc:266:slice$264 ($sdff) from module spk286_operand_decode (D = \decoded_rm, Q = \rm_index).
+Adding SRST signal on $procdff$241 ($dff) from module spk286_operand_decode (D = $procmux$167_Y, Q = \register_direct, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$270 ($sdff) from module spk286_operand_decode (D = \decoded_direct, Q = \register_direct).
+Adding SRST signal on $procdff$242 ($dff) from module spk286_operand_decode (D = $procmux$66_Y, Q = \displacement [15:8], rval = 8'00000000).
+Adding SRST signal on $procdff$242 ($dff) from module spk286_operand_decode (D = $procmux$81_Y, Q = \displacement [7:0], rval = 8'00000000).
+Adding EN signal on $auto$ff.cc:266:slice$277 ($sdff) from module spk286_operand_decode (D = $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_operand_decode.sv:64$51_Y [7:0], Q = \displacement [7:0]).
+Adding EN signal on $auto$ff.cc:266:slice$276 ($sdff) from module spk286_operand_decode (D = $procmux$58_Y, Q = \displacement [15:8]).
+Adding SRST signal on $procdff$243 ($dff) from module spk286_operand_decode (D = $procmux$141_Y, Q = \segment_index, rval = 2'11).
+Adding EN signal on $auto$ff.cc:266:slice$290 ($sdff) from module spk286_operand_decode (D = $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_operand_decode.sv:75$55_Y, Q = \segment_index).
+Adding SRST signal on $procdff$244 ($dff) from module spk286_operand_decode (D = $procmux$128_Y, Q = \effective_offset, rval = 16'0000000000000000).
+Adding EN signal on $auto$ff.cc:266:slice$298 ($sdff) from module spk286_operand_decode (D = \ea_offset, Q = \effective_offset).
+Adding SRST signal on $procdff$245 ($dff) from module spk286_operand_decode (D = $procmux$115_Y, Q = \state_q, rval = 3'000).
+Adding EN signal on $auto$ff.cc:266:slice$306 ($sdff) from module spk286_operand_decode (D = $procmux$110_Y, Q = \state_q).
+Adding SRST signal on $procdff$246 ($dff) from module spk286_operand_decode (D = $procmux$97_Y, Q = \size_q, rval = 2'00).
+Adding EN signal on $auto$ff.cc:266:slice$316 ($sdff) from module spk286_operand_decode (D = \decoded_size, Q = \size_q).
+Adding SRST signal on $procdff$247 ($dff) from module spk286_operand_decode (D = $procmux$151_Y, Q = \reuse_q, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$322 ($sdff) from module spk286_operand_decode (D = $procmux$151_Y, Q = \reuse_q).
+
+5.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spk286_operand_decode..
+Finding unused cells or wires in module \spk286_effective_address..
+Finding unused cells or wires in module \spk286_modrm..
+Removed 48 unused cells and 144 unused wires.
+<suppressed ~51 debug messages>
+
+5.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spk286_effective_address.
+Optimizing module spk286_modrm.
+Optimizing module spk286_operand_decode.
+<suppressed ~3 debug messages>
+
+5.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+5.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \spk286_effective_address..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \spk286_modrm..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \spk286_operand_decode..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~10 debug messages>
+
+5.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \spk286_effective_address.
+  Optimizing cells in module \spk286_modrm.
+  Optimizing cells in module \spk286_operand_decode.
+Performed a total of 0 changes.
+
+5.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spk286_effective_address'.
+Finding identical cells in module `\spk286_modrm'.
+Finding identical cells in module `\spk286_operand_decode'.
+<suppressed ~45 debug messages>
+Removed a total of 15 cells.
+
+5.13. Executing OPT_DFF pass (perform DFF optimizations).
+
+5.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spk286_effective_address..
+Finding unused cells or wires in module \spk286_modrm..
+Finding unused cells or wires in module \spk286_operand_decode..
+Removed 0 unused cells and 15 unused wires.
+<suppressed ~1 debug messages>
+
+5.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spk286_effective_address.
+Optimizing module spk286_modrm.
+Optimizing module spk286_operand_decode.
+
+5.16. Rerunning OPT passes. (Maybe there is more to do..)
+
+5.17. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \spk286_effective_address..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \spk286_modrm..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \spk286_operand_decode..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~10 debug messages>
+
+5.18. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \spk286_effective_address.
+  Optimizing cells in module \spk286_modrm.
+  Optimizing cells in module \spk286_operand_decode.
+Performed a total of 0 changes.
+
+5.19. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spk286_effective_address'.
+Finding identical cells in module `\spk286_modrm'.
+Finding identical cells in module `\spk286_operand_decode'.
+Removed a total of 0 cells.
+
+5.20. Executing OPT_DFF pass (perform DFF optimizations).
+
+5.21. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spk286_effective_address..
+Finding unused cells or wires in module \spk286_modrm..
+Finding unused cells or wires in module \spk286_operand_decode..
+
+5.22. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spk286_effective_address.
+Optimizing module spk286_modrm.
+Optimizing module spk286_operand_decode.
+
+5.23. Finished OPT passes. (There is nothing left to do.)
+Renaming module \spk286_operand_decode to \gold.
+
+6. Executing Verilog-2005 frontend: /mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_operand_decode.sv
+Parsing SystemVerilog input from `/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_operand_decode.sv' to AST representation.
+Generating RTLIL representation for module `\spk286_operand_decode'.
+Successfully finished Verilog frontend.
+Parameter \P06_IU_OVERLAP = 0
+
+7. Executing AST frontend in derive mode using pre-parsed AST for module `\spk286_operand_decode'.
+Parameter \P06_IU_OVERLAP = 0
+Generating RTLIL representation for module `$paramod\spk286_operand_decode\P06_IU_OVERLAP=32'00000000000000000000000000000000'.
+
+8. Executing PROC pass (convert processes to netlists).
+
+8.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+8.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Marked 4 switch rules as full_case in process $proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_operand_decode.sv:47$398 in module spk286_operand_decode.
+Removed a total of 0 dead cases.
+
+8.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 0 redundant assignments.
+Promoted 0 assignments to connections.
+
+8.4. Executing PROC_INIT pass (extract init attributes).
+
+8.5. Executing PROC_ARST pass (detect async resets in processes).
+
+8.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+<suppressed ~7 debug messages>
+
+8.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\spk286_operand_decode.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_operand_decode.sv:47$398'.
+     1/11: $0\displacement[15:0] [15:8]
+     2/11: $0\displacement[15:0] [7:0]
+     3/11: $0\size_q[1:0]
+     4/11: $0\state_q[2:0]
+     5/11: $0\effective_offset[15:0]
+     6/11: $0\segment_index[1:0]
+     7/11: $0\reuse_q[0:0]
+     8/11: $0\register_direct[0:0]
+     9/11: $0\rm_index[2:0]
+    10/11: $0\reg_index[2:0]
+    11/11: $0\mode[1:0]
+
+8.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+
+8.9. Executing PROC_DFF pass (convert process syncs to FFs).
+Creating register for signal `\spk286_operand_decode.\mode' using process `\spk286_operand_decode.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_operand_decode.sv:47$398'.
+  created $dff cell `$procdff$578' with positive edge clock.
+Creating register for signal `\spk286_operand_decode.\reg_index' using process `\spk286_operand_decode.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_operand_decode.sv:47$398'.
+  created $dff cell `$procdff$579' with positive edge clock.
+Creating register for signal `\spk286_operand_decode.\rm_index' using process `\spk286_operand_decode.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_operand_decode.sv:47$398'.
+  created $dff cell `$procdff$580' with positive edge clock.
+Creating register for signal `\spk286_operand_decode.\register_direct' using process `\spk286_operand_decode.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_operand_decode.sv:47$398'.
+  created $dff cell `$procdff$581' with positive edge clock.
+Creating register for signal `\spk286_operand_decode.\displacement' using process `\spk286_operand_decode.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_operand_decode.sv:47$398'.
+  created $dff cell `$procdff$582' with positive edge clock.
+Creating register for signal `\spk286_operand_decode.\segment_index' using process `\spk286_operand_decode.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_operand_decode.sv:47$398'.
+  created $dff cell `$procdff$583' with positive edge clock.
+Creating register for signal `\spk286_operand_decode.\effective_offset' using process `\spk286_operand_decode.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_operand_decode.sv:47$398'.
+  created $dff cell `$procdff$584' with positive edge clock.
+Creating register for signal `\spk286_operand_decode.\state_q' using process `\spk286_operand_decode.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_operand_decode.sv:47$398'.
+  created $dff cell `$procdff$585' with positive edge clock.
+Creating register for signal `\spk286_operand_decode.\size_q' using process `\spk286_operand_decode.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_operand_decode.sv:47$398'.
+  created $dff cell `$procdff$586' with positive edge clock.
+Creating register for signal `\spk286_operand_decode.\reuse_q' using process `\spk286_operand_decode.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_operand_decode.sv:47$398'.
+  created $dff cell `$procdff$587' with positive edge clock.
+
+8.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+8.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Found and cleaned up 7 empty switches in `\spk286_operand_decode.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_operand_decode.sv:47$398'.
+Removing empty process `spk286_operand_decode.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_operand_decode.sv:47$398'.
+Cleaned up 7 empty switches.
+
+8.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spk286_operand_decode.
+<suppressed ~11 debug messages>
+Optimizing module gold.
+Optimizing module spk286_modrm.
+Optimizing module spk286_effective_address.
+
+9. Executing OPT pass (performing simple optimizations).
+
+9.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spk286_operand_decode.
+Optimizing module gold.
+Optimizing module spk286_modrm.
+Optimizing module spk286_effective_address.
+
+9.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spk286_operand_decode'.
+<suppressed ~66 debug messages>
+Finding identical cells in module `\gold'.
+Finding identical cells in module `\spk286_modrm'.
+Finding identical cells in module `\spk286_effective_address'.
+Removed a total of 22 cells.
+
+9.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \spk286_operand_decode..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \gold..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \spk286_modrm..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \spk286_effective_address..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~22 debug messages>
+
+9.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \spk286_operand_decode.
+  Optimizing cells in module \gold.
+  Optimizing cells in module \spk286_modrm.
+  Optimizing cells in module \spk286_effective_address.
+Performed a total of 0 changes.
+
+9.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spk286_operand_decode'.
+Finding identical cells in module `\gold'.
+Finding identical cells in module `\spk286_modrm'.
+Finding identical cells in module `\spk286_effective_address'.
+Removed a total of 0 cells.
+
+9.6. Executing OPT_DFF pass (perform DFF optimizations).
+Adding SRST signal on $procdff$585 ($dff) from module spk286_operand_decode (D = $procmux$473_Y, Q = \state_q, rval = 3'000).
+Adding EN signal on $auto$ff.cc:266:slice$588 ($sdff) from module spk286_operand_decode (D = $procmux$468_Y, Q = \state_q).
+Adding SRST signal on $procdff$586 ($dff) from module spk286_operand_decode (D = $procmux$455_Y, Q = \size_q, rval = 2'00).
+Adding EN signal on $auto$ff.cc:266:slice$598 ($sdff) from module spk286_operand_decode (D = \decoded_size, Q = \size_q).
+Adding SRST signal on $procdff$587 ($dff) from module spk286_operand_decode (D = $procmux$509_Y, Q = \reuse_q, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$604 ($sdff) from module spk286_operand_decode (D = $procmux$509_Y, Q = \reuse_q).
+Adding SRST signal on $procdff$578 ($dff) from module spk286_operand_decode (D = $procmux$573_Y, Q = \mode, rval = 2'00).
+Adding EN signal on $auto$ff.cc:266:slice$612 ($sdff) from module spk286_operand_decode (D = \decoded_mode, Q = \mode).
+Adding SRST signal on $procdff$579 ($dff) from module spk286_operand_decode (D = $procmux$557_Y, Q = \reg_index, rval = 3'000).
+Adding EN signal on $auto$ff.cc:266:slice$618 ($sdff) from module spk286_operand_decode (D = \decoded_reg, Q = \reg_index).
+Adding SRST signal on $procdff$580 ($dff) from module spk286_operand_decode (D = $procmux$541_Y, Q = \rm_index, rval = 3'000).
+Adding EN signal on $auto$ff.cc:266:slice$624 ($sdff) from module spk286_operand_decode (D = \decoded_rm, Q = \rm_index).
+Adding SRST signal on $procdff$581 ($dff) from module spk286_operand_decode (D = $procmux$525_Y, Q = \register_direct, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$630 ($sdff) from module spk286_operand_decode (D = \decoded_direct, Q = \register_direct).
+Adding SRST signal on $procdff$582 ($dff) from module spk286_operand_decode (D = $procmux$424_Y, Q = \displacement [15:8], rval = 8'00000000).
+Adding SRST signal on $procdff$582 ($dff) from module spk286_operand_decode (D = $procmux$439_Y, Q = \displacement [7:0], rval = 8'00000000).
+Adding EN signal on $auto$ff.cc:266:slice$637 ($sdff) from module spk286_operand_decode (D = $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_operand_decode.sv:67$409_Y [7:0], Q = \displacement [7:0]).
+Adding EN signal on $auto$ff.cc:266:slice$636 ($sdff) from module spk286_operand_decode (D = $procmux$416_Y, Q = \displacement [15:8]).
+Adding SRST signal on $procdff$583 ($dff) from module spk286_operand_decode (D = $procmux$499_Y, Q = \segment_index, rval = 2'11).
+Adding EN signal on $auto$ff.cc:266:slice$650 ($sdff) from module spk286_operand_decode (D = $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_operand_decode.sv:78$413_Y, Q = \segment_index).
+Adding SRST signal on $procdff$584 ($dff) from module spk286_operand_decode (D = $procmux$486_Y, Q = \effective_offset, rval = 16'0000000000000000).
+Adding EN signal on $auto$ff.cc:266:slice$658 ($sdff) from module spk286_operand_decode (D = \ea_offset, Q = \effective_offset).
+
+9.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spk286_operand_decode..
+Finding unused cells or wires in module \gold..
+Finding unused cells or wires in module \spk286_modrm..
+Finding unused cells or wires in module \spk286_effective_address..
+Removed 48 unused cells and 133 unused wires.
+<suppressed ~49 debug messages>
+
+9.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module gold.
+Optimizing module spk286_effective_address.
+Optimizing module spk286_modrm.
+Optimizing module spk286_operand_decode.
+<suppressed ~3 debug messages>
+
+9.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+9.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \gold..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \spk286_effective_address..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \spk286_modrm..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \spk286_operand_decode..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~15 debug messages>
+
+9.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \gold.
+  Optimizing cells in module \spk286_effective_address.
+  Optimizing cells in module \spk286_modrm.
+  Optimizing cells in module \spk286_operand_decode.
+Performed a total of 0 changes.
+
+9.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\gold'.
+Finding identical cells in module `\spk286_effective_address'.
+Finding identical cells in module `\spk286_modrm'.
+Finding identical cells in module `\spk286_operand_decode'.
+<suppressed ~45 debug messages>
+Removed a total of 15 cells.
+
+9.13. Executing OPT_DFF pass (perform DFF optimizations).
+
+9.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \gold..
+Finding unused cells or wires in module \spk286_effective_address..
+Finding unused cells or wires in module \spk286_modrm..
+Finding unused cells or wires in module \spk286_operand_decode..
+Removed 0 unused cells and 15 unused wires.
+<suppressed ~1 debug messages>
+
+9.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module gold.
+Optimizing module spk286_effective_address.
+Optimizing module spk286_modrm.
+Optimizing module spk286_operand_decode.
+
+9.16. Rerunning OPT passes. (Maybe there is more to do..)
+
+9.17. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \gold..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \spk286_effective_address..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \spk286_modrm..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \spk286_operand_decode..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~15 debug messages>
+
+9.18. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \gold.
+  Optimizing cells in module \spk286_effective_address.
+  Optimizing cells in module \spk286_modrm.
+  Optimizing cells in module \spk286_operand_decode.
+Performed a total of 0 changes.
+
+9.19. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\gold'.
+Finding identical cells in module `\spk286_effective_address'.
+Finding identical cells in module `\spk286_modrm'.
+Finding identical cells in module `\spk286_operand_decode'.
+Removed a total of 0 cells.
+
+9.20. Executing OPT_DFF pass (perform DFF optimizations).
+
+9.21. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \gold..
+Finding unused cells or wires in module \spk286_effective_address..
+Finding unused cells or wires in module \spk286_modrm..
+Finding unused cells or wires in module \spk286_operand_decode..
+
+9.22. Executing OPT_EXPR pass (perform const folding).
+Optimizing module gold.
+Optimizing module spk286_effective_address.
+Optimizing module spk286_modrm.
+Optimizing module spk286_operand_decode.
+
+9.23. Finished OPT passes. (There is nothing left to do.)
+Renaming module \spk286_operand_decode to \gate.
+
+10. Executing EQUIV_MAKE pass (creating equiv checking module).
+Presumably equivalent wires: allowed_gold (\allowed_gold), allowed_gate (\allowed_gate) -> allowed
+Presumably equivalent wires: bp_gold (\bp_gold), bp_gate (\bp_gate) -> bp
+Presumably equivalent wires: bx_gold (\bx_gold), bx_gate (\bx_gate) -> bx
+Presumably equivalent wires: byte_data_gold (\byte_data_gold), byte_data_gate (\byte_data_gate) -> byte_data
+Presumably equivalent wires: byte_ready_gold (\byte_ready_gold), byte_ready_gate (\byte_ready_gate) -> byte_ready
+Presumably equivalent wires: byte_valid_gold (\byte_valid_gold), byte_valid_gate (\byte_valid_gate) -> byte_valid
+Presumably equivalent wires: cancel_gold (\cancel_gold), cancel_gate (\cancel_gate) -> cancel
+Presumably equivalent wires: clk_gold (\clk_gold), clk_gate (\clk_gate) -> clk
+Presumably equivalent wires: decoded_direct_gold (\decoded_direct_gold), decoded_direct_gate (\decoded_direct_gate) -> decoded_direct
+Presumably equivalent wires: decoded_mode_gold (\decoded_mode_gold), decoded_mode_gate (\decoded_mode_gate) -> decoded_mode
+Presumably equivalent wires: decoded_reg_gold (\decoded_reg_gold), decoded_reg_gate (\decoded_reg_gate) -> decoded_reg
+Presumably equivalent wires: decoded_rm_gold (\decoded_rm_gold), decoded_rm_gate (\decoded_rm_gate) -> decoded_rm
+Presumably equivalent wires: decoded_size_gold (\decoded_size_gold), decoded_size_gate (\decoded_size_gate) -> decoded_size
+Presumably equivalent wires: di_gold (\di_gold), di_gate (\di_gate) -> di
+Presumably equivalent wires: displacement_gold (\displacement_gold), displacement_gate (\displacement_gate) -> displacement
+Presumably equivalent wires: done_gold (\done_gold), done_gate (\done_gate) -> done
+Presumably equivalent wires: ea_memory_gold (\ea_memory_gold), ea_memory_gate (\ea_memory_gate) -> ea_memory
+Presumably equivalent wires: ea_offset_gold (\ea_offset_gold), ea_offset_gate (\ea_offset_gate) -> ea_offset
+Presumably equivalent wires: ea_segment_gold (\ea_segment_gold), ea_segment_gate (\ea_segment_gate) -> ea_segment
+Presumably equivalent wires: effective_offset_gold (\effective_offset_gold), effective_offset_gate (\effective_offset_gate) -> effective_offset
+Presumably equivalent wires: enable_gold (\enable_gold), enable_gate (\enable_gate) -> enable
+Presumably equivalent wires: mode_gold (\mode_gold), mode_gate (\mode_gate) -> mode
+Presumably equivalent wires: modrm_valid_gold (\modrm_valid_gold), modrm_valid_gate (\modrm_valid_gate) -> modrm_valid
+Presumably equivalent wires: rearm_gold (\rearm_gold), rearm_gate (\rearm_gate) -> rearm
+Presumably equivalent wires: reg_index_gold (\reg_index_gold), reg_index_gate (\reg_index_gate) -> reg_index
+Presumably equivalent wires: register_direct_gold (\register_direct_gold), register_direct_gate (\register_direct_gate) -> register_direct
+Presumably equivalent wires: reset_gold (\reset_gold), reset_gate (\reset_gate) -> reset
+Presumably equivalent wires: reuse_q_gold (\reuse_q_gold), reuse_q_gate (\reuse_q_gate) -> reuse_q
+Presumably equivalent wires: rm_index_gold (\rm_index_gold), rm_index_gate (\rm_index_gate) -> rm_index
+Presumably equivalent wires: segment_index_gold (\segment_index_gold), segment_index_gate (\segment_index_gate) -> segment_index
+Presumably equivalent wires: si_gold (\si_gold), si_gate (\si_gate) -> si
+Presumably equivalent wires: size_q_gold (\size_q_gold), size_q_gate (\size_q_gate) -> size_q
+Presumably equivalent wires: start_gold (\start_gold), start_gate (\start_gate) -> start
+Presumably equivalent wires: state_q_gold (\state_q_gold), state_q_gate (\state_q_gate) -> state_q
+Changing input D of cell $auto$ff.cc:266:slice$599_gate ($sdffe): \decoded_size_gate -> \decoded_size
+Changing input D of cell $auto$ff.cc:266:slice$613_gate ($sdffe): \decoded_mode_gate -> \decoded_mode
+Changing input D of cell $auto$ff.cc:266:slice$619_gate ($sdffe): \decoded_reg_gate -> \decoded_reg
+Changing input D of cell $auto$ff.cc:266:slice$625_gate ($sdffe): \decoded_rm_gate -> \decoded_rm
+Changing input D of cell $auto$ff.cc:266:slice$631_gate ($sdffe): \decoded_direct_gate -> \decoded_direct
+Changing input D of cell $auto$ff.cc:266:slice$659_gate ($sdffe): \ea_offset_gate -> \ea_offset
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$607_gate ($ne): { \allowed_gate $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_operand_decode.sv:45$394_Y_gate $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_operand_decode.sv:54$402_Y_gate } -> { \allowed $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_operand_decode.sv:45$394_Y_gate $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_operand_decode.sv:54$402_Y_gate }
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$609_gate ($reduce_bool): { \allowed_gate $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_operand_decode.sv:54$402_Y_gate } -> { \allowed $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_operand_decode.sv:54$402_Y_gate }
+Changing input A of cell $auto$opt_dff.cc:220:make_patterns_logic$597_gate ($reduce_and): { $auto$rtlil.cc:2401:Not$595_gate $auto$opt_dff.cc:194:make_patterns_logic$592_gate $auto$opt_dff.cc:194:make_patterns_logic$590_gate \allowed_gate } -> { $auto$rtlil.cc:2401:Not$595_gate $auto$opt_dff.cc:194:make_patterns_logic$592_gate $auto$opt_dff.cc:194:make_patterns_logic$590_gate \allowed }
+Changing input A of cell $auto$opt_dff.cc:220:make_patterns_logic$603_gate ($reduce_and): { $eq$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_operand_decode.sv:40$378_Y_gate $auto$rtlil.cc:2401:Not$595_gate $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_operand_decode.sv:59$405_Y_gate \allowed_gate } -> { $eq$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_operand_decode.sv:40$378_Y_gate $auto$rtlil.cc:2401:Not$595_gate $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_operand_decode.sv:59$405_Y_gate \allowed }
+Changing input A of cell $auto$opt_dff.cc:220:make_patterns_logic$642_gate ($reduce_and): { $eq$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_operand_decode.sv:40$379_Y_gate $auto$rtlil.cc:2401:Not$595_gate $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_operand_decode.sv:59$405_Y_gate \allowed_gate } -> { $eq$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_operand_decode.sv:40$379_Y_gate $auto$rtlil.cc:2401:Not$595_gate $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_operand_decode.sv:59$405_Y_gate \allowed }
+Changing input A of cell $auto$opt_dff.cc:220:make_patterns_logic$649_gate ($reduce_and): { $auto$opt_dff.cc:194:make_patterns_logic$644_gate $auto$rtlil.cc:2401:Not$595_gate $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_operand_decode.sv:59$405_Y_gate \allowed_gate } -> { $auto$opt_dff.cc:194:make_patterns_logic$644_gate $auto$rtlil.cc:2401:Not$595_gate $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_operand_decode.sv:59$405_Y_gate \allowed }
+Changing input A of cell $auto$opt_dff.cc:220:make_patterns_logic$657_gate ($reduce_and): { $auto$rtlil.cc:2401:Not$655_gate $auto$rtlil.cc:2401:Not$595_gate $eq$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_operand_decode.sv:45$392_Y_gate \allowed_gate } -> { $auto$rtlil.cc:2401:Not$655_gate $auto$rtlil.cc:2401:Not$595_gate $eq$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_operand_decode.sv:45$392_Y_gate \allowed }
+Changing input A of cell $eq$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_operand_decode.sv:45$392_gate ($eq): \state_q_gate -> \state_q
+Changing input A of cell $eq$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_operand_decode.sv:45$393_gate ($eq): \state_q_gate -> \state_q
+Changing input A of cell $eq$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_operand_decode.sv:64$406_gate ($logic_not): \decoded_size_gate -> \decoded_size
+Changing input A of cell $eq$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_operand_decode.sv:67$408_gate ($eq): \size_q_gate -> \size_q
+Changing input A of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_operand_decode.sv:40$383_gate ($logic_and): \allowed_gate -> \allowed
+Changing input A of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_operand_decode.sv:43$396_gate ($logic_and): \allowed_gate -> \allowed
+Changing input B of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_operand_decode.sv:45$394_gate ($logic_and): \reuse_q_gate -> \reuse_q
+Changing input B of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_operand_decode.sv:59$405_gate ($logic_and): \byte_ready_gate -> \byte_ready
+Changing input A of cell $ne$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_operand_decode.sv:46$397_gate ($reduce_bool): \state_q_gate -> \state_q
+Changing input A of cell $procmux$465_CMP0_gate ($eq): \state_q_gate -> \state_q
+Changing input A of cell $procmux$466_CMP0_gate ($eq): \state_q_gate -> \state_q
+Changing input S of cell $procmux$506_gate ($mux): \allowed_gate -> \allowed
+Changing input A of cell $procmux$567_CMP0_gate ($logic_not): \state_q_gate -> \state_q
+Changing input B of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_operand_decode.sv:78$413_gate ($mux): \ea_segment_gate -> \ea_segment
+Changing input S of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_operand_decode.sv:78$413_gate ($mux): \ea_memory_gate -> \ea_memory
+Changing input displacement of cell ea_gate (spk286_effective_address): \displacement_gate -> \displacement
+Changing input mode of cell ea_gate (spk286_effective_address): \mode_gate -> \mode
+Changing input rm_index of cell ea_gate (spk286_effective_address): \rm_index_gate -> \rm_index
+Changing input D of cell $auto$ff.cc:266:slice$259_gold ($sdffe): \decoded_reg_gold -> \decoded_reg
+Changing input D of cell $auto$ff.cc:266:slice$265_gold ($sdffe): \decoded_rm_gold -> \decoded_rm
+Changing input D of cell $auto$ff.cc:266:slice$271_gold ($sdffe): \decoded_direct_gold -> \decoded_direct
+Changing input D of cell $auto$ff.cc:266:slice$299_gold ($sdffe): \ea_offset_gold -> \ea_offset
+Changing input D of cell $auto$ff.cc:266:slice$317_gold ($sdffe): \decoded_size_gold -> \decoded_size
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$325_gold ($reduce_bool): { $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_operand_decode.sv:51$44_Y_gold \allowed_gold } -> { $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_operand_decode.sv:51$44_Y_gold \allowed }
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$327_gold ($ne): { $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_operand_decode.sv:42$36_Y_gold $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_operand_decode.sv:51$44_Y_gold \allowed_gold } -> { $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_operand_decode.sv:42$36_Y_gold $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_operand_decode.sv:51$44_Y_gold \allowed }
+Changing input A of cell $auto$opt_dff.cc:220:make_patterns_logic$257_gold ($reduce_and): { $auto$rtlil.cc:2401:Not$255_gold $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_operand_decode.sv:56$47_Y_gold $eq$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_operand_decode.sv:39$28_Y_gold \allowed_gold } -> { $auto$rtlil.cc:2401:Not$255_gold $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_operand_decode.sv:56$47_Y_gold $eq$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_operand_decode.sv:39$28_Y_gold \allowed }
+Changing input A of cell $auto$opt_dff.cc:220:make_patterns_logic$282_gold ($reduce_and): { $auto$rtlil.cc:2401:Not$255_gold $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_operand_decode.sv:56$47_Y_gold $eq$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_operand_decode.sv:39$29_Y_gold \allowed_gold } -> { $auto$rtlil.cc:2401:Not$255_gold $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_operand_decode.sv:56$47_Y_gold $eq$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_operand_decode.sv:39$29_Y_gold \allowed }
+Changing input A of cell $auto$opt_dff.cc:220:make_patterns_logic$289_gold ($reduce_and): { $auto$opt_dff.cc:194:make_patterns_logic$284_gold $auto$rtlil.cc:2401:Not$255_gold $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_operand_decode.sv:56$47_Y_gold \allowed_gold } -> { $auto$opt_dff.cc:194:make_patterns_logic$284_gold $auto$rtlil.cc:2401:Not$255_gold $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_operand_decode.sv:56$47_Y_gold \allowed }
+Changing input A of cell $auto$opt_dff.cc:220:make_patterns_logic$297_gold ($reduce_and): { $auto$rtlil.cc:2401:Not$293_gold $auto$rtlil.cc:2401:Not$255_gold $eq$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_operand_decode.sv:42$34_Y_gold \allowed_gold } -> { $auto$rtlil.cc:2401:Not$293_gold $auto$rtlil.cc:2401:Not$255_gold $eq$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_operand_decode.sv:42$34_Y_gold \allowed }
+Changing input A of cell $auto$opt_dff.cc:220:make_patterns_logic$315_gold ($reduce_and): { $auto$opt_dff.cc:194:make_patterns_logic$310_gold $auto$opt_dff.cc:194:make_patterns_logic$308_gold $auto$rtlil.cc:2401:Not$255_gold \allowed_gold } -> { $auto$opt_dff.cc:194:make_patterns_logic$310_gold $auto$opt_dff.cc:194:make_patterns_logic$308_gold $auto$rtlil.cc:2401:Not$255_gold \allowed }
+Changing input A of cell $eq$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_operand_decode.sv:55$45_gold ($eq): \state_q_gold -> \state_q
+Changing input A of cell $eq$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_operand_decode.sv:61$48_gold ($logic_not): \decoded_size_gold -> \decoded_size
+Changing input A of cell $eq$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_operand_decode.sv:65$52_gold ($eq): \size_q_gold -> \size_q
+Changing input A of cell $eq$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_operand_decode.sv:73$54_gold ($eq): \state_q_gold -> \state_q
+Changing input A of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_operand_decode.sv:39$33_gold ($logic_and): \allowed_gold -> \allowed
+Changing input A of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_operand_decode.sv:42$38_gold ($logic_and): \allowed_gold -> \allowed
+Changing input B of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_operand_decode.sv:55$46_gold ($logic_and): \reuse_q_gold -> \reuse_q
+Changing input B of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_operand_decode.sv:56$47_gold ($logic_and): \byte_ready_gold -> \byte_ready
+Changing input A of cell $ne$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_operand_decode.sv:43$39_gold ($reduce_bool): \state_q_gold -> \state_q
+Changing input A of cell $procmux$107_CMP0_gold ($eq): \state_q_gold -> \state_q
+Changing input A of cell $procmux$108_CMP0_gold ($eq): \state_q_gold -> \state_q
+Changing input S of cell $procmux$148_gold ($mux): \allowed_gold -> \allowed
+Changing input A of cell $procmux$209_CMP0_gold ($logic_not): \state_q_gold -> \state_q
+Changing input B of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_operand_decode.sv:75$55_gold ($mux): \ea_segment_gold -> \ea_segment
+Changing input S of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_operand_decode.sv:75$55_gold ($mux): \ea_memory_gold -> \ea_memory
+Changing input displacement of cell ea_gold (spk286_effective_address): \displacement_gold -> \displacement
+Changing input mode of cell ea_gold (spk286_effective_address): \mode_gold -> \mode
+Changing input rm_index of cell ea_gold (spk286_effective_address): \rm_index_gold -> \rm_index
+Changing input D of cell $auto$ff.cc:266:slice$253_gold ($sdffe): \decoded_mode_gold -> \decoded_mode
+Presumably equivalent cells: ea_gold ea_gate (spk286_effective_address) -> ea
+Presumably equivalent cells: modrm_gold modrm_gate (spk286_modrm) -> modrm
+Setting undriven nets to undef: \p06_relaunch_window_gate
+
+11. Executing HIERARCHY pass (managing design hierarchy).
+
+11.1. Analyzing design hierarchy..
+Top module:  \equiv
+Used module:     \spk286_modrm
+Used module:     \spk286_effective_address
+
+11.2. Analyzing design hierarchy..
+Top module:  \equiv
+Used module:     \spk286_modrm
+Used module:     \spk286_effective_address
+Removing unused module `\gate'.
+Removing unused module `\gold'.
+Removed 2 unused modules.
+
+12. Executing EQUIV_SIMPLE pass.
+Found 83 unproven $equiv cells (22 groups) in equiv:
+ Grouping SAT models for \mode:
+  Trying to prove $equiv for \mode [0]: failed.
+  Trying to prove $equiv for \mode [1]: failed.
+ Grouping SAT models for \reg_index:
+  Trying to prove $equiv for \reg_index [0]: failed.
+  Trying to prove $equiv for \reg_index [1]: failed.
+  Trying to prove $equiv for \reg_index [2]: failed.
+ Grouping SAT models for \rm_index:
+  Trying to prove $equiv for \rm_index [0]: failed.
+  Trying to prove $equiv for \rm_index [1]: failed.
+  Trying to prove $equiv for \rm_index [2]: failed.
+  Trying to prove $equiv for \register_direct: failed.
+ Grouping SAT models for \displacement:
+  Trying to prove $equiv for \displacement [0]: failed.
+  Trying to prove $equiv for \displacement [1]: failed.
+  Trying to prove $equiv for \displacement [2]: failed.
+  Trying to prove $equiv for \displacement [3]: failed.
+  Trying to prove $equiv for \displacement [4]: failed.
+  Trying to prove $equiv for \displacement [5]: failed.
+  Trying to prove $equiv for \displacement [6]: failed.
+  Trying to prove $equiv for \displacement [7]: failed.
+  Trying to prove $equiv for \displacement [8]: failed.
+  Trying to prove $equiv for \displacement [9]: failed.
+  Trying to prove $equiv for \displacement [10]: failed.
+  Trying to prove $equiv for \displacement [11]: failed.
+  Trying to prove $equiv for \displacement [12]: failed.
+  Trying to prove $equiv for \displacement [13]: failed.
+  Trying to prove $equiv for \displacement [14]: failed.
+  Trying to prove $equiv for \displacement [15]: failed.
+ Grouping SAT models for \segment_index:
+  Trying to prove $equiv for \segment_index [0]: failed.
+  Trying to prove $equiv for \segment_index [1]: failed.
+  Trying to prove $equiv for \byte_ready: success!
+  Trying to prove $equiv for \done: success!
+  Trying to prove $equiv for \modrm_valid: success!
+ Grouping SAT models for \effective_offset:
+  Trying to prove $equiv for \effective_offset [0]: failed.
+  Trying to prove $equiv for \effective_offset [1]: failed.
+  Trying to prove $equiv for \effective_offset [2]: failed.
+  Trying to prove $equiv for \effective_offset [3]: failed.
+  Trying to prove $equiv for \effective_offset [4]: failed.
+  Trying to prove $equiv for \effective_offset [5]: failed.
+  Trying to prove $equiv for \effective_offset [6]: failed.
+  Trying to prove $equiv for \effective_offset [7]: failed.
+  Trying to prove $equiv for \effective_offset [8]: failed.
+  Trying to prove $equiv for \effective_offset [9]: failed.
+  Trying to prove $equiv for \effective_offset [10]: failed.
+  Trying to prove $equiv for \effective_offset [11]: failed.
+  Trying to prove $equiv for \effective_offset [12]: failed.
+  Trying to prove $equiv for \effective_offset [13]: failed.
+  Trying to prove $equiv for \effective_offset [14]: failed.
+  Trying to prove $equiv for \effective_offset [15]: failed.
+ Grouping SAT models for \state_q:
+  Trying to prove $equiv for \state_q [0]: failed.
+  Trying to prove $equiv for \state_q [1]: failed.
+  Trying to prove $equiv for \state_q [2]: failed.
+ Grouping SAT models for \decoded_mode:
+  Trying to prove $equiv for \decoded_mode [0]: success!
+  Trying to prove $equiv for \decoded_mode [1]: success!
+ Grouping SAT models for \decoded_size:
+  Trying to prove $equiv for \decoded_size [0]: success!
+  Trying to prove $equiv for \decoded_size [1]: success!
+ Grouping SAT models for \size_q:
+  Trying to prove $equiv for \size_q [0]: failed.
+  Trying to prove $equiv for \size_q [1]: failed.
+ Grouping SAT models for \decoded_reg:
+  Trying to prove $equiv for \decoded_reg [0]: success!
+  Trying to prove $equiv for \decoded_reg [1]: success!
+  Trying to prove $equiv for \decoded_reg [2]: success!
+ Grouping SAT models for \decoded_rm:
+  Trying to prove $equiv for \decoded_rm [0]: success!
+  Trying to prove $equiv for \decoded_rm [1]: success!
+  Trying to prove $equiv for \decoded_rm [2]: success!
+  Trying to prove $equiv for \decoded_direct: success!
+  Trying to prove $equiv for \ea_memory: success!
+ Grouping SAT models for \ea_offset:
+  Trying to prove $equiv for \ea_offset [0]: success!
+  Trying to prove $equiv for \ea_offset [1]: success!
+  Trying to prove $equiv for \ea_offset [2]: success!
+  Trying to prove $equiv for \ea_offset [3]: success!
+  Trying to prove $equiv for \ea_offset [4]: success!
+  Trying to prove $equiv for \ea_offset [5]: success!
+  Trying to prove $equiv for \ea_offset [6]: success!
+  Trying to prove $equiv for \ea_offset [7]: success!
+  Trying to prove $equiv for \ea_offset [8]: success!
+  Trying to prove $equiv for \ea_offset [9]: success!
+  Trying to prove $equiv for \ea_offset [10]: success!
+  Trying to prove $equiv for \ea_offset [11]: success!
+  Trying to prove $equiv for \ea_offset [12]: success!
+  Trying to prove $equiv for \ea_offset [13]: success!
+  Trying to prove $equiv for \ea_offset [14]: success!
+  Trying to prove $equiv for \ea_offset [15]: success!
+ Grouping SAT models for \ea_segment:
+  Trying to prove $equiv for \ea_segment [0]: success!
+  Trying to prove $equiv for \ea_segment [1]: success!
+  Trying to prove $equiv for \allowed: success!
+  Trying to prove $equiv for \reuse_q: failed.
+Proved 34 previously unproven $equiv cells.
+
+13. Executing EQUIV_INDUCT pass.
+No selected unproven $equiv cells found in spk286_effective_address.
+No selected unproven $equiv cells found in spk286_modrm.
+Found 49 unproven $equiv cells in module equiv:
+Warning: No SAT model available for cell modrm (spk286_modrm).
+Warning: No SAT model available for cell ea (spk286_effective_address).
+  Proving existence of base case for step 1. (3954 clauses over 1598 variables)
+  Proving induction step 1. (10363 clauses over 3981 variables)
+  Proof for induction step holds. Entire workset of 49 cells proven!
+Proved 49 previously unproven $equiv cells.
+
+14. Executing EQUIV_STATUS pass.
+No $equiv cells found in spk286_effective_address.
+No $equiv cells found in spk286_modrm.
+Found 83 $equiv cells in equiv:
+  Of those cells 83 are proven and 0 are unproven.
+  Equivalence successfully proven!
+
+Warnings: 2 unique messages, 2 total
+End of script. Logfile hash: 5cb259f0aa, CPU: user 0.15s system 0.01s, MEM: 36.46 MB peak
+Yosys 0.33 (git sha1 2584903a060)
+Time spent: 24% 10x opt_expr (0 sec), 19% 1x equiv_induct (0 sec), ...

@@ -186,3 +186,17 @@ on 2026-10-04; retain explicit Intel/native differences.
 - Full CPU wiring, architectural issue milestones, IU lookahead (P06-IU01),
   event coverage, physical-board calibration and complete FPGA cost/STA
   remain separate gates in the [contract](P06_TIMING_CONTRACT_20261003.md).
+
+## 2026-10-04 pause checkpoint: M5 register handoff
+
+The [private M5 pilot](P06_CORE_IU_HANDOFF_20261004.md) removes M4's additional
+virtual dispatch clock for qualified register/immediate streams. All 688
+paired first handoffs save one processor clock; 1,448 instructions retain
+independent architectural results, with 760 same-edge retire/start events.
+Cold/late bytes, 15 lifecycle/event/scope modes, MAX compatibility, strict lint,
+microcode consistency and three MAX component equivalence proofs pass.
+Three isolated affected components add 47 generic cells and zero register bits;
+this excludes top/executor qualification and is not a complete FPGA delta.
+M3/M4 frozen evidence remains valid. Full decoded lookahead, bus/event and speed
+integration remain open. Work is **paused at the user's request**; no new
+development, fit or regression starts until the user resumes.

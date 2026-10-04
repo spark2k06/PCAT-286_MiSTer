@@ -1,0 +1,587 @@
+
+-- Executing script file `/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/equivalence-spk286_instruction_context.ys' --
+
+1. Executing Verilog-2005 frontend: /mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_modrm.sv
+Parsing SystemVerilog input from `/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_modrm.sv' to AST representation.
+Generating RTLIL representation for module `\spk286_modrm'.
+Successfully finished Verilog frontend.
+
+2. Executing Verilog-2005 frontend: /mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_effective_address.sv
+Parsing SystemVerilog input from `/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_effective_address.sv' to AST representation.
+Generating RTLIL representation for module `\spk286_effective_address'.
+Successfully finished Verilog frontend.
+
+3. Executing Verilog-2005 frontend: /mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_instruction_context.sv
+Parsing SystemVerilog input from `/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_instruction_context.sv' to AST representation.
+Generating RTLIL representation for module `\spk286_instruction_context'.
+Successfully finished Verilog frontend.
+
+4. Executing PROC pass (convert processes to netlists).
+
+4.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+4.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Marked 1 switch rules as full_case in process $proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_instruction_context.sv:17$39 in module spk286_instruction_context.
+Removed 1 dead cases from process $proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_effective_address.sv:0$10 in module spk286_effective_address.
+Marked 1 switch rules as full_case in process $proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_effective_address.sv:0$10 in module spk286_effective_address.
+Removed a total of 1 dead cases.
+
+4.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 0 redundant assignments.
+Promoted 2 assignments to connections.
+
+4.4. Executing PROC_INIT pass (extract init attributes).
+
+4.5. Executing PROC_ARST pass (detect async resets in processes).
+
+4.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+<suppressed ~6 debug messages>
+
+4.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\spk286_instruction_context.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_instruction_context.sv:17$39'.
+     1/7: $0\extended_q[0:0]
+     2/7: $0\byte_count[3:0]
+     3/7: $0\repeat_kind[1:0]
+     4/7: $0\lock_prefix[0:0]
+     5/7: $0\segment_override[0:0]
+     6/7: $0\active[0:0]
+     7/7: $0\segment_index[1:0]
+Creating decoders for process `\spk286_effective_address.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_effective_address.sv:0$10'.
+     1/2: $1\base_offset[15:0]
+     2/2: $1\uses_bp[0:0]
+
+4.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+No latch inferred for signal `\spk286_effective_address.\base_offset' from process `\spk286_effective_address.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_effective_address.sv:0$10'.
+No latch inferred for signal `\spk286_effective_address.\uses_bp' from process `\spk286_effective_address.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_effective_address.sv:0$10'.
+
+4.9. Executing PROC_DFF pass (convert process syncs to FFs).
+Creating register for signal `\spk286_instruction_context.\segment_index' using process `\spk286_instruction_context.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_instruction_context.sv:17$39'.
+  created $dff cell `$procdff$132' with positive edge clock.
+Creating register for signal `\spk286_instruction_context.\active' using process `\spk286_instruction_context.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_instruction_context.sv:17$39'.
+  created $dff cell `$procdff$133' with positive edge clock.
+Creating register for signal `\spk286_instruction_context.\segment_override' using process `\spk286_instruction_context.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_instruction_context.sv:17$39'.
+  created $dff cell `$procdff$134' with positive edge clock.
+Creating register for signal `\spk286_instruction_context.\lock_prefix' using process `\spk286_instruction_context.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_instruction_context.sv:17$39'.
+  created $dff cell `$procdff$135' with positive edge clock.
+Creating register for signal `\spk286_instruction_context.\repeat_kind' using process `\spk286_instruction_context.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_instruction_context.sv:17$39'.
+  created $dff cell `$procdff$136' with positive edge clock.
+Creating register for signal `\spk286_instruction_context.\byte_count' using process `\spk286_instruction_context.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_instruction_context.sv:17$39'.
+  created $dff cell `$procdff$137' with positive edge clock.
+Creating register for signal `\spk286_instruction_context.\extended_q' using process `\spk286_instruction_context.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_instruction_context.sv:17$39'.
+  created $dff cell `$procdff$138' with positive edge clock.
+
+4.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+4.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Found and cleaned up 5 empty switches in `\spk286_instruction_context.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_instruction_context.sv:17$39'.
+Removing empty process `spk286_instruction_context.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_instruction_context.sv:17$39'.
+Found and cleaned up 1 empty switch in `\spk286_effective_address.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_effective_address.sv:0$10'.
+Removing empty process `spk286_effective_address.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_effective_address.sv:0$10'.
+Cleaned up 6 empty switches.
+
+4.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spk286_instruction_context.
+Optimizing module spk286_effective_address.
+<suppressed ~4 debug messages>
+Optimizing module spk286_modrm.
+<suppressed ~1 debug messages>
+
+5. Executing OPT pass (performing simple optimizations).
+
+5.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spk286_instruction_context.
+Optimizing module spk286_effective_address.
+Optimizing module spk286_modrm.
+
+5.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spk286_instruction_context'.
+<suppressed ~39 debug messages>
+Finding identical cells in module `\spk286_effective_address'.
+<suppressed ~24 debug messages>
+Finding identical cells in module `\spk286_modrm'.
+Removed a total of 21 cells.
+
+5.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \spk286_instruction_context..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \spk286_effective_address..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \spk286_modrm..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~12 debug messages>
+
+5.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \spk286_instruction_context.
+  Optimizing cells in module \spk286_effective_address.
+    New ctrl vector for $pmux cell $procmux$123: { $auto$opt_reduce.cc:134:opt_pmux$142 $procmux$125_CMP $auto$opt_reduce.cc:134:opt_pmux$140 }
+  Optimizing cells in module \spk286_effective_address.
+  Optimizing cells in module \spk286_modrm.
+Performed a total of 1 changes.
+
+5.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spk286_instruction_context'.
+Finding identical cells in module `\spk286_effective_address'.
+Finding identical cells in module `\spk286_modrm'.
+Removed a total of 0 cells.
+
+5.6. Executing OPT_DFF pass (perform DFF optimizations).
+Adding SRST signal on $procdff$132 ($dff) from module spk286_instruction_context (D = $procmux$109_Y, Q = \segment_index, rval = 2'00).
+Adding EN signal on $auto$ff.cc:266:slice$143 ($sdff) from module spk286_instruction_context (D = \byte_data [4:3], Q = \segment_index).
+Adding SRST signal on $procdff$133 ($dff) from module spk286_instruction_context (D = $procmux$96_Y, Q = \active, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$147 ($sdff) from module spk286_instruction_context (D = 1'1, Q = \active).
+Adding SRST signal on $procdff$134 ($dff) from module spk286_instruction_context (D = $procmux$91_Y, Q = \segment_override, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$149 ($sdff) from module spk286_instruction_context (D = 1'1, Q = \segment_override).
+Adding SRST signal on $procdff$135 ($dff) from module spk286_instruction_context (D = $procmux$78_Y, Q = \lock_prefix, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$153 ($sdff) from module spk286_instruction_context (D = 1'1, Q = \lock_prefix).
+Adding SRST signal on $procdff$136 ($dff) from module spk286_instruction_context (D = $procmux$66_Y, Q = \repeat_kind, rval = 2'00).
+Adding EN signal on $auto$ff.cc:266:slice$157 ($sdff) from module spk286_instruction_context (D = $procmux$61_Y, Q = \repeat_kind).
+Adding SRST signal on $procdff$137 ($dff) from module spk286_instruction_context (D = $procmux$55_Y, Q = \byte_count, rval = 4'0000).
+Adding EN signal on $auto$ff.cc:266:slice$163 ($sdff) from module spk286_instruction_context (D = $add$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_instruction_context.sv:23$43_Y, Q = \byte_count).
+Adding SRST signal on $procdff$138 ($dff) from module spk286_instruction_context (D = $procmux$48_Y, Q = \extended_q, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$167 ($sdff) from module spk286_instruction_context (D = 1'1, Q = \extended_q).
+
+5.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spk286_instruction_context..
+Finding unused cells or wires in module \spk286_effective_address..
+Finding unused cells or wires in module \spk286_modrm..
+Removed 24 unused cells and 78 unused wires.
+<suppressed ~27 debug messages>
+
+5.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spk286_effective_address.
+Optimizing module spk286_instruction_context.
+<suppressed ~1 debug messages>
+Optimizing module spk286_modrm.
+
+5.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+5.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \spk286_effective_address..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \spk286_instruction_context..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \spk286_modrm..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~6 debug messages>
+
+5.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \spk286_effective_address.
+  Optimizing cells in module \spk286_instruction_context.
+  Optimizing cells in module \spk286_modrm.
+Performed a total of 0 changes.
+
+5.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spk286_effective_address'.
+Finding identical cells in module `\spk286_instruction_context'.
+<suppressed ~3 debug messages>
+Finding identical cells in module `\spk286_modrm'.
+Removed a total of 1 cells.
+
+5.13. Executing OPT_DFF pass (perform DFF optimizations).
+
+5.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spk286_effective_address..
+Finding unused cells or wires in module \spk286_instruction_context..
+Finding unused cells or wires in module \spk286_modrm..
+Removed 0 unused cells and 1 unused wires.
+<suppressed ~1 debug messages>
+
+5.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spk286_effective_address.
+Optimizing module spk286_instruction_context.
+Optimizing module spk286_modrm.
+
+5.16. Rerunning OPT passes. (Maybe there is more to do..)
+
+5.17. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \spk286_effective_address..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \spk286_instruction_context..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \spk286_modrm..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~6 debug messages>
+
+5.18. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \spk286_effective_address.
+  Optimizing cells in module \spk286_instruction_context.
+  Optimizing cells in module \spk286_modrm.
+Performed a total of 0 changes.
+
+5.19. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spk286_effective_address'.
+Finding identical cells in module `\spk286_instruction_context'.
+Finding identical cells in module `\spk286_modrm'.
+Removed a total of 0 cells.
+
+5.20. Executing OPT_DFF pass (perform DFF optimizations).
+
+5.21. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spk286_effective_address..
+Finding unused cells or wires in module \spk286_instruction_context..
+Finding unused cells or wires in module \spk286_modrm..
+
+5.22. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spk286_effective_address.
+Optimizing module spk286_instruction_context.
+Optimizing module spk286_modrm.
+
+5.23. Finished OPT passes. (There is nothing left to do.)
+Renaming module \spk286_instruction_context to \gold.
+
+6. Executing Verilog-2005 frontend: /mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_instruction_context.sv
+Parsing SystemVerilog input from `/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_instruction_context.sv' to AST representation.
+Generating RTLIL representation for module `\spk286_instruction_context'.
+Successfully finished Verilog frontend.
+Parameter \P06_IU_OVERLAP = 0
+
+7. Executing AST frontend in derive mode using pre-parsed AST for module `\spk286_instruction_context'.
+Parameter \P06_IU_OVERLAP = 0
+Generating RTLIL representation for module `$paramod\spk286_instruction_context\P06_IU_OVERLAP=32'00000000000000000000000000000000'.
+
+8. Executing PROC pass (convert processes to netlists).
+
+8.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+8.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Marked 1 switch rules as full_case in process $proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_instruction_context.sv:17$216 in module spk286_instruction_context.
+Removed a total of 0 dead cases.
+
+8.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 0 redundant assignments.
+Promoted 0 assignments to connections.
+
+8.4. Executing PROC_INIT pass (extract init attributes).
+
+8.5. Executing PROC_ARST pass (detect async resets in processes).
+
+8.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+<suppressed ~6 debug messages>
+
+8.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\spk286_instruction_context.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_instruction_context.sv:17$216'.
+     1/7: $0\extended_q[0:0]
+     2/7: $0\byte_count[3:0]
+     3/7: $0\repeat_kind[1:0]
+     4/7: $0\lock_prefix[0:0]
+     5/7: $0\segment_override[0:0]
+     6/7: $0\active[0:0]
+     7/7: $0\segment_index[1:0]
+
+8.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+
+8.9. Executing PROC_DFF pass (convert process syncs to FFs).
+Creating register for signal `\spk286_instruction_context.\segment_index' using process `\spk286_instruction_context.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_instruction_context.sv:17$216'.
+  created $dff cell `$procdff$301' with positive edge clock.
+Creating register for signal `\spk286_instruction_context.\active' using process `\spk286_instruction_context.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_instruction_context.sv:17$216'.
+  created $dff cell `$procdff$302' with positive edge clock.
+Creating register for signal `\spk286_instruction_context.\segment_override' using process `\spk286_instruction_context.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_instruction_context.sv:17$216'.
+  created $dff cell `$procdff$303' with positive edge clock.
+Creating register for signal `\spk286_instruction_context.\lock_prefix' using process `\spk286_instruction_context.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_instruction_context.sv:17$216'.
+  created $dff cell `$procdff$304' with positive edge clock.
+Creating register for signal `\spk286_instruction_context.\repeat_kind' using process `\spk286_instruction_context.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_instruction_context.sv:17$216'.
+  created $dff cell `$procdff$305' with positive edge clock.
+Creating register for signal `\spk286_instruction_context.\byte_count' using process `\spk286_instruction_context.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_instruction_context.sv:17$216'.
+  created $dff cell `$procdff$306' with positive edge clock.
+Creating register for signal `\spk286_instruction_context.\extended_q' using process `\spk286_instruction_context.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_instruction_context.sv:17$216'.
+  created $dff cell `$procdff$307' with positive edge clock.
+
+8.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+8.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Found and cleaned up 6 empty switches in `\spk286_instruction_context.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_instruction_context.sv:17$216'.
+Removing empty process `spk286_instruction_context.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_instruction_context.sv:17$216'.
+Cleaned up 6 empty switches.
+
+8.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spk286_instruction_context.
+<suppressed ~6 debug messages>
+Optimizing module gold.
+Optimizing module spk286_effective_address.
+Optimizing module spk286_modrm.
+
+9. Executing OPT pass (performing simple optimizations).
+
+9.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spk286_instruction_context.
+Optimizing module gold.
+Optimizing module spk286_effective_address.
+Optimizing module spk286_modrm.
+
+9.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spk286_instruction_context'.
+<suppressed ~39 debug messages>
+Finding identical cells in module `\gold'.
+Finding identical cells in module `\spk286_effective_address'.
+Finding identical cells in module `\spk286_modrm'.
+Removed a total of 13 cells.
+
+9.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \spk286_instruction_context..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \gold..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \spk286_effective_address..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \spk286_modrm..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~13 debug messages>
+
+9.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \spk286_instruction_context.
+  Optimizing cells in module \gold.
+  Optimizing cells in module \spk286_effective_address.
+  Optimizing cells in module \spk286_modrm.
+Performed a total of 0 changes.
+
+9.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spk286_instruction_context'.
+Finding identical cells in module `\gold'.
+Finding identical cells in module `\spk286_effective_address'.
+Finding identical cells in module `\spk286_modrm'.
+Removed a total of 0 cells.
+
+9.6. Executing OPT_DFF pass (perform DFF optimizations).
+Adding SRST signal on $procdff$304 ($dff) from module spk286_instruction_context (D = $procmux$263_Y, Q = \lock_prefix, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$308 ($sdff) from module spk286_instruction_context (D = 1'1, Q = \lock_prefix).
+Adding SRST signal on $procdff$305 ($dff) from module spk286_instruction_context (D = $procmux$251_Y, Q = \repeat_kind, rval = 2'00).
+Adding EN signal on $auto$ff.cc:266:slice$312 ($sdff) from module spk286_instruction_context (D = $procmux$246_Y, Q = \repeat_kind).
+Adding SRST signal on $procdff$306 ($dff) from module spk286_instruction_context (D = $procmux$238_Y, Q = \byte_count, rval = 4'0000).
+Adding EN signal on $auto$ff.cc:266:slice$318 ($sdff) from module spk286_instruction_context (D = $add$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_instruction_context.sv:26$226_Y, Q = \byte_count).
+Adding SRST signal on $procdff$307 ($dff) from module spk286_instruction_context (D = $procmux$231_Y, Q = \extended_q, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$322 ($sdff) from module spk286_instruction_context (D = 1'1, Q = \extended_q).
+Adding SRST signal on $procdff$302 ($dff) from module spk286_instruction_context (D = $procmux$281_Y, Q = \active, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$326 ($sdff) from module spk286_instruction_context (D = 1'1, Q = \active).
+Adding SRST signal on $procdff$303 ($dff) from module spk286_instruction_context (D = $procmux$276_Y, Q = \segment_override, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$328 ($sdff) from module spk286_instruction_context (D = 1'1, Q = \segment_override).
+Adding SRST signal on $procdff$301 ($dff) from module spk286_instruction_context (D = $procmux$296_Y, Q = \segment_index, rval = 2'00).
+Adding EN signal on $auto$ff.cc:266:slice$332 ($sdff) from module spk286_instruction_context (D = \byte_data [4:3], Q = \segment_index).
+
+9.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spk286_instruction_context..
+Finding unused cells or wires in module \gold..
+Finding unused cells or wires in module \spk286_effective_address..
+Finding unused cells or wires in module \spk286_modrm..
+Removed 26 unused cells and 69 unused wires.
+<suppressed ~27 debug messages>
+
+9.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module gold.
+Optimizing module spk286_effective_address.
+Optimizing module spk286_instruction_context.
+<suppressed ~1 debug messages>
+Optimizing module spk286_modrm.
+
+9.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+9.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \gold..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \spk286_effective_address..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \spk286_instruction_context..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \spk286_modrm..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~7 debug messages>
+
+9.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \gold.
+  Optimizing cells in module \spk286_effective_address.
+  Optimizing cells in module \spk286_instruction_context.
+  Optimizing cells in module \spk286_modrm.
+Performed a total of 0 changes.
+
+9.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\gold'.
+Finding identical cells in module `\spk286_effective_address'.
+Finding identical cells in module `\spk286_instruction_context'.
+<suppressed ~3 debug messages>
+Finding identical cells in module `\spk286_modrm'.
+Removed a total of 1 cells.
+
+9.13. Executing OPT_DFF pass (perform DFF optimizations).
+
+9.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \gold..
+Finding unused cells or wires in module \spk286_effective_address..
+Finding unused cells or wires in module \spk286_instruction_context..
+Finding unused cells or wires in module \spk286_modrm..
+Removed 0 unused cells and 1 unused wires.
+<suppressed ~1 debug messages>
+
+9.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module gold.
+Optimizing module spk286_effective_address.
+Optimizing module spk286_instruction_context.
+Optimizing module spk286_modrm.
+
+9.16. Rerunning OPT passes. (Maybe there is more to do..)
+
+9.17. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \gold..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \spk286_effective_address..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \spk286_instruction_context..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \spk286_modrm..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~7 debug messages>
+
+9.18. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \gold.
+  Optimizing cells in module \spk286_effective_address.
+  Optimizing cells in module \spk286_instruction_context.
+  Optimizing cells in module \spk286_modrm.
+Performed a total of 0 changes.
+
+9.19. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\gold'.
+Finding identical cells in module `\spk286_effective_address'.
+Finding identical cells in module `\spk286_instruction_context'.
+Finding identical cells in module `\spk286_modrm'.
+Removed a total of 0 cells.
+
+9.20. Executing OPT_DFF pass (perform DFF optimizations).
+
+9.21. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \gold..
+Finding unused cells or wires in module \spk286_effective_address..
+Finding unused cells or wires in module \spk286_instruction_context..
+Finding unused cells or wires in module \spk286_modrm..
+
+9.22. Executing OPT_EXPR pass (perform const folding).
+Optimizing module gold.
+Optimizing module spk286_effective_address.
+Optimizing module spk286_instruction_context.
+Optimizing module spk286_modrm.
+
+9.23. Finished OPT passes. (There is nothing left to do.)
+Renaming module \spk286_instruction_context to \gate.
+
+10. Executing EQUIV_MAKE pass (creating equiv checking module).
+Presumably equivalent wires: active_gold (\active_gold), active_gate (\active_gate) -> active
+Presumably equivalent wires: byte_count_gold (\byte_count_gold), byte_count_gate (\byte_count_gate) -> byte_count
+Presumably equivalent wires: byte_data_gold (\byte_data_gold), byte_data_gate (\byte_data_gate) -> byte_data
+Presumably equivalent wires: cancel_gold (\cancel_gold), cancel_gate (\cancel_gate) -> cancel
+Presumably equivalent wires: clk_gold (\clk_gold), clk_gate (\clk_gate) -> clk
+Presumably equivalent wires: complete_gold (\complete_gold), complete_gate (\complete_gate) -> complete
+Presumably equivalent wires: consume_gold (\consume_gold), consume_gate (\consume_gate) -> consume
+Presumably equivalent wires: extended_opcode_gold (\extended_q_gold), extended_opcode_gate (\extended_q_gate) -> extended_opcode
+Presumably equivalent wires: extended_q_gold (\extended_q_gold), extended_q_gate (\extended_q_gate) -> extended_q
+Presumably equivalent wires: is_prefix_gold (\is_prefix_gold), is_prefix_gate (\is_prefix_gate) -> is_prefix
+Presumably equivalent wires: lock_prefix_gold (\lock_prefix_gold), lock_prefix_gate (\lock_prefix_gate) -> lock_prefix
+Presumably equivalent wires: prefix_accept_gold (\prefix_accept_gold), prefix_accept_gate (\prefix_accept_gate) -> prefix_accept
+Presumably equivalent wires: repeat_kind_gold (\repeat_kind_gold), repeat_kind_gate (\repeat_kind_gate) -> repeat_kind
+Presumably equivalent wires: reset_gold (\reset_gold), reset_gate (\reset_gate) -> reset
+Presumably equivalent wires: segment_index_gold (\segment_index_gold), segment_index_gate (\segment_index_gate) -> segment_index
+Presumably equivalent wires: segment_override_gold (\segment_override_gold), segment_override_gate (\segment_override_gate) -> segment_override
+Changing input A of cell $logic_not$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_instruction_context.sv:16$213_gate ($logic_not): \extended_q_gate -> \extended_q
+Changing input A of cell $lt$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_instruction_context.sv:26$225_gate ($lt): \byte_count_gate -> \byte_count
+Changing input A of cell $add$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_instruction_context.sv:26$226_gate ($add): \byte_count_gate -> \byte_count
+Changing input A of cell $logic_not$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_instruction_context.sv:16$36_gold ($logic_not): \extended_q_gold -> \extended_q
+Changing input A of cell $lt$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_instruction_context.sv:23$42_gold ($lt): \byte_count_gold -> \byte_count
+Changing input A of cell $add$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_instruction_context.sv:23$43_gold ($add): \byte_count_gold -> \byte_count
+
+11. Executing HIERARCHY pass (managing design hierarchy).
+
+11.1. Analyzing design hierarchy..
+Top module:  \equiv
+
+11.2. Analyzing design hierarchy..
+Top module:  \equiv
+Removing unused module `\gate'.
+Removing unused module `\spk286_effective_address'.
+Removing unused module `\gold'.
+Removing unused module `\spk286_modrm'.
+Removed 4 unused modules.
+
+12. Executing EQUIV_SIMPLE pass.
+Found 14 unproven $equiv cells (9 groups) in equiv:
+ Grouping SAT models for \segment_index:
+  Trying to prove $equiv for \segment_index [0]: failed.
+  Trying to prove $equiv for \segment_index [1]: failed.
+  Trying to prove $equiv for \is_prefix: success!
+  Trying to prove $equiv for \active: failed.
+  Trying to prove $equiv for \segment_override: failed.
+  Trying to prove $equiv for \lock_prefix: failed.
+  Trying to prove $equiv for \extended_opcode: failed.
+ Grouping SAT models for \repeat_kind:
+  Trying to prove $equiv for \repeat_kind [0]: failed.
+  Trying to prove $equiv for \repeat_kind [1]: failed.
+ Grouping SAT models for \byte_count:
+  Trying to prove $equiv for \byte_count [0]: failed.
+  Trying to prove $equiv for \byte_count [1]: failed.
+  Trying to prove $equiv for \byte_count [2]: failed.
+  Trying to prove $equiv for \byte_count [3]: failed.
+  Trying to prove $equiv for \extended_q: failed.
+Proved 1 previously unproven $equiv cells.
+
+13. Executing EQUIV_INDUCT pass.
+Found 13 unproven $equiv cells in module equiv:
+  Proving existence of base case for step 1. (1330 clauses over 511 variables)
+  Proving induction step 1. (3241 clauses over 1207 variables)
+  Proof for induction step holds. Entire workset of 13 cells proven!
+Proved 13 previously unproven $equiv cells.
+
+14. Executing EQUIV_STATUS pass.
+Found 14 $equiv cells in equiv:
+  Of those cells 14 are proven and 0 are unproven.
+  Equivalence successfully proven!
+
+End of script. Logfile hash: 2405c0b5fc, CPU: user 0.09s system 0.02s, MEM: 36.46 MB peak
+Yosys 0.33 (git sha1 2584903a060)
+Time spent: 26% 10x opt_expr (0 sec), 17% 8x opt_merge (0 sec), ...

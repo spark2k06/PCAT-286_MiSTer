@@ -1,0 +1,5 @@
+read_verilog -sv /mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_instruction_context.sv
+chparam -set P06_IU_OVERLAP 1 spk286_instruction_context
+read_verilog -sv /mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_modrm.sv /mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_effective_address.sv
+synth -top spk286_instruction_context -flatten
+write_json /mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/generic-spk286_instruction_context-timed.json

@@ -1,0 +1,746 @@
+
+-- Executing script file `/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/equivalence-spk286_microsequencer.ys' --
+
+1. Executing Verilog-2005 frontend: /mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_modrm.sv
+Parsing SystemVerilog input from `/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_modrm.sv' to AST representation.
+Generating RTLIL representation for module `\spk286_modrm'.
+Successfully finished Verilog frontend.
+
+2. Executing Verilog-2005 frontend: /mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_effective_address.sv
+Parsing SystemVerilog input from `/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_effective_address.sv' to AST representation.
+Generating RTLIL representation for module `\spk286_effective_address'.
+Successfully finished Verilog frontend.
+
+3. Executing Verilog-2005 frontend: /mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv
+Parsing SystemVerilog input from `/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv' to AST representation.
+Generating RTLIL representation for module `\spk286_microsequencer'.
+Successfully finished Verilog frontend.
+Parameter \ADDRESS_WIDTH = 10
+Parameter \ROM_DEPTH = 743
+
+4. Executing AST frontend in derive mode using pre-parsed AST for module `\spk286_microsequencer'.
+Parameter \ADDRESS_WIDTH = 10
+Parameter \ROM_DEPTH = 743
+Generating RTLIL representation for module `$paramod$990d08d7e030b42abb74f57d81603d8388f28b04\spk286_microsequencer'.
+
+5. Executing PROC pass (convert processes to netlists).
+
+5.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+5.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Marked 8 switch rules as full_case in process $proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:0$91 in module spk286_microsequencer.
+Marked 8 switch rules as full_case in process $proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:57$106 in module spk286_microsequencer.
+Removed 1 dead cases from process $proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_effective_address.sv:0$10 in module spk286_effective_address.
+Marked 1 switch rules as full_case in process $proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_effective_address.sv:0$10 in module spk286_effective_address.
+Removed a total of 1 dead cases.
+
+5.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 1 redundant assignment.
+Promoted 3 assignments to connections.
+
+5.4. Executing PROC_INIT pass (extract init attributes).
+
+5.5. Executing PROC_ARST pass (detect async resets in processes).
+
+5.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+<suppressed ~20 debug messages>
+
+5.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\spk286_microsequencer.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:0$91'.
+     1/8: $8\next_micro_pc[9:0]
+     2/8: $7\next_micro_pc[9:0]
+     3/8: $6\next_micro_pc[9:0]
+     4/8: $5\next_micro_pc[9:0]
+     5/8: $4\next_micro_pc[9:0]
+     6/8: $3\next_micro_pc[9:0]
+     7/8: $2\next_micro_pc[9:0]
+     8/8: $1\next_micro_pc[9:0]
+Creating decoders for process `\spk286_microsequencer.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:57$106'.
+     1/5: $0\retired[0:0]
+     2/5: $0\fault[0:0]
+     3/5: $0\micro_entry[9:0]
+     4/5: $0\micro_pc[9:0]
+     5/5: $0\active[0:0]
+Creating decoders for process `\spk286_effective_address.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_effective_address.sv:0$10'.
+     1/2: $1\base_offset[15:0]
+     2/2: $1\uses_bp[0:0]
+
+5.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+No latch inferred for signal `\spk286_microsequencer.\next_micro_pc' from process `\spk286_microsequencer.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:0$91'.
+No latch inferred for signal `\spk286_effective_address.\base_offset' from process `\spk286_effective_address.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_effective_address.sv:0$10'.
+No latch inferred for signal `\spk286_effective_address.\uses_bp' from process `\spk286_effective_address.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_effective_address.sv:0$10'.
+
+5.9. Executing PROC_DFF pass (convert process syncs to FFs).
+Creating register for signal `\spk286_microsequencer.\active' using process `\spk286_microsequencer.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:57$106'.
+  created $dff cell `$procdff$344' with positive edge clock.
+Creating register for signal `\spk286_microsequencer.\micro_pc' using process `\spk286_microsequencer.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:57$106'.
+  created $dff cell `$procdff$345' with positive edge clock.
+Creating register for signal `\spk286_microsequencer.\micro_entry' using process `\spk286_microsequencer.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:57$106'.
+  created $dff cell `$procdff$346' with positive edge clock.
+Creating register for signal `\spk286_microsequencer.\retired' using process `\spk286_microsequencer.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:57$106'.
+  created $dff cell `$procdff$347' with positive edge clock.
+Creating register for signal `\spk286_microsequencer.\fault' using process `\spk286_microsequencer.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:57$106'.
+  created $dff cell `$procdff$348' with positive edge clock.
+
+5.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+5.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Found and cleaned up 8 empty switches in `\spk286_microsequencer.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:0$91'.
+Removing empty process `spk286_microsequencer.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:0$91'.
+Found and cleaned up 11 empty switches in `\spk286_microsequencer.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:57$106'.
+Removing empty process `spk286_microsequencer.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:57$106'.
+Found and cleaned up 1 empty switch in `\spk286_effective_address.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_effective_address.sv:0$10'.
+Removing empty process `spk286_effective_address.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_effective_address.sv:0$10'.
+Cleaned up 20 empty switches.
+
+5.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spk286_microsequencer.
+Optimizing module spk286_effective_address.
+<suppressed ~4 debug messages>
+Optimizing module spk286_modrm.
+<suppressed ~1 debug messages>
+
+6. Executing OPT pass (performing simple optimizations).
+
+6.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spk286_microsequencer.
+Optimizing module spk286_effective_address.
+Optimizing module spk286_modrm.
+
+6.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spk286_microsequencer'.
+<suppressed ~33 debug messages>
+Finding identical cells in module `\spk286_effective_address'.
+<suppressed ~24 debug messages>
+Finding identical cells in module `\spk286_modrm'.
+Removed a total of 19 cells.
+
+6.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \spk286_microsequencer..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+      Replacing known input bits on port A of cell $procmux$314: \active -> 1'1
+      Replacing known input bits on port A of cell $procmux$307: \active -> 1'1
+      Replacing known input bits on port A of cell $procmux$303: \active -> 1'1
+      Replacing known input bits on port A of cell $procmux$299: \active -> 1'0
+      Replacing known input bits on port B of cell $procmux$297: \active -> 1'0
+  Analyzing evaluation results.
+    dead port 1/2 on $mux $procmux$208.
+    dead port 1/2 on $mux $procmux$202.
+    dead port 2/2 on $mux $procmux$199.
+    dead port 1/2 on $mux $procmux$193.
+    dead port 2/2 on $mux $procmux$190.
+    dead port 2/2 on $mux $procmux$188.
+    dead port 1/2 on $mux $procmux$181.
+    dead port 2/2 on $mux $procmux$178.
+    dead port 2/2 on $mux $procmux$176.
+    dead port 2/2 on $mux $procmux$174.
+    dead port 1/2 on $mux $procmux$166.
+    dead port 2/2 on $mux $procmux$163.
+    dead port 2/2 on $mux $procmux$161.
+    dead port 2/2 on $mux $procmux$159.
+    dead port 2/2 on $mux $procmux$157.
+    dead port 1/2 on $mux $procmux$148.
+    dead port 2/2 on $mux $procmux$145.
+    dead port 2/2 on $mux $procmux$143.
+    dead port 2/2 on $mux $procmux$141.
+    dead port 1/2 on $mux $procmux$139.
+    dead port 1/2 on $mux $procmux$130.
+    dead port 2/2 on $mux $procmux$127.
+    dead port 1/2 on $mux $procmux$125.
+Running muxtree optimizer on module \spk286_effective_address..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \spk286_modrm..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 23 multiplexer ports.
+<suppressed ~11 debug messages>
+
+6.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \spk286_microsequencer.
+  Optimizing cells in module \spk286_effective_address.
+    New ctrl vector for $pmux cell $procmux$335: { $auto$opt_reduce.cc:134:opt_pmux$352 $procmux$337_CMP $auto$opt_reduce.cc:134:opt_pmux$350 }
+  Optimizing cells in module \spk286_effective_address.
+  Optimizing cells in module \spk286_modrm.
+Performed a total of 1 changes.
+
+6.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spk286_microsequencer'.
+<suppressed ~3 debug messages>
+Finding identical cells in module `\spk286_effective_address'.
+Finding identical cells in module `\spk286_modrm'.
+Removed a total of 1 cells.
+
+6.6. Executing OPT_DFF pass (perform DFF optimizations).
+Adding SRST signal on $procdff$344 ($dff) from module spk286_microsequencer (D = $procmux$321_Y, Q = \active, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$353 ($sdff) from module spk286_microsequencer (D = $procmux$319_Y, Q = \active).
+Adding SRST signal on $procdff$345 ($dff) from module spk286_microsequencer (D = $procmux$291_Y, Q = \micro_pc, rval = 10'0000000000).
+Adding EN signal on $auto$ff.cc:266:slice$355 ($sdff) from module spk286_microsequencer (D = $procmux$289_Y, Q = \micro_pc).
+Adding SRST signal on $procdff$346 ($dff) from module spk286_microsequencer (D = $procmux$264_Y, Q = \micro_entry, rval = 10'0000000000).
+Adding EN signal on $auto$ff.cc:266:slice$369 ($sdff) from module spk286_microsequencer (D = \start_entry, Q = \micro_entry).
+Adding SRST signal on $procdff$347 ($dff) from module spk286_microsequencer (D = $procmux$215_Y, Q = \retired, rval = 1'0).
+Adding SRST signal on $procdff$348 ($dff) from module spk286_microsequencer (D = $procmux$254_Y, Q = \fault, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$384 ($sdff) from module spk286_microsequencer (D = $procmux$252_Y, Q = \fault).
+
+6.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spk286_microsequencer..
+Finding unused cells or wires in module \spk286_effective_address..
+Finding unused cells or wires in module \spk286_modrm..
+Removed 15 unused cells and 159 unused wires.
+<suppressed ~18 debug messages>
+
+6.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spk286_effective_address.
+Optimizing module spk286_microsequencer.
+<suppressed ~1 debug messages>
+Optimizing module spk286_modrm.
+
+6.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+6.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \spk286_effective_address..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \spk286_microsequencer..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \spk286_modrm..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~11 debug messages>
+
+6.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \spk286_effective_address.
+  Optimizing cells in module \spk286_microsequencer.
+  Optimizing cells in module \spk286_modrm.
+Performed a total of 0 changes.
+
+6.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spk286_effective_address'.
+Finding identical cells in module `\spk286_microsequencer'.
+<suppressed ~9 debug messages>
+Finding identical cells in module `\spk286_modrm'.
+Removed a total of 3 cells.
+
+6.13. Executing OPT_DFF pass (perform DFF optimizations).
+
+6.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spk286_effective_address..
+Finding unused cells or wires in module \spk286_microsequencer..
+Finding unused cells or wires in module \spk286_modrm..
+Removed 0 unused cells and 3 unused wires.
+<suppressed ~1 debug messages>
+
+6.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spk286_effective_address.
+Optimizing module spk286_microsequencer.
+Optimizing module spk286_modrm.
+
+6.16. Rerunning OPT passes. (Maybe there is more to do..)
+
+6.17. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \spk286_effective_address..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \spk286_microsequencer..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \spk286_modrm..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~11 debug messages>
+
+6.18. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \spk286_effective_address.
+  Optimizing cells in module \spk286_microsequencer.
+  Optimizing cells in module \spk286_modrm.
+Performed a total of 0 changes.
+
+6.19. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spk286_effective_address'.
+Finding identical cells in module `\spk286_microsequencer'.
+Finding identical cells in module `\spk286_modrm'.
+Removed a total of 0 cells.
+
+6.20. Executing OPT_DFF pass (perform DFF optimizations).
+
+6.21. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spk286_effective_address..
+Finding unused cells or wires in module \spk286_microsequencer..
+Finding unused cells or wires in module \spk286_modrm..
+
+6.22. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spk286_effective_address.
+Optimizing module spk286_microsequencer.
+Optimizing module spk286_modrm.
+
+6.23. Finished OPT passes. (There is nothing left to do.)
+Renaming module \spk286_microsequencer to \gold.
+
+7. Executing Verilog-2005 frontend: /mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv
+Parsing SystemVerilog input from `/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv' to AST representation.
+Generating RTLIL representation for module `\spk286_microsequencer'.
+Successfully finished Verilog frontend.
+Parameter \P06_IU_OVERLAP = 0
+
+8. Executing AST frontend in derive mode using pre-parsed AST for module `\spk286_microsequencer'.
+Parameter \P06_IU_OVERLAP = 0
+Generating RTLIL representation for module `$paramod\spk286_microsequencer\P06_IU_OVERLAP=32'00000000000000000000000000000000'.
+Parameter \ADDRESS_WIDTH = 10
+Parameter \ROM_DEPTH = 743
+
+9. Executing AST frontend in derive mode using pre-parsed AST for module `\spk286_microsequencer'.
+Parameter \ADDRESS_WIDTH = 10
+Parameter \ROM_DEPTH = 743
+Generating RTLIL representation for module `$paramod$990d08d7e030b42abb74f57d81603d8388f28b04\spk286_microsequencer'.
+
+10. Executing PROC pass (convert processes to netlists).
+
+10.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+10.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Marked 9 switch rules as full_case in process $proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:0$551 in module spk286_microsequencer.
+Marked 9 switch rules as full_case in process $proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:63$569 in module spk286_microsequencer.
+Removed a total of 0 dead cases.
+
+10.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 1 redundant assignment.
+Promoted 1 assignment to connection.
+
+10.4. Executing PROC_INIT pass (extract init attributes).
+
+10.5. Executing PROC_ARST pass (detect async resets in processes).
+
+10.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+<suppressed ~22 debug messages>
+
+10.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\spk286_microsequencer.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:0$551'.
+     1/9: $9\next_micro_pc[9:0]
+     2/9: $8\next_micro_pc[9:0]
+     3/9: $7\next_micro_pc[9:0]
+     4/9: $6\next_micro_pc[9:0]
+     5/9: $5\next_micro_pc[9:0]
+     6/9: $4\next_micro_pc[9:0]
+     7/9: $3\next_micro_pc[9:0]
+     8/9: $2\next_micro_pc[9:0]
+     9/9: $1\next_micro_pc[9:0]
+Creating decoders for process `\spk286_microsequencer.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:63$569'.
+     1/5: $0\retired[0:0]
+     2/5: $0\fault[0:0]
+     3/5: $0\micro_entry[9:0]
+     4/5: $0\micro_pc[9:0]
+     5/5: $0\active[0:0]
+
+10.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+No latch inferred for signal `\spk286_microsequencer.\next_micro_pc' from process `\spk286_microsequencer.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:0$551'.
+
+10.9. Executing PROC_DFF pass (convert process syncs to FFs).
+Creating register for signal `\spk286_microsequencer.\active' using process `\spk286_microsequencer.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:63$569'.
+  created $dff cell `$procdff$841' with positive edge clock.
+Creating register for signal `\spk286_microsequencer.\micro_pc' using process `\spk286_microsequencer.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:63$569'.
+  created $dff cell `$procdff$842' with positive edge clock.
+Creating register for signal `\spk286_microsequencer.\micro_entry' using process `\spk286_microsequencer.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:63$569'.
+  created $dff cell `$procdff$843' with positive edge clock.
+Creating register for signal `\spk286_microsequencer.\retired' using process `\spk286_microsequencer.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:63$569'.
+  created $dff cell `$procdff$844' with positive edge clock.
+Creating register for signal `\spk286_microsequencer.\fault' using process `\spk286_microsequencer.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:63$569'.
+  created $dff cell `$procdff$845' with positive edge clock.
+
+10.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+10.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Found and cleaned up 9 empty switches in `\spk286_microsequencer.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:0$551'.
+Removing empty process `spk286_microsequencer.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:0$551'.
+Found and cleaned up 13 empty switches in `\spk286_microsequencer.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:63$569'.
+Removing empty process `spk286_microsequencer.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:63$569'.
+Cleaned up 22 empty switches.
+
+10.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spk286_microsequencer.
+<suppressed ~24 debug messages>
+Optimizing module gold.
+Optimizing module spk286_effective_address.
+Optimizing module spk286_modrm.
+
+11. Executing OPT pass (performing simple optimizations).
+
+11.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spk286_microsequencer.
+Optimizing module gold.
+Optimizing module spk286_effective_address.
+Optimizing module spk286_modrm.
+
+11.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spk286_microsequencer'.
+<suppressed ~42 debug messages>
+Finding identical cells in module `\gold'.
+Finding identical cells in module `\spk286_effective_address'.
+Finding identical cells in module `\spk286_modrm'.
+Removed a total of 14 cells.
+
+11.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \spk286_microsequencer..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+      Replacing known input bits on port A of cell $procmux$829: \active -> 1'1
+      Replacing known input bits on port A of cell $procmux$817: \active -> 1'1
+      Replacing known input bits on port A of cell $procmux$813: \active -> 1'1
+      Replacing known input bits on port A of cell $procmux$809: \active -> 1'0
+      Replacing known input bits on port B of cell $procmux$807: \active -> 1'0
+  Analyzing evaluation results.
+    dead port 1/2 on $mux $procmux$739.
+    dead port 2/2 on $mux $procmux$739.
+    dead port 1/2 on $mux $procmux$701.
+    dead port 1/2 on $mux $procmux$695.
+    dead port 2/2 on $mux $procmux$692.
+    dead port 1/2 on $mux $procmux$686.
+    dead port 2/2 on $mux $procmux$683.
+    dead port 1/2 on $mux $procmux$674.
+    dead port 2/2 on $mux $procmux$671.
+    dead port 1/2 on $mux $procmux$823.
+    dead port 2/2 on $mux $procmux$823.
+    dead port 2/2 on $mux $procmux$666.
+    dead port 1/2 on $mux $procmux$659.
+    dead port 2/2 on $mux $procmux$656.
+    dead port 2/2 on $mux $procmux$651.
+    dead port 2/2 on $mux $procmux$649.
+    dead port 1/2 on $mux $procmux$641.
+    dead port 2/2 on $mux $procmux$638.
+    dead port 2/2 on $mux $procmux$633.
+    dead port 2/2 on $mux $procmux$631.
+    dead port 2/2 on $mux $procmux$629.
+    dead port 1/2 on $mux $procmux$620.
+    dead port 2/2 on $mux $procmux$617.
+    dead port 2/2 on $mux $procmux$612.
+    dead port 2/2 on $mux $procmux$610.
+    dead port 1/2 on $mux $procmux$608.
+    dead port 1/2 on $mux $procmux$599.
+    dead port 2/2 on $mux $procmux$596.
+    dead port 1/2 on $mux $procmux$591.
+Running muxtree optimizer on module \gold..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \spk286_effective_address..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \spk286_modrm..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 29 multiplexer ports.
+<suppressed ~17 debug messages>
+
+11.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \spk286_microsequencer.
+  Optimizing cells in module \gold.
+  Optimizing cells in module \spk286_effective_address.
+  Optimizing cells in module \spk286_modrm.
+Performed a total of 0 changes.
+
+11.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spk286_microsequencer'.
+<suppressed ~3 debug messages>
+Finding identical cells in module `\gold'.
+Finding identical cells in module `\spk286_effective_address'.
+Finding identical cells in module `\spk286_modrm'.
+Removed a total of 1 cells.
+
+11.6. Executing OPT_DFF pass (perform DFF optimizations).
+Adding SRST signal on $procdff$844 ($dff) from module spk286_microsequencer (D = $procmux$708_Y, Q = \retired, rval = 1'0).
+Adding SRST signal on $procdff$845 ($dff) from module spk286_microsequencer (D = $procmux$752_Y, Q = \fault, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$855 ($sdff) from module spk286_microsequencer (D = $procmux$750_Y, Q = \fault).
+Adding SRST signal on $procdff$841 ($dff) from module spk286_microsequencer (D = $procmux$836_Y, Q = \active, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$871 ($sdff) from module spk286_microsequencer (D = $procmux$834_Y, Q = \active).
+Adding SRST signal on $procdff$842 ($dff) from module spk286_microsequencer (D = $procmux$801_Y, Q = \micro_pc, rval = 10'0000000000).
+Adding EN signal on $auto$ff.cc:266:slice$873 ($sdff) from module spk286_microsequencer (D = $procmux$799_Y, Q = \micro_pc).
+Adding SRST signal on $procdff$843 ($dff) from module spk286_microsequencer (D = $procmux$772_Y, Q = \micro_entry, rval = 10'0000000000).
+Adding EN signal on $auto$ff.cc:266:slice$887 ($sdff) from module spk286_microsequencer (D = $procmux$770_Y, Q = \micro_entry).
+
+11.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spk286_microsequencer..
+Finding unused cells or wires in module \gold..
+Finding unused cells or wires in module \spk286_effective_address..
+Finding unused cells or wires in module \spk286_modrm..
+Removed 13 unused cells and 188 unused wires.
+<suppressed ~14 debug messages>
+
+11.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module gold.
+Optimizing module spk286_effective_address.
+Optimizing module spk286_microsequencer.
+<suppressed ~3 debug messages>
+Optimizing module spk286_modrm.
+
+11.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+11.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \gold..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \spk286_effective_address..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \spk286_microsequencer..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \spk286_modrm..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~18 debug messages>
+
+11.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \gold.
+  Optimizing cells in module \spk286_effective_address.
+  Optimizing cells in module \spk286_microsequencer.
+  Optimizing cells in module \spk286_modrm.
+Performed a total of 0 changes.
+
+11.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\gold'.
+Finding identical cells in module `\spk286_effective_address'.
+Finding identical cells in module `\spk286_microsequencer'.
+<suppressed ~12 debug messages>
+Finding identical cells in module `\spk286_modrm'.
+Removed a total of 4 cells.
+
+11.13. Executing OPT_DFF pass (perform DFF optimizations).
+
+11.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \gold..
+Finding unused cells or wires in module \spk286_effective_address..
+Finding unused cells or wires in module \spk286_microsequencer..
+Finding unused cells or wires in module \spk286_modrm..
+Removed 0 unused cells and 4 unused wires.
+<suppressed ~1 debug messages>
+
+11.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module gold.
+Optimizing module spk286_effective_address.
+Optimizing module spk286_microsequencer.
+Optimizing module spk286_modrm.
+
+11.16. Rerunning OPT passes. (Maybe there is more to do..)
+
+11.17. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \gold..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \spk286_effective_address..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \spk286_microsequencer..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \spk286_modrm..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~18 debug messages>
+
+11.18. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \gold.
+  Optimizing cells in module \spk286_effective_address.
+  Optimizing cells in module \spk286_microsequencer.
+  Optimizing cells in module \spk286_modrm.
+Performed a total of 0 changes.
+
+11.19. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\gold'.
+Finding identical cells in module `\spk286_effective_address'.
+Finding identical cells in module `\spk286_microsequencer'.
+Finding identical cells in module `\spk286_modrm'.
+Removed a total of 0 cells.
+
+11.20. Executing OPT_DFF pass (perform DFF optimizations).
+
+11.21. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \gold..
+Finding unused cells or wires in module \spk286_effective_address..
+Finding unused cells or wires in module \spk286_microsequencer..
+Finding unused cells or wires in module \spk286_modrm..
+
+11.22. Executing OPT_EXPR pass (perform const folding).
+Optimizing module gold.
+Optimizing module spk286_effective_address.
+Optimizing module spk286_microsequencer.
+Optimizing module spk286_modrm.
+
+11.23. Finished OPT passes. (There is nothing left to do.)
+Renaming module \spk286_microsequencer to \gate.
+
+12. Executing EQUIV_MAKE pass (creating equiv checking module).
+Presumably equivalent wires: active_gold (\active_gold), active_gate (\active_gate) -> active
+Presumably equivalent wires: branch_request_gold (\branch_request_gold), branch_request_gate (\branch_request_gate) -> branch_request
+Presumably equivalent wires: branch_target_gold (\branch_target_gold), branch_target_gate (\branch_target_gate) -> branch_target
+Presumably equivalent wires: branch_target_valid_gold (\branch_target_valid_gold), branch_target_valid_gate (\branch_target_valid_gate) -> branch_target_valid
+Presumably equivalent wires: cancel_gold (\cancel_gold), cancel_gate (\cancel_gate) -> cancel
+Presumably equivalent wires: clk_gold (\clk_gold), clk_gate (\clk_gate) -> clk
+Presumably equivalent wires: enable_gold (\enable_gold), enable_gate (\enable_gate) -> enable
+Presumably equivalent wires: fault_gold (\fault_gold), fault_gate (\fault_gate) -> fault
+Presumably equivalent wires: micro_entry_gold (\micro_entry_gold), micro_entry_gate (\micro_entry_gate) -> micro_entry
+Presumably equivalent wires: micro_pc_gold (\micro_pc_gold), micro_pc_gate (\micro_pc_gate) -> micro_pc
+Presumably equivalent wires: next_micro_pc_gold (\next_micro_pc_gold), next_micro_pc_gate (\next_micro_pc_gate) -> next_micro_pc
+Presumably equivalent wires: operation_done_gold (\operation_done_gold), operation_done_gate (\operation_done_gate) -> operation_done
+Presumably equivalent wires: operation_retire_gold (\operation_retire_gold), operation_retire_gate (\operation_retire_gate) -> operation_retire
+Presumably equivalent wires: operation_valid_gold (\operation_valid_gold), operation_valid_gate (\operation_valid_gate) -> operation_valid
+Presumably equivalent wires: reset_gold (\reset_gold), reset_gate (\reset_gate) -> reset
+Presumably equivalent wires: retired_gold (\retired_gold), retired_gate (\retired_gate) -> retired
+Presumably equivalent wires: rom_end_gold (\rom_end_gold), rom_end_gate (\rom_end_gate) -> rom_end
+Presumably equivalent wires: rom_valid_gold (\rom_valid_gold), rom_valid_gate (\rom_valid_gate) -> rom_valid
+Presumably equivalent wires: start_gold (\start_gold), start_gate (\start_gate) -> start
+Presumably equivalent wires: start_entry_gold (\start_entry_gold), start_entry_gate (\start_entry_gate) -> start_entry
+Presumably equivalent wires: start_ready_gold (\start_ready_gold), start_ready_gate (\start_ready_gate) -> start_ready
+Changing input A of cell $add$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:56$567_gate ($add): \micro_pc_gate -> \micro_pc
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$858_gate ($ne): { $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:102$584_Y_gate \active_gate $ge$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:105$585_Y_gate } -> { $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:102$584_Y_gate \active $ge$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:105$585_Y_gate }
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$860_gate ($ne): { $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:75$573_Y_gate \active_gate \operation_done_gate } -> { $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:75$573_Y_gate \active \operation_done_gate }
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$862_gate ($ne): { $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:79$574_Y_gate $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:75$573_Y_gate $ge$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:94$582_Y_gate \active_gate \branch_request_gate \operation_done_gate } -> { $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:79$574_Y_gate $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:75$573_Y_gate $ge$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:94$582_Y_gate \active \branch_request_gate \operation_done_gate }
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$864_gate ($ne): { $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:88$580_Y_gate $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:79$574_Y_gate $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:75$573_Y_gate \active_gate \branch_request_gate \operation_done_gate } -> { $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:88$580_Y_gate $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:79$574_Y_gate $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:75$573_Y_gate \active \branch_request_gate \operation_done_gate }
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$866_gate ($ne): { $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:79$574_Y_gate $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:75$573_Y_gate \active_gate \operation_done_gate } -> { $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:79$574_Y_gate $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:75$573_Y_gate \active \operation_done_gate }
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$868_gate ($reduce_bool): { $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:102$584_Y_gate \active_gate } -> { $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:102$584_Y_gate \active }
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$878_gate ($ne): { $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:79$574_Y_gate $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:75$573_Y_gate $ge$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:94$582_Y_gate \active_gate \branch_request_gate \operation_done_gate } -> { $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:79$574_Y_gate $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:75$573_Y_gate $ge$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:94$582_Y_gate \active \branch_request_gate \operation_done_gate }
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$880_gate ($ne): { $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:88$580_Y_gate $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:79$574_Y_gate $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:75$573_Y_gate \active_gate \branch_request_gate \operation_done_gate } -> { $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:88$580_Y_gate $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:79$574_Y_gate $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:75$573_Y_gate \active \branch_request_gate \operation_done_gate }
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$884_gate ($ne): { $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:75$573_Y_gate \active_gate } -> { $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:75$573_Y_gate \active }
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$892_gate ($not): \active_gate -> \active
+Changing input A of cell $ge$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:75$572_gate ($ge): { 1'0 \micro_pc_gate } -> { 1'0 \micro_pc }
+Changing input B of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:36$543_gate ($logic_and): \active_gate -> \active
+Changing input B of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:58$568_gate ($logic_and): \start_ready_gate -> \start_ready
+Changing input A of cell $logic_not$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:33$528_gate ($logic_not): \fault_gate -> \fault
+Changing input A of cell $logic_not$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:33$530_gate ($logic_not): \active_gate -> \active
+Changing input A of cell $lt$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:35$535_gate ($lt): { 1'0 \micro_pc_gate } -> { 1'0 \micro_pc }
+Changing input A of cell $procmux$588_gate ($mux): \micro_pc_gate -> \micro_pc
+Changing input A of cell $procmux$605_gate ($mux): \micro_pc_gate -> \micro_pc
+Changing input A of cell $procmux$627_gate ($mux): \micro_pc_gate -> \micro_pc
+Changing input A of cell $procmux$664_gate ($mux): \micro_pc_gate -> \micro_pc
+Changing input S of cell $procmux$678_gate ($mux): \active_gate -> \active
+Changing input A of cell $procmux$698_gate ($mux): \micro_pc_gate -> \micro_pc
+Changing input S of cell $procmux$750_gate ($mux): \active_gate -> \active
+Changing input S of cell $procmux$770_gate ($mux): \active_gate -> \active
+Changing input S of cell $procmux$799_gate ($mux): \active_gate -> \active
+Changing input S of cell $procmux$834_gate ($mux): \active_gate -> \active
+Changing input A of cell $add$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-iu-final1-20261004/private-rtl/spk286_microsequencer.sv:55$565_gate ($add): { 1'0 \micro_pc_gate } -> { 1'0 \micro_pc }
+Changing input A of cell $add$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:50$104_gold ($add): \micro_pc_gold -> \micro_pc
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$358_gold ($ne): { $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:69$110_Y_gold \active_gold \operation_done_gold } -> { $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:69$110_Y_gold \active \operation_done_gold }
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$360_gold ($ne): { $ge$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:83$116_Y_gold $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:73$111_Y_gold $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:69$110_Y_gold \active_gold \branch_request_gold \operation_done_gold } -> { $ge$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:83$116_Y_gold $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:73$111_Y_gold $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:69$110_Y_gold \active \branch_request_gold \operation_done_gold }
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$362_gold ($ne): { $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:77$114_Y_gold $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:73$111_Y_gold $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:69$110_Y_gold \active_gold \branch_request_gold \operation_done_gold } -> { $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:77$114_Y_gold $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:73$111_Y_gold $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:69$110_Y_gold \active \branch_request_gold \operation_done_gold }
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$364_gold ($ne): { $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:73$111_Y_gold $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:69$110_Y_gold \active_gold \operation_done_gold } -> { $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:73$111_Y_gold $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:69$110_Y_gold \active \operation_done_gold }
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$366_gold ($ne): { $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:69$110_Y_gold \active_gold } -> { $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:69$110_Y_gold \active }
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$389_gold ($ne): { $ge$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:83$116_Y_gold $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:73$111_Y_gold $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:69$110_Y_gold \active_gold \branch_request_gold \operation_done_gold } -> { $ge$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:83$116_Y_gold $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:73$111_Y_gold $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:69$110_Y_gold \active \branch_request_gold \operation_done_gold }
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$391_gold ($ne): { $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:77$114_Y_gold $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:73$111_Y_gold $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:69$110_Y_gold \active_gold \branch_request_gold \operation_done_gold } -> { $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:77$114_Y_gold $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:73$111_Y_gold $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:69$110_Y_gold \active \branch_request_gold \operation_done_gold }
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$395_gold ($reduce_bool): { $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:52$105_Y_gold \active_gold } -> { $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:52$105_Y_gold \active }
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$397_gold ($ne): { $ge$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:94$119_Y_gold $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:52$105_Y_gold \active_gold } -> { $ge$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:94$119_Y_gold $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:52$105_Y_gold \active }
+Changing input A of cell $auto$opt_dff.cc:210:make_patterns_logic$371_gold ($not): \active_gold -> \active
+Changing input A of cell $ge$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:69$109_gold ($ge): { 1'0 \micro_pc_gold } -> { 1'0 \micro_pc }
+Changing input B of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:32$83_gold ($logic_and): \active_gold -> \active
+Changing input B of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:52$105_gold ($logic_and): \start_ready_gold -> \start_ready
+Changing input A of cell $logic_not$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:31$75_gold ($logic_not): \active_gold -> \active
+Changing input A of cell $logic_not$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:31$77_gold ($logic_not): \fault_gold -> \fault
+Changing input A of cell $lt$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:33$89_gold ($lt): { 1'0 \micro_pc_gold } -> { 1'0 \micro_pc }
+Changing input A of cell $procmux$136_gold ($mux): \micro_pc_gold -> \micro_pc
+Changing input A of cell $procmux$155_gold ($mux): \micro_pc_gold -> \micro_pc
+Changing input A of cell $procmux$186_gold ($mux): \micro_pc_gold -> \micro_pc
+Changing input S of cell $procmux$197_gold ($mux): \active_gold -> \active
+Changing input A of cell $procmux$205_gold ($mux): \micro_pc_gold -> \micro_pc
+Changing input S of cell $procmux$252_gold ($mux): \active_gold -> \active
+Changing input A of cell $procmux$269_gold ($mux): \micro_pc_gold -> \micro_pc
+Changing input S of cell $procmux$289_gold ($mux): \active_gold -> \active
+Changing input S of cell $procmux$319_gold ($mux): \active_gold -> \active
+Changing input A of cell $add$/mnt/d/GitHub/PCAT-286_MiSTer/vendor/spk286/rtl/spk286_microsequencer.sv:49$102_gold ($add): { 1'0 \micro_pc_gold } -> { 1'0 \micro_pc }
+Setting undriven nets to undef: \p06_relaunch_window_gate
+
+13. Executing HIERARCHY pass (managing design hierarchy).
+
+13.1. Analyzing design hierarchy..
+Top module:  \equiv
+
+13.2. Analyzing design hierarchy..
+Top module:  \equiv
+Removing unused module `\gate'.
+Removing unused module `\spk286_effective_address'.
+Removing unused module `\gold'.
+Removing unused module `\spk286_modrm'.
+Removed 4 unused modules.
+
+14. Executing EQUIV_SIMPLE pass.
+Found 35 unproven $equiv cells (8 groups) in equiv:
+  Trying to prove $equiv for \start_ready: success!
+  Trying to prove $equiv for \operation_valid: success!
+  Trying to prove $equiv for \active: failed.
+ Grouping SAT models for \micro_pc:
+  Trying to prove $equiv for \micro_pc [0]: failed.
+  Trying to prove $equiv for \micro_pc [1]: failed.
+  Trying to prove $equiv for \micro_pc [2]: failed.
+  Trying to prove $equiv for \micro_pc [3]: failed.
+  Trying to prove $equiv for \micro_pc [4]: failed.
+  Trying to prove $equiv for \micro_pc [5]: failed.
+  Trying to prove $equiv for \micro_pc [6]: failed.
+  Trying to prove $equiv for \micro_pc [7]: failed.
+  Trying to prove $equiv for \micro_pc [8]: failed.
+  Trying to prove $equiv for \micro_pc [9]: failed.
+ Grouping SAT models for \next_micro_pc:
+  Trying to prove $equiv for \next_micro_pc [0]: success!
+  Trying to prove $equiv for \next_micro_pc [1]: success!
+  Trying to prove $equiv for \next_micro_pc [2]: success!
+  Trying to prove $equiv for \next_micro_pc [3]: success!
+  Trying to prove $equiv for \next_micro_pc [4]: success!
+  Trying to prove $equiv for \next_micro_pc [5]: success!
+  Trying to prove $equiv for \next_micro_pc [6]: success!
+  Trying to prove $equiv for \next_micro_pc [7]: success!
+  Trying to prove $equiv for \next_micro_pc [8]: success!
+  Trying to prove $equiv for \next_micro_pc [9]: success!
+ Grouping SAT models for \micro_entry:
+  Trying to prove $equiv for \micro_entry [0]: failed.
+  Trying to prove $equiv for \micro_entry [1]: failed.
+  Trying to prove $equiv for \micro_entry [2]: failed.
+  Trying to prove $equiv for \micro_entry [3]: failed.
+  Trying to prove $equiv for \micro_entry [4]: failed.
+  Trying to prove $equiv for \micro_entry [5]: failed.
+  Trying to prove $equiv for \micro_entry [6]: failed.
+  Trying to prove $equiv for \micro_entry [7]: failed.
+  Trying to prove $equiv for \micro_entry [8]: failed.
+  Trying to prove $equiv for \micro_entry [9]: failed.
+  Trying to prove $equiv for \retired: failed.
+  Trying to prove $equiv for \fault: failed.
+Proved 12 previously unproven $equiv cells.
+
+15. Executing EQUIV_INDUCT pass.
+Found 23 unproven $equiv cells in module equiv:
+  Proving existence of base case for step 1. (9065 clauses over 3426 variables)
+  Proving induction step 1. (19267 clauses over 7215 variables)
+  Proof for induction step holds. Entire workset of 23 cells proven!
+Proved 23 previously unproven $equiv cells.
+
+16. Executing EQUIV_STATUS pass.
+Found 35 $equiv cells in equiv:
+  Of those cells 35 are proven and 0 are unproven.
+  Equivalence successfully proven!
+
+End of script. Logfile hash: 4896607026, CPU: user 0.21s system 0.01s, MEM: 36.46 MB peak
+Yosys 0.33 (git sha1 2584903a060)
+Time spent: 21% 10x opt_expr (0 sec), 19% 1x equiv_induct (0 sec), ...

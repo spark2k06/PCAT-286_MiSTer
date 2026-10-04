@@ -1,0 +1,18 @@
++----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Fmax Summary                                                                                                                                                                     ;
++------------+-----------------+-------------------------------------------------------------------------------------------+-------------------------------------------------------+
+; Fmax       ; Restricted Fmax ; Clock Name                                                                                ; Note                                                  ;
++------------+-----------------+-------------------------------------------------------------------------------------------+-------------------------------------------------------+
+; 28.42 MHz  ; 28.42 MHz       ; FPGA_CLK2_50                                                                              ;                                                       ;
+; 31.01 MHz  ; 31.01 MHz       ; emu|u_at_video_pll|pll_system_inst|altera_pll_i|general[0].gpll~PLL_OUTPUT_COUNTER|divclk ;                                                       ;
+; 37.54 MHz  ; 37.54 MHz       ; pll_audio|pll_audio_inst|altera_pll_i|general[0].gpll~PLL_OUTPUT_COUNTER|divclk           ;                                                       ;
+; 74.69 MHz  ; 74.69 MHz       ; emu|u_at_video_pll|pll_system_inst|altera_pll_i|general[1].gpll~PLL_OUTPUT_COUNTER|divclk ;                                                       ;
+; 86.22 MHz  ; 86.22 MHz       ; FPGA_CLK1_50                                                                              ;                                                       ;
+; 86.24 MHz  ; 86.24 MHz       ; emu|u_at_video_pll|pll_system_inst|altera_pll_i|general[2].gpll~PLL_OUTPUT_COUNTER|divclk ;                                                       ;
+; 148.35 MHz ; 148.35 MHz      ; pll_hdmi|pll_hdmi_inst|altera_pll_i|cyclonev_pll|counter[0].output_counter|divclk         ;                                                       ;
+; 177.75 MHz ; 177.75 MHz      ; sysmem|fpga_interfaces|clocks_resets|h2f_user0_clk                                        ;                                                       ;
+; 211.46 MHz ; 211.46 MHz      ; spi_sck                                                                                   ;                                                       ;
+; 868.81 MHz ; 513.35 MHz      ; AT_HDMI_TX_SCALED                                                                         ; limit due to high minimum pulse width violation (tch) ;
+; 916.59 MHz ; 513.35 MHz      ; AT_HDMI_TX_DIRECT                                                                         ; limit due to high minimum pulse width violation (tch) ;
++------------+-----------------+-------------------------------------------------------------------------------------------+-------------------------------------------------------+
+This panel reports FMAX for every clock in the design, regardless of the user-specified clock periods.  FMAX is only computed for paths where the source and destination registers or ports are driven by the same clock.  Paths of different clocks, including generated clocks, are ignored.  For paths between a clock and its inversion, FMAX is computed as if the rising and falling edges are scaled along with FMAX, such that the duty cycle (in terms of a percentage) is maintained. Altera recommends that you always use clock constraints and other slack reports for sign-off analysis.

@@ -1,0 +1,1866 @@
+----------------
+; Command Info ;
+----------------
+Report Timing: Found 20 hold paths (0 violated).  Worst case slack is 0.181 
+
+Tcl Command:
+    report_timing -hold -file /run-output/timing/MIN_fast_1100mv_100c/keyboard_hold.rpt -from [get_registers {*u_at_keyboard|*}] -to [get_registers {*u_at_keyboard|*}] -npaths 20 -detail full_path
+
+Options:
+    -from [get_registers {*u_at_keyboard|*}] 
+    -to [get_registers {*u_at_keyboard|*}] 
+    -hold 
+    -npaths 20 
+    -detail full_path 
+    -file {/run-output/timing/MIN_fast_1100mv_100c/keyboard_hold.rpt} 
+
+Delay Model:
+    Fast 1100mV 100C Model
+
++------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Summary of Paths                                                                                                                                                                                                 ;
++-------+------------------------------------------------------------+----------------------------------------------------------------------+--------------+--------------+--------------+------------+------------+
+; Slack ; From Node                                                  ; To Node                                                              ; Launch Clock ; Latch Clock  ; Relationship ; Clock Skew ; Data Delay ;
++-------+------------------------------------------------------------+----------------------------------------------------------------------+--------------+--------------+--------------+------------+------------+
+; 0.181 ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|read_ptr_q[0]  ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|read_ptr_q[0]            ; FPGA_CLK2_50 ; FPGA_CLK2_50 ; 0.000        ; 0.036      ; 0.217      ;
+; 0.183 ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|read_ptr_q[4]  ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|read_ptr_q[4]            ; FPGA_CLK2_50 ; FPGA_CLK2_50 ; 0.000        ; 0.036      ; 0.219      ;
+; 0.185 ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[0] ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[0]           ; FPGA_CLK2_50 ; FPGA_CLK2_50 ; 0.000        ; 0.039      ; 0.224      ;
+; 0.185 ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[0] ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[0]~DUPLICATE ; FPGA_CLK2_50 ; FPGA_CLK2_50 ; 0.000        ; 0.039      ; 0.224      ;
+; 0.195 ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|remaining_q[1] ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|remaining_q[1]           ; FPGA_CLK2_50 ; FPGA_CLK2_50 ; 0.000        ; 0.039      ; 0.234      ;
+; 0.195 ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[1] ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[1]           ; FPGA_CLK2_50 ; FPGA_CLK2_50 ; 0.000        ; 0.039      ; 0.234      ;
+; 0.198 ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|remaining_q[0] ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|remaining_q[0]           ; FPGA_CLK2_50 ; FPGA_CLK2_50 ; 0.000        ; 0.036      ; 0.234      ;
+; 0.198 ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|remaining_q[3] ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|remaining_q[3]           ; FPGA_CLK2_50 ; FPGA_CLK2_50 ; 0.000        ; 0.036      ; 0.234      ;
+; 0.198 ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|read_ptr_q[3]  ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|read_ptr_q[3]            ; FPGA_CLK2_50 ; FPGA_CLK2_50 ; 0.000        ; 0.036      ; 0.234      ;
+; 0.198 ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[4] ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[4]           ; FPGA_CLK2_50 ; FPGA_CLK2_50 ; 0.000        ; 0.038      ; 0.236      ;
+; 0.200 ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|overflow       ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|overflow                 ; FPGA_CLK2_50 ; FPGA_CLK2_50 ; 0.000        ; 0.036      ; 0.236      ;
+; 0.202 ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|right_shift_q  ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|right_shift_q            ; FPGA_CLK2_50 ; FPGA_CLK2_50 ; 0.000        ; 0.034      ; 0.236      ;
+; 0.202 ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|left_shift_q   ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|left_shift_q             ; FPGA_CLK2_50 ; FPGA_CLK2_50 ; 0.000        ; 0.034      ; 0.236      ;
+; 0.216 ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|sequence_q[50] ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|sequence_q[42]           ; FPGA_CLK2_50 ; FPGA_CLK2_50 ; 0.000        ; 0.039      ; 0.255      ;
+; 0.223 ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[3] ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[3]           ; FPGA_CLK2_50 ; FPGA_CLK2_50 ; 0.000        ; 0.039      ; 0.262      ;
+; 0.224 ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[2] ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[2]           ; FPGA_CLK2_50 ; FPGA_CLK2_50 ; 0.000        ; 0.039      ; 0.263      ;
+; 0.226 ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[2] ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[2]~DUPLICATE ; FPGA_CLK2_50 ; FPGA_CLK2_50 ; 0.000        ; 0.037      ; 0.263      ;
+; 0.227 ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|remaining_q[2] ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|remaining_q[2]           ; FPGA_CLK2_50 ; FPGA_CLK2_50 ; 0.000        ; 0.036      ; 0.263      ;
+; 0.227 ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|read_ptr_q[2]  ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|read_ptr_q[2]            ; FPGA_CLK2_50 ; FPGA_CLK2_50 ; 0.000        ; 0.035      ; 0.262      ;
+; 0.228 ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|read_ptr_q[1]  ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|read_ptr_q[1]            ; FPGA_CLK2_50 ; FPGA_CLK2_50 ; 0.000        ; 0.035      ; 0.263      ;
++-------+------------------------------------------------------------+----------------------------------------------------------------------+--------------+--------------+--------------+------------+------------+
+
+Path #1: Hold slack is 0.181 
+===============================================================================
++--------------------------------------------------------------------------------+
+; Path Summary                                                                   ;
++--------------------+-----------------------------------------------------------+
+; Property           ; Value                                                     ;
++--------------------+-----------------------------------------------------------+
+; From Node          ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|read_ptr_q[0] ;
+; To Node            ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|read_ptr_q[0] ;
+; Launch Clock       ; FPGA_CLK2_50                                              ;
+; Latch Clock        ; FPGA_CLK2_50                                              ;
+; Data Arrival Time  ; 2.657                                                     ;
+; Data Required Time ; 2.476                                                     ;
+; Slack              ; 0.181                                                     ;
++--------------------+-----------------------------------------------------------+
+
++-----------------------------------------------------------------------------------+
+; Statistics                                                                        ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Property               ; Value ; Count ; Total Delay ; % of Total ; Min   ; Max   ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Hold Relationship      ; 0.000 ;       ;             ;            ;       ;       ;
+; Clock Skew             ; 0.036 ;       ;             ;            ;       ;       ;
+; Data Delay             ; 0.217 ;       ;             ;            ;       ;       ;
+; Number of Logic Levels ;       ; 1     ;             ;            ;       ;       ;
+; Physical Delays        ;       ;       ;             ;            ;       ;       ;
+;  Arrival Path          ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 1.754       ; 72         ; 0.000 ; 0.993 ;
+;    Cell                ;       ; 3     ; 0.686       ; 28         ; 0.203 ; 0.268 ;
+;   Data                 ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 2     ; 0.000       ; 0          ; 0.000 ; 0.000 ;
+;    Cell                ;       ; 3     ; 0.217       ; 100        ; 0.000 ; 0.191 ;
+;    uTco                ;       ; 1     ; 0.000       ; 0          ; 0.000 ; 0.000 ;
+;  Required Path         ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 2.066       ; 74         ; 0.000 ; 1.199 ;
+;    Cell                ;       ; 3     ; 0.719       ; 26         ; 0.212 ; 0.268 ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+Note: Negative delays are omitted from totals when calculating percentages
+
++--------------------------------------------------------------------------------------------------------------------------+
+; Data Arrival Path                                                                                                        ;
++---------+---------+----+------+--------+---------------------+-----------------------------------------------------------+
+; Total   ; Incr    ; RF ; Type ; Fanout ; Location            ; Element                                                   ;
++---------+---------+----+------+--------+---------------------+-----------------------------------------------------------+
+; 0.000   ; 0.000   ;    ;      ;        ;                     ; launch edge time                                          ;
+; 2.440   ; 2.440   ;    ;      ;        ;                     ; clock path                                                ;
+;   0.000 ;   0.000 ;    ;      ;        ;                     ; source latency                                            ;
+;   0.000 ;   0.000 ;    ;      ; 1      ; PIN_Y13             ; FPGA_CLK2_50                                              ;
+;   0.000 ;   0.000 ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1    ; FPGA_CLK2_50~input|i                                      ;
+;   0.268 ;   0.268 ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1    ; FPGA_CLK2_50~input|o                                      ;
+;   1.029 ;   0.761 ; RR ; IC   ; 1      ; CLKCTRL_G2          ; FPGA_CLK2_50~inputCLKENA0|inclk                           ;
+;   1.232 ;   0.203 ; RR ; CELL ; 20805  ; CLKCTRL_G2          ; FPGA_CLK2_50~inputCLKENA0|outclk                          ;
+;   2.225 ;   0.993 ; RR ; IC   ; 1      ; FF_X31_Y47_N44      ; emu|u_at_keyboard|read_ptr_q[0]|clk                       ;
+;   2.440 ;   0.215 ; RR ; CELL ; 1      ; FF_X31_Y47_N44      ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|read_ptr_q[0] ;
+; 2.657   ; 0.217   ;    ;      ;        ;                     ; data path                                                 ;
+;   2.440 ;   0.000 ;    ; uTco ; 1      ; FF_X31_Y47_N44      ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|read_ptr_q[0] ;
+;   2.440 ;   0.000 ; FF ; CELL ; 10     ; FF_X31_Y47_N44      ; emu|u_at_keyboard|read_ptr_q[0]|q                         ;
+;   2.440 ;   0.000 ; FF ; IC   ; 1      ; LABCELL_X31_Y47_N42 ; emu|u_at_keyboard|read_ptr_q~1|datae                      ;
+;   2.631 ;   0.191 ; FF ; CELL ; 1      ; LABCELL_X31_Y47_N42 ; emu|u_at_keyboard|read_ptr_q~1|combout                    ;
+;   2.631 ;   0.000 ; FF ; IC   ; 1      ; FF_X31_Y47_N44      ; emu|u_at_keyboard|read_ptr_q[0]|d                         ;
+;   2.657 ;   0.026 ; FF ; CELL ; 1      ; FF_X31_Y47_N44      ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|read_ptr_q[0] ;
++---------+---------+----+------+--------+---------------------+-----------------------------------------------------------+
+
++------------------------------------------------------------------------------------------------------------------------+
+; Data Required Path                                                                                                     ;
++---------+----------+----+------+--------+------------------+-----------------------------------------------------------+
+; Total   ; Incr     ; RF ; Type ; Fanout ; Location         ; Element                                                   ;
++---------+----------+----+------+--------+------------------+-----------------------------------------------------------+
+; 0.000   ; 0.000    ;    ;      ;        ;                  ; latch edge time                                           ;
+; 2.476   ; 2.476    ;    ;      ;        ;                  ; clock path                                                ;
+;   0.000 ;   0.000  ;    ;      ;        ;                  ; source latency                                            ;
+;   0.000 ;   0.000  ;    ;      ; 1      ; PIN_Y13          ; FPGA_CLK2_50                                              ;
+;   0.000 ;   0.000  ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|i                                      ;
+;   0.268 ;   0.268  ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|o                                      ;
+;   1.135 ;   0.867  ; RR ; IC   ; 1      ; CLKCTRL_G2       ; FPGA_CLK2_50~inputCLKENA0|inclk                           ;
+;   1.347 ;   0.212  ; RR ; CELL ; 20805  ; CLKCTRL_G2       ; FPGA_CLK2_50~inputCLKENA0|outclk                          ;
+;   2.546 ;   1.199  ; RR ; IC   ; 1      ; FF_X31_Y47_N44   ; emu|u_at_keyboard|read_ptr_q[0]|clk                       ;
+;   2.785 ;   0.239  ; RR ; CELL ; 1      ; FF_X31_Y47_N44   ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|read_ptr_q[0] ;
+;   2.476 ;   -0.309 ;    ;      ;        ;                  ; clock pessimism removed                                   ;
+; 2.476   ; 0.000    ;    ;      ;        ;                  ; clock uncertainty                                         ;
+; 2.476   ; 0.000    ;    ; uTh  ; 1      ; FF_X31_Y47_N44   ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|read_ptr_q[0] ;
++---------+----------+----+------+--------+------------------+-----------------------------------------------------------+
+
+----------------------------
+; Extra Fitter Information ;
+----------------------------
+HTML report is unavailable in plain text report export.
+
+
+Path #2: Hold slack is 0.183 
+===============================================================================
++--------------------------------------------------------------------------------+
+; Path Summary                                                                   ;
++--------------------+-----------------------------------------------------------+
+; Property           ; Value                                                     ;
++--------------------+-----------------------------------------------------------+
+; From Node          ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|read_ptr_q[4] ;
+; To Node            ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|read_ptr_q[4] ;
+; Launch Clock       ; FPGA_CLK2_50                                              ;
+; Latch Clock        ; FPGA_CLK2_50                                              ;
+; Data Arrival Time  ; 2.659                                                     ;
+; Data Required Time ; 2.476                                                     ;
+; Slack              ; 0.183                                                     ;
++--------------------+-----------------------------------------------------------+
+
++-----------------------------------------------------------------------------------+
+; Statistics                                                                        ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Property               ; Value ; Count ; Total Delay ; % of Total ; Min   ; Max   ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Hold Relationship      ; 0.000 ;       ;             ;            ;       ;       ;
+; Clock Skew             ; 0.036 ;       ;             ;            ;       ;       ;
+; Data Delay             ; 0.219 ;       ;             ;            ;       ;       ;
+; Number of Logic Levels ;       ; 1     ;             ;            ;       ;       ;
+; Physical Delays        ;       ;       ;             ;            ;       ;       ;
+;  Arrival Path          ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 1.754       ; 72         ; 0.000 ; 0.993 ;
+;    Cell                ;       ; 3     ; 0.686       ; 28         ; 0.203 ; 0.268 ;
+;   Data                 ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 2     ; 0.000       ; 0          ; 0.000 ; 0.000 ;
+;    Cell                ;       ; 3     ; 0.219       ; 100        ; 0.000 ; 0.193 ;
+;    uTco                ;       ; 1     ; 0.000       ; 0          ; 0.000 ; 0.000 ;
+;  Required Path         ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 2.066       ; 74         ; 0.000 ; 1.199 ;
+;    Cell                ;       ; 3     ; 0.719       ; 26         ; 0.212 ; 0.268 ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+Note: Negative delays are omitted from totals when calculating percentages
+
++--------------------------------------------------------------------------------------------------------------------------+
+; Data Arrival Path                                                                                                        ;
++---------+---------+----+------+--------+---------------------+-----------------------------------------------------------+
+; Total   ; Incr    ; RF ; Type ; Fanout ; Location            ; Element                                                   ;
++---------+---------+----+------+--------+---------------------+-----------------------------------------------------------+
+; 0.000   ; 0.000   ;    ;      ;        ;                     ; launch edge time                                          ;
+; 2.440   ; 2.440   ;    ;      ;        ;                     ; clock path                                                ;
+;   0.000 ;   0.000 ;    ;      ;        ;                     ; source latency                                            ;
+;   0.000 ;   0.000 ;    ;      ; 1      ; PIN_Y13             ; FPGA_CLK2_50                                              ;
+;   0.000 ;   0.000 ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1    ; FPGA_CLK2_50~input|i                                      ;
+;   0.268 ;   0.268 ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1    ; FPGA_CLK2_50~input|o                                      ;
+;   1.029 ;   0.761 ; RR ; IC   ; 1      ; CLKCTRL_G2          ; FPGA_CLK2_50~inputCLKENA0|inclk                           ;
+;   1.232 ;   0.203 ; RR ; CELL ; 20805  ; CLKCTRL_G2          ; FPGA_CLK2_50~inputCLKENA0|outclk                          ;
+;   2.225 ;   0.993 ; RR ; IC   ; 1      ; FF_X31_Y47_N38      ; emu|u_at_keyboard|read_ptr_q[4]|clk                       ;
+;   2.440 ;   0.215 ; RR ; CELL ; 1      ; FF_X31_Y47_N38      ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|read_ptr_q[4] ;
+; 2.659   ; 0.219   ;    ;      ;        ;                     ; data path                                                 ;
+;   2.440 ;   0.000 ;    ; uTco ; 1      ; FF_X31_Y47_N38      ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|read_ptr_q[4] ;
+;   2.440 ;   0.000 ; FF ; CELL ; 2      ; FF_X31_Y47_N38      ; emu|u_at_keyboard|read_ptr_q[4]|q                         ;
+;   2.440 ;   0.000 ; FF ; IC   ; 1      ; LABCELL_X31_Y47_N36 ; emu|u_at_keyboard|read_ptr_q~0|datae                      ;
+;   2.633 ;   0.193 ; FF ; CELL ; 2      ; LABCELL_X31_Y47_N36 ; emu|u_at_keyboard|read_ptr_q~0|combout                    ;
+;   2.633 ;   0.000 ; FF ; IC   ; 1      ; FF_X31_Y47_N38      ; emu|u_at_keyboard|read_ptr_q[4]|d                         ;
+;   2.659 ;   0.026 ; FF ; CELL ; 1      ; FF_X31_Y47_N38      ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|read_ptr_q[4] ;
++---------+---------+----+------+--------+---------------------+-----------------------------------------------------------+
+
++------------------------------------------------------------------------------------------------------------------------+
+; Data Required Path                                                                                                     ;
++---------+----------+----+------+--------+------------------+-----------------------------------------------------------+
+; Total   ; Incr     ; RF ; Type ; Fanout ; Location         ; Element                                                   ;
++---------+----------+----+------+--------+------------------+-----------------------------------------------------------+
+; 0.000   ; 0.000    ;    ;      ;        ;                  ; latch edge time                                           ;
+; 2.476   ; 2.476    ;    ;      ;        ;                  ; clock path                                                ;
+;   0.000 ;   0.000  ;    ;      ;        ;                  ; source latency                                            ;
+;   0.000 ;   0.000  ;    ;      ; 1      ; PIN_Y13          ; FPGA_CLK2_50                                              ;
+;   0.000 ;   0.000  ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|i                                      ;
+;   0.268 ;   0.268  ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|o                                      ;
+;   1.135 ;   0.867  ; RR ; IC   ; 1      ; CLKCTRL_G2       ; FPGA_CLK2_50~inputCLKENA0|inclk                           ;
+;   1.347 ;   0.212  ; RR ; CELL ; 20805  ; CLKCTRL_G2       ; FPGA_CLK2_50~inputCLKENA0|outclk                          ;
+;   2.546 ;   1.199  ; RR ; IC   ; 1      ; FF_X31_Y47_N38   ; emu|u_at_keyboard|read_ptr_q[4]|clk                       ;
+;   2.785 ;   0.239  ; RR ; CELL ; 1      ; FF_X31_Y47_N38   ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|read_ptr_q[4] ;
+;   2.476 ;   -0.309 ;    ;      ;        ;                  ; clock pessimism removed                                   ;
+; 2.476   ; 0.000    ;    ;      ;        ;                  ; clock uncertainty                                         ;
+; 2.476   ; 0.000    ;    ; uTh  ; 1      ; FF_X31_Y47_N38   ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|read_ptr_q[4] ;
++---------+----------+----+------+--------+------------------+-----------------------------------------------------------+
+
+----------------------------
+; Extra Fitter Information ;
+----------------------------
+HTML report is unavailable in plain text report export.
+
+
+Path #3: Hold slack is 0.185 
+===============================================================================
++---------------------------------------------------------------------------------+
+; Path Summary                                                                    ;
++--------------------+------------------------------------------------------------+
+; Property           ; Value                                                      ;
++--------------------+------------------------------------------------------------+
+; From Node          ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[0] ;
+; To Node            ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[0] ;
+; Launch Clock       ; FPGA_CLK2_50                                               ;
+; Latch Clock        ; FPGA_CLK2_50                                               ;
+; Data Arrival Time  ; 2.658                                                      ;
+; Data Required Time ; 2.473                                                      ;
+; Slack              ; 0.185                                                      ;
++--------------------+------------------------------------------------------------+
+
++-----------------------------------------------------------------------------------+
+; Statistics                                                                        ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Property               ; Value ; Count ; Total Delay ; % of Total ; Min   ; Max   ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Hold Relationship      ; 0.000 ;       ;             ;            ;       ;       ;
+; Clock Skew             ; 0.039 ;       ;             ;            ;       ;       ;
+; Data Delay             ; 0.224 ;       ;             ;            ;       ;       ;
+; Number of Logic Levels ;       ; 1     ;             ;            ;       ;       ;
+; Physical Delays        ;       ;       ;             ;            ;       ;       ;
+;  Arrival Path          ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 1.754       ; 72         ; 0.000 ; 0.993 ;
+;    Cell                ;       ; 3     ; 0.680       ; 28         ; 0.203 ; 0.268 ;
+;   Data                 ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 2     ; 0.000       ; 0          ; 0.000 ; 0.000 ;
+;    Cell                ;       ; 3     ; 0.224       ; 100        ; 0.000 ; 0.195 ;
+;    uTco                ;       ; 1     ; 0.000       ; 0          ; 0.000 ; 0.000 ;
+;  Required Path         ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 2.066       ; 74         ; 0.000 ; 1.199 ;
+;    Cell                ;       ; 3     ; 0.716       ; 26         ; 0.212 ; 0.268 ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+Note: Negative delays are omitted from totals when calculating percentages
+
++---------------------------------------------------------------------------------------------------------------------------+
+; Data Arrival Path                                                                                                         ;
++---------+---------+----+------+--------+---------------------+------------------------------------------------------------+
+; Total   ; Incr    ; RF ; Type ; Fanout ; Location            ; Element                                                    ;
++---------+---------+----+------+--------+---------------------+------------------------------------------------------------+
+; 0.000   ; 0.000   ;    ;      ;        ;                     ; launch edge time                                           ;
+; 2.434   ; 2.434   ;    ;      ;        ;                     ; clock path                                                 ;
+;   0.000 ;   0.000 ;    ;      ;        ;                     ; source latency                                             ;
+;   0.000 ;   0.000 ;    ;      ; 1      ; PIN_Y13             ; FPGA_CLK2_50                                               ;
+;   0.000 ;   0.000 ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1    ; FPGA_CLK2_50~input|i                                       ;
+;   0.268 ;   0.268 ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1    ; FPGA_CLK2_50~input|o                                       ;
+;   1.029 ;   0.761 ; RR ; IC   ; 1      ; CLKCTRL_G2          ; FPGA_CLK2_50~inputCLKENA0|inclk                            ;
+;   1.232 ;   0.203 ; RR ; CELL ; 20805  ; CLKCTRL_G2          ; FPGA_CLK2_50~inputCLKENA0|outclk                           ;
+;   2.225 ;   0.993 ; RR ; IC   ; 1      ; FF_X31_Y47_N56      ; emu|u_at_keyboard|write_ptr_q[0]|clk                       ;
+;   2.434 ;   0.209 ; RR ; CELL ; 1      ; FF_X31_Y47_N56      ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[0] ;
+; 2.658   ; 0.224   ;    ;      ;        ;                     ; data path                                                  ;
+;   2.434 ;   0.000 ;    ; uTco ; 1      ; FF_X31_Y47_N56      ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[0] ;
+;   2.434 ;   0.000 ; FF ; CELL ; 6      ; FF_X31_Y47_N56      ; emu|u_at_keyboard|write_ptr_q[0]|q                         ;
+;   2.434 ;   0.000 ; FF ; IC   ; 1      ; LABCELL_X31_Y47_N54 ; emu|u_at_keyboard|write_ptr_q[0]~_wirecell|datae           ;
+;   2.629 ;   0.195 ; FR ; CELL ; 2      ; LABCELL_X31_Y47_N54 ; emu|u_at_keyboard|write_ptr_q[0]~_wirecell|combout         ;
+;   2.629 ;   0.000 ; RR ; IC   ; 1      ; FF_X31_Y47_N56      ; emu|u_at_keyboard|write_ptr_q[0]|d                         ;
+;   2.658 ;   0.029 ; RR ; CELL ; 1      ; FF_X31_Y47_N56      ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[0] ;
++---------+---------+----+------+--------+---------------------+------------------------------------------------------------+
+
++-------------------------------------------------------------------------------------------------------------------------+
+; Data Required Path                                                                                                      ;
++---------+----------+----+------+--------+------------------+------------------------------------------------------------+
+; Total   ; Incr     ; RF ; Type ; Fanout ; Location         ; Element                                                    ;
++---------+----------+----+------+--------+------------------+------------------------------------------------------------+
+; 0.000   ; 0.000    ;    ;      ;        ;                  ; latch edge time                                            ;
+; 2.473   ; 2.473    ;    ;      ;        ;                  ; clock path                                                 ;
+;   0.000 ;   0.000  ;    ;      ;        ;                  ; source latency                                             ;
+;   0.000 ;   0.000  ;    ;      ; 1      ; PIN_Y13          ; FPGA_CLK2_50                                               ;
+;   0.000 ;   0.000  ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|i                                       ;
+;   0.268 ;   0.268  ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|o                                       ;
+;   1.135 ;   0.867  ; RR ; IC   ; 1      ; CLKCTRL_G2       ; FPGA_CLK2_50~inputCLKENA0|inclk                            ;
+;   1.347 ;   0.212  ; RR ; CELL ; 20805  ; CLKCTRL_G2       ; FPGA_CLK2_50~inputCLKENA0|outclk                           ;
+;   2.546 ;   1.199  ; RR ; IC   ; 1      ; FF_X31_Y47_N56   ; emu|u_at_keyboard|write_ptr_q[0]|clk                       ;
+;   2.782 ;   0.236  ; RR ; CELL ; 1      ; FF_X31_Y47_N56   ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[0] ;
+;   2.473 ;   -0.309 ;    ;      ;        ;                  ; clock pessimism removed                                    ;
+; 2.473   ; 0.000    ;    ;      ;        ;                  ; clock uncertainty                                          ;
+; 2.473   ; 0.000    ;    ; uTh  ; 1      ; FF_X31_Y47_N56   ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[0] ;
++---------+----------+----+------+--------+------------------+------------------------------------------------------------+
+
+----------------------------
+; Extra Fitter Information ;
+----------------------------
+HTML report is unavailable in plain text report export.
+
+
+Path #4: Hold slack is 0.185 
+===============================================================================
++-------------------------------------------------------------------------------------------+
+; Path Summary                                                                              ;
++--------------------+----------------------------------------------------------------------+
+; Property           ; Value                                                                ;
++--------------------+----------------------------------------------------------------------+
+; From Node          ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[0]           ;
+; To Node            ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[0]~DUPLICATE ;
+; Launch Clock       ; FPGA_CLK2_50                                                         ;
+; Latch Clock        ; FPGA_CLK2_50                                                         ;
+; Data Arrival Time  ; 2.658                                                                ;
+; Data Required Time ; 2.473                                                                ;
+; Slack              ; 0.185                                                                ;
++--------------------+----------------------------------------------------------------------+
+
++-----------------------------------------------------------------------------------+
+; Statistics                                                                        ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Property               ; Value ; Count ; Total Delay ; % of Total ; Min   ; Max   ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Hold Relationship      ; 0.000 ;       ;             ;            ;       ;       ;
+; Clock Skew             ; 0.039 ;       ;             ;            ;       ;       ;
+; Data Delay             ; 0.224 ;       ;             ;            ;       ;       ;
+; Number of Logic Levels ;       ; 1     ;             ;            ;       ;       ;
+; Physical Delays        ;       ;       ;             ;            ;       ;       ;
+;  Arrival Path          ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 1.754       ; 72         ; 0.000 ; 0.993 ;
+;    Cell                ;       ; 3     ; 0.680       ; 28         ; 0.203 ; 0.268 ;
+;   Data                 ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 2     ; 0.000       ; 0          ; 0.000 ; 0.000 ;
+;    Cell                ;       ; 3     ; 0.224       ; 100        ; 0.000 ; 0.195 ;
+;    uTco                ;       ; 1     ; 0.000       ; 0          ; 0.000 ; 0.000 ;
+;  Required Path         ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 2.066       ; 74         ; 0.000 ; 1.199 ;
+;    Cell                ;       ; 3     ; 0.716       ; 26         ; 0.212 ; 0.268 ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+Note: Negative delays are omitted from totals when calculating percentages
+
++-------------------------------------------------------------------------------------------------------------------------------------+
+; Data Arrival Path                                                                                                                   ;
++---------+---------+----+------+--------+---------------------+----------------------------------------------------------------------+
+; Total   ; Incr    ; RF ; Type ; Fanout ; Location            ; Element                                                              ;
++---------+---------+----+------+--------+---------------------+----------------------------------------------------------------------+
+; 0.000   ; 0.000   ;    ;      ;        ;                     ; launch edge time                                                     ;
+; 2.434   ; 2.434   ;    ;      ;        ;                     ; clock path                                                           ;
+;   0.000 ;   0.000 ;    ;      ;        ;                     ; source latency                                                       ;
+;   0.000 ;   0.000 ;    ;      ; 1      ; PIN_Y13             ; FPGA_CLK2_50                                                         ;
+;   0.000 ;   0.000 ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1    ; FPGA_CLK2_50~input|i                                                 ;
+;   0.268 ;   0.268 ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1    ; FPGA_CLK2_50~input|o                                                 ;
+;   1.029 ;   0.761 ; RR ; IC   ; 1      ; CLKCTRL_G2          ; FPGA_CLK2_50~inputCLKENA0|inclk                                      ;
+;   1.232 ;   0.203 ; RR ; CELL ; 20805  ; CLKCTRL_G2          ; FPGA_CLK2_50~inputCLKENA0|outclk                                     ;
+;   2.225 ;   0.993 ; RR ; IC   ; 1      ; FF_X31_Y47_N56      ; emu|u_at_keyboard|write_ptr_q[0]|clk                                 ;
+;   2.434 ;   0.209 ; RR ; CELL ; 1      ; FF_X31_Y47_N56      ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[0]           ;
+; 2.658   ; 0.224   ;    ;      ;        ;                     ; data path                                                            ;
+;   2.434 ;   0.000 ;    ; uTco ; 1      ; FF_X31_Y47_N56      ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[0]           ;
+;   2.434 ;   0.000 ; FF ; CELL ; 6      ; FF_X31_Y47_N56      ; emu|u_at_keyboard|write_ptr_q[0]|q                                   ;
+;   2.434 ;   0.000 ; FF ; IC   ; 1      ; LABCELL_X31_Y47_N54 ; emu|u_at_keyboard|write_ptr_q[0]~_wirecell|datae                     ;
+;   2.629 ;   0.195 ; FR ; CELL ; 2      ; LABCELL_X31_Y47_N54 ; emu|u_at_keyboard|write_ptr_q[0]~_wirecell|combout                   ;
+;   2.629 ;   0.000 ; RR ; IC   ; 1      ; FF_X31_Y47_N55      ; emu|u_at_keyboard|write_ptr_q[0]~DUPLICATE|d                         ;
+;   2.658 ;   0.029 ; RR ; CELL ; 1      ; FF_X31_Y47_N55      ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[0]~DUPLICATE ;
++---------+---------+----+------+--------+---------------------+----------------------------------------------------------------------+
+
++-----------------------------------------------------------------------------------------------------------------------------------+
+; Data Required Path                                                                                                                ;
++---------+----------+----+------+--------+------------------+----------------------------------------------------------------------+
+; Total   ; Incr     ; RF ; Type ; Fanout ; Location         ; Element                                                              ;
++---------+----------+----+------+--------+------------------+----------------------------------------------------------------------+
+; 0.000   ; 0.000    ;    ;      ;        ;                  ; latch edge time                                                      ;
+; 2.473   ; 2.473    ;    ;      ;        ;                  ; clock path                                                           ;
+;   0.000 ;   0.000  ;    ;      ;        ;                  ; source latency                                                       ;
+;   0.000 ;   0.000  ;    ;      ; 1      ; PIN_Y13          ; FPGA_CLK2_50                                                         ;
+;   0.000 ;   0.000  ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|i                                                 ;
+;   0.268 ;   0.268  ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|o                                                 ;
+;   1.135 ;   0.867  ; RR ; IC   ; 1      ; CLKCTRL_G2       ; FPGA_CLK2_50~inputCLKENA0|inclk                                      ;
+;   1.347 ;   0.212  ; RR ; CELL ; 20805  ; CLKCTRL_G2       ; FPGA_CLK2_50~inputCLKENA0|outclk                                     ;
+;   2.546 ;   1.199  ; RR ; IC   ; 1      ; FF_X31_Y47_N55   ; emu|u_at_keyboard|write_ptr_q[0]~DUPLICATE|clk                       ;
+;   2.782 ;   0.236  ; RR ; CELL ; 1      ; FF_X31_Y47_N55   ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[0]~DUPLICATE ;
+;   2.473 ;   -0.309 ;    ;      ;        ;                  ; clock pessimism removed                                              ;
+; 2.473   ; 0.000    ;    ;      ;        ;                  ; clock uncertainty                                                    ;
+; 2.473   ; 0.000    ;    ; uTh  ; 1      ; FF_X31_Y47_N55   ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[0]~DUPLICATE ;
++---------+----------+----+------+--------+------------------+----------------------------------------------------------------------+
+
+----------------------------
+; Extra Fitter Information ;
+----------------------------
+HTML report is unavailable in plain text report export.
+
+
+Path #5: Hold slack is 0.195 
+===============================================================================
++---------------------------------------------------------------------------------+
+; Path Summary                                                                    ;
++--------------------+------------------------------------------------------------+
+; Property           ; Value                                                      ;
++--------------------+------------------------------------------------------------+
+; From Node          ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|remaining_q[1] ;
+; To Node            ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|remaining_q[1] ;
+; Launch Clock       ; FPGA_CLK2_50                                               ;
+; Latch Clock        ; FPGA_CLK2_50                                               ;
+; Data Arrival Time  ; 2.685                                                      ;
+; Data Required Time ; 2.490                                                      ;
+; Slack              ; 0.195                                                      ;
++--------------------+------------------------------------------------------------+
+
++-----------------------------------------------------------------------------------+
+; Statistics                                                                        ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Property               ; Value ; Count ; Total Delay ; % of Total ; Min   ; Max   ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Hold Relationship      ; 0.000 ;       ;             ;            ;       ;       ;
+; Clock Skew             ; 0.039 ;       ;             ;            ;       ;       ;
+; Data Delay             ; 0.234 ;       ;             ;            ;       ;       ;
+; Number of Logic Levels ;       ; 1     ;             ;            ;       ;       ;
+; Physical Delays        ;       ;       ;             ;            ;       ;       ;
+;  Arrival Path          ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 1.768       ; 72         ; 0.000 ; 1.007 ;
+;    Cell                ;       ; 3     ; 0.683       ; 28         ; 0.203 ; 0.268 ;
+;   Data                 ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 2     ; 0.000       ; 0          ; 0.000 ; 0.000 ;
+;    Cell                ;       ; 3     ; 0.234       ; 100        ; 0.000 ; 0.208 ;
+;    uTco                ;       ; 1     ; 0.000       ; 0          ; 0.000 ; 0.000 ;
+;  Required Path         ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 2.080       ; 74         ; 0.000 ; 1.213 ;
+;    Cell                ;       ; 3     ; 0.719       ; 26         ; 0.212 ; 0.268 ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+Note: Negative delays are omitted from totals when calculating percentages
+
++---------------------------------------------------------------------------------------------------------------------------+
+; Data Arrival Path                                                                                                         ;
++---------+---------+----+------+--------+---------------------+------------------------------------------------------------+
+; Total   ; Incr    ; RF ; Type ; Fanout ; Location            ; Element                                                    ;
++---------+---------+----+------+--------+---------------------+------------------------------------------------------------+
+; 0.000   ; 0.000   ;    ;      ;        ;                     ; launch edge time                                           ;
+; 2.451   ; 2.451   ;    ;      ;        ;                     ; clock path                                                 ;
+;   0.000 ;   0.000 ;    ;      ;        ;                     ; source latency                                             ;
+;   0.000 ;   0.000 ;    ;      ; 1      ; PIN_Y13             ; FPGA_CLK2_50                                               ;
+;   0.000 ;   0.000 ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1    ; FPGA_CLK2_50~input|i                                       ;
+;   0.268 ;   0.268 ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1    ; FPGA_CLK2_50~input|o                                       ;
+;   1.029 ;   0.761 ; RR ; IC   ; 1      ; CLKCTRL_G2          ; FPGA_CLK2_50~inputCLKENA0|inclk                            ;
+;   1.232 ;   0.203 ; RR ; CELL ; 20805  ; CLKCTRL_G2          ; FPGA_CLK2_50~inputCLKENA0|outclk                           ;
+;   2.239 ;   1.007 ; RR ; IC   ; 1      ; FF_X36_Y47_N56      ; emu|u_at_keyboard|remaining_q[1]|clk                       ;
+;   2.451 ;   0.212 ; RR ; CELL ; 1      ; FF_X36_Y47_N56      ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|remaining_q[1] ;
+; 2.685   ; 0.234   ;    ;      ;        ;                     ; data path                                                  ;
+;   2.451 ;   0.000 ;    ; uTco ; 1      ; FF_X36_Y47_N56      ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|remaining_q[1] ;
+;   2.451 ;   0.000 ; FF ; CELL ; 4      ; FF_X36_Y47_N56      ; emu|u_at_keyboard|remaining_q[1]|q                         ;
+;   2.451 ;   0.000 ; FF ; IC   ; 1      ; LABCELL_X36_Y47_N54 ; emu|u_at_keyboard|remaining_q~9|datad                      ;
+;   2.659 ;   0.208 ; FF ; CELL ; 1      ; LABCELL_X36_Y47_N54 ; emu|u_at_keyboard|remaining_q~9|combout                    ;
+;   2.659 ;   0.000 ; FF ; IC   ; 1      ; FF_X36_Y47_N56      ; emu|u_at_keyboard|remaining_q[1]|d                         ;
+;   2.685 ;   0.026 ; FF ; CELL ; 1      ; FF_X36_Y47_N56      ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|remaining_q[1] ;
++---------+---------+----+------+--------+---------------------+------------------------------------------------------------+
+
++-------------------------------------------------------------------------------------------------------------------------+
+; Data Required Path                                                                                                      ;
++---------+----------+----+------+--------+------------------+------------------------------------------------------------+
+; Total   ; Incr     ; RF ; Type ; Fanout ; Location         ; Element                                                    ;
++---------+----------+----+------+--------+------------------+------------------------------------------------------------+
+; 0.000   ; 0.000    ;    ;      ;        ;                  ; latch edge time                                            ;
+; 2.490   ; 2.490    ;    ;      ;        ;                  ; clock path                                                 ;
+;   0.000 ;   0.000  ;    ;      ;        ;                  ; source latency                                             ;
+;   0.000 ;   0.000  ;    ;      ; 1      ; PIN_Y13          ; FPGA_CLK2_50                                               ;
+;   0.000 ;   0.000  ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|i                                       ;
+;   0.268 ;   0.268  ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|o                                       ;
+;   1.135 ;   0.867  ; RR ; IC   ; 1      ; CLKCTRL_G2       ; FPGA_CLK2_50~inputCLKENA0|inclk                            ;
+;   1.347 ;   0.212  ; RR ; CELL ; 20805  ; CLKCTRL_G2       ; FPGA_CLK2_50~inputCLKENA0|outclk                           ;
+;   2.560 ;   1.213  ; RR ; IC   ; 1      ; FF_X36_Y47_N56   ; emu|u_at_keyboard|remaining_q[1]|clk                       ;
+;   2.799 ;   0.239  ; RR ; CELL ; 1      ; FF_X36_Y47_N56   ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|remaining_q[1] ;
+;   2.490 ;   -0.309 ;    ;      ;        ;                  ; clock pessimism removed                                    ;
+; 2.490   ; 0.000    ;    ;      ;        ;                  ; clock uncertainty                                          ;
+; 2.490   ; 0.000    ;    ; uTh  ; 1      ; FF_X36_Y47_N56   ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|remaining_q[1] ;
++---------+----------+----+------+--------+------------------+------------------------------------------------------------+
+
+----------------------------
+; Extra Fitter Information ;
+----------------------------
+HTML report is unavailable in plain text report export.
+
+
+Path #6: Hold slack is 0.195 
+===============================================================================
++---------------------------------------------------------------------------------+
+; Path Summary                                                                    ;
++--------------------+------------------------------------------------------------+
+; Property           ; Value                                                      ;
++--------------------+------------------------------------------------------------+
+; From Node          ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[1] ;
+; To Node            ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[1] ;
+; Launch Clock       ; FPGA_CLK2_50                                               ;
+; Latch Clock        ; FPGA_CLK2_50                                               ;
+; Data Arrival Time  ; 2.668                                                      ;
+; Data Required Time ; 2.473                                                      ;
+; Slack              ; 0.195                                                      ;
++--------------------+------------------------------------------------------------+
+
++-----------------------------------------------------------------------------------+
+; Statistics                                                                        ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Property               ; Value ; Count ; Total Delay ; % of Total ; Min   ; Max   ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Hold Relationship      ; 0.000 ;       ;             ;            ;       ;       ;
+; Clock Skew             ; 0.039 ;       ;             ;            ;       ;       ;
+; Data Delay             ; 0.234 ;       ;             ;            ;       ;       ;
+; Number of Logic Levels ;       ; 1     ;             ;            ;       ;       ;
+; Physical Delays        ;       ;       ;             ;            ;       ;       ;
+;  Arrival Path          ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 1.754       ; 72         ; 0.000 ; 0.993 ;
+;    Cell                ;       ; 3     ; 0.680       ; 28         ; 0.203 ; 0.268 ;
+;   Data                 ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 2     ; 0.000       ; 0          ; 0.000 ; 0.000 ;
+;    Cell                ;       ; 3     ; 0.234       ; 100        ; 0.000 ; 0.208 ;
+;    uTco                ;       ; 1     ; 0.000       ; 0          ; 0.000 ; 0.000 ;
+;  Required Path         ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 2.066       ; 74         ; 0.000 ; 1.199 ;
+;    Cell                ;       ; 3     ; 0.716       ; 26         ; 0.212 ; 0.268 ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+Note: Negative delays are omitted from totals when calculating percentages
+
++---------------------------------------------------------------------------------------------------------------------------+
+; Data Arrival Path                                                                                                         ;
++---------+---------+----+------+--------+---------------------+------------------------------------------------------------+
+; Total   ; Incr    ; RF ; Type ; Fanout ; Location            ; Element                                                    ;
++---------+---------+----+------+--------+---------------------+------------------------------------------------------------+
+; 0.000   ; 0.000   ;    ;      ;        ;                     ; launch edge time                                           ;
+; 2.434   ; 2.434   ;    ;      ;        ;                     ; clock path                                                 ;
+;   0.000 ;   0.000 ;    ;      ;        ;                     ; source latency                                             ;
+;   0.000 ;   0.000 ;    ;      ; 1      ; PIN_Y13             ; FPGA_CLK2_50                                               ;
+;   0.000 ;   0.000 ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1    ; FPGA_CLK2_50~input|i                                       ;
+;   0.268 ;   0.268 ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1    ; FPGA_CLK2_50~input|o                                       ;
+;   1.029 ;   0.761 ; RR ; IC   ; 1      ; CLKCTRL_G2          ; FPGA_CLK2_50~inputCLKENA0|inclk                            ;
+;   1.232 ;   0.203 ; RR ; CELL ; 20805  ; CLKCTRL_G2          ; FPGA_CLK2_50~inputCLKENA0|outclk                           ;
+;   2.225 ;   0.993 ; RR ; IC   ; 1      ; FF_X31_Y47_N14      ; emu|u_at_keyboard|write_ptr_q[1]|clk                       ;
+;   2.434 ;   0.209 ; RR ; CELL ; 1      ; FF_X31_Y47_N14      ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[1] ;
+; 2.668   ; 0.234   ;    ;      ;        ;                     ; data path                                                  ;
+;   2.434 ;   0.000 ;    ; uTco ; 1      ; FF_X31_Y47_N14      ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[1] ;
+;   2.434 ;   0.000 ; FF ; CELL ; 6      ; FF_X31_Y47_N14      ; emu|u_at_keyboard|write_ptr_q[1]|q                         ;
+;   2.434 ;   0.000 ; FF ; IC   ; 1      ; LABCELL_X31_Y47_N12 ; emu|u_at_keyboard|Add0~1|datad                             ;
+;   2.642 ;   0.208 ; FF ; CELL ; 1      ; LABCELL_X31_Y47_N12 ; emu|u_at_keyboard|Add0~1|combout                           ;
+;   2.642 ;   0.000 ; FF ; IC   ; 1      ; FF_X31_Y47_N14      ; emu|u_at_keyboard|write_ptr_q[1]|d                         ;
+;   2.668 ;   0.026 ; FF ; CELL ; 1      ; FF_X31_Y47_N14      ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[1] ;
++---------+---------+----+------+--------+---------------------+------------------------------------------------------------+
+
++-------------------------------------------------------------------------------------------------------------------------+
+; Data Required Path                                                                                                      ;
++---------+----------+----+------+--------+------------------+------------------------------------------------------------+
+; Total   ; Incr     ; RF ; Type ; Fanout ; Location         ; Element                                                    ;
++---------+----------+----+------+--------+------------------+------------------------------------------------------------+
+; 0.000   ; 0.000    ;    ;      ;        ;                  ; latch edge time                                            ;
+; 2.473   ; 2.473    ;    ;      ;        ;                  ; clock path                                                 ;
+;   0.000 ;   0.000  ;    ;      ;        ;                  ; source latency                                             ;
+;   0.000 ;   0.000  ;    ;      ; 1      ; PIN_Y13          ; FPGA_CLK2_50                                               ;
+;   0.000 ;   0.000  ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|i                                       ;
+;   0.268 ;   0.268  ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|o                                       ;
+;   1.135 ;   0.867  ; RR ; IC   ; 1      ; CLKCTRL_G2       ; FPGA_CLK2_50~inputCLKENA0|inclk                            ;
+;   1.347 ;   0.212  ; RR ; CELL ; 20805  ; CLKCTRL_G2       ; FPGA_CLK2_50~inputCLKENA0|outclk                           ;
+;   2.546 ;   1.199  ; RR ; IC   ; 1      ; FF_X31_Y47_N14   ; emu|u_at_keyboard|write_ptr_q[1]|clk                       ;
+;   2.782 ;   0.236  ; RR ; CELL ; 1      ; FF_X31_Y47_N14   ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[1] ;
+;   2.473 ;   -0.309 ;    ;      ;        ;                  ; clock pessimism removed                                    ;
+; 2.473   ; 0.000    ;    ;      ;        ;                  ; clock uncertainty                                          ;
+; 2.473   ; 0.000    ;    ; uTh  ; 1      ; FF_X31_Y47_N14   ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[1] ;
++---------+----------+----+------+--------+------------------+------------------------------------------------------------+
+
+----------------------------
+; Extra Fitter Information ;
+----------------------------
+HTML report is unavailable in plain text report export.
+
+
+Path #7: Hold slack is 0.198 
+===============================================================================
++---------------------------------------------------------------------------------+
+; Path Summary                                                                    ;
++--------------------+------------------------------------------------------------+
+; Property           ; Value                                                      ;
++--------------------+------------------------------------------------------------+
+; From Node          ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|remaining_q[0] ;
+; To Node            ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|remaining_q[0] ;
+; Launch Clock       ; FPGA_CLK2_50                                               ;
+; Latch Clock        ; FPGA_CLK2_50                                               ;
+; Data Arrival Time  ; 2.690                                                      ;
+; Data Required Time ; 2.492                                                      ;
+; Slack              ; 0.198                                                      ;
++--------------------+------------------------------------------------------------+
+
++-----------------------------------------------------------------------------------+
+; Statistics                                                                        ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Property               ; Value ; Count ; Total Delay ; % of Total ; Min   ; Max   ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Hold Relationship      ; 0.000 ;       ;             ;            ;       ;       ;
+; Clock Skew             ; 0.036 ;       ;             ;            ;       ;       ;
+; Data Delay             ; 0.234 ;       ;             ;            ;       ;       ;
+; Number of Logic Levels ;       ; 1     ;             ;            ;       ;       ;
+; Physical Delays        ;       ;       ;             ;            ;       ;       ;
+;  Arrival Path          ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 1.768       ; 72         ; 0.000 ; 1.007 ;
+;    Cell                ;       ; 3     ; 0.688       ; 28         ; 0.203 ; 0.268 ;
+;   Data                 ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 2     ; 0.000       ; 0          ; 0.000 ; 0.000 ;
+;    Cell                ;       ; 3     ; 0.234       ; 100        ; 0.000 ; 0.208 ;
+;    uTco                ;       ; 1     ; 0.000       ; 0          ; 0.000 ; 0.000 ;
+;  Required Path         ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 2.080       ; 74         ; 0.000 ; 1.213 ;
+;    Cell                ;       ; 3     ; 0.721       ; 26         ; 0.212 ; 0.268 ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+Note: Negative delays are omitted from totals when calculating percentages
+
++---------------------------------------------------------------------------------------------------------------------------+
+; Data Arrival Path                                                                                                         ;
++---------+---------+----+------+--------+---------------------+------------------------------------------------------------+
+; Total   ; Incr    ; RF ; Type ; Fanout ; Location            ; Element                                                    ;
++---------+---------+----+------+--------+---------------------+------------------------------------------------------------+
+; 0.000   ; 0.000   ;    ;      ;        ;                     ; launch edge time                                           ;
+; 2.456   ; 2.456   ;    ;      ;        ;                     ; clock path                                                 ;
+;   0.000 ;   0.000 ;    ;      ;        ;                     ; source latency                                             ;
+;   0.000 ;   0.000 ;    ;      ; 1      ; PIN_Y13             ; FPGA_CLK2_50                                               ;
+;   0.000 ;   0.000 ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1    ; FPGA_CLK2_50~input|i                                       ;
+;   0.268 ;   0.268 ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1    ; FPGA_CLK2_50~input|o                                       ;
+;   1.029 ;   0.761 ; RR ; IC   ; 1      ; CLKCTRL_G2          ; FPGA_CLK2_50~inputCLKENA0|inclk                            ;
+;   1.232 ;   0.203 ; RR ; CELL ; 20805  ; CLKCTRL_G2          ; FPGA_CLK2_50~inputCLKENA0|outclk                           ;
+;   2.239 ;   1.007 ; RR ; IC   ; 1      ; FF_X36_Y47_N26      ; emu|u_at_keyboard|remaining_q[0]|clk                       ;
+;   2.456 ;   0.217 ; RR ; CELL ; 1      ; FF_X36_Y47_N26      ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|remaining_q[0] ;
+; 2.690   ; 0.234   ;    ;      ;        ;                     ; data path                                                  ;
+;   2.456 ;   0.000 ;    ; uTco ; 1      ; FF_X36_Y47_N26      ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|remaining_q[0] ;
+;   2.456 ;   0.000 ; FF ; CELL ; 5      ; FF_X36_Y47_N26      ; emu|u_at_keyboard|remaining_q[0]|q                         ;
+;   2.456 ;   0.000 ; FF ; IC   ; 1      ; LABCELL_X36_Y47_N24 ; emu|u_at_keyboard|remaining_q~13|datad                     ;
+;   2.664 ;   0.208 ; FF ; CELL ; 1      ; LABCELL_X36_Y47_N24 ; emu|u_at_keyboard|remaining_q~13|combout                   ;
+;   2.664 ;   0.000 ; FF ; IC   ; 1      ; FF_X36_Y47_N26      ; emu|u_at_keyboard|remaining_q[0]|d                         ;
+;   2.690 ;   0.026 ; FF ; CELL ; 1      ; FF_X36_Y47_N26      ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|remaining_q[0] ;
++---------+---------+----+------+--------+---------------------+------------------------------------------------------------+
+
++-------------------------------------------------------------------------------------------------------------------------+
+; Data Required Path                                                                                                      ;
++---------+----------+----+------+--------+------------------+------------------------------------------------------------+
+; Total   ; Incr     ; RF ; Type ; Fanout ; Location         ; Element                                                    ;
++---------+----------+----+------+--------+------------------+------------------------------------------------------------+
+; 0.000   ; 0.000    ;    ;      ;        ;                  ; latch edge time                                            ;
+; 2.492   ; 2.492    ;    ;      ;        ;                  ; clock path                                                 ;
+;   0.000 ;   0.000  ;    ;      ;        ;                  ; source latency                                             ;
+;   0.000 ;   0.000  ;    ;      ; 1      ; PIN_Y13          ; FPGA_CLK2_50                                               ;
+;   0.000 ;   0.000  ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|i                                       ;
+;   0.268 ;   0.268  ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|o                                       ;
+;   1.135 ;   0.867  ; RR ; IC   ; 1      ; CLKCTRL_G2       ; FPGA_CLK2_50~inputCLKENA0|inclk                            ;
+;   1.347 ;   0.212  ; RR ; CELL ; 20805  ; CLKCTRL_G2       ; FPGA_CLK2_50~inputCLKENA0|outclk                           ;
+;   2.560 ;   1.213  ; RR ; IC   ; 1      ; FF_X36_Y47_N26   ; emu|u_at_keyboard|remaining_q[0]|clk                       ;
+;   2.801 ;   0.241  ; RR ; CELL ; 1      ; FF_X36_Y47_N26   ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|remaining_q[0] ;
+;   2.492 ;   -0.309 ;    ;      ;        ;                  ; clock pessimism removed                                    ;
+; 2.492   ; 0.000    ;    ;      ;        ;                  ; clock uncertainty                                          ;
+; 2.492   ; 0.000    ;    ; uTh  ; 1      ; FF_X36_Y47_N26   ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|remaining_q[0] ;
++---------+----------+----+------+--------+------------------+------------------------------------------------------------+
+
+----------------------------
+; Extra Fitter Information ;
+----------------------------
+HTML report is unavailable in plain text report export.
+
+
+Path #8: Hold slack is 0.198 
+===============================================================================
++---------------------------------------------------------------------------------+
+; Path Summary                                                                    ;
++--------------------+------------------------------------------------------------+
+; Property           ; Value                                                      ;
++--------------------+------------------------------------------------------------+
+; From Node          ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|remaining_q[3] ;
+; To Node            ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|remaining_q[3] ;
+; Launch Clock       ; FPGA_CLK2_50                                               ;
+; Latch Clock        ; FPGA_CLK2_50                                               ;
+; Data Arrival Time  ; 2.686                                                      ;
+; Data Required Time ; 2.488                                                      ;
+; Slack              ; 0.198                                                      ;
++--------------------+------------------------------------------------------------+
+
++-----------------------------------------------------------------------------------+
+; Statistics                                                                        ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Property               ; Value ; Count ; Total Delay ; % of Total ; Min   ; Max   ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Hold Relationship      ; 0.000 ;       ;             ;            ;       ;       ;
+; Clock Skew             ; 0.036 ;       ;             ;            ;       ;       ;
+; Data Delay             ; 0.234 ;       ;             ;            ;       ;       ;
+; Number of Logic Levels ;       ; 1     ;             ;            ;       ;       ;
+; Physical Delays        ;       ;       ;             ;            ;       ;       ;
+;  Arrival Path          ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 1.769       ; 72         ; 0.000 ; 1.008 ;
+;    Cell                ;       ; 3     ; 0.683       ; 28         ; 0.203 ; 0.268 ;
+;   Data                 ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 2     ; 0.000       ; 0          ; 0.000 ; 0.000 ;
+;    Cell                ;       ; 3     ; 0.234       ; 100        ; 0.000 ; 0.208 ;
+;    uTco                ;       ; 1     ; 0.000       ; 0          ; 0.000 ; 0.000 ;
+;  Required Path         ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 2.082       ; 74         ; 0.000 ; 1.215 ;
+;    Cell                ;       ; 3     ; 0.715       ; 26         ; 0.212 ; 0.268 ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+Note: Negative delays are omitted from totals when calculating percentages
+
++---------------------------------------------------------------------------------------------------------------------------+
+; Data Arrival Path                                                                                                         ;
++---------+---------+----+------+--------+---------------------+------------------------------------------------------------+
+; Total   ; Incr    ; RF ; Type ; Fanout ; Location            ; Element                                                    ;
++---------+---------+----+------+--------+---------------------+------------------------------------------------------------+
+; 0.000   ; 0.000   ;    ;      ;        ;                     ; launch edge time                                           ;
+; 2.452   ; 2.452   ;    ;      ;        ;                     ; clock path                                                 ;
+;   0.000 ;   0.000 ;    ;      ;        ;                     ; source latency                                             ;
+;   0.000 ;   0.000 ;    ;      ; 1      ; PIN_Y13             ; FPGA_CLK2_50                                               ;
+;   0.000 ;   0.000 ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1    ; FPGA_CLK2_50~input|i                                       ;
+;   0.268 ;   0.268 ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1    ; FPGA_CLK2_50~input|o                                       ;
+;   1.029 ;   0.761 ; RR ; IC   ; 1      ; CLKCTRL_G2          ; FPGA_CLK2_50~inputCLKENA0|inclk                            ;
+;   1.232 ;   0.203 ; RR ; CELL ; 20805  ; CLKCTRL_G2          ; FPGA_CLK2_50~inputCLKENA0|outclk                           ;
+;   2.240 ;   1.008 ; RR ; IC   ; 1      ; FF_X37_Y47_N56      ; emu|u_at_keyboard|remaining_q[3]|clk                       ;
+;   2.452 ;   0.212 ; RR ; CELL ; 1      ; FF_X37_Y47_N56      ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|remaining_q[3] ;
+; 2.686   ; 0.234   ;    ;      ;        ;                     ; data path                                                  ;
+;   2.452 ;   0.000 ;    ; uTco ; 1      ; FF_X37_Y47_N56      ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|remaining_q[3] ;
+;   2.452 ;   0.000 ; FF ; CELL ; 3      ; FF_X37_Y47_N56      ; emu|u_at_keyboard|remaining_q[3]|q                         ;
+;   2.452 ;   0.000 ; FF ; IC   ; 1      ; LABCELL_X37_Y47_N54 ; emu|u_at_keyboard|remaining_q[3]~7|datad                   ;
+;   2.660 ;   0.208 ; FF ; CELL ; 1      ; LABCELL_X37_Y47_N54 ; emu|u_at_keyboard|remaining_q[3]~7|combout                 ;
+;   2.660 ;   0.000 ; FF ; IC   ; 1      ; FF_X37_Y47_N56      ; emu|u_at_keyboard|remaining_q[3]|d                         ;
+;   2.686 ;   0.026 ; FF ; CELL ; 1      ; FF_X37_Y47_N56      ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|remaining_q[3] ;
++---------+---------+----+------+--------+---------------------+------------------------------------------------------------+
+
++-------------------------------------------------------------------------------------------------------------------------+
+; Data Required Path                                                                                                      ;
++---------+----------+----+------+--------+------------------+------------------------------------------------------------+
+; Total   ; Incr     ; RF ; Type ; Fanout ; Location         ; Element                                                    ;
++---------+----------+----+------+--------+------------------+------------------------------------------------------------+
+; 0.000   ; 0.000    ;    ;      ;        ;                  ; latch edge time                                            ;
+; 2.488   ; 2.488    ;    ;      ;        ;                  ; clock path                                                 ;
+;   0.000 ;   0.000  ;    ;      ;        ;                  ; source latency                                             ;
+;   0.000 ;   0.000  ;    ;      ; 1      ; PIN_Y13          ; FPGA_CLK2_50                                               ;
+;   0.000 ;   0.000  ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|i                                       ;
+;   0.268 ;   0.268  ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|o                                       ;
+;   1.135 ;   0.867  ; RR ; IC   ; 1      ; CLKCTRL_G2       ; FPGA_CLK2_50~inputCLKENA0|inclk                            ;
+;   1.347 ;   0.212  ; RR ; CELL ; 20805  ; CLKCTRL_G2       ; FPGA_CLK2_50~inputCLKENA0|outclk                           ;
+;   2.562 ;   1.215  ; RR ; IC   ; 1      ; FF_X37_Y47_N56   ; emu|u_at_keyboard|remaining_q[3]|clk                       ;
+;   2.797 ;   0.235  ; RR ; CELL ; 1      ; FF_X37_Y47_N56   ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|remaining_q[3] ;
+;   2.488 ;   -0.309 ;    ;      ;        ;                  ; clock pessimism removed                                    ;
+; 2.488   ; 0.000    ;    ;      ;        ;                  ; clock uncertainty                                          ;
+; 2.488   ; 0.000    ;    ; uTh  ; 1      ; FF_X37_Y47_N56   ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|remaining_q[3] ;
++---------+----------+----+------+--------+------------------+------------------------------------------------------------+
+
+----------------------------
+; Extra Fitter Information ;
+----------------------------
+HTML report is unavailable in plain text report export.
+
+
+Path #9: Hold slack is 0.198 
+===============================================================================
++--------------------------------------------------------------------------------+
+; Path Summary                                                                   ;
++--------------------+-----------------------------------------------------------+
+; Property           ; Value                                                     ;
++--------------------+-----------------------------------------------------------+
+; From Node          ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|read_ptr_q[3] ;
+; To Node            ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|read_ptr_q[3] ;
+; Launch Clock       ; FPGA_CLK2_50                                              ;
+; Latch Clock        ; FPGA_CLK2_50                                              ;
+; Data Arrival Time  ; 2.674                                                     ;
+; Data Required Time ; 2.476                                                     ;
+; Slack              ; 0.198                                                     ;
++--------------------+-----------------------------------------------------------+
+
++-----------------------------------------------------------------------------------+
+; Statistics                                                                        ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Property               ; Value ; Count ; Total Delay ; % of Total ; Min   ; Max   ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Hold Relationship      ; 0.000 ;       ;             ;            ;       ;       ;
+; Clock Skew             ; 0.036 ;       ;             ;            ;       ;       ;
+; Data Delay             ; 0.234 ;       ;             ;            ;       ;       ;
+; Number of Logic Levels ;       ; 1     ;             ;            ;       ;       ;
+; Physical Delays        ;       ;       ;             ;            ;       ;       ;
+;  Arrival Path          ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 1.754       ; 72         ; 0.000 ; 0.993 ;
+;    Cell                ;       ; 3     ; 0.686       ; 28         ; 0.203 ; 0.268 ;
+;   Data                 ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 2     ; 0.000       ; 0          ; 0.000 ; 0.000 ;
+;    Cell                ;       ; 3     ; 0.234       ; 100        ; 0.000 ; 0.208 ;
+;    uTco                ;       ; 1     ; 0.000       ; 0          ; 0.000 ; 0.000 ;
+;  Required Path         ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 2.066       ; 74         ; 0.000 ; 1.199 ;
+;    Cell                ;       ; 3     ; 0.719       ; 26         ; 0.212 ; 0.268 ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+Note: Negative delays are omitted from totals when calculating percentages
+
++--------------------------------------------------------------------------------------------------------------------------+
+; Data Arrival Path                                                                                                        ;
++---------+---------+----+------+--------+---------------------+-----------------------------------------------------------+
+; Total   ; Incr    ; RF ; Type ; Fanout ; Location            ; Element                                                   ;
++---------+---------+----+------+--------+---------------------+-----------------------------------------------------------+
+; 0.000   ; 0.000   ;    ;      ;        ;                     ; launch edge time                                          ;
+; 2.440   ; 2.440   ;    ;      ;        ;                     ; clock path                                                ;
+;   0.000 ;   0.000 ;    ;      ;        ;                     ; source latency                                            ;
+;   0.000 ;   0.000 ;    ;      ; 1      ; PIN_Y13             ; FPGA_CLK2_50                                              ;
+;   0.000 ;   0.000 ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1    ; FPGA_CLK2_50~input|i                                      ;
+;   0.268 ;   0.268 ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1    ; FPGA_CLK2_50~input|o                                      ;
+;   1.029 ;   0.761 ; RR ; IC   ; 1      ; CLKCTRL_G2          ; FPGA_CLK2_50~inputCLKENA0|inclk                           ;
+;   1.232 ;   0.203 ; RR ; CELL ; 20805  ; CLKCTRL_G2          ; FPGA_CLK2_50~inputCLKENA0|outclk                          ;
+;   2.225 ;   0.993 ; RR ; IC   ; 1      ; FF_X31_Y47_N20      ; emu|u_at_keyboard|read_ptr_q[3]|clk                       ;
+;   2.440 ;   0.215 ; RR ; CELL ; 1      ; FF_X31_Y47_N20      ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|read_ptr_q[3] ;
+; 2.674   ; 0.234   ;    ;      ;        ;                     ; data path                                                 ;
+;   2.440 ;   0.000 ;    ; uTco ; 1      ; FF_X31_Y47_N20      ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|read_ptr_q[3] ;
+;   2.440 ;   0.000 ; FF ; CELL ; 4      ; FF_X31_Y47_N20      ; emu|u_at_keyboard|read_ptr_q[3]|q                         ;
+;   2.440 ;   0.000 ; FF ; IC   ; 1      ; LABCELL_X31_Y47_N18 ; emu|u_at_keyboard|read_ptr_q~4|datad                      ;
+;   2.648 ;   0.208 ; FF ; CELL ; 1      ; LABCELL_X31_Y47_N18 ; emu|u_at_keyboard|read_ptr_q~4|combout                    ;
+;   2.648 ;   0.000 ; FF ; IC   ; 1      ; FF_X31_Y47_N20      ; emu|u_at_keyboard|read_ptr_q[3]|d                         ;
+;   2.674 ;   0.026 ; FF ; CELL ; 1      ; FF_X31_Y47_N20      ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|read_ptr_q[3] ;
++---------+---------+----+------+--------+---------------------+-----------------------------------------------------------+
+
++------------------------------------------------------------------------------------------------------------------------+
+; Data Required Path                                                                                                     ;
++---------+----------+----+------+--------+------------------+-----------------------------------------------------------+
+; Total   ; Incr     ; RF ; Type ; Fanout ; Location         ; Element                                                   ;
++---------+----------+----+------+--------+------------------+-----------------------------------------------------------+
+; 0.000   ; 0.000    ;    ;      ;        ;                  ; latch edge time                                           ;
+; 2.476   ; 2.476    ;    ;      ;        ;                  ; clock path                                                ;
+;   0.000 ;   0.000  ;    ;      ;        ;                  ; source latency                                            ;
+;   0.000 ;   0.000  ;    ;      ; 1      ; PIN_Y13          ; FPGA_CLK2_50                                              ;
+;   0.000 ;   0.000  ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|i                                      ;
+;   0.268 ;   0.268  ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|o                                      ;
+;   1.135 ;   0.867  ; RR ; IC   ; 1      ; CLKCTRL_G2       ; FPGA_CLK2_50~inputCLKENA0|inclk                           ;
+;   1.347 ;   0.212  ; RR ; CELL ; 20805  ; CLKCTRL_G2       ; FPGA_CLK2_50~inputCLKENA0|outclk                          ;
+;   2.546 ;   1.199  ; RR ; IC   ; 1      ; FF_X31_Y47_N20   ; emu|u_at_keyboard|read_ptr_q[3]|clk                       ;
+;   2.785 ;   0.239  ; RR ; CELL ; 1      ; FF_X31_Y47_N20   ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|read_ptr_q[3] ;
+;   2.476 ;   -0.309 ;    ;      ;        ;                  ; clock pessimism removed                                   ;
+; 2.476   ; 0.000    ;    ;      ;        ;                  ; clock uncertainty                                         ;
+; 2.476   ; 0.000    ;    ; uTh  ; 1      ; FF_X31_Y47_N20   ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|read_ptr_q[3] ;
++---------+----------+----+------+--------+------------------+-----------------------------------------------------------+
+
+----------------------------
+; Extra Fitter Information ;
+----------------------------
+HTML report is unavailable in plain text report export.
+
+
+Path #10: Hold slack is 0.198 
+===============================================================================
++---------------------------------------------------------------------------------+
+; Path Summary                                                                    ;
++--------------------+------------------------------------------------------------+
+; Property           ; Value                                                      ;
++--------------------+------------------------------------------------------------+
+; From Node          ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[4] ;
+; To Node            ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[4] ;
+; Launch Clock       ; FPGA_CLK2_50                                               ;
+; Latch Clock        ; FPGA_CLK2_50                                               ;
+; Data Arrival Time  ; 2.671                                                      ;
+; Data Required Time ; 2.473                                                      ;
+; Slack              ; 0.198                                                      ;
++--------------------+------------------------------------------------------------+
+
++-----------------------------------------------------------------------------------+
+; Statistics                                                                        ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Property               ; Value ; Count ; Total Delay ; % of Total ; Min   ; Max   ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Hold Relationship      ; 0.000 ;       ;             ;            ;       ;       ;
+; Clock Skew             ; 0.038 ;       ;             ;            ;       ;       ;
+; Data Delay             ; 0.236 ;       ;             ;            ;       ;       ;
+; Number of Logic Levels ;       ; 1     ;             ;            ;       ;       ;
+; Physical Delays        ;       ;       ;             ;            ;       ;       ;
+;  Arrival Path          ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 1.754       ; 72         ; 0.000 ; 0.993 ;
+;    Cell                ;       ; 3     ; 0.681       ; 28         ; 0.203 ; 0.268 ;
+;   Data                 ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 2     ; 0.000       ; 0          ; 0.000 ; 0.000 ;
+;    Cell                ;       ; 3     ; 0.236       ; 100        ; 0.000 ; 0.211 ;
+;    uTco                ;       ; 1     ; 0.000       ; 0          ; 0.000 ; 0.000 ;
+;  Required Path         ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 2.066       ; 74         ; 0.000 ; 1.199 ;
+;    Cell                ;       ; 3     ; 0.716       ; 26         ; 0.212 ; 0.268 ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+Note: Negative delays are omitted from totals when calculating percentages
+
++--------------------------------------------------------------------------------------------------------------------------+
+; Data Arrival Path                                                                                                        ;
++---------+---------+----+------+--------+--------------------+------------------------------------------------------------+
+; Total   ; Incr    ; RF ; Type ; Fanout ; Location           ; Element                                                    ;
++---------+---------+----+------+--------+--------------------+------------------------------------------------------------+
+; 0.000   ; 0.000   ;    ;      ;        ;                    ; launch edge time                                           ;
+; 2.435   ; 2.435   ;    ;      ;        ;                    ; clock path                                                 ;
+;   0.000 ;   0.000 ;    ;      ;        ;                    ; source latency                                             ;
+;   0.000 ;   0.000 ;    ;      ; 1      ; PIN_Y13            ; FPGA_CLK2_50                                               ;
+;   0.000 ;   0.000 ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1   ; FPGA_CLK2_50~input|i                                       ;
+;   0.268 ;   0.268 ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1   ; FPGA_CLK2_50~input|o                                       ;
+;   1.029 ;   0.761 ; RR ; IC   ; 1      ; CLKCTRL_G2         ; FPGA_CLK2_50~inputCLKENA0|inclk                            ;
+;   1.232 ;   0.203 ; RR ; CELL ; 20805  ; CLKCTRL_G2         ; FPGA_CLK2_50~inputCLKENA0|outclk                           ;
+;   2.225 ;   0.993 ; RR ; IC   ; 1      ; FF_X31_Y47_N1      ; emu|u_at_keyboard|write_ptr_q[4]|clk                       ;
+;   2.435 ;   0.210 ; RR ; CELL ; 1      ; FF_X31_Y47_N1      ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[4] ;
+; 2.671   ; 0.236   ;    ;      ;        ;                    ; data path                                                  ;
+;   2.435 ;   0.000 ;    ; uTco ; 1      ; FF_X31_Y47_N1      ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[4] ;
+;   2.435 ;   0.000 ; FF ; CELL ; 3      ; FF_X31_Y47_N1      ; emu|u_at_keyboard|write_ptr_q[4]|q                         ;
+;   2.435 ;   0.000 ; FF ; IC   ; 1      ; LABCELL_X31_Y47_N0 ; emu|u_at_keyboard|Add0~0|datad                             ;
+;   2.646 ;   0.211 ; FF ; CELL ; 1      ; LABCELL_X31_Y47_N0 ; emu|u_at_keyboard|Add0~0|combout                           ;
+;   2.646 ;   0.000 ; FF ; IC   ; 1      ; FF_X31_Y47_N1      ; emu|u_at_keyboard|write_ptr_q[4]|d                         ;
+;   2.671 ;   0.025 ; FF ; CELL ; 1      ; FF_X31_Y47_N1      ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[4] ;
++---------+---------+----+------+--------+--------------------+------------------------------------------------------------+
+
++-------------------------------------------------------------------------------------------------------------------------+
+; Data Required Path                                                                                                      ;
++---------+----------+----+------+--------+------------------+------------------------------------------------------------+
+; Total   ; Incr     ; RF ; Type ; Fanout ; Location         ; Element                                                    ;
++---------+----------+----+------+--------+------------------+------------------------------------------------------------+
+; 0.000   ; 0.000    ;    ;      ;        ;                  ; latch edge time                                            ;
+; 2.473   ; 2.473    ;    ;      ;        ;                  ; clock path                                                 ;
+;   0.000 ;   0.000  ;    ;      ;        ;                  ; source latency                                             ;
+;   0.000 ;   0.000  ;    ;      ; 1      ; PIN_Y13          ; FPGA_CLK2_50                                               ;
+;   0.000 ;   0.000  ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|i                                       ;
+;   0.268 ;   0.268  ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|o                                       ;
+;   1.135 ;   0.867  ; RR ; IC   ; 1      ; CLKCTRL_G2       ; FPGA_CLK2_50~inputCLKENA0|inclk                            ;
+;   1.347 ;   0.212  ; RR ; CELL ; 20805  ; CLKCTRL_G2       ; FPGA_CLK2_50~inputCLKENA0|outclk                           ;
+;   2.546 ;   1.199  ; RR ; IC   ; 1      ; FF_X31_Y47_N1    ; emu|u_at_keyboard|write_ptr_q[4]|clk                       ;
+;   2.782 ;   0.236  ; RR ; CELL ; 1      ; FF_X31_Y47_N1    ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[4] ;
+;   2.473 ;   -0.309 ;    ;      ;        ;                  ; clock pessimism removed                                    ;
+; 2.473   ; 0.000    ;    ;      ;        ;                  ; clock uncertainty                                          ;
+; 2.473   ; 0.000    ;    ; uTh  ; 1      ; FF_X31_Y47_N1    ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[4] ;
++---------+----------+----+------+--------+------------------+------------------------------------------------------------+
+
+----------------------------
+; Extra Fitter Information ;
+----------------------------
+HTML report is unavailable in plain text report export.
+
+
+Path #11: Hold slack is 0.200 
+===============================================================================
++---------------------------------------------------------------------------+
+; Path Summary                                                              ;
++--------------------+------------------------------------------------------+
+; Property           ; Value                                                ;
++--------------------+------------------------------------------------------+
+; From Node          ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|overflow ;
+; To Node            ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|overflow ;
+; Launch Clock       ; FPGA_CLK2_50                                         ;
+; Latch Clock        ; FPGA_CLK2_50                                         ;
+; Data Arrival Time  ; 2.692                                                ;
+; Data Required Time ; 2.492                                                ;
+; Slack              ; 0.200                                                ;
++--------------------+------------------------------------------------------+
+
++-----------------------------------------------------------------------------------+
+; Statistics                                                                        ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Property               ; Value ; Count ; Total Delay ; % of Total ; Min   ; Max   ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Hold Relationship      ; 0.000 ;       ;             ;            ;       ;       ;
+; Clock Skew             ; 0.036 ;       ;             ;            ;       ;       ;
+; Data Delay             ; 0.236 ;       ;             ;            ;       ;       ;
+; Number of Logic Levels ;       ; 1     ;             ;            ;       ;       ;
+; Physical Delays        ;       ;       ;             ;            ;       ;       ;
+;  Arrival Path          ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 1.768       ; 72         ; 0.000 ; 1.007 ;
+;    Cell                ;       ; 3     ; 0.688       ; 28         ; 0.203 ; 0.268 ;
+;   Data                 ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 2     ; 0.000       ; 0          ; 0.000 ; 0.000 ;
+;    Cell                ;       ; 3     ; 0.236       ; 100        ; 0.000 ; 0.211 ;
+;    uTco                ;       ; 1     ; 0.000       ; 0          ; 0.000 ; 0.000 ;
+;  Required Path         ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 2.080       ; 74         ; 0.000 ; 1.213 ;
+;    Cell                ;       ; 3     ; 0.721       ; 26         ; 0.212 ; 0.268 ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+Note: Negative delays are omitted from totals when calculating percentages
+
++---------------------------------------------------------------------------------------------------------------------+
+; Data Arrival Path                                                                                                   ;
++---------+---------+----+------+--------+---------------------+------------------------------------------------------+
+; Total   ; Incr    ; RF ; Type ; Fanout ; Location            ; Element                                              ;
++---------+---------+----+------+--------+---------------------+------------------------------------------------------+
+; 0.000   ; 0.000   ;    ;      ;        ;                     ; launch edge time                                     ;
+; 2.456   ; 2.456   ;    ;      ;        ;                     ; clock path                                           ;
+;   0.000 ;   0.000 ;    ;      ;        ;                     ; source latency                                       ;
+;   0.000 ;   0.000 ;    ;      ; 1      ; PIN_Y13             ; FPGA_CLK2_50                                         ;
+;   0.000 ;   0.000 ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1    ; FPGA_CLK2_50~input|i                                 ;
+;   0.268 ;   0.268 ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1    ; FPGA_CLK2_50~input|o                                 ;
+;   1.029 ;   0.761 ; RR ; IC   ; 1      ; CLKCTRL_G2          ; FPGA_CLK2_50~inputCLKENA0|inclk                      ;
+;   1.232 ;   0.203 ; RR ; CELL ; 20805  ; CLKCTRL_G2          ; FPGA_CLK2_50~inputCLKENA0|outclk                     ;
+;   2.239 ;   1.007 ; RR ; IC   ; 1      ; FF_X36_Y47_N13      ; emu|u_at_keyboard|overflow|clk                       ;
+;   2.456 ;   0.217 ; RR ; CELL ; 1      ; FF_X36_Y47_N13      ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|overflow ;
+; 2.692   ; 0.236   ;    ;      ;        ;                     ; data path                                            ;
+;   2.456 ;   0.000 ;    ; uTco ; 1      ; FF_X36_Y47_N13      ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|overflow ;
+;   2.456 ;   0.000 ; FF ; CELL ; 2      ; FF_X36_Y47_N13      ; emu|u_at_keyboard|overflow|q                         ;
+;   2.456 ;   0.000 ; FF ; IC   ; 1      ; LABCELL_X36_Y47_N12 ; emu|u_at_keyboard|overflow~0|datad                   ;
+;   2.667 ;   0.211 ; FF ; CELL ; 1      ; LABCELL_X36_Y47_N12 ; emu|u_at_keyboard|overflow~0|combout                 ;
+;   2.667 ;   0.000 ; FF ; IC   ; 1      ; FF_X36_Y47_N13      ; emu|u_at_keyboard|overflow|d                         ;
+;   2.692 ;   0.025 ; FF ; CELL ; 1      ; FF_X36_Y47_N13      ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|overflow ;
++---------+---------+----+------+--------+---------------------+------------------------------------------------------+
+
++-------------------------------------------------------------------------------------------------------------------+
+; Data Required Path                                                                                                ;
++---------+----------+----+------+--------+------------------+------------------------------------------------------+
+; Total   ; Incr     ; RF ; Type ; Fanout ; Location         ; Element                                              ;
++---------+----------+----+------+--------+------------------+------------------------------------------------------+
+; 0.000   ; 0.000    ;    ;      ;        ;                  ; latch edge time                                      ;
+; 2.492   ; 2.492    ;    ;      ;        ;                  ; clock path                                           ;
+;   0.000 ;   0.000  ;    ;      ;        ;                  ; source latency                                       ;
+;   0.000 ;   0.000  ;    ;      ; 1      ; PIN_Y13          ; FPGA_CLK2_50                                         ;
+;   0.000 ;   0.000  ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|i                                 ;
+;   0.268 ;   0.268  ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|o                                 ;
+;   1.135 ;   0.867  ; RR ; IC   ; 1      ; CLKCTRL_G2       ; FPGA_CLK2_50~inputCLKENA0|inclk                      ;
+;   1.347 ;   0.212  ; RR ; CELL ; 20805  ; CLKCTRL_G2       ; FPGA_CLK2_50~inputCLKENA0|outclk                     ;
+;   2.560 ;   1.213  ; RR ; IC   ; 1      ; FF_X36_Y47_N13   ; emu|u_at_keyboard|overflow|clk                       ;
+;   2.801 ;   0.241  ; RR ; CELL ; 1      ; FF_X36_Y47_N13   ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|overflow ;
+;   2.492 ;   -0.309 ;    ;      ;        ;                  ; clock pessimism removed                              ;
+; 2.492   ; 0.000    ;    ;      ;        ;                  ; clock uncertainty                                    ;
+; 2.492   ; 0.000    ;    ; uTh  ; 1      ; FF_X36_Y47_N13   ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|overflow ;
++---------+----------+----+------+--------+------------------+------------------------------------------------------+
+
+----------------------------
+; Extra Fitter Information ;
+----------------------------
+HTML report is unavailable in plain text report export.
+
+
+Path #12: Hold slack is 0.202 
+===============================================================================
++--------------------------------------------------------------------------------+
+; Path Summary                                                                   ;
++--------------------+-----------------------------------------------------------+
+; Property           ; Value                                                     ;
++--------------------+-----------------------------------------------------------+
+; From Node          ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|right_shift_q ;
+; To Node            ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|right_shift_q ;
+; Launch Clock       ; FPGA_CLK2_50                                              ;
+; Latch Clock        ; FPGA_CLK2_50                                              ;
+; Data Arrival Time  ; 2.694                                                     ;
+; Data Required Time ; 2.492                                                     ;
+; Slack              ; 0.202                                                     ;
++--------------------+-----------------------------------------------------------+
+
++-----------------------------------------------------------------------------------+
+; Statistics                                                                        ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Property               ; Value ; Count ; Total Delay ; % of Total ; Min   ; Max   ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Hold Relationship      ; 0.000 ;       ;             ;            ;       ;       ;
+; Clock Skew             ; 0.034 ;       ;             ;            ;       ;       ;
+; Data Delay             ; 0.236 ;       ;             ;            ;       ;       ;
+; Number of Logic Levels ;       ; 1     ;             ;            ;       ;       ;
+; Physical Delays        ;       ;       ;             ;            ;       ;       ;
+;  Arrival Path          ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 1.772       ; 72         ; 0.000 ; 1.011 ;
+;    Cell                ;       ; 3     ; 0.686       ; 28         ; 0.203 ; 0.268 ;
+;   Data                 ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 2     ; 0.000       ; 0          ; 0.000 ; 0.000 ;
+;    Cell                ;       ; 3     ; 0.236       ; 100        ; 0.000 ; 0.211 ;
+;    uTco                ;       ; 1     ; 0.000       ; 0          ; 0.000 ; 0.000 ;
+;  Required Path         ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 2.084       ; 74         ; 0.000 ; 1.217 ;
+;    Cell                ;       ; 3     ; 0.718       ; 26         ; 0.212 ; 0.268 ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+Note: Negative delays are omitted from totals when calculating percentages
+
++---------------------------------------------------------------------------------------------------------------------------+
+; Data Arrival Path                                                                                                         ;
++---------+---------+----+------+--------+----------------------+-----------------------------------------------------------+
+; Total   ; Incr    ; RF ; Type ; Fanout ; Location             ; Element                                                   ;
++---------+---------+----+------+--------+----------------------+-----------------------------------------------------------+
+; 0.000   ; 0.000   ;    ;      ;        ;                      ; launch edge time                                          ;
+; 2.458   ; 2.458   ;    ;      ;        ;                      ; clock path                                                ;
+;   0.000 ;   0.000 ;    ;      ;        ;                      ; source latency                                            ;
+;   0.000 ;   0.000 ;    ;      ; 1      ; PIN_Y13              ; FPGA_CLK2_50                                              ;
+;   0.000 ;   0.000 ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1     ; FPGA_CLK2_50~input|i                                      ;
+;   0.268 ;   0.268 ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1     ; FPGA_CLK2_50~input|o                                      ;
+;   1.029 ;   0.761 ; RR ; IC   ; 1      ; CLKCTRL_G2           ; FPGA_CLK2_50~inputCLKENA0|inclk                           ;
+;   1.232 ;   0.203 ; RR ; CELL ; 20805  ; CLKCTRL_G2           ; FPGA_CLK2_50~inputCLKENA0|outclk                          ;
+;   2.243 ;   1.011 ; RR ; IC   ; 1      ; FF_X34_Y48_N13       ; emu|u_at_keyboard|right_shift_q|clk                       ;
+;   2.458 ;   0.215 ; RR ; CELL ; 1      ; FF_X34_Y48_N13       ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|right_shift_q ;
+; 2.694   ; 0.236   ;    ;      ;        ;                      ; data path                                                 ;
+;   2.458 ;   0.000 ;    ; uTco ; 1      ; FF_X34_Y48_N13       ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|right_shift_q ;
+;   2.458 ;   0.000 ; FF ; CELL ; 56     ; FF_X34_Y48_N13       ; emu|u_at_keyboard|right_shift_q|q                         ;
+;   2.458 ;   0.000 ; FF ; IC   ; 1      ; MLABCELL_X34_Y48_N12 ; emu|u_at_keyboard|right_shift_q~2|datad                   ;
+;   2.669 ;   0.211 ; FF ; CELL ; 1      ; MLABCELL_X34_Y48_N12 ; emu|u_at_keyboard|right_shift_q~2|combout                 ;
+;   2.669 ;   0.000 ; FF ; IC   ; 1      ; FF_X34_Y48_N13       ; emu|u_at_keyboard|right_shift_q|d                         ;
+;   2.694 ;   0.025 ; FF ; CELL ; 1      ; FF_X34_Y48_N13       ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|right_shift_q ;
++---------+---------+----+------+--------+----------------------+-----------------------------------------------------------+
+
++------------------------------------------------------------------------------------------------------------------------+
+; Data Required Path                                                                                                     ;
++---------+----------+----+------+--------+------------------+-----------------------------------------------------------+
+; Total   ; Incr     ; RF ; Type ; Fanout ; Location         ; Element                                                   ;
++---------+----------+----+------+--------+------------------+-----------------------------------------------------------+
+; 0.000   ; 0.000    ;    ;      ;        ;                  ; latch edge time                                           ;
+; 2.492   ; 2.492    ;    ;      ;        ;                  ; clock path                                                ;
+;   0.000 ;   0.000  ;    ;      ;        ;                  ; source latency                                            ;
+;   0.000 ;   0.000  ;    ;      ; 1      ; PIN_Y13          ; FPGA_CLK2_50                                              ;
+;   0.000 ;   0.000  ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|i                                      ;
+;   0.268 ;   0.268  ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|o                                      ;
+;   1.135 ;   0.867  ; RR ; IC   ; 1      ; CLKCTRL_G2       ; FPGA_CLK2_50~inputCLKENA0|inclk                           ;
+;   1.347 ;   0.212  ; RR ; CELL ; 20805  ; CLKCTRL_G2       ; FPGA_CLK2_50~inputCLKENA0|outclk                          ;
+;   2.564 ;   1.217  ; RR ; IC   ; 1      ; FF_X34_Y48_N13   ; emu|u_at_keyboard|right_shift_q|clk                       ;
+;   2.802 ;   0.238  ; RR ; CELL ; 1      ; FF_X34_Y48_N13   ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|right_shift_q ;
+;   2.492 ;   -0.310 ;    ;      ;        ;                  ; clock pessimism removed                                   ;
+; 2.492   ; 0.000    ;    ;      ;        ;                  ; clock uncertainty                                         ;
+; 2.492   ; 0.000    ;    ; uTh  ; 1      ; FF_X34_Y48_N13   ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|right_shift_q ;
++---------+----------+----+------+--------+------------------+-----------------------------------------------------------+
+
+----------------------------
+; Extra Fitter Information ;
+----------------------------
+HTML report is unavailable in plain text report export.
+
+
+Path #13: Hold slack is 0.202 
+===============================================================================
++-------------------------------------------------------------------------------+
+; Path Summary                                                                  ;
++--------------------+----------------------------------------------------------+
+; Property           ; Value                                                    ;
++--------------------+----------------------------------------------------------+
+; From Node          ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|left_shift_q ;
+; To Node            ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|left_shift_q ;
+; Launch Clock       ; FPGA_CLK2_50                                             ;
+; Latch Clock        ; FPGA_CLK2_50                                             ;
+; Data Arrival Time  ; 2.694                                                    ;
+; Data Required Time ; 2.492                                                    ;
+; Slack              ; 0.202                                                    ;
++--------------------+----------------------------------------------------------+
+
++-----------------------------------------------------------------------------------+
+; Statistics                                                                        ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Property               ; Value ; Count ; Total Delay ; % of Total ; Min   ; Max   ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Hold Relationship      ; 0.000 ;       ;             ;            ;       ;       ;
+; Clock Skew             ; 0.034 ;       ;             ;            ;       ;       ;
+; Data Delay             ; 0.236 ;       ;             ;            ;       ;       ;
+; Number of Logic Levels ;       ; 1     ;             ;            ;       ;       ;
+; Physical Delays        ;       ;       ;             ;            ;       ;       ;
+;  Arrival Path          ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 1.772       ; 72         ; 0.000 ; 1.011 ;
+;    Cell                ;       ; 3     ; 0.686       ; 28         ; 0.203 ; 0.268 ;
+;   Data                 ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 2     ; 0.000       ; 0          ; 0.000 ; 0.000 ;
+;    Cell                ;       ; 3     ; 0.236       ; 100        ; 0.000 ; 0.211 ;
+;    uTco                ;       ; 1     ; 0.000       ; 0          ; 0.000 ; 0.000 ;
+;  Required Path         ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 2.084       ; 74         ; 0.000 ; 1.217 ;
+;    Cell                ;       ; 3     ; 0.718       ; 26         ; 0.212 ; 0.268 ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+Note: Negative delays are omitted from totals when calculating percentages
+
++-------------------------------------------------------------------------------------------------------------------------+
+; Data Arrival Path                                                                                                       ;
++---------+---------+----+------+--------+---------------------+----------------------------------------------------------+
+; Total   ; Incr    ; RF ; Type ; Fanout ; Location            ; Element                                                  ;
++---------+---------+----+------+--------+---------------------+----------------------------------------------------------+
+; 0.000   ; 0.000   ;    ;      ;        ;                     ; launch edge time                                         ;
+; 2.458   ; 2.458   ;    ;      ;        ;                     ; clock path                                               ;
+;   0.000 ;   0.000 ;    ;      ;        ;                     ; source latency                                           ;
+;   0.000 ;   0.000 ;    ;      ; 1      ; PIN_Y13             ; FPGA_CLK2_50                                             ;
+;   0.000 ;   0.000 ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1    ; FPGA_CLK2_50~input|i                                     ;
+;   0.268 ;   0.268 ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1    ; FPGA_CLK2_50~input|o                                     ;
+;   1.029 ;   0.761 ; RR ; IC   ; 1      ; CLKCTRL_G2          ; FPGA_CLK2_50~inputCLKENA0|inclk                          ;
+;   1.232 ;   0.203 ; RR ; CELL ; 20805  ; CLKCTRL_G2          ; FPGA_CLK2_50~inputCLKENA0|outclk                         ;
+;   2.243 ;   1.011 ; RR ; IC   ; 1      ; FF_X34_Y48_N7       ; emu|u_at_keyboard|left_shift_q|clk                       ;
+;   2.458 ;   0.215 ; RR ; CELL ; 1      ; FF_X34_Y48_N7       ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|left_shift_q ;
+; 2.694   ; 0.236   ;    ;      ;        ;                     ; data path                                                ;
+;   2.458 ;   0.000 ;    ; uTco ; 1      ; FF_X34_Y48_N7       ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|left_shift_q ;
+;   2.458 ;   0.000 ; FF ; CELL ; 63     ; FF_X34_Y48_N7       ; emu|u_at_keyboard|left_shift_q|q                         ;
+;   2.458 ;   0.000 ; FF ; IC   ; 1      ; MLABCELL_X34_Y48_N6 ; emu|u_at_keyboard|left_shift_q~1|datad                   ;
+;   2.669 ;   0.211 ; FF ; CELL ; 1      ; MLABCELL_X34_Y48_N6 ; emu|u_at_keyboard|left_shift_q~1|combout                 ;
+;   2.669 ;   0.000 ; FF ; IC   ; 1      ; FF_X34_Y48_N7       ; emu|u_at_keyboard|left_shift_q|d                         ;
+;   2.694 ;   0.025 ; FF ; CELL ; 1      ; FF_X34_Y48_N7       ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|left_shift_q ;
++---------+---------+----+------+--------+---------------------+----------------------------------------------------------+
+
++-----------------------------------------------------------------------------------------------------------------------+
+; Data Required Path                                                                                                    ;
++---------+----------+----+------+--------+------------------+----------------------------------------------------------+
+; Total   ; Incr     ; RF ; Type ; Fanout ; Location         ; Element                                                  ;
++---------+----------+----+------+--------+------------------+----------------------------------------------------------+
+; 0.000   ; 0.000    ;    ;      ;        ;                  ; latch edge time                                          ;
+; 2.492   ; 2.492    ;    ;      ;        ;                  ; clock path                                               ;
+;   0.000 ;   0.000  ;    ;      ;        ;                  ; source latency                                           ;
+;   0.000 ;   0.000  ;    ;      ; 1      ; PIN_Y13          ; FPGA_CLK2_50                                             ;
+;   0.000 ;   0.000  ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|i                                     ;
+;   0.268 ;   0.268  ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|o                                     ;
+;   1.135 ;   0.867  ; RR ; IC   ; 1      ; CLKCTRL_G2       ; FPGA_CLK2_50~inputCLKENA0|inclk                          ;
+;   1.347 ;   0.212  ; RR ; CELL ; 20805  ; CLKCTRL_G2       ; FPGA_CLK2_50~inputCLKENA0|outclk                         ;
+;   2.564 ;   1.217  ; RR ; IC   ; 1      ; FF_X34_Y48_N7    ; emu|u_at_keyboard|left_shift_q|clk                       ;
+;   2.802 ;   0.238  ; RR ; CELL ; 1      ; FF_X34_Y48_N7    ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|left_shift_q ;
+;   2.492 ;   -0.310 ;    ;      ;        ;                  ; clock pessimism removed                                  ;
+; 2.492   ; 0.000    ;    ;      ;        ;                  ; clock uncertainty                                        ;
+; 2.492   ; 0.000    ;    ; uTh  ; 1      ; FF_X34_Y48_N7    ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|left_shift_q ;
++---------+----------+----+------+--------+------------------+----------------------------------------------------------+
+
+----------------------------
+; Extra Fitter Information ;
+----------------------------
+HTML report is unavailable in plain text report export.
+
+
+Path #14: Hold slack is 0.216 
+===============================================================================
++---------------------------------------------------------------------------------+
+; Path Summary                                                                    ;
++--------------------+------------------------------------------------------------+
+; Property           ; Value                                                      ;
++--------------------+------------------------------------------------------------+
+; From Node          ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|sequence_q[50] ;
+; To Node            ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|sequence_q[42] ;
+; Launch Clock       ; FPGA_CLK2_50                                               ;
+; Latch Clock        ; FPGA_CLK2_50                                               ;
+; Data Arrival Time  ; 2.706                                                      ;
+; Data Required Time ; 2.490                                                      ;
+; Slack              ; 0.216                                                      ;
++--------------------+------------------------------------------------------------+
+
++-----------------------------------------------------------------------------------+
+; Statistics                                                                        ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Property               ; Value ; Count ; Total Delay ; % of Total ; Min   ; Max   ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Hold Relationship      ; 0.000 ;       ;             ;            ;       ;       ;
+; Clock Skew             ; 0.039 ;       ;             ;            ;       ;       ;
+; Data Delay             ; 0.255 ;       ;             ;            ;       ;       ;
+; Number of Logic Levels ;       ; 1     ;             ;            ;       ;       ;
+; Physical Delays        ;       ;       ;             ;            ;       ;       ;
+;  Arrival Path          ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 1.774       ; 72         ; 0.000 ; 1.013 ;
+;    Cell                ;       ; 3     ; 0.677       ; 28         ; 0.203 ; 0.268 ;
+;   Data                 ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 2     ; 0.137       ; 54         ; 0.000 ; 0.137 ;
+;    Cell                ;       ; 3     ; 0.118       ; 46         ; 0.000 ; 0.093 ;
+;    uTco                ;       ; 1     ; 0.000       ; 0          ; 0.000 ; 0.000 ;
+;  Required Path         ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 2.087       ; 75         ; 0.000 ; 1.220 ;
+;    Cell                ;       ; 3     ; 0.713       ; 25         ; 0.212 ; 0.268 ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+Note: Negative delays are omitted from totals when calculating percentages
+
++--------------------------------------------------------------------------------------------------------------------------+
+; Data Arrival Path                                                                                                        ;
++---------+---------+----+------+--------+--------------------+------------------------------------------------------------+
+; Total   ; Incr    ; RF ; Type ; Fanout ; Location           ; Element                                                    ;
++---------+---------+----+------+--------+--------------------+------------------------------------------------------------+
+; 0.000   ; 0.000   ;    ;      ;        ;                    ; launch edge time                                           ;
+; 2.451   ; 2.451   ;    ;      ;        ;                    ; clock path                                                 ;
+;   0.000 ;   0.000 ;    ;      ;        ;                    ; source latency                                             ;
+;   0.000 ;   0.000 ;    ;      ; 1      ; PIN_Y13            ; FPGA_CLK2_50                                               ;
+;   0.000 ;   0.000 ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1   ; FPGA_CLK2_50~input|i                                       ;
+;   0.268 ;   0.268 ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1   ; FPGA_CLK2_50~input|o                                       ;
+;   1.029 ;   0.761 ; RR ; IC   ; 1      ; CLKCTRL_G2         ; FPGA_CLK2_50~inputCLKENA0|inclk                            ;
+;   1.232 ;   0.203 ; RR ; CELL ; 20805  ; CLKCTRL_G2         ; FPGA_CLK2_50~inputCLKENA0|outclk                           ;
+;   2.245 ;   1.013 ; RR ; IC   ; 1      ; FF_X35_Y46_N38     ; emu|u_at_keyboard|sequence_q[50]|clk                       ;
+;   2.451 ;   0.206 ; RR ; CELL ; 1      ; FF_X35_Y46_N38     ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|sequence_q[50] ;
+; 2.706   ; 0.255   ;    ;      ;        ;                    ; data path                                                  ;
+;   2.451 ;   0.000 ;    ; uTco ; 1      ; FF_X35_Y46_N38     ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|sequence_q[50] ;
+;   2.451 ;   0.000 ; RR ; CELL ; 1      ; FF_X35_Y46_N38     ; emu|u_at_keyboard|sequence_q[50]|q                         ;
+;   2.588 ;   0.137 ; RR ; IC   ; 1      ; LABCELL_X35_Y46_N6 ; emu|u_at_keyboard|sequence_q~173|datag                     ;
+;   2.681 ;   0.093 ; RR ; CELL ; 1      ; LABCELL_X35_Y46_N6 ; emu|u_at_keyboard|sequence_q~173|combout                   ;
+;   2.681 ;   0.000 ; RR ; IC   ; 1      ; FF_X35_Y46_N7      ; emu|u_at_keyboard|sequence_q[42]|d                         ;
+;   2.706 ;   0.025 ; RR ; CELL ; 1      ; FF_X35_Y46_N7      ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|sequence_q[42] ;
++---------+---------+----+------+--------+--------------------+------------------------------------------------------------+
+
++-------------------------------------------------------------------------------------------------------------------------+
+; Data Required Path                                                                                                      ;
++---------+----------+----+------+--------+------------------+------------------------------------------------------------+
+; Total   ; Incr     ; RF ; Type ; Fanout ; Location         ; Element                                                    ;
++---------+----------+----+------+--------+------------------+------------------------------------------------------------+
+; 0.000   ; 0.000    ;    ;      ;        ;                  ; latch edge time                                            ;
+; 2.490   ; 2.490    ;    ;      ;        ;                  ; clock path                                                 ;
+;   0.000 ;   0.000  ;    ;      ;        ;                  ; source latency                                             ;
+;   0.000 ;   0.000  ;    ;      ; 1      ; PIN_Y13          ; FPGA_CLK2_50                                               ;
+;   0.000 ;   0.000  ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|i                                       ;
+;   0.268 ;   0.268  ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|o                                       ;
+;   1.135 ;   0.867  ; RR ; IC   ; 1      ; CLKCTRL_G2       ; FPGA_CLK2_50~inputCLKENA0|inclk                            ;
+;   1.347 ;   0.212  ; RR ; CELL ; 20805  ; CLKCTRL_G2       ; FPGA_CLK2_50~inputCLKENA0|outclk                           ;
+;   2.567 ;   1.220  ; RR ; IC   ; 1      ; FF_X35_Y46_N7    ; emu|u_at_keyboard|sequence_q[42]|clk                       ;
+;   2.800 ;   0.233  ; RR ; CELL ; 1      ; FF_X35_Y46_N7    ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|sequence_q[42] ;
+;   2.490 ;   -0.310 ;    ;      ;        ;                  ; clock pessimism removed                                    ;
+; 2.490   ; 0.000    ;    ;      ;        ;                  ; clock uncertainty                                          ;
+; 2.490   ; 0.000    ;    ; uTh  ; 1      ; FF_X35_Y46_N7    ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|sequence_q[42] ;
++---------+----------+----+------+--------+------------------+------------------------------------------------------------+
+
+----------------------------
+; Extra Fitter Information ;
+----------------------------
+HTML report is unavailable in plain text report export.
+
+
+Path #15: Hold slack is 0.223 
+===============================================================================
++---------------------------------------------------------------------------------+
+; Path Summary                                                                    ;
++--------------------+------------------------------------------------------------+
+; Property           ; Value                                                      ;
++--------------------+------------------------------------------------------------+
+; From Node          ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[3] ;
+; To Node            ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[3] ;
+; Launch Clock       ; FPGA_CLK2_50                                               ;
+; Latch Clock        ; FPGA_CLK2_50                                               ;
+; Data Arrival Time  ; 2.697                                                      ;
+; Data Required Time ; 2.474                                                      ;
+; Slack              ; 0.223                                                      ;
++--------------------+------------------------------------------------------------+
+
++-----------------------------------------------------------------------------------+
+; Statistics                                                                        ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Property               ; Value ; Count ; Total Delay ; % of Total ; Min   ; Max   ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Hold Relationship      ; 0.000 ;       ;             ;            ;       ;       ;
+; Clock Skew             ; 0.039 ;       ;             ;            ;       ;       ;
+; Data Delay             ; 0.262 ;       ;             ;            ;       ;       ;
+; Number of Logic Levels ;       ; 1     ;             ;            ;       ;       ;
+; Physical Delays        ;       ;       ;             ;            ;       ;       ;
+;  Arrival Path          ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 1.754       ; 72         ; 0.000 ; 0.993 ;
+;    Cell                ;       ; 3     ; 0.681       ; 28         ; 0.203 ; 0.268 ;
+;   Data                 ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 2     ; 0.000       ; 0          ; 0.000 ; 0.000 ;
+;    Cell                ;       ; 3     ; 0.262       ; 100        ; 0.000 ; 0.236 ;
+;    uTco                ;       ; 1     ; 0.000       ; 0          ; 0.000 ; 0.000 ;
+;  Required Path         ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 2.066       ; 74         ; 0.000 ; 1.199 ;
+;    Cell                ;       ; 3     ; 0.717       ; 26         ; 0.212 ; 0.268 ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+Note: Negative delays are omitted from totals when calculating percentages
+
++--------------------------------------------------------------------------------------------------------------------------+
+; Data Arrival Path                                                                                                        ;
++---------+---------+----+------+--------+--------------------+------------------------------------------------------------+
+; Total   ; Incr    ; RF ; Type ; Fanout ; Location           ; Element                                                    ;
++---------+---------+----+------+--------+--------------------+------------------------------------------------------------+
+; 0.000   ; 0.000   ;    ;      ;        ;                    ; launch edge time                                           ;
+; 2.435   ; 2.435   ;    ;      ;        ;                    ; clock path                                                 ;
+;   0.000 ;   0.000 ;    ;      ;        ;                    ; source latency                                             ;
+;   0.000 ;   0.000 ;    ;      ; 1      ; PIN_Y13            ; FPGA_CLK2_50                                               ;
+;   0.000 ;   0.000 ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1   ; FPGA_CLK2_50~input|i                                       ;
+;   0.268 ;   0.268 ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1   ; FPGA_CLK2_50~input|o                                       ;
+;   1.029 ;   0.761 ; RR ; IC   ; 1      ; CLKCTRL_G2         ; FPGA_CLK2_50~inputCLKENA0|inclk                            ;
+;   1.232 ;   0.203 ; RR ; CELL ; 20805  ; CLKCTRL_G2         ; FPGA_CLK2_50~inputCLKENA0|outclk                           ;
+;   2.225 ;   0.993 ; RR ; IC   ; 1      ; FF_X31_Y47_N5      ; emu|u_at_keyboard|write_ptr_q[3]|clk                       ;
+;   2.435 ;   0.210 ; RR ; CELL ; 1      ; FF_X31_Y47_N5      ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[3] ;
+; 2.697   ; 0.262   ;    ;      ;        ;                    ; data path                                                  ;
+;   2.435 ;   0.000 ;    ; uTco ; 1      ; FF_X31_Y47_N5      ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[3] ;
+;   2.435 ;   0.000 ; FF ; CELL ; 4      ; FF_X31_Y47_N5      ; emu|u_at_keyboard|write_ptr_q[3]|q                         ;
+;   2.435 ;   0.000 ; FF ; IC   ; 1      ; LABCELL_X31_Y47_N3 ; emu|u_at_keyboard|Add0~3|datad                             ;
+;   2.671 ;   0.236 ; FF ; CELL ; 1      ; LABCELL_X31_Y47_N3 ; emu|u_at_keyboard|Add0~3|combout                           ;
+;   2.671 ;   0.000 ; FF ; IC   ; 1      ; FF_X31_Y47_N5      ; emu|u_at_keyboard|write_ptr_q[3]|d                         ;
+;   2.697 ;   0.026 ; FF ; CELL ; 1      ; FF_X31_Y47_N5      ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[3] ;
++---------+---------+----+------+--------+--------------------+------------------------------------------------------------+
+
++-------------------------------------------------------------------------------------------------------------------------+
+; Data Required Path                                                                                                      ;
++---------+----------+----+------+--------+------------------+------------------------------------------------------------+
+; Total   ; Incr     ; RF ; Type ; Fanout ; Location         ; Element                                                    ;
++---------+----------+----+------+--------+------------------+------------------------------------------------------------+
+; 0.000   ; 0.000    ;    ;      ;        ;                  ; latch edge time                                            ;
+; 2.474   ; 2.474    ;    ;      ;        ;                  ; clock path                                                 ;
+;   0.000 ;   0.000  ;    ;      ;        ;                  ; source latency                                             ;
+;   0.000 ;   0.000  ;    ;      ; 1      ; PIN_Y13          ; FPGA_CLK2_50                                               ;
+;   0.000 ;   0.000  ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|i                                       ;
+;   0.268 ;   0.268  ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|o                                       ;
+;   1.135 ;   0.867  ; RR ; IC   ; 1      ; CLKCTRL_G2       ; FPGA_CLK2_50~inputCLKENA0|inclk                            ;
+;   1.347 ;   0.212  ; RR ; CELL ; 20805  ; CLKCTRL_G2       ; FPGA_CLK2_50~inputCLKENA0|outclk                           ;
+;   2.546 ;   1.199  ; RR ; IC   ; 1      ; FF_X31_Y47_N5    ; emu|u_at_keyboard|write_ptr_q[3]|clk                       ;
+;   2.783 ;   0.237  ; RR ; CELL ; 1      ; FF_X31_Y47_N5    ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[3] ;
+;   2.474 ;   -0.309 ;    ;      ;        ;                  ; clock pessimism removed                                    ;
+; 2.474   ; 0.000    ;    ;      ;        ;                  ; clock uncertainty                                          ;
+; 2.474   ; 0.000    ;    ; uTh  ; 1      ; FF_X31_Y47_N5    ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[3] ;
++---------+----------+----+------+--------+------------------+------------------------------------------------------------+
+
+----------------------------
+; Extra Fitter Information ;
+----------------------------
+HTML report is unavailable in plain text report export.
+
+
+Path #16: Hold slack is 0.224 
+===============================================================================
++---------------------------------------------------------------------------------+
+; Path Summary                                                                    ;
++--------------------+------------------------------------------------------------+
+; Property           ; Value                                                      ;
++--------------------+------------------------------------------------------------+
+; From Node          ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[2] ;
+; To Node            ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[2] ;
+; Launch Clock       ; FPGA_CLK2_50                                               ;
+; Latch Clock        ; FPGA_CLK2_50                                               ;
+; Data Arrival Time  ; 2.698                                                      ;
+; Data Required Time ; 2.474                                                      ;
+; Slack              ; 0.224                                                      ;
++--------------------+------------------------------------------------------------+
+
++-----------------------------------------------------------------------------------+
+; Statistics                                                                        ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Property               ; Value ; Count ; Total Delay ; % of Total ; Min   ; Max   ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Hold Relationship      ; 0.000 ;       ;             ;            ;       ;       ;
+; Clock Skew             ; 0.039 ;       ;             ;            ;       ;       ;
+; Data Delay             ; 0.263 ;       ;             ;            ;       ;       ;
+; Number of Logic Levels ;       ; 1     ;             ;            ;       ;       ;
+; Physical Delays        ;       ;       ;             ;            ;       ;       ;
+;  Arrival Path          ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 1.754       ; 72         ; 0.000 ; 0.993 ;
+;    Cell                ;       ; 3     ; 0.681       ; 28         ; 0.203 ; 0.268 ;
+;   Data                 ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 2     ; 0.000       ; 0          ; 0.000 ; 0.000 ;
+;    Cell                ;       ; 3     ; 0.263       ; 100        ; 0.000 ; 0.236 ;
+;    uTco                ;       ; 1     ; 0.000       ; 0          ; 0.000 ; 0.000 ;
+;  Required Path         ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 2.066       ; 74         ; 0.000 ; 1.199 ;
+;    Cell                ;       ; 3     ; 0.717       ; 26         ; 0.212 ; 0.268 ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+Note: Negative delays are omitted from totals when calculating percentages
+
++---------------------------------------------------------------------------------------------------------------------------+
+; Data Arrival Path                                                                                                         ;
++---------+---------+----+------+--------+---------------------+------------------------------------------------------------+
+; Total   ; Incr    ; RF ; Type ; Fanout ; Location            ; Element                                                    ;
++---------+---------+----+------+--------+---------------------+------------------------------------------------------------+
+; 0.000   ; 0.000   ;    ;      ;        ;                     ; launch edge time                                           ;
+; 2.435   ; 2.435   ;    ;      ;        ;                     ; clock path                                                 ;
+;   0.000 ;   0.000 ;    ;      ;        ;                     ; source latency                                             ;
+;   0.000 ;   0.000 ;    ;      ; 1      ; PIN_Y13             ; FPGA_CLK2_50                                               ;
+;   0.000 ;   0.000 ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1    ; FPGA_CLK2_50~input|i                                       ;
+;   0.268 ;   0.268 ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1    ; FPGA_CLK2_50~input|o                                       ;
+;   1.029 ;   0.761 ; RR ; IC   ; 1      ; CLKCTRL_G2          ; FPGA_CLK2_50~inputCLKENA0|inclk                            ;
+;   1.232 ;   0.203 ; RR ; CELL ; 20805  ; CLKCTRL_G2          ; FPGA_CLK2_50~inputCLKENA0|outclk                           ;
+;   2.225 ;   0.993 ; RR ; IC   ; 1      ; FF_X31_Y47_N17      ; emu|u_at_keyboard|write_ptr_q[2]|clk                       ;
+;   2.435 ;   0.210 ; RR ; CELL ; 1      ; FF_X31_Y47_N17      ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[2] ;
+; 2.698   ; 0.263   ;    ;      ;        ;                     ; data path                                                  ;
+;   2.435 ;   0.000 ;    ; uTco ; 1      ; FF_X31_Y47_N17      ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[2] ;
+;   2.435 ;   0.000 ; FF ; CELL ; 3      ; FF_X31_Y47_N17      ; emu|u_at_keyboard|write_ptr_q[2]|q                         ;
+;   2.435 ;   0.000 ; FF ; IC   ; 1      ; LABCELL_X31_Y47_N15 ; emu|u_at_keyboard|Add0~2|datad                             ;
+;   2.671 ;   0.236 ; FF ; CELL ; 2      ; LABCELL_X31_Y47_N15 ; emu|u_at_keyboard|Add0~2|combout                           ;
+;   2.671 ;   0.000 ; FF ; IC   ; 1      ; FF_X31_Y47_N17      ; emu|u_at_keyboard|write_ptr_q[2]|d                         ;
+;   2.698 ;   0.027 ; FF ; CELL ; 1      ; FF_X31_Y47_N17      ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[2] ;
++---------+---------+----+------+--------+---------------------+------------------------------------------------------------+
+
++-------------------------------------------------------------------------------------------------------------------------+
+; Data Required Path                                                                                                      ;
++---------+----------+----+------+--------+------------------+------------------------------------------------------------+
+; Total   ; Incr     ; RF ; Type ; Fanout ; Location         ; Element                                                    ;
++---------+----------+----+------+--------+------------------+------------------------------------------------------------+
+; 0.000   ; 0.000    ;    ;      ;        ;                  ; latch edge time                                            ;
+; 2.474   ; 2.474    ;    ;      ;        ;                  ; clock path                                                 ;
+;   0.000 ;   0.000  ;    ;      ;        ;                  ; source latency                                             ;
+;   0.000 ;   0.000  ;    ;      ; 1      ; PIN_Y13          ; FPGA_CLK2_50                                               ;
+;   0.000 ;   0.000  ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|i                                       ;
+;   0.268 ;   0.268  ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|o                                       ;
+;   1.135 ;   0.867  ; RR ; IC   ; 1      ; CLKCTRL_G2       ; FPGA_CLK2_50~inputCLKENA0|inclk                            ;
+;   1.347 ;   0.212  ; RR ; CELL ; 20805  ; CLKCTRL_G2       ; FPGA_CLK2_50~inputCLKENA0|outclk                           ;
+;   2.546 ;   1.199  ; RR ; IC   ; 1      ; FF_X31_Y47_N17   ; emu|u_at_keyboard|write_ptr_q[2]|clk                       ;
+;   2.783 ;   0.237  ; RR ; CELL ; 1      ; FF_X31_Y47_N17   ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[2] ;
+;   2.474 ;   -0.309 ;    ;      ;        ;                  ; clock pessimism removed                                    ;
+; 2.474   ; 0.000    ;    ;      ;        ;                  ; clock uncertainty                                          ;
+; 2.474   ; 0.000    ;    ; uTh  ; 1      ; FF_X31_Y47_N17   ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[2] ;
++---------+----------+----+------+--------+------------------+------------------------------------------------------------+
+
+----------------------------
+; Extra Fitter Information ;
+----------------------------
+HTML report is unavailable in plain text report export.
+
+
+Path #17: Hold slack is 0.226 
+===============================================================================
++-------------------------------------------------------------------------------------------+
+; Path Summary                                                                              ;
++--------------------+----------------------------------------------------------------------+
+; Property           ; Value                                                                ;
++--------------------+----------------------------------------------------------------------+
+; From Node          ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[2]           ;
+; To Node            ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[2]~DUPLICATE ;
+; Launch Clock       ; FPGA_CLK2_50                                                         ;
+; Latch Clock        ; FPGA_CLK2_50                                                         ;
+; Data Arrival Time  ; 2.698                                                                ;
+; Data Required Time ; 2.472                                                                ;
+; Slack              ; 0.226                                                                ;
++--------------------+----------------------------------------------------------------------+
+
++-----------------------------------------------------------------------------------+
+; Statistics                                                                        ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Property               ; Value ; Count ; Total Delay ; % of Total ; Min   ; Max   ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Hold Relationship      ; 0.000 ;       ;             ;            ;       ;       ;
+; Clock Skew             ; 0.037 ;       ;             ;            ;       ;       ;
+; Data Delay             ; 0.263 ;       ;             ;            ;       ;       ;
+; Number of Logic Levels ;       ; 1     ;             ;            ;       ;       ;
+; Physical Delays        ;       ;       ;             ;            ;       ;       ;
+;  Arrival Path          ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 1.754       ; 72         ; 0.000 ; 0.993 ;
+;    Cell                ;       ; 3     ; 0.681       ; 28         ; 0.203 ; 0.268 ;
+;   Data                 ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 2     ; 0.000       ; 0          ; 0.000 ; 0.000 ;
+;    Cell                ;       ; 3     ; 0.263       ; 100        ; 0.000 ; 0.236 ;
+;    uTco                ;       ; 1     ; 0.000       ; 0          ; 0.000 ; 0.000 ;
+;  Required Path         ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 2.066       ; 74         ; 0.000 ; 1.199 ;
+;    Cell                ;       ; 3     ; 0.715       ; 26         ; 0.212 ; 0.268 ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+Note: Negative delays are omitted from totals when calculating percentages
+
++-------------------------------------------------------------------------------------------------------------------------------------+
+; Data Arrival Path                                                                                                                   ;
++---------+---------+----+------+--------+---------------------+----------------------------------------------------------------------+
+; Total   ; Incr    ; RF ; Type ; Fanout ; Location            ; Element                                                              ;
++---------+---------+----+------+--------+---------------------+----------------------------------------------------------------------+
+; 0.000   ; 0.000   ;    ;      ;        ;                     ; launch edge time                                                     ;
+; 2.435   ; 2.435   ;    ;      ;        ;                     ; clock path                                                           ;
+;   0.000 ;   0.000 ;    ;      ;        ;                     ; source latency                                                       ;
+;   0.000 ;   0.000 ;    ;      ; 1      ; PIN_Y13             ; FPGA_CLK2_50                                                         ;
+;   0.000 ;   0.000 ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1    ; FPGA_CLK2_50~input|i                                                 ;
+;   0.268 ;   0.268 ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1    ; FPGA_CLK2_50~input|o                                                 ;
+;   1.029 ;   0.761 ; RR ; IC   ; 1      ; CLKCTRL_G2          ; FPGA_CLK2_50~inputCLKENA0|inclk                                      ;
+;   1.232 ;   0.203 ; RR ; CELL ; 20805  ; CLKCTRL_G2          ; FPGA_CLK2_50~inputCLKENA0|outclk                                     ;
+;   2.225 ;   0.993 ; RR ; IC   ; 1      ; FF_X31_Y47_N17      ; emu|u_at_keyboard|write_ptr_q[2]|clk                                 ;
+;   2.435 ;   0.210 ; RR ; CELL ; 1      ; FF_X31_Y47_N17      ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[2]           ;
+; 2.698   ; 0.263   ;    ;      ;        ;                     ; data path                                                            ;
+;   2.435 ;   0.000 ;    ; uTco ; 1      ; FF_X31_Y47_N17      ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[2]           ;
+;   2.435 ;   0.000 ; FF ; CELL ; 3      ; FF_X31_Y47_N17      ; emu|u_at_keyboard|write_ptr_q[2]|q                                   ;
+;   2.435 ;   0.000 ; FF ; IC   ; 1      ; LABCELL_X31_Y47_N15 ; emu|u_at_keyboard|Add0~2|datad                                       ;
+;   2.671 ;   0.236 ; FF ; CELL ; 2      ; LABCELL_X31_Y47_N15 ; emu|u_at_keyboard|Add0~2|combout                                     ;
+;   2.671 ;   0.000 ; FF ; IC   ; 1      ; FF_X31_Y47_N16      ; emu|u_at_keyboard|write_ptr_q[2]~DUPLICATE|d                         ;
+;   2.698 ;   0.027 ; FF ; CELL ; 1      ; FF_X31_Y47_N16      ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[2]~DUPLICATE ;
++---------+---------+----+------+--------+---------------------+----------------------------------------------------------------------+
+
++-----------------------------------------------------------------------------------------------------------------------------------+
+; Data Required Path                                                                                                                ;
++---------+----------+----+------+--------+------------------+----------------------------------------------------------------------+
+; Total   ; Incr     ; RF ; Type ; Fanout ; Location         ; Element                                                              ;
++---------+----------+----+------+--------+------------------+----------------------------------------------------------------------+
+; 0.000   ; 0.000    ;    ;      ;        ;                  ; latch edge time                                                      ;
+; 2.472   ; 2.472    ;    ;      ;        ;                  ; clock path                                                           ;
+;   0.000 ;   0.000  ;    ;      ;        ;                  ; source latency                                                       ;
+;   0.000 ;   0.000  ;    ;      ; 1      ; PIN_Y13          ; FPGA_CLK2_50                                                         ;
+;   0.000 ;   0.000  ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|i                                                 ;
+;   0.268 ;   0.268  ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|o                                                 ;
+;   1.135 ;   0.867  ; RR ; IC   ; 1      ; CLKCTRL_G2       ; FPGA_CLK2_50~inputCLKENA0|inclk                                      ;
+;   1.347 ;   0.212  ; RR ; CELL ; 20805  ; CLKCTRL_G2       ; FPGA_CLK2_50~inputCLKENA0|outclk                                     ;
+;   2.546 ;   1.199  ; RR ; IC   ; 1      ; FF_X31_Y47_N16   ; emu|u_at_keyboard|write_ptr_q[2]~DUPLICATE|clk                       ;
+;   2.781 ;   0.235  ; RR ; CELL ; 1      ; FF_X31_Y47_N16   ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[2]~DUPLICATE ;
+;   2.472 ;   -0.309 ;    ;      ;        ;                  ; clock pessimism removed                                              ;
+; 2.472   ; 0.000    ;    ;      ;        ;                  ; clock uncertainty                                                    ;
+; 2.472   ; 0.000    ;    ; uTh  ; 1      ; FF_X31_Y47_N16   ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|write_ptr_q[2]~DUPLICATE ;
++---------+----------+----+------+--------+------------------+----------------------------------------------------------------------+
+
+----------------------------
+; Extra Fitter Information ;
+----------------------------
+HTML report is unavailable in plain text report export.
+
+
+Path #18: Hold slack is 0.227 
+===============================================================================
++---------------------------------------------------------------------------------+
+; Path Summary                                                                    ;
++--------------------+------------------------------------------------------------+
+; Property           ; Value                                                      ;
++--------------------+------------------------------------------------------------+
+; From Node          ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|remaining_q[2] ;
+; To Node            ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|remaining_q[2] ;
+; Launch Clock       ; FPGA_CLK2_50                                               ;
+; Latch Clock        ; FPGA_CLK2_50                                               ;
+; Data Arrival Time  ; 2.714                                                      ;
+; Data Required Time ; 2.487                                                      ;
+; Slack              ; 0.227                                                      ;
++--------------------+------------------------------------------------------------+
+
++-----------------------------------------------------------------------------------+
+; Statistics                                                                        ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Property               ; Value ; Count ; Total Delay ; % of Total ; Min   ; Max   ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Hold Relationship      ; 0.000 ;       ;             ;            ;       ;       ;
+; Clock Skew             ; 0.036 ;       ;             ;            ;       ;       ;
+; Data Delay             ; 0.263 ;       ;             ;            ;       ;       ;
+; Number of Logic Levels ;       ; 1     ;             ;            ;       ;       ;
+; Physical Delays        ;       ;       ;             ;            ;       ;       ;
+;  Arrival Path          ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 1.769       ; 72         ; 0.000 ; 1.008 ;
+;    Cell                ;       ; 3     ; 0.682       ; 28         ; 0.203 ; 0.268 ;
+;   Data                 ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 2     ; 0.000       ; 0          ; 0.000 ; 0.000 ;
+;    Cell                ;       ; 3     ; 0.263       ; 100        ; 0.000 ; 0.238 ;
+;    uTco                ;       ; 1     ; 0.000       ; 0          ; 0.000 ; 0.000 ;
+;  Required Path         ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 2.082       ; 74         ; 0.000 ; 1.215 ;
+;    Cell                ;       ; 3     ; 0.714       ; 26         ; 0.212 ; 0.268 ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+Note: Negative delays are omitted from totals when calculating percentages
+
++---------------------------------------------------------------------------------------------------------------------------+
+; Data Arrival Path                                                                                                         ;
++---------+---------+----+------+--------+---------------------+------------------------------------------------------------+
+; Total   ; Incr    ; RF ; Type ; Fanout ; Location            ; Element                                                    ;
++---------+---------+----+------+--------+---------------------+------------------------------------------------------------+
+; 0.000   ; 0.000   ;    ;      ;        ;                     ; launch edge time                                           ;
+; 2.451   ; 2.451   ;    ;      ;        ;                     ; clock path                                                 ;
+;   0.000 ;   0.000 ;    ;      ;        ;                     ; source latency                                             ;
+;   0.000 ;   0.000 ;    ;      ; 1      ; PIN_Y13             ; FPGA_CLK2_50                                               ;
+;   0.000 ;   0.000 ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1    ; FPGA_CLK2_50~input|i                                       ;
+;   0.268 ;   0.268 ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1    ; FPGA_CLK2_50~input|o                                       ;
+;   1.029 ;   0.761 ; RR ; IC   ; 1      ; CLKCTRL_G2          ; FPGA_CLK2_50~inputCLKENA0|inclk                            ;
+;   1.232 ;   0.203 ; RR ; CELL ; 20805  ; CLKCTRL_G2          ; FPGA_CLK2_50~inputCLKENA0|outclk                           ;
+;   2.240 ;   1.008 ; RR ; IC   ; 1      ; FF_X37_Y47_N58      ; emu|u_at_keyboard|remaining_q[2]|clk                       ;
+;   2.451 ;   0.211 ; RR ; CELL ; 1      ; FF_X37_Y47_N58      ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|remaining_q[2] ;
+; 2.714   ; 0.263   ;    ;      ;        ;                     ; data path                                                  ;
+;   2.451 ;   0.000 ;    ; uTco ; 1      ; FF_X37_Y47_N58      ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|remaining_q[2] ;
+;   2.451 ;   0.000 ; FF ; CELL ; 4      ; FF_X37_Y47_N58      ; emu|u_at_keyboard|remaining_q[2]|q                         ;
+;   2.451 ;   0.000 ; FF ; IC   ; 1      ; LABCELL_X37_Y47_N57 ; emu|u_at_keyboard|remaining_q[2]~8|datad                   ;
+;   2.689 ;   0.238 ; FF ; CELL ; 1      ; LABCELL_X37_Y47_N57 ; emu|u_at_keyboard|remaining_q[2]~8|combout                 ;
+;   2.689 ;   0.000 ; FF ; IC   ; 1      ; FF_X37_Y47_N58      ; emu|u_at_keyboard|remaining_q[2]|d                         ;
+;   2.714 ;   0.025 ; FF ; CELL ; 1      ; FF_X37_Y47_N58      ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|remaining_q[2] ;
++---------+---------+----+------+--------+---------------------+------------------------------------------------------------+
+
++-------------------------------------------------------------------------------------------------------------------------+
+; Data Required Path                                                                                                      ;
++---------+----------+----+------+--------+------------------+------------------------------------------------------------+
+; Total   ; Incr     ; RF ; Type ; Fanout ; Location         ; Element                                                    ;
++---------+----------+----+------+--------+------------------+------------------------------------------------------------+
+; 0.000   ; 0.000    ;    ;      ;        ;                  ; latch edge time                                            ;
+; 2.487   ; 2.487    ;    ;      ;        ;                  ; clock path                                                 ;
+;   0.000 ;   0.000  ;    ;      ;        ;                  ; source latency                                             ;
+;   0.000 ;   0.000  ;    ;      ; 1      ; PIN_Y13          ; FPGA_CLK2_50                                               ;
+;   0.000 ;   0.000  ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|i                                       ;
+;   0.268 ;   0.268  ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|o                                       ;
+;   1.135 ;   0.867  ; RR ; IC   ; 1      ; CLKCTRL_G2       ; FPGA_CLK2_50~inputCLKENA0|inclk                            ;
+;   1.347 ;   0.212  ; RR ; CELL ; 20805  ; CLKCTRL_G2       ; FPGA_CLK2_50~inputCLKENA0|outclk                           ;
+;   2.562 ;   1.215  ; RR ; IC   ; 1      ; FF_X37_Y47_N58   ; emu|u_at_keyboard|remaining_q[2]|clk                       ;
+;   2.796 ;   0.234  ; RR ; CELL ; 1      ; FF_X37_Y47_N58   ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|remaining_q[2] ;
+;   2.487 ;   -0.309 ;    ;      ;        ;                  ; clock pessimism removed                                    ;
+; 2.487   ; 0.000    ;    ;      ;        ;                  ; clock uncertainty                                          ;
+; 2.487   ; 0.000    ;    ; uTh  ; 1      ; FF_X37_Y47_N58   ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|remaining_q[2] ;
++---------+----------+----+------+--------+------------------+------------------------------------------------------------+
+
+----------------------------
+; Extra Fitter Information ;
+----------------------------
+HTML report is unavailable in plain text report export.
+
+
+Path #19: Hold slack is 0.227 
+===============================================================================
++--------------------------------------------------------------------------------+
+; Path Summary                                                                   ;
++--------------------+-----------------------------------------------------------+
+; Property           ; Value                                                     ;
++--------------------+-----------------------------------------------------------+
+; From Node          ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|read_ptr_q[2] ;
+; To Node            ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|read_ptr_q[2] ;
+; Launch Clock       ; FPGA_CLK2_50                                              ;
+; Latch Clock        ; FPGA_CLK2_50                                              ;
+; Data Arrival Time  ; 2.704                                                     ;
+; Data Required Time ; 2.477                                                     ;
+; Slack              ; 0.227                                                     ;
++--------------------+-----------------------------------------------------------+
+
++-----------------------------------------------------------------------------------+
+; Statistics                                                                        ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Property               ; Value ; Count ; Total Delay ; % of Total ; Min   ; Max   ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Hold Relationship      ; 0.000 ;       ;             ;            ;       ;       ;
+; Clock Skew             ; 0.035 ;       ;             ;            ;       ;       ;
+; Data Delay             ; 0.262 ;       ;             ;            ;       ;       ;
+; Number of Logic Levels ;       ; 1     ;             ;            ;       ;       ;
+; Physical Delays        ;       ;       ;             ;            ;       ;       ;
+;  Arrival Path          ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 1.754       ; 72         ; 0.000 ; 0.993 ;
+;    Cell                ;       ; 3     ; 0.688       ; 28         ; 0.203 ; 0.268 ;
+;   Data                 ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 2     ; 0.000       ; 0          ; 0.000 ; 0.000 ;
+;    Cell                ;       ; 3     ; 0.262       ; 100        ; 0.000 ; 0.236 ;
+;    uTco                ;       ; 1     ; 0.000       ; 0          ; 0.000 ; 0.000 ;
+;  Required Path         ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 2.066       ; 74         ; 0.000 ; 1.199 ;
+;    Cell                ;       ; 3     ; 0.720       ; 26         ; 0.212 ; 0.268 ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+Note: Negative delays are omitted from totals when calculating percentages
+
++--------------------------------------------------------------------------------------------------------------------------+
+; Data Arrival Path                                                                                                        ;
++---------+---------+----+------+--------+---------------------+-----------------------------------------------------------+
+; Total   ; Incr    ; RF ; Type ; Fanout ; Location            ; Element                                                   ;
++---------+---------+----+------+--------+---------------------+-----------------------------------------------------------+
+; 0.000   ; 0.000   ;    ;      ;        ;                     ; launch edge time                                          ;
+; 2.442   ; 2.442   ;    ;      ;        ;                     ; clock path                                                ;
+;   0.000 ;   0.000 ;    ;      ;        ;                     ; source latency                                            ;
+;   0.000 ;   0.000 ;    ;      ; 1      ; PIN_Y13             ; FPGA_CLK2_50                                              ;
+;   0.000 ;   0.000 ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1    ; FPGA_CLK2_50~input|i                                      ;
+;   0.268 ;   0.268 ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1    ; FPGA_CLK2_50~input|o                                      ;
+;   1.029 ;   0.761 ; RR ; IC   ; 1      ; CLKCTRL_G2          ; FPGA_CLK2_50~inputCLKENA0|inclk                           ;
+;   1.232 ;   0.203 ; RR ; CELL ; 20805  ; CLKCTRL_G2          ; FPGA_CLK2_50~inputCLKENA0|outclk                          ;
+;   2.225 ;   0.993 ; RR ; IC   ; 1      ; FF_X31_Y47_N53      ; emu|u_at_keyboard|read_ptr_q[2]|clk                       ;
+;   2.442 ;   0.217 ; RR ; CELL ; 1      ; FF_X31_Y47_N53      ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|read_ptr_q[2] ;
+; 2.704   ; 0.262   ;    ;      ;        ;                     ; data path                                                 ;
+;   2.442 ;   0.000 ;    ; uTco ; 1      ; FF_X31_Y47_N53      ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|read_ptr_q[2] ;
+;   2.442 ;   0.000 ; FF ; CELL ; 6      ; FF_X31_Y47_N53      ; emu|u_at_keyboard|read_ptr_q[2]|q                         ;
+;   2.442 ;   0.000 ; FF ; IC   ; 1      ; LABCELL_X31_Y47_N51 ; emu|u_at_keyboard|read_ptr_q~3|datad                      ;
+;   2.678 ;   0.236 ; FF ; CELL ; 1      ; LABCELL_X31_Y47_N51 ; emu|u_at_keyboard|read_ptr_q~3|combout                    ;
+;   2.678 ;   0.000 ; FF ; IC   ; 1      ; FF_X31_Y47_N53      ; emu|u_at_keyboard|read_ptr_q[2]|d                         ;
+;   2.704 ;   0.026 ; FF ; CELL ; 1      ; FF_X31_Y47_N53      ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|read_ptr_q[2] ;
++---------+---------+----+------+--------+---------------------+-----------------------------------------------------------+
+
++------------------------------------------------------------------------------------------------------------------------+
+; Data Required Path                                                                                                     ;
++---------+----------+----+------+--------+------------------+-----------------------------------------------------------+
+; Total   ; Incr     ; RF ; Type ; Fanout ; Location         ; Element                                                   ;
++---------+----------+----+------+--------+------------------+-----------------------------------------------------------+
+; 0.000   ; 0.000    ;    ;      ;        ;                  ; latch edge time                                           ;
+; 2.477   ; 2.477    ;    ;      ;        ;                  ; clock path                                                ;
+;   0.000 ;   0.000  ;    ;      ;        ;                  ; source latency                                            ;
+;   0.000 ;   0.000  ;    ;      ; 1      ; PIN_Y13          ; FPGA_CLK2_50                                              ;
+;   0.000 ;   0.000  ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|i                                      ;
+;   0.268 ;   0.268  ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|o                                      ;
+;   1.135 ;   0.867  ; RR ; IC   ; 1      ; CLKCTRL_G2       ; FPGA_CLK2_50~inputCLKENA0|inclk                           ;
+;   1.347 ;   0.212  ; RR ; CELL ; 20805  ; CLKCTRL_G2       ; FPGA_CLK2_50~inputCLKENA0|outclk                          ;
+;   2.546 ;   1.199  ; RR ; IC   ; 1      ; FF_X31_Y47_N53   ; emu|u_at_keyboard|read_ptr_q[2]|clk                       ;
+;   2.786 ;   0.240  ; RR ; CELL ; 1      ; FF_X31_Y47_N53   ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|read_ptr_q[2] ;
+;   2.477 ;   -0.309 ;    ;      ;        ;                  ; clock pessimism removed                                   ;
+; 2.477   ; 0.000    ;    ;      ;        ;                  ; clock uncertainty                                         ;
+; 2.477   ; 0.000    ;    ; uTh  ; 1      ; FF_X31_Y47_N53   ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|read_ptr_q[2] ;
++---------+----------+----+------+--------+------------------+-----------------------------------------------------------+
+
+----------------------------
+; Extra Fitter Information ;
+----------------------------
+HTML report is unavailable in plain text report export.
+
+
+Path #20: Hold slack is 0.228 
+===============================================================================
++--------------------------------------------------------------------------------+
+; Path Summary                                                                   ;
++--------------------+-----------------------------------------------------------+
+; Property           ; Value                                                     ;
++--------------------+-----------------------------------------------------------+
+; From Node          ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|read_ptr_q[1] ;
+; To Node            ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|read_ptr_q[1] ;
+; Launch Clock       ; FPGA_CLK2_50                                              ;
+; Latch Clock        ; FPGA_CLK2_50                                              ;
+; Data Arrival Time  ; 2.703                                                     ;
+; Data Required Time ; 2.475                                                     ;
+; Slack              ; 0.228                                                     ;
++--------------------+-----------------------------------------------------------+
+
++-----------------------------------------------------------------------------------+
+; Statistics                                                                        ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Property               ; Value ; Count ; Total Delay ; % of Total ; Min   ; Max   ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+; Hold Relationship      ; 0.000 ;       ;             ;            ;       ;       ;
+; Clock Skew             ; 0.035 ;       ;             ;            ;       ;       ;
+; Data Delay             ; 0.263 ;       ;             ;            ;       ;       ;
+; Number of Logic Levels ;       ; 1     ;             ;            ;       ;       ;
+; Physical Delays        ;       ;       ;             ;            ;       ;       ;
+;  Arrival Path          ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 1.754       ; 72         ; 0.000 ; 0.993 ;
+;    Cell                ;       ; 3     ; 0.686       ; 28         ; 0.203 ; 0.268 ;
+;   Data                 ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 2     ; 0.000       ; 0          ; 0.000 ; 0.000 ;
+;    Cell                ;       ; 3     ; 0.263       ; 100        ; 0.000 ; 0.238 ;
+;    uTco                ;       ; 1     ; 0.000       ; 0          ; 0.000 ; 0.000 ;
+;  Required Path         ;       ;       ;             ;            ;       ;       ;
+;   Clock                ;       ;       ;             ;            ;       ;       ;
+;    IC                  ;       ; 3     ; 2.066       ; 74         ; 0.000 ; 1.199 ;
+;    Cell                ;       ; 3     ; 0.718       ; 26         ; 0.212 ; 0.268 ;
++------------------------+-------+-------+-------------+------------+-------+-------+
+Note: Negative delays are omitted from totals when calculating percentages
+
++--------------------------------------------------------------------------------------------------------------------------+
+; Data Arrival Path                                                                                                        ;
++---------+---------+----+------+--------+---------------------+-----------------------------------------------------------+
+; Total   ; Incr    ; RF ; Type ; Fanout ; Location            ; Element                                                   ;
++---------+---------+----+------+--------+---------------------+-----------------------------------------------------------+
+; 0.000   ; 0.000   ;    ;      ;        ;                     ; launch edge time                                          ;
+; 2.440   ; 2.440   ;    ;      ;        ;                     ; clock path                                                ;
+;   0.000 ;   0.000 ;    ;      ;        ;                     ; source latency                                            ;
+;   0.000 ;   0.000 ;    ;      ; 1      ; PIN_Y13             ; FPGA_CLK2_50                                              ;
+;   0.000 ;   0.000 ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1    ; FPGA_CLK2_50~input|i                                      ;
+;   0.268 ;   0.268 ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1    ; FPGA_CLK2_50~input|o                                      ;
+;   1.029 ;   0.761 ; RR ; IC   ; 1      ; CLKCTRL_G2          ; FPGA_CLK2_50~inputCLKENA0|inclk                           ;
+;   1.232 ;   0.203 ; RR ; CELL ; 20805  ; CLKCTRL_G2          ; FPGA_CLK2_50~inputCLKENA0|outclk                          ;
+;   2.225 ;   0.993 ; RR ; IC   ; 1      ; FF_X31_Y47_N28      ; emu|u_at_keyboard|read_ptr_q[1]|clk                       ;
+;   2.440 ;   0.215 ; RR ; CELL ; 1      ; FF_X31_Y47_N28      ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|read_ptr_q[1] ;
+; 2.703   ; 0.263   ;    ;      ;        ;                     ; data path                                                 ;
+;   2.440 ;   0.000 ;    ; uTco ; 1      ; FF_X31_Y47_N28      ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|read_ptr_q[1] ;
+;   2.440 ;   0.000 ; FF ; CELL ; 8      ; FF_X31_Y47_N28      ; emu|u_at_keyboard|read_ptr_q[1]|q                         ;
+;   2.440 ;   0.000 ; FF ; IC   ; 1      ; LABCELL_X31_Y47_N27 ; emu|u_at_keyboard|read_ptr_q~2|datad                      ;
+;   2.678 ;   0.238 ; FF ; CELL ; 1      ; LABCELL_X31_Y47_N27 ; emu|u_at_keyboard|read_ptr_q~2|combout                    ;
+;   2.678 ;   0.000 ; FF ; IC   ; 1      ; FF_X31_Y47_N28      ; emu|u_at_keyboard|read_ptr_q[1]|d                         ;
+;   2.703 ;   0.025 ; FF ; CELL ; 1      ; FF_X31_Y47_N28      ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|read_ptr_q[1] ;
++---------+---------+----+------+--------+---------------------+-----------------------------------------------------------+
+
++------------------------------------------------------------------------------------------------------------------------+
+; Data Required Path                                                                                                     ;
++---------+----------+----+------+--------+------------------+-----------------------------------------------------------+
+; Total   ; Incr     ; RF ; Type ; Fanout ; Location         ; Element                                                   ;
++---------+----------+----+------+--------+------------------+-----------------------------------------------------------+
+; 0.000   ; 0.000    ;    ;      ;        ;                  ; latch edge time                                           ;
+; 2.475   ; 2.475    ;    ;      ;        ;                  ; clock path                                                ;
+;   0.000 ;   0.000  ;    ;      ;        ;                  ; source latency                                            ;
+;   0.000 ;   0.000  ;    ;      ; 1      ; PIN_Y13          ; FPGA_CLK2_50                                              ;
+;   0.000 ;   0.000  ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|i                                      ;
+;   0.268 ;   0.268  ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1 ; FPGA_CLK2_50~input|o                                      ;
+;   1.135 ;   0.867  ; RR ; IC   ; 1      ; CLKCTRL_G2       ; FPGA_CLK2_50~inputCLKENA0|inclk                           ;
+;   1.347 ;   0.212  ; RR ; CELL ; 20805  ; CLKCTRL_G2       ; FPGA_CLK2_50~inputCLKENA0|outclk                          ;
+;   2.546 ;   1.199  ; RR ; IC   ; 1      ; FF_X31_Y47_N28   ; emu|u_at_keyboard|read_ptr_q[1]|clk                       ;
+;   2.784 ;   0.238  ; RR ; CELL ; 1      ; FF_X31_Y47_N28   ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|read_ptr_q[1] ;
+;   2.475 ;   -0.309 ;    ;      ;        ;                  ; clock pessimism removed                                   ;
+; 2.475   ; 0.000    ;    ;      ;        ;                  ; clock uncertainty                                         ;
+; 2.475   ; 0.000    ;    ; uTh  ; 1      ; FF_X31_Y47_N28   ; emu_at:emu|spk286_at_keyboard:u_at_keyboard|read_ptr_q[1] ;
++---------+----------+----+------+--------+------------------+-----------------------------------------------------------+
+
+----------------------------
+; Extra Fitter Information ;
+----------------------------
+HTML report is unavailable in plain text report export.
+
+

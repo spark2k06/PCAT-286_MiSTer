@@ -139,3 +139,20 @@ No se ha ejecutado Quartus ni se ha generado un RBF.
 6. Si sólo falla la lectura, anotar el tamaño exacto de la imagen montada y
    capturar la página de debug durante el fallo. Las señales decisivas serán
    DRQ2, DACK2, TC, IRQ6, dirección DMA y `byte_enable`.
+
+## 2026-10-04 escritura de sectores pendiente de corregir
+
+El usuario detecta corrupción tras COPY y desmontar/remontar el disquete:
+desaparecen también los archivos anteriores. Las lecturas funcionan y el
+core PCXT-EGA escribe correctamente.
+
+La [investigación de escritura DMA](AT_FLOPPY_WRITE_CORRUPTION_20261004.md)
+identifica por inspección una respuesta de RAM consumida por el FDC un ciclo
+después de perder validez, con selección de byte derivada de la dirección DMA
+ya adelantada. La ruta actual puede entregar ceros al FIFO de escritura.
+Este defecto de integración existe en código anterior a P06.
+
+La verificación histórica de esta nota cubría lectura de sectores y escritura
+de puertos/comandos. La corrección del payload y su prueba dirigida de sector
+RAM a FDC, lectura posterior y remontaje siguen pendientes. Esta actualización
+documenta el hallazgo; no modifica RTL ni acredita una corrección probada.

@@ -340,3 +340,11 @@ El mínimo de cinco relojes más esperas READ no certifica todavía todas las
 fases de ejecución Intel: dependencias físicas y de fetch pueden alargarlo.
 Palabras impares, escrituras, read/modify/write y los servicios restantes
 siguen pendientes, al igual que los perfiles completos y la calibración física.
+
+The [M6d private milestone](P06_CORE_READ_STREAM_20261004.md) qualifies
+consecutive aligned A1 reuse without changing the M6c generated CPU or adding
+hardware. Both simulators pass 240 programs/1,120 instructions per warm/cold
+matrix and targeted lifecycle/recovery cases; MAX remains trace-identical.
+It preserves the existing serialized handoff and does not accept its issue
+gap as an Intel requirement. Public speeds and remaining memory services
+are still pending.

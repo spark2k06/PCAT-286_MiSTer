@@ -275,3 +275,19 @@ their actual instruction issue/results: consecutive DATA reuse, odd words,
 writes/write-buffer overlap and read/modify/write. Branches, bus/events,
 decoded IU lookahead, the DOS wrapper, complete public speeds and physical
 collaborator calibration remain open.
+
+## 2026-10-04 M6d: consecutive aligned A1 READ qualification
+
+The [M6d evidence milestone](P06_CORE_READ_STREAM_20261004.md) qualifies the
+existing M6c CPU with 240 consecutive-read programs (two, four or eight A1
+instructions), 1,120 instructions in each warm/cold matrix, and targeted
+pause/cancel/reset/HOLD and full-sequence recovery checks. Original/private
+MAX traces remain identical. All 23 dual trace pairs, three independent
+negative controls, lint and microcode checks pass; the frozen audit reconstructs
+the exact M6c RTL and checks 825 timed programs/3,794 retirements.
+
+This milestone adds zero hardware. The existing serialized DATA handoff is
+preserved, not claimed as an Intel-required issue gap. Odd words, writes/RMW,
+bus/events, decoded lookahead and complete public profiles remain open.
+Production config, RBF and source selection remain unchanged. No total
+regression, fit or STA was run.

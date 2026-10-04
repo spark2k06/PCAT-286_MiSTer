@@ -421,3 +421,21 @@ same causal model at 8/10/12.5/16/20/25 MHz and explicitly identify those
 unmeasured predictions. Interpolation/extrapolation of aggregate kernel times
 alone does not define instruction timing. MAX remains dependency-driven.
 No CPU RTL, public profile, OSD, clock or RBF adjustment is made by this analysis.
+
+## 2026-10-04 MiSTer profile measurements
+
+The first synthesized eight-profile selector has
+[hardware fixed-work observations](P06_MISTER_REFERENCE_RESULTS_20261004.md)
+from the user, with reset applied for every selection. All 336 samples pass
+the unchanged T286REF validator. MAX CHECKNUM preserves 6906 / 121.6K, and
+BIOS/CheckIT reportedly display each intended nominal MHz.
+
+Historical calibration remains open: the gross kernels complete earlier
+than the retained physical 6/12 anchors and native 6/12.5 visible-zero controls.
+R0 at 25 MHz is also slower than at 20 MHz in this capture, despite CHECKNUM
+improving. Next work should qualify per-instruction deadline/implementation
+extensions at 20/25 MHz, taken-target/refill timing and separate board READ/WRITE
+policy. Keep Intel minima and unchanged benchmark bytes; neither a global
+multiplier nor MHz detection alone establishes the intended AT timing model.
+The analysis changes evidence/documentation only and does not close P06/P12
+calibration or the candidate's physical setup failure.

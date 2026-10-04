@@ -198,3 +198,18 @@ Directed functionality passes, but physical setup fails at -17.001 ns;
 minimum reported hold is +0.076 ns. The metadata/deadline and bridge/cache
 admission cones require a separate P21 follow-up. The generated artifact is
 an experimental candidate, not a timing-closed or hardware-accepted release.
+
+## M4 hardware profile observations
+
+The user has now tested this RBF on MiSTer with reset applied for each
+selection. The [hardware results](P06_MISTER_REFERENCE_RESULTS_20261004.md)
+preserve eight CSVs, three CHECKNUM screenshots and 336 validated fixed-work
+samples. BIOS/CheckIT reportedly detect the intended nominal MHz. MAX
+CHECKNUM retains 6906 / 121.6K; historical profile results differ from the
+retained physical/native anchors. R0 takes 316 median ticks at 25 MHz versus
+298 at 20 MHz, requiring a directed timing trace before assigning a cause.
+
+This provides hardware evidence for the first selector candidate, while
+historical calibration, broad OS acceptance and physical timing closure
+remain open. The frozen M3 fit receipt retains its original pre-hardware
+status; no RTL, config or RBF changes are made by the measurement analysis.

@@ -159,6 +159,11 @@ and bus too; prior frozen receipts remain unchanged.
 
 ## Next stages
 
+The [M3 full CPU register probe](P06_CORE_REGISTER_PILOT_20261004.md) now
+records real dispatch, byte consumption, retained operands, architectural
+writes and retirement. Its 208 cases pass in both simulators. M3a is
+observation; the temporal CPU connection is the following milestone.
+
 - Map the qualified forms to actual decode/start/issue/commit milestones,
   reuse existing retention and validate fetch/redirect/ownership/events.
 - Catalogue the full T286REF timer/setup/return wrapper before running that

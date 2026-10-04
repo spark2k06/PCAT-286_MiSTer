@@ -1,7 +1,9 @@
 # P06 — Perfiles de CPU 6–25 MHz y MAX
 
-Status, 2026-10-04: the first general reset-applied OSD candidate is in directed
-validation. See [the public candidate record](P06_OSD_CANDIDATE_20261004.md) for
+Status, 2026-10-04: the first general reset-applied OSD candidate is synthesized
+and passes directed validation; its physical setup does not close. See
+[the public candidate record](P06_OSD_CANDIDATE_20261004.md) and
+[measured fit](P06_OSD_FIT_20261004.md) for
 its current integration, evidence and bitstream milestones. It uses one CPU
 and the existing common 50 MHz CPU/bridge/SDRAM clock. Historical instruction
 intervals and normalized bus timing are provisional; full internal EU/native

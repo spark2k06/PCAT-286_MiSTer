@@ -1,0 +1,527 @@
+diff --git a/.gitattributes b/.gitattributes
+index 8e54c70..e099a97 100644
+--- a/.gitattributes
++++ b/.gitattributes
+@@ -103,5 +103,11 @@ scripts/build_p06_profile_cpu.py text eol=lf
+ scripts/test_spk286_at_cpu_profile.py text eol=lf
+ scripts/test_p06_profile_compatibility.py text eol=lf
+ scripts/prove_at_profile_bridge.py text eol=lf
++scripts/test_at_speed_profiles.py text eol=lf
++scripts/record_p06_osd_fit.py text eol=lf
++scripts/check_p06_profile_components.py text eol=lf
++scripts/test_spk286_instruction_timing.py text eol=lf
++sim/spk286_timing/** text eol=lf
++sim/spk286_integration/spk286_instruction_timing_tb.sv text eol=lf
+ docs/evidence/p06-osd-components-20261004/** -text -whitespace
+ docs/evidence/p06-osd-candidate-20261004/** -text -whitespace
+diff --git a/PCAT-286.sv b/PCAT-286.sv
+index 0475219..bc95988 100644
+--- a/PCAT-286.sv
++++ b/PCAT-286.sv
+@@ -116,6 +116,7 @@ module emu_at
+         "P3,Hardware;",
+         "P3-;",
+         "P3O[74:72],Installed RAM,4MB,8MB,16MB,1MB,2MB;",
++        "P3O[77:75],CPU Speed,MAX,6 MHz,8 MHz,10 MHz,12.5 MHz,16 MHz,20 MHz,25 MHz;",
+         "P3oCD,Monitor,5154/ECD,5153/CGA,5151/MDA;",
+         "P3ONO,Joystick 1, Analog, Digital, Disabled;",
+         "P3OPQ,Joystick 2, Analog, Digital, Disabled;",
+@@ -183,6 +184,8 @@ module emu_at
+     wire [7:0]   at_info = at_bios_info_req ? at_bios_info : at_monitor_pending_info;
+     wire         at_monitor_profile_pending =
+         at_monitor_profile_osd != at_monitor_profile_applied;
++    wire [2:0]   at_cpu_speed_active;
++    wire         at_cpu_speed_pending;
+     wire         at_vga_mode13_native_osd = ~hps_status[10];
+     wire [3:0]   at_crt_h_osd = hps_status[49:46];
+     wire [2:0]   at_crt_v_osd = hps_status[52:50];
+@@ -995,7 +998,7 @@ module emu_at
+         .INFO_INDEX (8'd1)
+     ) at_monitor_pending_notice (
+         .clock      (CLK_50M),
+-        .pending    (at_monitor_profile_pending),
++        .pending    (at_monitor_profile_pending | at_cpu_speed_pending),
+         .osd_status (OSD_STATUS),
+         .suppress   (at_bios_hold),
+         .info       (at_monitor_pending_info),
+@@ -1085,6 +1088,9 @@ module emu_at
+         .clk                    (CLK_50M),
+         .clk_cpu                (at_cpu_clock),
+         .cpu_sample_edge        (at_cpu_sample_edge),
++        .cpu_speed_requested    (hps_status[77:75]),
++        .cpu_speed_active       (at_cpu_speed_active),
++        .cpu_speed_pending      (at_cpu_speed_pending),
+         // Keep the AT devices and EGA raster alive during the splash.  Only
+         // the CPU/BIU reset is extended over the splash interval.
+         .reset                  (at_boot_reset),
+diff --git a/docs/optimization/P06_CPU_SPEED_PROFILES.md b/docs/optimization/P06_CPU_SPEED_PROFILES.md
+index 5c0b4f1..bf884c5 100644
+--- a/docs/optimization/P06_CPU_SPEED_PROFILES.md
++++ b/docs/optimization/P06_CPU_SPEED_PROFILES.md
+@@ -1,10 +1,13 @@
+ # P06 — Perfiles de CPU 6–25 MHz y MAX
+ 
+-Estado: especificación futura, actualizada el 2026-10-04. Base: implementación
+-única tras la limpieza P20, con CPU/puente/SDRAM sobre el reloj común de 50 MHz;
+-P21 mantiene pendiente la aceptación del cierre de tiempos. No hay perfiles
+-históricos completos integrados en el RBF. La validación temporal privada
+-parcial se describe a continuación. Aplican los
++Status, 2026-10-04: the first general reset-applied OSD candidate is in directed
++validation. See [the public candidate record](P06_OSD_CANDIDATE_20261004.md) for
++its current integration, evidence and bitstream milestones. It uses one CPU
++and the existing common 50 MHz CPU/bridge/SDRAM clock. Historical instruction
++intervals and normalized bus timing are provisional; full internal EU/native
++pin timing and board-specific physical calibration remain open. P21 physical
++timing acceptance is separate. The dated private milestones below preserve
++their original limited scope. Aplican los
+ [requisitos comunes](README.md) y el
+ [modelo de temporización SPK286](../../vendor/spk286/SPK286_TIMING_MODEL.md).
+ 
+diff --git a/docs/optimization/P06_OSD_CANDIDATE_20261004.md b/docs/optimization/P06_OSD_CANDIDATE_20261004.md
+index 525a96f..e58b77b 100644
+--- a/docs/optimization/P06_OSD_CANDIDATE_20261004.md
++++ b/docs/optimization/P06_OSD_CANDIDATE_20261004.md
+@@ -72,3 +72,68 @@ These are not FPGA ALMs and exclude the CPU schedule and complete project.
+ M1 qualifies components only. Production OSD/CPU integration, broader
+ functional validation and a new fit/RBF are subsequent milestones of this
+ same objective.
++
++## M2: production CPU and machine integration
++
++The production wrapper selects one generated `spk286_profiled` CPU. Its
++functional source, microcode and private pilot ancestors are unchanged.
++Instruction timing is a separate combinational form table and interval
++controller, driven by the selected virtual processor boundary. Real fetch,
++operand, bus, protection and event dependencies still extend completion.
++MAX follows the original operation/retirement/event paths.
++
++The table covers legal ordinary/extended decoder entries and named microcode
++entries. It separates ModR/M effective-address costs, branch/count outcomes,
++REP setup/iteration intervals, READ-wait eligibility and estimated forms.
++Odd corrections are charged once for each original word reference before
++the BIU splits it; an odd RMW can therefore charge both READ and WRITE.
++LOCK has no extra prefix clock, and REP setup includes one REP prefix;
++other accumulated prefix costs use an explicitly provisional native fallback.
++
++The controller times new instruction bodies, repetition checkpoints and
++observable retirement. Existing internal GPR/FLAGS/protection commits can
++occur before the interval ends; a following opcode or asynchronous boundary
++cannot observe them until the interval permits it. This is not a fully timed
++internal EU or speculative architectural model. Event services keep their
++original functional sequencing and receive an interval budget at dispatch.
++Idle asynchronous selection/capture runs on the fabric clock; instruction
++boundaries, event completion and logical bus timing are qualified separately.
++Exact native pin recognition offsets are outside this first release.
++
++Both the CPU and bridge open a retained admission window after completion.
++The following head/request can be accepted on the next fabric edge within
++that virtual interval, after old ownership clears. This prevents an invented
++extra processor clock while preserving adjacent identical transfers, event
++priority and the original payload storage.
++
++The actual OSD entry uses bits `77:75` and **Reset & apply settings**. A pending
++change displays the existing reset notice. CPU-local warm reset does not
++recapture a pending OSD choice. Peripherals continue on their existing clocks.
++
++### Validation findings and declared fixture scope
++
++Directed validation found and corrected timing-admission defects in INTO
++condition qualification and NMI arbitration. No original architectural
++assertion was changed to accept them.
++
++One protected-system fixture patched address `0197` from HLT to IRET after
++prefetch had already captured it in a slower profile. The historical build-only
++fixture initializes that same IRET byte before the stream starts, retaining
++the original later patch and all architectural assertions. MAX retains its
++original stimulus and per-edge trace. This is a fixture initialization
++correction, not CPU instruction-cache invalidation or altered HLT behavior.
++
++Cross-simulator comparison declares four-state versus two-state observation
++differences: the first reset's pre-edge address/status/HLDA and unknown bits
++of uninitialized memory input. Architectural output differences remain
++failures. Raw MAX comparisons within Icarus require identical complete traces;
++cross-simulator results identify their passive representation explicitly.
++
++Active microcode generation/roundtrip checks pass. One old vendor predecessor
++fixture has LOADALL/SALC numbers swapped relative to its own frozen derivation;
++its failure is retained separately and does not alter the active compiled-ROM
++contract. The corresponding standalone committed fixture is consistent.
++
++Final directed receipts and measured full-project cost/timing will be recorded
++with the newly synthesized candidate. No hardware or complete-OS regression
++acceptance is implied by component validation.
+diff --git a/docs/optimization/P12_REAL_CHECKNUM_MEMORY_ATTRIBUTION_20261002.md b/docs/optimization/P12_REAL_CHECKNUM_MEMORY_ATTRIBUTION_20261002.md
+index 68a6ad2..f01720f 100644
+--- a/docs/optimization/P12_REAL_CHECKNUM_MEMORY_ATTRIBUTION_20261002.md
++++ b/docs/optimization/P12_REAL_CHECKNUM_MEMORY_ATTRIBUTION_20261002.md
+@@ -604,3 +604,18 @@ select a causal board policy rather than a global score correction. Predict
+ MAX retains dependency-driven accelerated execution. Actual physical clocks,
+ board/BIOS identity and executable hash remain unverified; NOT_CALIBRATED
+ still applies. No immediate RTL, clock, fit or RBF change is included here.
++
++### First general OSD candidate (2026-10-04)
++
++The [public candidate record](P06_OSD_CANDIDATE_20261004.md) now supersedes the
++earlier no-integration status for the current development milestone. CPU
++instruction intervals and normalized retained bus transfers are integrated
++with all eight reset-applied choices. MAX bypasses historical delays. READY
++capture stays on the fabric clock, while logical bus publication follows
++Ts/Tc. There is no public T-state switch or benchmark score multiplier.
++
++The initial candidate ties additional board READ-wait corrections to zero.
++Backend deadline misses retain real dependencies and are implementation
++extensions, not assumed physical motherboard waits. The different physical
++6/12 MHz CODE/DATA sensitivities remain calibration work; accepting a first
++synthesized selector does not close P12 or certify every nominal speed.
+diff --git a/docs/optimization/README.md b/docs/optimization/README.md
+index 631bbef..1a7a587 100644
+--- a/docs/optimization/README.md
++++ b/docs/optimization/README.md
+@@ -22,7 +22,7 @@ frecuencia física no se fija como requisito ni se promete una puntuación final
+ | P03 | [Buffer de lectura SDRAM](P03_AT_SDRAM_READ_BUFFER.md) | Memoria PCAT | Amortizar activación y precarga mediante lecturas de varias palabras |
+ | P04 | [Perfilado y optimización de ejecución](P04_SPK286_EXECUTION_PROFILING.md) | Verificación y CPU | Separar costes de memoria/ejecución y elegir cambios medidos |
+ | P05 | [Cierre de timing FPGA](P05_AT_FPGA_TIMING_CLOSURE.md) | Integración, CPU y constraints | Cumplir los tiempos del diseño físico a la frecuencia declarada |
+-| P06 | [Perfiles de velocidad de CPU](P06_CPU_SPEED_PROFILES.md) | Política CPU e integración OSD | 6–25 MHz y MAX; [piloto privado de registro a 6 MHz](P06_CORE_REGISTER_PILOT_20261004.md) validado en CPU completa; BIU/IU, cobertura completa y evidencia física pendientes |
++| P06 | [Perfiles de velocidad de CPU](P06_CPU_SPEED_PROFILES.md) | Política CPU e integración OSD | MAX / 6–25 MHz: [first reset-applied OSD candidate](P06_OSD_CANDIDATE_20261004.md) in directed validation; historical intervals provisional, physical calibration and complete EU/pin timing remain open |
+ | P07 | [Camino EGA byte-preservado](P07_EGA_BYTE_PRESERVING_PATH.md) | Vídeo y frontend VRAM | Reducir latencia interna sólo cuando sea seguro, sin convertir EGA en un dispositivo de 16 bits |
+ 
+ P01–P04 corresponden a las cuatro mejoras iniciales. P03 tiene ya una primera
+diff --git a/rtl/spk286_integration/spk286_at_bus_bridge.sv b/rtl/spk286_integration/spk286_at_bus_bridge.sv
+index 1987156..b860ade 100644
+--- a/rtl/spk286_integration/spk286_at_bus_bridge.sv
++++ b/rtl/spk286_integration/spk286_at_bus_bridge.sv
+@@ -116,8 +116,9 @@ module spk286_at_bus_bridge #(
+     logic [15:0] cpu_data_in_q;
+     logic        timing_tc_q;
+     logic        timing_active_q;
++    logic        timing_admission_window_q;
+     wire historical = timing_historical === 1'b1;
+-    wire timing_admit = !historical || timing_cpu_boundary;
++    wire timing_admit = !historical || timing_cpu_boundary || timing_admission_window_q;
+     // Admission is the beginning of Ts. The following boundary begins Tc;
+     // the next boundary is the earliest terminal READY sample (two clocks).
+     wire timing_terminal = !historical ||
+@@ -302,13 +303,20 @@ module spk286_at_bus_bridge #(
+             cpu_data_in_q      <= 16'd0;
+             timing_tc_q        <= 1'b0;
+             timing_active_q    <= 1'b0;
++            timing_admission_window_q <= 1'b0;
+             protocol_error     <= 1'b0;
+         end else begin
++            if (timing_cpu_boundary || !historical)
++                timing_admission_window_q <= 1'b0;
+             if (historical && timing_active_q && timing_cpu_boundary)
+                 timing_tc_q <= 1'b1;
+             if (cpu_ready) begin
+                 timing_active_q <= 1'b0;
+                 timing_tc_q <= 1'b0;
++                // A level-held BIU presents the NEXT request after this edge.
++                // Admit it on a subsequent fabric edge in this same virtual
++                // interval, never by replaying the just-completed request.
++                timing_admission_window_q <= historical;
+             end
+             if (state_q != STATE_COMPLETE)
+                 complete_sampled_q <= 1'b0;
+@@ -317,6 +325,7 @@ module spk286_at_bus_bridge #(
+                     if (cpu_bus_valid && timing_admit && !drain_barrier) begin
+                         timing_active_q <= historical;
+                         timing_tc_q <= 1'b0;
++                        timing_admission_window_q <= 1'b0;
+                         // Snapshot is performed once per request.  No edge or
+                         // payload comparison is used as a delimiter, so an
+                         // identical request held back-to-back is accepted.
+diff --git a/rtl/spk286_integration/spk286_at_machine.sv b/rtl/spk286_integration/spk286_at_machine.sv
+index 5e7a0c3..dc7977d 100644
+--- a/rtl/spk286_integration/spk286_at_machine.sv
++++ b/rtl/spk286_integration/spk286_at_machine.sv
+@@ -6,6 +6,7 @@
+ // memory/refresh interfaces.  A later MiSTer profile can attach those ports
+ // to the SDRAM/HPS/media/video owners without changing the CPU contract.
+ `timescale 1ns/1ps
++`include "rtl/spk286_integration/spk286_at_cpu_profile.sv"
+ 
+ `ifndef ENABLE_OPL2
+ `define ENABLE_OPL2 0
+@@ -33,6 +34,9 @@ module spk286_at_machine #(
+     input  logic         clk,
+     input  logic         clk_cpu,
+     input  logic         cpu_sample_edge,
++    input  logic [2:0]   cpu_speed_requested,
++    output logic [2:0]   cpu_speed_active,
++    output logic         cpu_speed_pending,
+     input  logic         reset,
+     // The video raster can run its power-on timing while the machine remains
+     // reset for a missing system BIOS.
+@@ -696,10 +700,26 @@ module spk286_at_machine #(
+                                     video_aperture_select);
+     end
+ 
++    wire timing_historical, timing_cpu_boundary;
++    wire timing_phase_enable, timing_phase_two;
++    wire timing_deadline_miss;
++    // Only an external machine reset applies an OSD speed change. CPU-local
++    // warm resets preserve the applied choice and all peripheral clocks.
++    spk286_at_cpu_profile u_cpu_profile (
++        .clk(clk), .reset(reset | cpu_reset),
++        .requested(cpu_speed_requested), .active(cpu_speed_active),
++        .pending(cpu_speed_pending), .historical(timing_historical),
++        .phase_enable(timing_phase_enable), .phase_two(timing_phase_two),
++        .cpu_boundary(timing_cpu_boundary)
++    );
++
+     spk286_machine_cpu u_cpu (
+         .clk                    (clk_cpu),
+         .reset                  (cpu_clock_reset),
+         .execute_enable         (execute_enable),
++        .historical_enable      (timing_historical),
++        .cpu_boundary           (timing_cpu_boundary),
++        .timing_read_wait_event (1'b0),
+         .ready                  (cpu_ready_i),
+         .data_in                (cpu_data_in_i),
+         .intr                   (intr),
+@@ -781,6 +801,9 @@ module spk286_at_machine #(
+         .clk                    (clk),
+         .reset                  (cpu_core_reset),
+         .cpu_sample_edge        (cpu_sample_edge),
++        .timing_historical      (timing_historical),
++        .timing_cpu_boundary    (timing_cpu_boundary),
++        .timing_deadline_miss   (timing_deadline_miss),
+         .cpu_bus_valid          (cpu_bus_valid),
+         .cpu_address            (cpu_address),
+         .cpu_data_out           (cpu_data_out),
+diff --git a/rtl/spk286_integration/spk286_integration.qip b/rtl/spk286_integration/spk286_integration.qip
+index 34d9c0c..3b6e152 100644
+--- a/rtl/spk286_integration/spk286_integration.qip
++++ b/rtl/spk286_integration/spk286_integration.qip
+@@ -39,6 +39,11 @@ set_global_assignment -name SYSTEMVERILOG_FILE "vendor/spk286/rtl/spk286_tss_ser
+ set_global_assignment -name SYSTEMVERILOG_FILE "vendor/spk286/rtl/spk286_timing_policy.sv"
+ set_global_assignment -name SYSTEMVERILOG_FILE "vendor/spk286/rtl/spk286_timing_trace.sv"
+ set_global_assignment -name SYSTEMVERILOG_FILE "vendor/spk286/rtl/spk286.sv"
++set_global_assignment -name SYSTEMVERILOG_FILE "rtl/spk286_timing/spk286_instruction_timing.sv"
++set_global_assignment -name SYSTEMVERILOG_FILE "rtl/spk286_timing/spk286_instruction_schedule.sv"
++set_global_assignment -name SYSTEMVERILOG_FILE "vendor/spk286/rtl/timed/spk286_profiled_events.sv"
++set_global_assignment -name SYSTEMVERILOG_FILE "vendor/spk286/rtl/timed/spk286_profiled.sv"
++set_global_assignment -name SYSTEMVERILOG_FILE "rtl/spk286_integration/spk286_at_cpu_profile.sv"
+ set_global_assignment -name SYSTEMVERILOG_FILE "rtl/spk286_integration/spk286_at_bus_bridge.sv"
+ set_global_assignment -name SYSTEMVERILOG_FILE "rtl/spk286_integration/spk286_at_memory_decode.sv"
+ set_global_assignment -name SYSTEMVERILOG_FILE "rtl/spk286_integration/spk286_at_arbiter.sv"
+diff --git a/rtl/spk286_integration/spk286_machine_cpu.sv b/rtl/spk286_integration/spk286_machine_cpu.sv
+index 9578f8e..1b63e7d 100644
+--- a/rtl/spk286_integration/spk286_machine_cpu.sv
++++ b/rtl/spk286_integration/spk286_machine_cpu.sv
+@@ -1,11 +1,20 @@
+ // SPK286 production wrapper for the XT-derived MiSTer machine.
+ // Setup/debug mutation inputs are disabled; diagnostics remain observable.
+ `timescale 1ns/1ps
++// Guarded definitions keep older directed integration source lists usable.
++// The selected hardware has one profiled CPU; MAX bypasses its schedule.
++`include "rtl/spk286_timing/spk286_instruction_timing.sv"
++`include "rtl/spk286_timing/spk286_instruction_schedule.sv"
++`include "vendor/spk286/rtl/timed/spk286_profiled_events.sv"
++`include "vendor/spk286/rtl/timed/spk286_profiled.sv"
+ 
+ module spk286_machine_cpu (
+     input  logic         clk,
+     input  logic         reset,
+     input  logic         execute_enable,
++    input  logic         historical_enable,
++    input  logic         cpu_boundary,
++    input  logic         timing_read_wait_event,
+     input  logic         ready,
+     input  logic [15:0]  data_in,
+     input  logic         intr,
+@@ -83,6 +92,9 @@ module spk286_machine_cpu (
+     logic [23:0] unused_debug_ldtr_base;
+     logic [23:0] unused_debug_tr_base;
+     logic [3:0]  unused_debug_bus_transaction;
++    // Older directed fixtures omit the profile inputs. Their baseline remains
++    // MAX; execute_enable keeps its original native/setup ownership meaning.
++    wire applied_historical = historical_enable === 1'b1;
+ 
+     // Preserve the existing 8-bit integration diagnostic while the CPU
+     // exposes the bus state and protected transaction class separately.
+@@ -97,12 +109,15 @@ module spk286_machine_cpu (
+     logic [15:0] sim_cs = 16'h0000;
+ `endif
+ 
+-    spk286 cpu (
++    spk286_profiled cpu (
+         .clk(clk),
+         .reset(reset),
+         .ready(ready),
+         .data_in(data_in),
+         .execute_enable(execute_enable),
++        .historical_enable(applied_historical),
++        .cpu_boundary(cpu_boundary),
++        .timing_read_wait_event(timing_read_wait_event),
+         // PCAT uses the baseline dependency-driven policy; policy selection
+         // is intentionally kept local to the CPU integration boundary.
+         .timing_policy_request(2'd0),
+diff --git a/scripts/test_at_landmark_dma.sh b/scripts/test_at_landmark_dma.sh
+index 9c19eb7..1f363af 100644
+--- a/scripts/test_at_landmark_dma.sh
++++ b/scripts/test_at_landmark_dma.sh
+@@ -15,6 +15,7 @@ cd "$root"
+ sources=(
+   vendor/spk286/microcode/generated/spk286_microcode_pkg.sv
+   vendor/spk286/microcode/generated/spk286_microcode_rom.sv
++  vendor/spk286/microcode/generated/spk286_microcode_sync_rom.sv
+   vendor/spk286/rtl/spk286_protected_pkg.sv
+   vendor/spk286/rtl/spk286_tss_pkg.sv
+ )
+diff --git a/sim/spk286_integration/spk286_at_config_tb.sv b/sim/spk286_integration/spk286_at_config_tb.sv
+index 827d762..3e3e3cd 100644
+--- a/sim/spk286_integration/spk286_at_config_tb.sv
++++ b/sim/spk286_integration/spk286_at_config_tb.sv
+@@ -45,6 +45,7 @@ module spk286_at_config_tb;
+             contains("UMB E000-EFFF") ||
+             !contains("S2,VHD,IDE 0-0;") ||
+             !contains("R0,Reset & apply settings;") ||
++            !contains("P3O[77:75],CPU Speed,MAX,6 MHz,8 MHz,10 MHz,12.5 MHz,16 MHz,20 MHz,25 MHz;") ||
+             !contains("J,Fire 1,Fire 2;") ||
+             dut.hps_io_at.CONF_STR[23:0] !== "V,v")
+             $fatal(1, "AT_CONFIG: host configuration is incomplete");
+diff --git a/sim/spk286_integration/spk286_at_machine_tb.sv b/sim/spk286_integration/spk286_at_machine_tb.sv
+index d4abfc4..79ff505 100644
+--- a/sim/spk286_integration/spk286_at_machine_tb.sv
++++ b/sim/spk286_integration/spk286_at_machine_tb.sv
+@@ -11,6 +11,9 @@ module spk286_at_machine_tb;
+     logic clk = 1'b0;
+     logic reset = 1'b1;
+     logic cpu_local_reset = 1'b0;
++    integer selected_cpu_profile = 0;
++    logic [2:0] applied_cpu_profile;
++    wire cpu_profile_pending;
+     always #5 clk = ~clk;
+     logic clk_video = 1'b0;
+     always #17.45 clk_video = ~clk_video;
+@@ -492,6 +495,8 @@ module spk286_at_machine_tb;
+     spk286_at_machine dut (
+         .clk(clk), .clk_cpu(clk), .cpu_sample_edge(1'b1), .reset(reset), .video_reset(reset),
+         .cpu_reset(reset | cpu_local_reset), .clk_video(clk_video), .splashscreen(1'b0),
++        .cpu_speed_requested(3'(selected_cpu_profile)),
++        .cpu_speed_active(applied_cpu_profile), .cpu_speed_pending(cpu_profile_pending),
+         .ega_monitor_profile(2'b00),
+         .installed_ram_size_osd(3'd0),
+         .at286ctl_eff_mpu401(runtime_mpu_enable),
+@@ -562,6 +567,10 @@ module spk286_at_machine_tb;
+         logic mrbios_ram_fault_seen;
+         if (!$value$plusargs("MAX_CYCLES=%d", max_cycles))
+             max_cycles = 2000000;
++        if (!$value$plusargs("CPU_PROFILE=%d", selected_cpu_profile))
++            selected_cpu_profile = 0;
++        if (selected_cpu_profile < 0 || selected_cpu_profile > 7)
++            $fatal(1, "invalid CPU_PROFILE=%0d", selected_cpu_profile);
+ 
+         runtime_mpu_test = $test$plusargs("RUNTIME_MPU_ENABLE");
+         mrbios_warm_restarts = 0;
+@@ -577,6 +586,9 @@ module spk286_at_machine_tb;
+ 
+         repeat (8) @(posedge clk);
+         reset = 1'b0;
++        #1;
++        if (applied_cpu_profile !== 3'(selected_cpu_profile) || cpu_profile_pending)
++            $fatal(1, "CPU profile was not applied through machine reset");
+ 
+         // The AT motherboard converts the 80286 SHUTDOWN indication into a
+         // CPU-local reset and exports the same pulse to cancel a retained
+diff --git a/sim/spk286_integration/spk286_at_profile_bridge_tb.sv b/sim/spk286_integration/spk286_at_profile_bridge_tb.sv
+index 3dbc594..6dab7d2 100644
+--- a/sim/spk286_integration/spk286_at_profile_bridge_tb.sv
++++ b/sim/spk286_integration/spk286_at_profile_bridge_tb.sv
+@@ -58,7 +58,7 @@ module spk286_at_profile_bridge_tb;
+             ticks = 0;
+         end else begin
+             if (boundary) ticks = ticks + 1;
+-            if (state == 0 && valid && (!historical || boundary) && !drain_pending)
++            if (state == 0 && valid && (!historical || boundary || dut.timing_admission_window_q) && !drain_pending)
+                 ts_tick = ticks;
+             if (accept) begin
+                 backend_pending <= 1;
+@@ -87,6 +87,76 @@ module spk286_at_profile_bridge_tb;
+         checks = checks + 1;
+         if (!condition) $fatal(1, "PROFILE_BRIDGE_FAIL %s", label_text);
+     endtask
++    task automatic reset_retained_response;
++        integer timeout_count, old_publications;
++        begin
++            if (historical) begin
++                @(negedge clk);
++                status = 4'h5; write_cycle = 0; memory_width = 1;
++                address = 24'h102; bhe_n = 0; locked = 0; latency = 0;
++                valid = 1; timeout_count = 0; old_publications = publications;
++                while (state != 6 && timeout_count < 500) begin
++                    @(negedge clk); timeout_count = timeout_count + 1;
++                end
++                check(state == 6 && !ready, "physical response retained before Tc");
++                reset = 1; valid = 0;
++                repeat (3) @(negedge clk);
++                reset = 0;
++                repeat (15) @(negedge clk);
++                check(publications == old_publications && idle && !ready,
++                      "reset cancels retained logical publication without replay");
++            end
++        end
++    endtask
++    task automatic drain_barrier_test;
++        integer old_commands;
++        begin
++            @(negedge clk);
++            status = 4'h9; write_cycle = 0; memory_width = 0;
++            address = 24'h60; bhe_n = 1; locked = 0; valid = 1;
++            drain_pending = 1; old_commands = commands;
++            repeat (25) @(negedge clk);
++            check(commands == old_commands && !ready && !idle,
++                  "posted writes drain before peripheral admission");
++            valid = 0; drain_pending = 0;
++            repeat (3) @(negedge clk);
++            check(idle && !ready, "withdraw unaccepted request after barrier");
++        end
++    endtask
++    // The real BIU may hold valid high and replace its payload only after
++    // sampling READY. Identical adjacent requests are distinct transactions.
++    task automatic consecutive_reads;
++        integer old_publications, old_commands, old_captures, timeout_count;
++        integer terminal_tick, first_admission_tick;
++        begin
++            @(negedge clk);
++            status = 4'h5; write_cycle = 0; memory_width = 1;
++            address = 24'h100; bhe_n = 0; locked = 1; latency = 0;
++            old_commands = commands; old_captures = captures;
++            valid = 1;
++            for (integer n = 0; n < 8; n = n + 1) begin
++                old_publications = publications;
++                timeout_count = 0;
++                while (publications == old_publications && timeout_count < 500) begin
++                    @(negedge clk); timeout_count = timeout_count + 1;
++                end
++                check(publications == old_publications+1, "consecutive request publication");
++                check(sampled == 16'hC35A, "identical request data");
++                if (historical && n > 0)
++                    check(ts_tick == terminal_tick, "next Ts has no inserted idle CPU clock");
++                terminal_tick = ticks;
++                first_admission_tick = ts_tick;
++                check(!historical || terminal_tick-first_admission_tick == 2,
++                      "fast retained RAM takes exactly Ts plus Tc");
++                // valid/address intentionally remain identical across READY.
++            end
++            valid = 0; locked = 0;
++            repeat (3) @(negedge clk);
++            check(commands-old_commands == 8 && captures-old_captures == 8,
++                  "identical requests accepted/captured once each");
++            cases = cases + 8;
++        end
++    endtask
+     task automatic transfer(input integer delay_cycles, input logic [3:0] cycle_class,
+                             input bit native_memory, input bit odd_address,
+                             input bit byte_request, input bit lock_request);
+@@ -131,6 +201,9 @@ module spk286_at_profile_bridge_tb;
+             repeat (3) @(negedge clk);
+             reset = 0;
+             check(active == 3'(p), "profile applied at reset");
++            reset_retained_response();
++            drain_barrier_test();
++            consecutive_reads();
+             for (offset = 0; offset < 21; offset = offset + 1) begin
+                 transfer(offset, 4'hD, 1, 0, 0, 0);
+                 transfer(offset, 4'h5, 1, 0, 0, 1);

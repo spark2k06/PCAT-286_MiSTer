@@ -188,3 +188,13 @@ final coverage above uses the completed shards and the explicitly split IOPL
 receipt. None of these checks is a hardware, complete OS or full-regression
 acceptance. Full-project fitted cost and physical timing are a separate M3
 measurement of the newly generated RBF.
+
+## M3: newly synthesized candidate
+
+The [complete measured fit](P06_OSD_FIT_20261004.md) is now available with a new
+RBF and all existing features enabled, including Adlib/OPL2. It fits at
+30,751 equivalent / 36,363 placed ALMs, with unchanged M10K/DSP/PLL counts.
+Directed functionality passes, but physical setup fails at -17.001 ns;
+minimum reported hold is +0.076 ns. The metadata/deadline and bridge/cache
+admission cones require a separate P21 follow-up. The generated artifact is
+an experimental candidate, not a timing-closed or hardware-accepted release.

@@ -1,0 +1,129 @@
+----------------
+; Command Info ;
+----------------
+Report Timing: Found 1 hold paths (0 violated).  Worst case slack is 0.967 
+
+Tcl Command:
+    report_timing -hold -file /run-output/timing/7_slow_1100mv_100c/prebios_stage2_hold.rpt -from [get_registers {*u_video|prebios_video_sync1_q}] -to [get_registers {*u_video|prebios_video_sync2_q}] -npaths 20 -detail full_path
+
+Options:
+    -from [get_registers {*u_video|prebios_video_sync1_q}] 
+    -to [get_registers {*u_video|prebios_video_sync2_q}] 
+    -hold 
+    -npaths 20 
+    -detail full_path 
+    -file {/run-output/timing/7_slow_1100mv_100c/prebios_stage2_hold.rpt} 
+
+Delay Model:
+    Slow 1100mV 100C Model
+
++------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Summary of Paths                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               ;
++-------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------+--------------+------------+------------+
+; Slack ; From Node                                                                                                                                                                 ; To Node                                                                                                                                                                   ; Launch Clock                                                                              ; Latch Clock                                                                               ; Relationship ; Clock Skew ; Data Delay ;
++-------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------+--------------+------------+------------+
+; 0.967 ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_storage_video:u_storage_video|spk286_at_video_adapter:u_video|prebios_video_sync1_q ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_storage_video:u_storage_video|spk286_at_video_adapter:u_video|prebios_video_sync2_q ; emu|u_at_video_pll|pll_system_inst|altera_pll_i|general[0].gpll~PLL_OUTPUT_COUNTER|divclk ; emu|u_at_video_pll|pll_system_inst|altera_pll_i|general[0].gpll~PLL_OUTPUT_COUNTER|divclk ; 0.000        ; 0.125      ; 1.092      ;
++-------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------+-------------------------------------------------------------------------------------------+--------------+------------+------------+
+
+Path #1: Hold slack is 0.967 
+===============================================================================
++------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Path Summary                                                                                                                                                                                   ;
++--------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Property           ; Value                                                                                                                                                                     ;
++--------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; From Node          ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_storage_video:u_storage_video|spk286_at_video_adapter:u_video|prebios_video_sync1_q ;
+; To Node            ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_storage_video:u_storage_video|spk286_at_video_adapter:u_video|prebios_video_sync2_q ;
+; Launch Clock       ; emu|u_at_video_pll|pll_system_inst|altera_pll_i|general[0].gpll~PLL_OUTPUT_COUNTER|divclk                                                                                 ;
+; Latch Clock        ; emu|u_at_video_pll|pll_system_inst|altera_pll_i|general[0].gpll~PLL_OUTPUT_COUNTER|divclk                                                                                 ;
+; Data Arrival Time  ; 8.166                                                                                                                                                                     ;
+; Data Required Time ; 7.199                                                                                                                                                                     ;
+; Slack              ; 0.967                                                                                                                                                                     ;
++--------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
++-------------------------------------------------------------------------------------+
+; Statistics                                                                          ;
++------------------------+-------+-------+-------------+------------+--------+--------+
+; Property               ; Value ; Count ; Total Delay ; % of Total ; Min    ; Max    ;
++------------------------+-------+-------+-------------+------------+--------+--------+
+; Hold Relationship      ; 0.000 ;       ;             ;            ;        ;        ;
+; Clock Skew             ; 0.125 ;       ;             ;            ;        ;        ;
+; Data Delay             ; 1.092 ;       ;             ;            ;        ;        ;
+; Number of Logic Levels ;       ; 0     ;             ;            ;        ;        ;
+; Physical Delays        ;       ;       ;             ;            ;        ;        ;
+;  Arrival Path          ;       ;       ;             ;            ;        ;        ;
+;   Clock                ;       ;       ;             ;            ;        ;        ;
+;    IC                  ;       ; 6     ; 3.992       ; 56         ; 0.000  ; 1.875  ;
+;    Cell                ;       ; 5     ; 3.154       ; 44         ; 0.296  ; 1.268  ;
+;    PLL Compensation    ;       ; 1     ; -0.072      ; 0          ; -0.072 ; -0.072 ;
+;   Data                 ;       ;       ;             ;            ;        ;        ;
+;    IC                  ;       ; 1     ; 0.819       ; 75         ; 0.819  ; 0.819  ;
+;    Cell                ;       ; 2     ; 0.273       ; 25         ; 0.000  ; 0.273  ;
+;    uTco                ;       ; 1     ; 0.000       ; 0          ; 0.000  ; 0.000  ;
+;  Required Path         ;       ;       ;             ;            ;        ;        ;
+;   Clock                ;       ;       ;             ;            ;        ;        ;
+;    IC                  ;       ; 6     ; 4.670       ; 55         ; 0.000  ; 2.316  ;
+;    Cell                ;       ; 6     ; 3.802       ; 45         ; 0.265  ; 1.535  ;
++------------------------+-------+-------+-------------+------------+--------+--------+
+Note: Negative delays are omitted from totals when calculating percentages
+
++--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Data Arrival Path                                                                                                                                                                                                                                ;
++---------+----------+----+------+--------+----------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Total   ; Incr     ; RF ; Type ; Fanout ; Location                   ; Element                                                                                                                                                                   ;
++---------+----------+----+------+--------+----------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; 0.000   ; 0.000    ;    ;      ;        ;                            ; launch edge time                                                                                                                                                          ;
+; 7.074   ; 7.074    ;    ;      ;        ;                            ; clock path                                                                                                                                                                ;
+;   0.000 ;   0.000  ;    ;      ;        ;                            ; source latency                                                                                                                                                            ;
+;   0.000 ;   0.000  ;    ;      ; 1      ; PIN_Y13                    ; FPGA_CLK2_50                                                                                                                                                              ;
+;   0.000 ;   0.000  ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1           ; FPGA_CLK2_50~input|i                                                                                                                                                      ;
+;   0.761 ;   0.761  ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1           ; FPGA_CLK2_50~input|o                                                                                                                                                      ;
+;   1.932 ;   1.171  ; RR ; IC   ; 1      ; PLLREFCLKSELECT_X89_Y7_N0  ; emu|u_at_video_pll|pll_system_inst|altera_pll_i|general[0].gpll~PLL_REFCLK_SELECT|clkin[0]                                                                                ;
+;   2.240 ;   0.308  ; RR ; CELL ; 1      ; PLLREFCLKSELECT_X89_Y7_N0  ; emu|u_at_video_pll|pll_system_inst|altera_pll_i|general[0].gpll~PLL_REFCLK_SELECT|clkout                                                                                  ;
+;   2.240 ;   0.000  ; RR ; IC   ; 10     ; FRACTIONALPLL_X89_Y1_N0    ; emu|u_at_video_pll|pll_system_inst|altera_pll_i|general[0].gpll~FRACTIONAL_PLL|refclkin                                                                                   ;
+;   2.168 ;   -0.072 ; RR ; COMP ; 3      ; FRACTIONALPLL_X89_Y1_N0    ; emu|u_at_video_pll|pll_system_inst|altera_pll_i|general[0].gpll~FRACTIONAL_PLL|vcoph[0]                                                                                   ;
+;   2.168 ;   0.000  ; RR ; IC   ; 1      ; PLLOUTPUTCOUNTER_X89_Y2_N1 ; emu|u_at_video_pll|pll_system_inst|altera_pll_i|general[0].gpll~PLL_OUTPUT_COUNTER|vco0ph[0]                                                                              ;
+;   3.436 ;   1.268  ; RR ; CELL ; 1      ; PLLOUTPUTCOUNTER_X89_Y2_N1 ; emu|u_at_video_pll|pll_system_inst|altera_pll_i|general[0].gpll~PLL_OUTPUT_COUNTER|divclk                                                                                 ;
+;   4.382 ;   0.946  ; RR ; IC   ; 1      ; CLKCTRL_G8                 ; emu|u_at_video_pll|pll_system_inst|altera_pll_i|outclk_wire[0]~CLKENA0|inclk                                                                                              ;
+;   4.678 ;   0.296  ; RR ; CELL ; 3454   ; CLKCTRL_G8                 ; emu|u_at_video_pll|pll_system_inst|altera_pll_i|outclk_wire[0]~CLKENA0|outclk                                                                                             ;
+;   6.553 ;   1.875  ; RR ; IC   ; 1      ; FF_X43_Y28_N41             ; emu|u_at_machine|u_devices|u_storage_video|u_video|prebios_video_sync1_q|clk                                                                                              ;
+;   7.074 ;   0.521  ; RR ; CELL ; 1      ; FF_X43_Y28_N41             ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_storage_video:u_storage_video|spk286_at_video_adapter:u_video|prebios_video_sync1_q ;
+; 8.166   ; 1.092    ;    ;      ;        ;                            ; data path                                                                                                                                                                 ;
+;   7.074 ;   0.000  ;    ; uTco ; 1      ; FF_X43_Y28_N41             ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_storage_video:u_storage_video|spk286_at_video_adapter:u_video|prebios_video_sync1_q ;
+;   7.074 ;   0.000  ; RR ; CELL ; 1      ; FF_X43_Y28_N41             ; emu|u_at_machine|u_devices|u_storage_video|u_video|prebios_video_sync1_q|q                                                                                                ;
+;   7.893 ;   0.819  ; RR ; IC   ; 1      ; FF_X43_Y33_N50             ; emu|u_at_machine|u_devices|u_storage_video|u_video|prebios_video_sync2_q|asdata                                                                                           ;
+;   8.166 ;   0.273  ; RR ; CELL ; 1      ; FF_X43_Y33_N50             ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_storage_video:u_storage_video|spk286_at_video_adapter:u_video|prebios_video_sync2_q ;
++---------+----------+----+------+--------+----------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
++--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Data Required Path                                                                                                                                                                                                                               ;
++---------+----------+----+------+--------+----------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; Total   ; Incr     ; RF ; Type ; Fanout ; Location                   ; Element                                                                                                                                                                   ;
++---------+----------+----+------+--------+----------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+; 0.000   ; 0.000    ;    ;      ;        ;                            ; latch edge time                                                                                                                                                           ;
+; 7.199   ; 7.199    ;    ;      ;        ;                            ; clock path                                                                                                                                                                ;
+;   0.000 ;   0.000  ;    ;      ;        ;                            ; source latency                                                                                                                                                            ;
+;   0.000 ;   0.000  ;    ;      ; 1      ; PIN_Y13                    ; FPGA_CLK2_50                                                                                                                                                              ;
+;   0.000 ;   0.000  ; RR ; IC   ; 1      ; IOIBUF_X56_Y0_N1           ; FPGA_CLK2_50~input|i                                                                                                                                                      ;
+;   0.761 ;   0.761  ; RR ; CELL ; 2      ; IOIBUF_X56_Y0_N1           ; FPGA_CLK2_50~input|o                                                                                                                                                      ;
+;   2.096 ;   1.335  ; RR ; IC   ; 1      ; PLLREFCLKSELECT_X89_Y7_N0  ; emu|u_at_video_pll|pll_system_inst|altera_pll_i|general[0].gpll~PLL_REFCLK_SELECT|clkin[0]                                                                                ;
+;   2.429 ;   0.333  ; RR ; CELL ; 1      ; PLLREFCLKSELECT_X89_Y7_N0  ; emu|u_at_video_pll|pll_system_inst|altera_pll_i|general[0].gpll~PLL_REFCLK_SELECT|clkout                                                                                  ;
+;   2.429 ;   0.000  ; RR ; IC   ; 10     ; FRACTIONALPLL_X89_Y1_N0    ; emu|u_at_video_pll|pll_system_inst|altera_pll_i|general[0].gpll~FRACTIONAL_PLL|refclkin                                                                                   ;
+;   2.694 ;   0.265  ; RR ; CELL ; 3      ; FRACTIONALPLL_X89_Y1_N0    ; emu|u_at_video_pll|pll_system_inst|altera_pll_i|general[0].gpll~FRACTIONAL_PLL|vcoph[0]                                                                                   ;
+;   2.694 ;   0.000  ; RR ; IC   ; 1      ; PLLOUTPUTCOUNTER_X89_Y2_N1 ; emu|u_at_video_pll|pll_system_inst|altera_pll_i|general[0].gpll~PLL_OUTPUT_COUNTER|vco0ph[0]                                                                              ;
+;   4.229 ;   1.535  ; RR ; CELL ; 1      ; PLLOUTPUTCOUNTER_X89_Y2_N1 ; emu|u_at_video_pll|pll_system_inst|altera_pll_i|general[0].gpll~PLL_OUTPUT_COUNTER|divclk                                                                                 ;
+;   5.248 ;   1.019  ; RR ; IC   ; 1      ; CLKCTRL_G8                 ; emu|u_at_video_pll|pll_system_inst|altera_pll_i|outclk_wire[0]~CLKENA0|inclk                                                                                              ;
+;   5.570 ;   0.322  ; RR ; CELL ; 3454   ; CLKCTRL_G8                 ; emu|u_at_video_pll|pll_system_inst|altera_pll_i|outclk_wire[0]~CLKENA0|outclk                                                                                             ;
+;   7.886 ;   2.316  ; RR ; IC   ; 1      ; FF_X43_Y33_N50             ; emu|u_at_machine|u_devices|u_storage_video|u_video|prebios_video_sync2_q|clk                                                                                              ;
+;   8.472 ;   0.586  ; RR ; CELL ; 1      ; FF_X43_Y33_N50             ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_storage_video:u_storage_video|spk286_at_video_adapter:u_video|prebios_video_sync2_q ;
+;   7.199 ;   -1.273 ;    ;      ;        ;                            ; clock pessimism removed                                                                                                                                                   ;
+; 7.199   ; 0.000    ;    ;      ;        ;                            ; clock uncertainty                                                                                                                                                         ;
+; 7.199   ; 0.000    ;    ; uTh  ; 1      ; FF_X43_Y33_N50             ; emu_at:emu|spk286_at_machine:u_at_machine|spk286_at_device_router:u_devices|spk286_at_storage_video:u_storage_video|spk286_at_video_adapter:u_video|prebios_video_sync2_q ;
++---------+----------+----+------+--------+----------------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+
+----------------------------
+; Extra Fitter Information ;
+----------------------------
+HTML report is unavailable in plain text report export.
+
+

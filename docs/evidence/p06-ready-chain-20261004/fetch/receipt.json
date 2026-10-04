@@ -1,0 +1,212 @@
+{
+  "status": "FETCH_TURNAROUND_DUAL_PASS",
+  "source_sha256": {
+    "vendor/spk286/rtl/spk286_fetch.sv": "1da4efb3273c690d97acba5f8646a3e40b9588b957e00dfc7d4aa40c66b6af3c",
+    "vendor/spk286/rtl/spk286_prefetch_queue.sv": "7a53a407df6114214a7d3861d7fb94c7f35b094d9e0162ab6789cb46a6bc2e29",
+    "sim/spk286_timing/spk286_fetch_turnaround_tb.sv": "c9c1005a8ff7538c739cb97d590d4d9682bdcf2835223bfa3ac92a375dce1a59",
+    "scripts/test_fetch_turnaround.py": "be11e4d42c2cf6a5ee6c9dfc3c764656d26081b695ba40dd9e193a13b7640dff"
+  },
+  "requires_ready_chain": true,
+  "simulators": [
+    {
+      "simulator": "iverilog",
+      "compile_seconds": 0.034,
+      "run_seconds": 0.067,
+      "cases": [
+        [
+          "1",
+          "even_ready_chain_and_response_reuse"
+        ],
+        [
+          "2",
+          "odd_upper_lane_then_even_word"
+        ],
+        [
+          "3",
+          "odd_code_base_lane_and_ip"
+        ],
+        [
+          "4",
+          "request_grant_suspend_gates"
+        ],
+        [
+          "5",
+          "prepared_hidden_backpressure_unsolicited_ready"
+        ],
+        [
+          "6",
+          "restart_discards_invisible_prepared_request"
+        ],
+        [
+          "7",
+          "visible_cancel_drain_latest_restart"
+        ],
+        [
+          "8",
+          "restart_ready_chain_priority"
+        ],
+        [
+          "9",
+          "last_even_odd_byte_limit_blocks_chain"
+        ],
+        [
+          "10",
+          "protected_word_overflow"
+        ],
+        [
+          "11",
+          "real_word_wrap_ready_chain"
+        ],
+        [
+          "12",
+          "real_odd_byte_wrap_ready_chain"
+        ],
+        [
+          "13",
+          "protected_odd_byte_overflow"
+        ],
+        [
+          "14",
+          "reset_ready_chain_priority"
+        ],
+        [
+          "15",
+          "suspend_retains_prepared_transfer_without_new_admission"
+        ],
+        [
+          "16",
+          "reserved_six_byte_queue_even_odd_streams"
+        ]
+      ],
+      "summary": "FETCH_TURNAROUND_PASS cases=16 checks=3609 cycles=802 completed=231 delivered=230 stale=1 ready_chains=8 hidden=9 queue_bytes=411 require_chain=1",
+      "trace_sha256": "3a2bc1d88a00354a00d35a03b12d3edfb6efea8196436942fd6dcb2d59e906de",
+      "compile_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "run_log_sha256": "822194c2c72c3c6e8c3cbb7e165e8021a4331dcf6ff595a086072bcd7a747f73"
+    },
+    {
+      "simulator": "verilator",
+      "compile_seconds": 40.935,
+      "run_seconds": 0.035,
+      "cases": [
+        [
+          "1",
+          "even_ready_chain_and_response_reuse"
+        ],
+        [
+          "2",
+          "odd_upper_lane_then_even_word"
+        ],
+        [
+          "3",
+          "odd_code_base_lane_and_ip"
+        ],
+        [
+          "4",
+          "request_grant_suspend_gates"
+        ],
+        [
+          "5",
+          "prepared_hidden_backpressure_unsolicited_ready"
+        ],
+        [
+          "6",
+          "restart_discards_invisible_prepared_request"
+        ],
+        [
+          "7",
+          "visible_cancel_drain_latest_restart"
+        ],
+        [
+          "8",
+          "restart_ready_chain_priority"
+        ],
+        [
+          "9",
+          "last_even_odd_byte_limit_blocks_chain"
+        ],
+        [
+          "10",
+          "protected_word_overflow"
+        ],
+        [
+          "11",
+          "real_word_wrap_ready_chain"
+        ],
+        [
+          "12",
+          "real_odd_byte_wrap_ready_chain"
+        ],
+        [
+          "13",
+          "protected_odd_byte_overflow"
+        ],
+        [
+          "14",
+          "reset_ready_chain_priority"
+        ],
+        [
+          "15",
+          "suspend_retains_prepared_transfer_without_new_admission"
+        ],
+        [
+          "16",
+          "reserved_six_byte_queue_even_odd_streams"
+        ]
+      ],
+      "summary": "FETCH_TURNAROUND_PASS cases=16 checks=3609 cycles=802 completed=231 delivered=230 stale=1 ready_chains=8 hidden=9 queue_bytes=411 require_chain=1",
+      "trace_sha256": "36e2ece7c1ac0dbd3e909b32931a732d10eef0b42d982ca922fbbd66b35328f9",
+      "compile_log_sha256": "9242a44f2c229352717f63a0a75bbb221d2d5b26a5d6cefe046d9a2b006fb89f",
+      "run_log_sha256": "b0890b738d76ee4f8bc23a124c683cdc5aff6e134268e104424a8ad18680a2b6"
+    }
+  ],
+  "scope": "Direct production fetch+six-byte queue. Physical CODE response scoreboard, independent byte FIFO, separate ordinary request and chain reservation; no CPU instruction or AT bridge regression claim.",
+  "bounds": {
+    "compile_seconds": 120,
+    "run_seconds": 30,
+    "fabric_cycles": 12000
+  },
+  "trace_comparison": {
+    "rows": 802,
+    "exact_rows_after_first_reset": 801,
+    "policy": "Only the first pre-clock row's uninitialized response state and queue occupancy are inapplicable before reset is sampled. Every other signal/row compares exactly; raw CSVs are preserved.",
+    "ignored_initial_differences": [
+      {
+        "row_index": 0,
+        "field": "response_ip",
+        "iverilog_raw": "xxxx",
+        "verilator_raw": "0000"
+      },
+      {
+        "row_index": 0,
+        "field": "response_count",
+        "iverilog_raw": "x",
+        "verilator_raw": "0"
+      },
+      {
+        "row_index": 0,
+        "field": "response_data",
+        "iverilog_raw": "xxxx",
+        "verilator_raw": "0000"
+      },
+      {
+        "row_index": 0,
+        "field": "response_valid",
+        "iverilog_raw": "x",
+        "verilator_raw": "0"
+      },
+      {
+        "row_index": 0,
+        "field": "queue_count",
+        "iverilog_raw": "x",
+        "verilator_raw": "0"
+      }
+    ]
+  },
+  "negative_control": {
+    "mutation": "Only test instance READY_CHAINING=1 changed to READY_CHAINING=0",
+    "detected": "First READY->next CODE request assertion rejects old turnaround",
+    "source_sha256": "c8ea94a46ec4fccaa572aad69ba43b1f272cfac7427f697eb766f0d8d34d1656",
+    "build_log_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "run_log_sha256": "e3850a6c864e9851113dd503127467fe5b4117ae25dc1cbd90c7764e373439be"
+  }
+}

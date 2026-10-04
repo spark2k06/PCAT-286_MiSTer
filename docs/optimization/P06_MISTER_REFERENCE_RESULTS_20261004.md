@@ -205,3 +205,9 @@ fetch turnaround interacting with the historical bridge admission window.
 This closes the pending trace task; a general fetch optimization and an
 explicit historical Ts epoch contract remain implementation work. No CPU
 timing table, MAX, config or RBF is changed by this diagnosis.
+
+The subsequent [general fetch correction](P06_READY_CHAIN_CORRECTION_20261004.md)
+reduces the reproduced 25 MHz R0 count from 12,300 to 9,734 physical clocks,
+with unchanged workload and nominal timing policy. This removes the simulated
+20/25 MHz inversion; a new MiSTer CSV is required to confirm it in hardware.
+The separate Ts epoch contract and broader historical calibration remain open.

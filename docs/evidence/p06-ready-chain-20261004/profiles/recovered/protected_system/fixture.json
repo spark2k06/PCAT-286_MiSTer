@@ -1,0 +1,41 @@
+{
+  "original": "vendor/spk286/sim/unit/spk286_protected_system_tb.sv",
+  "original_sha256": "c07d1e5ca0369b853471516be4e715726893861c1196fc6113c70a8b53c4d124",
+  "profiled_sha256": "a26a3f910a13e03cfa4587c416236b2f22ce686f92763cbe541d34586db5cb21",
+  "golden_sha256": "be5e0a31b32c0b0816a061c36dafd3b52b2957b2dc24f5097e7f456210cfa5ce",
+  "watchdog_changes": [],
+  "functional_expectations": "unchanged",
+  "fixed_delays": "unchanged",
+  "code_stimulus_adjustments": [
+    {
+      "kind": "historical-only earlier installation of intended code byte",
+      "address": "000197",
+      "value": "CF",
+      "insert_before": "far_restart(16'h0038, 16'h0190);",
+      "inserted_statement": "if (p06_historical_enable) memory[16'h0197] = 8'hCF;",
+      "original_later_patch": "preserved",
+      "reason": "original patch occurs after a retained CODE fetch in a slower EU profile",
+      "evidence": {
+        "trace": "build/p06-profile-compat-focal2-20261004/protected_system/profile-1-iverilog.csv",
+        "code_capture_edge": 97209,
+        "code_address": "000196",
+        "code_payload": "F412",
+        "outer_iret_retirement_edge": 97401,
+        "queue_bytes_at_retirement": 6,
+        "stale_hlt_retirement_edge": 97418
+      },
+      "architectural_expectations": "unchanged",
+      "fixed_delays": "unchanged",
+      "max_stimulus": "unchanged"
+    }
+  ],
+  "trace_normalization": {
+    "pre_reset": [
+      "address=0",
+      "status=0",
+      "hlda=0"
+    ],
+    "input_datain": "observed X/Z input bits map to 0; defined bits preserved; DUT input unchanged",
+    "post_architecture": "none"
+  }
+}

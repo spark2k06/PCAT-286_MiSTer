@@ -1,5 +1,9 @@
 # P06: reproduced R0 slowdown at 25 MHz
 
+The general follow-up correction and its separately measured results are
+recorded in [P06_READY_CHAIN_CORRECTION_20261004.md](P06_READY_CHAIN_CORRECTION_20261004.md).
+The evidence below remains the unchanged-RTL baseline.
+
 ## Result
 
 The original T286REF R0 workload reproduces the user's 25/20 MHz inversion

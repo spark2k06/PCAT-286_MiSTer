@@ -1,0 +1,530 @@
+diff --git a/vendor/spk286/rtl/spk286.sv b/vendor/spk286/rtl/spk286.sv
+index da3aad9..54a1b4c 100644
+--- a/vendor/spk286/rtl/spk286.sv
++++ b/vendor/spk286/rtl/spk286.sv
+@@ -548,11 +548,16 @@ module spk286 (
+                                      (execute_enable ? internal_ip_write_data : ip_write_data);
+     assign effective_flags_write_en = execute_enable ? internal_flags_write_en : flags_write_en;
+ 
+-    // Keep two bytes of bus capacity available. This lets the current fetch
+-    // service preserve both bytes of every word response without a second
+-    // response staging slot in the instruction queue.
++    // Reserve every staged response and the current bus beat before granting
++    // another maximum two-byte fetch. A prepared request cannot complete
++    // until the previous response leaves its slot; total reserved bytes still
++    // fit the six-byte queue even when consumption stops on the next edge.
++    logic [4:0] fetch_reserved_bytes;
++    assign fetch_reserved_bytes = {1'b0, queue_count} +
++        (fetch_response_valid ? {3'b000, fetch_response_count} : 5'd0) +
++        (fetch_bus_valid ? 5'd2 : 5'd0);
+     assign fetch_request_internal = execute_enable && !event_active && !halted && !shutdown && !unsupported_q && !microcode_fault && !operand_blocked &&
+-                                    !protected_fetch_invalid && (queue_count <= 4'd4);
++                                    !protected_fetch_invalid && (fetch_reserved_bytes <= 5'd4);
+     assign fetch_response_ready = execute_enable ? queue_fill_ready : fetch_ready;
+ 
+     spk286_registers registers (
+@@ -722,7 +727,7 @@ module spk286 (
+         .limit_state(real_segment_limits), .access_state(real_segment_access_state)
+     );
+ 
+-    spk286_fetch fetch (
++    spk286_fetch #(.READY_CHAINING(1'b1)) fetch (
+         .clk(clk), .reset(reset), .ready(fetch_bus_ready), .data_in(data_in),
+         .code_base(debug_segment_bases[24 +: 24]),
+         .code_limit(debug_segment_limits[16 +: 16]),
+diff --git a/vendor/spk286/rtl/spk286_fetch.sv b/vendor/spk286/rtl/spk286_fetch.sv
+index 9059450..fbd6d80 100644
+--- a/vendor/spk286/rtl/spk286_fetch.sv
++++ b/vendor/spk286/rtl/spk286_fetch.sv
+@@ -2,7 +2,11 @@
+ // Transaction semantics only: native 80286 Ts/Tc timing is not implemented yet.
+ `timescale 1ns/1ps
+ 
+-module spk286_fetch (
++module spk286_fetch #(
++    // When enabled, request also reserves the returning beat and the next
++    // beat. The CPU caller accounts for queued and staged bytes before grant.
++    parameter logic READY_CHAINING = 1'b0
++) (
+     input  logic        clk,
+     input  logic        reset,
+     input  logic        ready,
+@@ -33,6 +37,8 @@ module spk286_fetch (
+     logic [1:0] request_count_q;
+     logic bhe_n_q;
+     logic [23:0] next_address;
++    logic [16:0] completed_cursor, next_cursor;
++    logic next_blocked;
+     logic single_byte;
+     localparam logic FETCH_CHAINING = 1'b1;
+     wire response_fire = response_valid && response_ready;
+@@ -41,11 +47,22 @@ module spk286_fetch (
+ 
+     assign cursor = cursor_q;
+     assign blocked = (cursor_q[16] && !wrap_ip) || (cursor_q[15:0] > code_limit);
+-    assign next_address = code_base + {8'h00, cursor_q[15:0]};
+-    assign single_byte = next_address[0] || (cursor_q[15:0] == code_limit);
++    assign completed_cursor = wrap_ip ?
++        {1'b0, (request_ip_q + {14'h0000, request_count_q})} :
++        ({1'b0, request_ip_q} + {15'h0000, request_count_q});
++    assign next_cursor = READY_CHAINING && active_q ? completed_cursor : cursor_q;
++    assign next_blocked = (next_cursor[16] && !wrap_ip) ||
++                          (next_cursor[15:0] > code_limit);
++    assign next_address = code_base + {8'h00, next_cursor[15:0]};
++    assign single_byte = next_address[0] || (next_cursor[15:0] == code_limit);
+     assign request_ready = !reset && !restart && !restart_pending_q &&
+-                           !active_q && response_slot_available && !blocked;
+-    assign bus_valid = active_q && !reset;
++                           (!active_q || (READY_CHAINING && bus_valid && ready && !canceled_q)) &&
++                           response_slot_available && !next_blocked;
++    // A prepared request stays invisible until the preceding response can
++    // leave its only slot. Once offered, that slot is empty until completion,
++    // so READY/backpressure cannot withdraw an outstanding bus transaction.
++    assign bus_valid = active_q && !reset &&
++                       (!READY_CHAINING || response_slot_available);
+     assign address = bus_valid ? address_q : 24'h000000;
+     assign bus_bhe_n = bus_valid ? bhe_n_q : 1'b1;
+ 
+@@ -68,7 +85,7 @@ module spk286_fetch (
+             cursor_q <= {1'b0, restart_ip};
+             restart_pending_q <= 1'b1;
+             response_valid <= 1'b0;
+-            if (active_q && !ready) canceled_q <= 1'b1;
++            if (active_q && bus_valid && !ready) canceled_q <= 1'b1;
+             else begin
+                 active_q <= 1'b0;
+                 canceled_q <= 1'b0;
+@@ -76,7 +93,7 @@ module spk286_fetch (
+         end else begin
+             if (response_fire) response_valid <= 1'b0;
+             if (active_q) begin
+-                if (ready) begin
++                if (bus_valid && ready) begin
+                     active_q <= 1'b0;
+                     canceled_q <= 1'b0;
+                     if (!canceled_q) begin
+@@ -89,21 +106,30 @@ module spk286_fetch (
+                         // Real-mode IP is a 16-bit register and wraps after FFFF.
+                         // Protected fetches retain the 17th bit so an over-limit
+                         // stream is reported instead of silently restarting.
+-                        if (wrap_ip)
+-                            cursor_q <= {1'b0, request_ip_q + {14'h0000, request_count_q}};
+-                        else
+-                            cursor_q <= {1'b0, request_ip_q} + {15'h0000, request_count_q};
++                        cursor_q <= completed_cursor;
++                        if (READY_CHAINING && !suspend && request &&
++                            response_slot_available && !next_blocked) begin
++                            // Capture the next address on the old READY edge.
++                            // Its bus offer is separately qualified by the
++                            // response slot, never by anticipating READY.
++                            active_q <= 1'b1;
++                            address_q <= next_address;
++                            request_ip_q <= next_cursor[15:0];
++                            request_count_q <= single_byte ? 2'd1 : 2'd2;
++                            bhe_n_q <= single_byte && !next_address[0];
++                        end
+                     end
+                 end
+             end else if (!suspend && response_slot_available && !blocked &&
+                          (restart_pending_q || request)) begin
+-                // P02 may retire the response and capture the next fetch on
+-                // the same edge; the base profile keeps the old bubble.
++                // Retire a staged response and capture an ordinary request
++                // on the same edge. READY chaining additionally prepares that
++                // request on the preceding completion edge when reserved.
+                 active_q <= 1'b1;
+                 canceled_q <= 1'b0;
+                 restart_pending_q <= 1'b0;
+                 address_q <= next_address;
+-                request_ip_q <= cursor_q[15:0];
++                request_ip_q <= next_cursor[15:0];
+                 request_count_q <= single_byte ? 2'd1 : 2'd2;
+                 bhe_n_q <= single_byte && !next_address[0];
+             end
+diff --git a/vendor/spk286/rtl/timed/generation.json b/vendor/spk286/rtl/timed/generation.json
+index 5fcecdd..90f4f56 100644
+--- a/vendor/spk286/rtl/timed/generation.json
++++ b/vendor/spk286/rtl/timed/generation.json
+@@ -1,16 +1,54 @@
+ {
+   "status": "PROFILED_CPU_GENERATED_NOT_ACCEPTED",
+   "sources_sha256": {
+-    "vendor/spk286/rtl/spk286.sv": "10273776b109037657ecb9cbf21dc7256343a20c1dfe53188b9826fdb30cb483",
+-    "vendor/spk286/rtl/spk286_events.sv": "fb5253389daf3e69338a9aed2e3dfcb0d2352a4ac1e48b07baea3c68ea60fa9d",
+     "vendor/spk286/microcode/generated/spk286_microcode_pkg.sv": "fedea94b3d1435a77765aa425926ba8efecabdc0806092a7894c6a1b38d85afe",
+-    "scripts/build_p06_profile_cpu.py": "c4dc329c31ab591baa2d693b03ff786c5aa6ce96b3084c885b1d56eaee6dad41",
++    "vendor/spk286/microcode/generated/spk286_microcode_rom.sv": "a8d40ae8395de692a3d21da9d31ab956e7d6226aa2c2a113ea4d01e85a97bcd0",
++    "vendor/spk286/microcode/generated/spk286_microcode_sync_rom.sv": "774c1d5a9f2077d691e1f3708f8a300b8eb7dd31a81e93b9ef643deaa6473638",
++    "vendor/spk286/rtl/spk286_protected_pkg.sv": "1e4d70a8c9c068402af7441a792e58a1e9e5545d6ba2edb40c236fd93547877f",
++    "vendor/spk286/rtl/spk286_tss_pkg.sv": "04d2c46e1ed5be52f7822b9d948da11860c6ec4d419b2c1cfddf6a834ea09592",
++    "vendor/spk286/rtl/spk286.sv": "9a04d8b46b4fab359ba6739b159444925b4118df51e26227e62f9b584db5f046",
++    "vendor/spk286/rtl/spk286_adjust.sv": "dfa7b1ffcfa3278d0ae9baf58c9a63f8190cb4146bd385194d296b78ae3ceb58",
++    "vendor/spk286/rtl/spk286_alu.sv": "103cd07b5a3ae79e96b2bb42aa0eb411ba1b4ee6261f7e5f9cfbc5a41f21d232",
++    "vendor/spk286/rtl/spk286_alu_decode.sv": "633b8daad1036370e5b9070d86c64a8a610b026113dc373998eb91030e2cc2a2",
++    "vendor/spk286/rtl/spk286_biu.sv": "0c17999947f7d3ed4e044e10893516d9dfd1ed30a3b4af1578dcc6cfc8202d33",
++    "vendor/spk286/rtl/spk286_condition.sv": "2885a31a13ad49c64460a329b640d4329725c7c8ce82cc0b983148563e9431a9",
++    "vendor/spk286/rtl/spk286_control_decode.sv": "d56e5de2a0f89f017fc96bb91a85e872dd4b8478d8858f61a7bdc540664860df",
++    "vendor/spk286/rtl/spk286_decoder.sv": "6afedc009dabbad5947fe888cafc4c2af09b4cc4a15eed8e8082b529c96516f0",
++    "vendor/spk286/rtl/spk286_descriptor.sv": "cf6ab285f3be15332eb32868571f879c66b5b3c7d250fd5ea1d05b909c36ea5d",
++    "vendor/spk286/rtl/spk286_effective_address.sv": "cb2ec2959b616f92594353a36ecea7e0af18774b32d4cd9a7e547fd28516d988",
++    "vendor/spk286/rtl/spk286_events.sv": "fb5253389daf3e69338a9aed2e3dfcb0d2352a4ac1e48b07baea3c68ea60fa9d",
++    "vendor/spk286/rtl/spk286_fetch.sv": "1da4efb3273c690d97acba5f8646a3e40b9588b957e00dfc7d4aa40c66b6af3c",
++    "vendor/spk286/rtl/spk286_flags_decode.sv": "81527f7053df20cdb32a4a56c499bfaa3abea65e1e956530c1f15ea3b2d032ed",
++    "vendor/spk286/rtl/spk286_instruction_context.sv": "1a17b502e71e13d8520bd3f31cf42f69685a4d49155ae3c0f02c9882729b3aa7",
++    "vendor/spk286/rtl/spk286_loadall_service.sv": "f32239d7b48abbfad8d5798d2b62aa84fb5ba6a54b748342240afa9e42f6d617",
++    "vendor/spk286/rtl/spk286_micro_executor.sv": "df68b9fe22d0ce01837b587f0cb187f4c01a23d23f37dada9b562b4ccb24a1bc",
++    "vendor/spk286/rtl/spk286_microsequencer.sv": "160587b4221faf89b5742f9d52c7a3451045a6aa5cefb1dcedd3a05159e23b8c",
++    "vendor/spk286/rtl/spk286_modrm.sv": "621ab5d58c2f8877559d151d0e270f0062ac069cd781e3c7ac9a8565c3d7193c",
++    "vendor/spk286/rtl/spk286_muldiv.sv": "0816c915198cd2433aec9a74695b90ad398f9a29a39eef8b1e7858810192682f",
++    "vendor/spk286/rtl/spk286_operand.sv": "d81b58b5755a88aa18f8dcb6506bbd8bf3248b6f6c1c5f51dd3981e222729f65",
++    "vendor/spk286/rtl/spk286_operand_decode.sv": "1121b175eb793a1309cdb5c6f7c2145de1ec8c90d9d99a9139726986752e091a",
++    "vendor/spk286/rtl/spk286_prefetch_queue.sv": "7a53a407df6114214a7d3861d7fb94c7f35b094d9e0162ab6789cb46a6bc2e29",
++    "vendor/spk286/rtl/spk286_protected_state.sv": "fff4a24b02ab9499c64fd22037c4746f69726e34a7ded03d96b8baefef387014",
++    "vendor/spk286/rtl/spk286_registers.sv": "c395b673525c79b206b8555c4b71b42e037914b5851f2513e018985fcaa245df",
++    "vendor/spk286/rtl/spk286_segments.sv": "099b8210c1f2eaf3252db7ac0eadb1481d038f73c72972141761d396b8544a4a",
++    "vendor/spk286/rtl/spk286_selector.sv": "cd003eaccbb361fece41fa4fff352015d4d2e2723ed7656bfdf4457b40af4c33",
++    "vendor/spk286/rtl/spk286_shift.sv": "722482adde5777f89947ec03572f183436db4dfa8f6e599ab972f5eb55f108fc",
++    "vendor/spk286/rtl/spk286_stack.sv": "30c94c57730dd333ba4533193b805891a9eb5ce772bf9e263e608224662be577",
++    "vendor/spk286/rtl/spk286_stack_range.sv": "e59f5f231422eca0f8ea0016b4fa65b714a66d0d694eb8b38c44683f68f60fea",
++    "vendor/spk286/rtl/spk286_system_0f.sv": "4bcc57a0d233888ac9a7bd73a35d6126a164b33a34851908f3a14ee9f0fb5a9e",
++    "vendor/spk286/rtl/spk286_task_segment_service.sv": "083823336285dcf44cbe586ea31d78f861cae60a9ad66a45c6b3d0322d51d620",
++    "vendor/spk286/rtl/spk286_task_switch_service.sv": "73eb067716965144ac9dd3ea63632913758710395b6f0908cbe5561470c922e5",
++    "vendor/spk286/rtl/spk286_timing_policy.sv": "479b333fca7ef32b409b6f12cb7bfa3d016d6d4259bc09495959794bdf95e4d3",
++    "vendor/spk286/rtl/spk286_timing_trace.sv": "37e8e3ffdc726558cb80dc08f62e6b849d30a9d1cd58d5bc15779670eff0daf1",
++    "vendor/spk286/rtl/spk286_tss_descriptor_service.sv": "b48f687c7e77b6383709ceaf8362b0846902e1da9905234b0a95321ddafc4ed0",
++    "vendor/spk286/rtl/spk286_tss_service.sv": "e720c9ad15449983febda2b3a8c4171f169a74f94586b9cc1ca4a14fd23acdda",
++    "scripts/build_p06_profile_cpu.py": "d5a89e1ee29206fcdeaa041a6a18a220cea43b896506696458152ebc7fa59027",
+     "rtl/spk286_timing/spk286_instruction_schedule.sv": "e27dd87bf0c5c8c9c02e7d0ad77b32201e8f666dee336bed0920a86373540307",
+     "rtl/spk286_timing/spk286_instruction_timing.sv": "41d901063422f6e3532a2fb9653d21a281b0af85d6274334dcca29ec3db4ff02"
+   },
+   "generated_sha256": {
+-    "spk286_profiled.sv": "f45787c2e5e30ae94370ba164ddbf3f1d8058ef52a023c05355131aea3755501",
++    "spk286_profiled.sv": "847a6930469e67d7345847e39f57ab51a5fe3556c73f8741d5e9c7d69c6038c7",
+     "spk286_profiled_events.sv": "a158e55b5b0a66060784c4901576fb717842cc9a009e3656d5feaaf76b51fbef"
+   },
+-  "scope": "Single selected functional core; provisional instruction intervals and logical bus supplied by integration; original vendor and private pilots unchanged"
++  "scope": "Single selected functional core with reserved READY chaining; provisional instruction intervals and logical bus supplied by integration; private pilot evidence unchanged"
+ }
+diff --git a/vendor/spk286/rtl/timed/spk286_profiled.sv b/vendor/spk286/rtl/timed/spk286_profiled.sv
+index cd2da03..3582e18 100644
+--- a/vendor/spk286/rtl/timed/spk286_profiled.sv
++++ b/vendor/spk286/rtl/timed/spk286_profiled.sv
+@@ -734,11 +734,16 @@ module spk286_profiled (
+                                      (execute_enable ? internal_ip_write_data : ip_write_data);
+     assign effective_flags_write_en = execute_enable ? internal_flags_write_en : flags_write_en;
+ 
+-    // Keep two bytes of bus capacity available. This lets the current fetch
+-    // service preserve both bytes of every word response without a second
+-    // response staging slot in the instruction queue.
++    // Reserve every staged response and the current bus beat before granting
++    // another maximum two-byte fetch. A prepared request cannot complete
++    // until the previous response leaves its slot; total reserved bytes still
++    // fit the six-byte queue even when consumption stops on the next edge.
++    logic [4:0] fetch_reserved_bytes;
++    assign fetch_reserved_bytes = {1'b0, queue_count} +
++        (fetch_response_valid ? {3'b000, fetch_response_count} : 5'd0) +
++        (fetch_bus_valid ? 5'd2 : 5'd0);
+     assign fetch_request_internal = execute_enable && !event_active && !halted && !shutdown && !unsupported_q && !microcode_fault && !operand_blocked &&
+-                                    !protected_fetch_invalid && (queue_count <= 4'd4);
++                                    !protected_fetch_invalid && (fetch_reserved_bytes <= 5'd4);
+     assign fetch_response_ready = execute_enable ? queue_fill_ready : fetch_ready;
+ 
+     spk286_registers registers (
+@@ -908,7 +913,7 @@ module spk286_profiled (
+         .limit_state(real_segment_limits), .access_state(real_segment_access_state)
+     );
+ 
+-    spk286_fetch fetch (
++    spk286_fetch #(.READY_CHAINING(1'b1)) fetch (
+         .clk(clk), .reset(reset), .ready(fetch_bus_ready), .data_in(data_in),
+         .code_base(debug_segment_bases[24 +: 24]),
+         .code_limit(debug_segment_limits[16 +: 16]),
+diff --git a/vendor/spk286/sim/unit/spk286_adjust_instructions_tb.sv b/vendor/spk286/sim/unit/spk286_adjust_instructions_tb.sv
+index 869f5ae..aff480f 100644
+--- a/vendor/spk286/sim/unit/spk286_adjust_instructions_tb.sv
++++ b/vendor/spk286/sim/unit/spk286_adjust_instructions_tb.sv
+@@ -70,7 +70,10 @@ module spk286_adjust_instructions_tb;
+         if (waiting) check(bus_valid && address == held_address && data_out == held_data &&
+                            bus_status == held_status && bus_write == held_write && bus_bhe_n == held_bhe,
+                            "READY retains transaction owner and data");
+-        ready = bus_valid && wait_count >= wait_length;
++        // Exercise genuine radix-byte starvation even when READY chaining
++        // overlaps the next CODE request. Keep operand READY latencies and all
++        // architectural expectations from the independent vectors unchanged.
++        ready = bus_valid && wait_count >= wait_length + (bus_status == 4'hD ? 16 : 0);
+         waiting = bus_valid && !ready;
+         if (waiting) begin
+             held_address = address; held_data = data_out; held_status = bus_status;
+diff --git a/vendor/spk286/tests/test_microcode_immediate_execution.py b/vendor/spk286/tests/test_microcode_immediate_execution.py
+index 6f38b76..04b06f7 100644
+--- a/vendor/spk286/tests/test_microcode_immediate_execution.py
++++ b/vendor/spk286/tests/test_microcode_immediate_execution.py
+@@ -4,6 +4,7 @@ import unittest
+ 
+ from tools.microcode.compile_microcode import ROOT, CompileError, compile_sources, encode, generate
+ from tools.microcode.audit_microcode import canonical_source, read_generated_words
++from tests.test_microcode_register_execution import standalone_catalog_words
+ 
+ 
+ REPLACEMENTS = {
+@@ -24,21 +25,24 @@ class ImmediateExecutionMicrocodeTests(unittest.TestCase):
+             pc = old['entries'][name] + offset
+             self.assertEqual(expected[pc], before)
+             expected[pc] = after
+-        # This is the frozen format-23 contract, independent of later controls.
+-        sources = {'format23.mc': canonical_source(active['words'], active['entries'],
++        # Retain the frozen format-23 delta, translating only the independently
++        # asserted historical LOADALL/SALC catalog before current decoding.
++        self.assertEqual(active['words'], expected)
++        current_words = standalone_catalog_words(self, active)
++        current_expected = standalone_catalog_words(self, {**old, 'words': expected})
++        sources = {'format23.mc': canonical_source(current_words, active['entries'],
+                     active['labels'], {int(k): v for k, v in active['branch_targets'].items()})}
+         program = compile_sources(sources)
+         artifacts = generate(program)
+         words = read_generated_words(artifacts['spk286_microcode_pkg.sv'], artifacts['spk286_microcode_rom.sv'])
+-        self.assertEqual(list(words), expected)
+-        self.assertEqual(active['words'], expected)
++        self.assertEqual(list(words), current_expected)
+         self.assertEqual(program.entries, old['entries'])
+         self.assertEqual(program.labels, old['labels'])
+         self.assertEqual({str(k): v for k, v in program.branch_targets.items()}, old['branch_targets'])
+         self.assertEqual((program.format_version, program.word_width), (23, 8))
+         rebuilt = compile_sources({'canonical.mc': canonical_source(
+             words, program.entries, program.labels, program.branch_targets)})
+-        self.assertEqual([encode(op) for op in rebuilt.operations], expected)
++        self.assertEqual([encode(op) for op in rebuilt.operations], current_expected)
+ 
+     def test_every_control_rejects_inconsistent_or_partial_protocol(self):
+         sources = {p.name: p.read_text() for p in (ROOT/'microcode/source').glob('*.mc')}
+diff --git a/vendor/spk286/tests/test_microcode_io.py b/vendor/spk286/tests/test_microcode_io.py
+index 017afd8..5c0b555 100644
+--- a/vendor/spk286/tests/test_microcode_io.py
++++ b/vendor/spk286/tests/test_microcode_io.py
+@@ -5,16 +5,30 @@ import tempfile
+ import unittest
+ from tools.microcode.compile_microcode import ROOT,CompileError,compile_sources,generate,emit
+ from tools.microcode.audit_microcode import canonical_source,read_generated_words,read_generated_branches
++from tests.test_microcode_register_execution import standalone_catalog_words
+ 
+ class IoMicrocodeTests(unittest.TestCase):
+     def test_literal_image_and_generated_roundtrip(self):
+-        # Keep the pre-SALC LOADALL image independent from the active source.
+-        sources=json.loads((ROOT/'tests/fixtures/microcode_phase9_loadall_sources.json').read_text())
+-        program=compile_sources(sources);artifacts=generate(program)
++        # The historical phase-9 fixture includes SALC (723 words), while this
++        # IO contract deliberately covers its pre-SALC predecessor (719). The
++        # old *_sources.json is absent. Derive only the independently asserted
++        # four-word suffix removal and catalog translation from frozen words,
++        # not from the active .mc sources or generated candidate ROM.
+         fixture=json.loads((ROOT/'tests/fixtures/microcode_phase9_loadall.json').read_text())
++        migrated=standalone_catalog_words(self,fixture)
++        self.assertEqual(len(migrated),723)
++        self.assertEqual(fixture['entries']['LOAD_CARRY_BYTE'],719)
++        self.assertEqual(migrated[719:],[30,172,54,3])
++        expected=migrated[:719]
++        entries={name:pc for name,pc in fixture['entries'].items() if name!='LOAD_CARRY_BYTE'}
++        self.assertTrue(all(pc<719 for pc in fixture['labels'].values()))
++        self.assertTrue(all(int(pc)<719 and target<719 for pc,target in fixture['branch_targets'].items()))
++        sources={'pre_salc_format21.mc':canonical_source(expected,entries,fixture['labels'],
++                    {int(k):v for k,v in fixture['branch_targets'].items()})}
++        program=compile_sources(sources);artifacts=generate(program)
+         words=read_generated_words(artifacts['spk286_microcode_pkg.sv'],artifacts['spk286_microcode_rom.sv']);branches=read_generated_branches(artifacts['spk286_microcode_pkg.sv'])
+         self.assertEqual((program.format_version,program.word_width,program.address_width,len(words)),(21,8,10,719))
+-        self.assertEqual(list(words),fixture['words']);self.assertEqual(program.entries,fixture['entries']);self.assertEqual(program.labels,fixture['labels'])
++        self.assertEqual(list(words),expected);self.assertEqual(program.entries,entries);self.assertEqual(program.labels,fixture['labels'])
+         self.assertEqual(branches,{435: 445, 437: 443, 442: 438, 576: 583, 582: 577, 584: 594, 593: 585, 595: 601, 600: 597, 602: 608, 607: 603, 609: 618, 617: 610, 635: 642, 641: 637, 643: 650, 649: 645, 651: 658, 657: 653, 659: 666, 665: 661})
+         rebuilt=compile_sources({'canonical.mc':canonical_source(words,program.entries,program.labels,branches)})
+         self.assertEqual([op.operation for op in rebuilt.operations],[op.operation for op in program.operations])
+diff --git a/vendor/spk286/tests/test_microcode_loadall.py b/vendor/spk286/tests/test_microcode_loadall.py
+index 4b2e5f4..8add5d4 100644
+--- a/vendor/spk286/tests/test_microcode_loadall.py
++++ b/vendor/spk286/tests/test_microcode_loadall.py
+@@ -7,14 +7,16 @@ from tools.microcode.compile_microcode import (
+ from tools.microcode.audit_microcode import canonical_source, read_generated_words
+ 
+ 
+-NAME = 'zzzzzzzzzzzzzzzzzz_loadall.mc'
++# Source names/catalog were aligned with the standalone CPU in the accepted
++# 2026-09-30 targeted-fixes milestone; LOADALL is now literal control 171.
++NAME = 'zzzzzzzzzzzzzzzzzzzz_loadall.mc'
+ 
+ 
+ class LoadallMicrocodeTests(unittest.TestCase):
+     def test_atomic_protocol(self):
+         source = (ROOT / 'microcode/source' / NAME).read_text()
+         program = compile_sources({NAME: source})
+-        self.assertEqual([encode(op) for op in program.operations], [172, 3])
++        self.assertEqual([encode(op) for op in program.operations], [171, 3])
+         for changed in (
+             source.replace('21', '20'),
+             source.replace('    LOADALL\n', ''),
+@@ -31,7 +33,7 @@ class LoadallMicrocodeTests(unittest.TestCase):
+         current = compile_sources(sources)
+         words = [encode(op) for op in current.operations]
+         start = current.entries['LOADALL']
+-        self.assertEqual(words[start:start + 2], [172, 3])
++        self.assertEqual(words[start:start + 2], [171, 3])
+         self.assertEqual(words[:start] + words[start + 2:],
+                          [encode(op) for op in previous.operations])
+         for name, address in previous.entries.items():
+diff --git a/vendor/spk286/tests/test_microcode_register_execution.py b/vendor/spk286/tests/test_microcode_register_execution.py
+index 56ae00f..815a498 100644
+--- a/vendor/spk286/tests/test_microcode_register_execution.py
++++ b/vendor/spk286/tests/test_microcode_register_execution.py
+@@ -29,6 +29,25 @@ instruction ADD_OR_MEMORY:
+ '''
+ 
+ 
++def standalone_catalog_words(test, fixture):
++    """Explicitly migrate the two controls in the frozen PCAT catalog.
++
++    Historical fixtures retain CARRY_FILL8=171/LOADALL=172. The accepted
++    standalone catalog/audit uses LOADALL=171/CARRY_FILL8=172. Assert the
++    complete old protocols and exact affected positions before translating;
++    all other words, addresses, labels and branches remain frozen evidence.
++    """
++    words = fixture['words'].copy()
++    loadall = fixture['entries']['LOADALL']
++    carry = fixture['entries']['LOAD_CARRY_BYTE']
++    test.assertEqual(words[loadall:loadall+2], [172, 3])
++    test.assertEqual(words[carry:carry+4], [30, 171, 54, 3])
++    test.assertEqual({pc for pc, word in enumerate(words) if word in (171, 172)},
++                     {loadall, carry+1})
++    words[loadall], words[carry+1] = 171, 172
++    return words
++
++
+ class RegisterExecutionMicrocodeTests(unittest.TestCase):
+     def test_register_decode_controls_change(self):
+         baseline = json.loads((ROOT / 'tests/fixtures/microcode_phase9_loadall.json').read_text())
+@@ -38,21 +57,25 @@ class RegisterExecutionMicrocodeTests(unittest.TestCase):
+             address = baseline['entries'][entry]
+             self.assertEqual(expected[address], old_code)
+             expected[address] = code
+-        sources = {'format22.mc': canonical_source(active['words'], active['entries'],
++        # Compare the original literal delta before its versioned catalog
++        # translation. The compiler does not supply the expected fixture words.
++        self.assertEqual(active['words'], expected)
++        current_words = standalone_catalog_words(self, active)
++        current_expected = standalone_catalog_words(self, {**baseline, 'words': expected})
++        sources = {'format22.mc': canonical_source(current_words, active['entries'],
+                                                   active['labels'], {int(k): v for k, v in active['branch_targets'].items()})}
+         program = compile_sources(sources)
+         artifacts = generate(program)
+         words = read_generated_words(artifacts['spk286_microcode_pkg.sv'],
+                                      artifacts['spk286_microcode_rom.sv'])
+-        self.assertEqual(list(words), expected)
+-        self.assertEqual(active['words'], expected)
++        self.assertEqual(list(words), current_expected)
+         self.assertEqual(program.entries, baseline['entries'])
+         self.assertEqual(program.labels, baseline['labels'])
+         self.assertEqual({str(k): v for k, v in program.branch_targets.items()}, baseline['branch_targets'])
+         self.assertEqual((program.format_version, program.word_width), (22, 8))
+         rebuilt = compile_sources({'canonical.mc': canonical_source(
+             words, program.entries, program.labels, program.branch_targets)})
+-        self.assertEqual([encode(op) for op in rebuilt.operations], expected)
++        self.assertEqual([encode(op) for op in rebuilt.operations], current_expected)
+ 
+     def test_register_and_memory_paths_must_agree(self):
+         mutations = (
+diff --git a/vendor/spk286/tests/test_microcode_salc.py b/vendor/spk286/tests/test_microcode_salc.py
+index 6a69243..52948cb 100644
+--- a/vendor/spk286/tests/test_microcode_salc.py
++++ b/vendor/spk286/tests/test_microcode_salc.py
+@@ -3,14 +3,16 @@ import unittest
+ from tools.microcode.compile_microcode import ROOT, CompileError, compile_sources, generate, encode, emit
+ from tools.microcode.audit_microcode import canonical_source, read_generated_words
+ 
+-NAME = 'zzzzzzzzzzzzzzzzzz_salc.mc'
++# The accepted standalone catalog assigns LOADALL=171 and CARRY_FILL8=172.
++# Only allocation/source naming changed; the four-operation SALC protocol did not.
++NAME = 'zzzzzzzzzzzzzzzzzzzzz_salc.mc'
+ 
+ 
+ class SalcMicrocodeTests(unittest.TestCase):
+     def test_encoding_and_flags_preservation_protocol(self):
+         source = (ROOT / 'microcode/source' / NAME).read_text()
+         program = compile_sources({NAME: source})
+-        self.assertEqual([encode(op) for op in program.operations], [30, 171, 54, 3])
++        self.assertEqual([encode(op) for op in program.operations], [30, 172, 54, 3])
+         self.assertEqual(program.entries, {'LOAD_CARRY_BYTE': 0})
+         for line in ('    READ_FLAGS -> TMP0\n', '    CARRY_FILL8 TMP0\n',
+                      '    TMP0 -> DST8\n', '    END\n'):
+@@ -36,7 +38,7 @@ class SalcMicrocodeTests(unittest.TestCase):
+         artifacts = generate(current)
+         words = read_generated_words(artifacts['spk286_microcode_pkg.sv'],
+                                      artifacts['spk286_microcode_rom.sv'])
+-        self.assertEqual(list(words[-4:]), [30, 171, 54, 3])
++        self.assertEqual(list(words[-4:]), [30, 172, 54, 3])
+         rebuilt = compile_sources({'canonical.mc': canonical_source(
+             words, current.entries, current.labels, current.branch_targets)})
+         self.assertEqual([encode(op) for op in rebuilt.operations], list(words))
+diff --git a/vendor/spk286/tests/test_microcode_system_access.py b/vendor/spk286/tests/test_microcode_system_access.py
+index 5d66684..491d85a 100644
+--- a/vendor/spk286/tests/test_microcode_system_access.py
++++ b/vendor/spk286/tests/test_microcode_system_access.py
+@@ -3,26 +3,32 @@ import unittest
+ 
+ from tools.microcode.compile_microcode import ROOT, CompileError, compile_sources, encode, generate
+ from tools.microcode.audit_microcode import canonical_source, read_generated_words
++from tests.test_microcode_register_execution import standalone_catalog_words
+ 
+ 
+ class SystemAccessMicrocodeTests(unittest.TestCase):
+     def test_frozen_h01_rom_adds_only_the_eight_documented_checks(self):
+         old = json.loads((ROOT / 'tests/fixtures/microcode_immediate_execution.json').read_text())
++        # The format-24 fixture already has the standalone catalog. Preserve
++        # the independent format-23 words and migrate only its two asserted
++        # LOADALL/SALC controls before deriving the eight H01 insertions.
++        old_words = standalone_catalog_words(self, old)
+         additions = {
+             'SYSTEM_STORE_LDTR': (0, 193), 'SYSTEM_STORE_TR': (0, 193),
+             'SYSTEM_LOAD_LDTR': (0, 194), 'SYSTEM_LOAD_TR': (0, 194),
+             'SYSTEM_VERIFY_READ': (0, 193), 'SYSTEM_VERIFY_WRITE': (0, 193),
+             'SYSTEM_LOAD_ACCESS': (1, 193), 'SYSTEM_LOAD_LIMIT': (1, 193),
+         }
+-        expected_words, expected_entries = [], {}
++        expected_words, expected_entries, positions = [], {}, []
+         entries = sorted(old['entries'].items(), key=lambda item: item[1])
+         for index, (name, address) in enumerate(entries):
+             expected_entries[name] = len(expected_words)
+             end = entries[index + 1][1] if index + 1 < len(entries) else len(old['words'])
+-            body = old['words'][address:end].copy()
++            body = old_words[address:end].copy()
+             if name in additions:
+                 offset, code = additions[name]
+                 body.insert(offset, code)
++                positions.append(address + offset)
+             expected_words.extend(body)
+         frozen = json.loads((ROOT / 'tests/fixtures/microcode_system_access.json').read_text())
+         program = compile_sources({'format24.mc': canonical_source(frozen['words'], frozen['entries'],
+@@ -31,6 +37,15 @@ class SystemAccessMicrocodeTests(unittest.TestCase):
+         self.assertEqual(program.entries, expected_entries)
+         self.assertEqual(frozen['words'], expected_words)
+         self.assertEqual(frozen['entries'], expected_entries)
++        def shifted(pc):
++            return pc + sum(position <= pc for position in positions)
++        labels = {name: shifted(pc) for name, pc in old['labels'].items()}
++        branches = {shifted(int(pc)): shifted(target)
++                    for pc, target in old['branch_targets'].items()}
++        self.assertEqual(program.labels, labels)
++        self.assertEqual(program.branch_targets, branches)
++        self.assertEqual(frozen['labels'], labels)
++        self.assertEqual({int(pc): target for pc, target in frozen['branch_targets'].items()}, branches)
+         generated = generate(program)
+         words = read_generated_words(generated['spk286_microcode_pkg.sv'], generated['spk286_microcode_rom.sv'])
+         rebuilt = compile_sources({'canonical.mc': canonical_source(words, program.entries, program.labels, program.branch_targets)})
+diff --git a/vendor/spk286/tools/microcode/compile_microcode.py b/vendor/spk286/tools/microcode/compile_microcode.py
+index 3d854ca..8255a5e 100644
+--- a/vendor/spk286/tools/microcode/compile_microcode.py
++++ b/vendor/spk286/tools/microcode/compile_microcode.py
+@@ -647,7 +647,7 @@ def validate_block(block: Block) -> None:
+     if block.location.entry == 'LOAD_CARRY_BYTE' or 'CARRY_FILL8' in names:
+         validate_carry_byte_block(block)
+         return
+-    if 'LOADALL' in names:
++    if block.location.entry == 'LOADALL' or 'LOADALL' in names:
+         validate_loadall_block(block)
+         return
+     if block.location.entry.startswith('SYSTEM_'):

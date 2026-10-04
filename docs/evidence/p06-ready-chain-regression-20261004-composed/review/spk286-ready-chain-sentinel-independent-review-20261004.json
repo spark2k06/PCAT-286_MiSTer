@@ -1,0 +1,42 @@
+{
+  "status": "STANDALONE_SENTINEL_ADAPTER_INDEPENDENT_REVIEW_PASS",
+  "scope": "Read-only patch and focused receipt/log integrity review. No new simulation, source mutation or standalone commit by reviewer; not full standalone regression or architectural release.",
+  "reviewer_source_sha256": "923d3119216da18efeb6641d7677ddaa1ce176e5e82f2234854f6a9e6a63b4f4",
+  "evidence_manifest_sha256": "ca92a008855c6a0c25e3555e999e9d57d623e7a86883fab51e85313708d2a809",
+  "reviewed_patch_sha256": "a1fc8ed46b3fedd61983369fae362949833929b91403bb33e54ffb3da0f82d41",
+  "reviewed_portable_contract_patch_sha256": "7e120e253b46808fd29ed7dbc9383c7cfd8a5f6a49cb73a45a58772081b7165e",
+  "focused_receipt_sha256": "398e065f62abedc9ba8c6cb4673503701747d40cadaa0c873e5064175220801c",
+  "bound_artifacts": 16,
+  "microcode": {
+    "original_mov_vectors": 48,
+    "actual_ud_acceptances_per_simulator": 48,
+    "fault_origins": {
+      "0103": 24,
+      "0104": 24
+    },
+    "cycles": [
+      2,
+      3
+    ],
+    "retirements": 1,
+    "mov_stream": 8,
+    "cancellation_reset_resume_boundaries": 3,
+    "checks_per_simulator": 5512,
+    "underfill_cycles_per_simulator": 382,
+    "identical_recorded_sentinel_traces": true
+  },
+  "execution": {
+    "retained_fault_ip": "0200",
+    "actual_ud_acceptance_cycles_per_simulator": 9,
+    "complete_128bit_gpr_signature_preserved": true
+  },
+  "static_contract": [
+    "First post-edge event_active plus event_cancel precedes entry dispatch and stack writes.",
+    "Event vector6/kindFAULT1 and retained event CS/IP/FLAGS are asserted; no live-IP substitution.",
+    "Original exact MOV architecture and pause checks precede resumed sentinel execution.",
+    "No second retirement/MOV, unsupported latch, event completion or stack write is accepted.",
+    "Portable selected milestone explicitly pins new functional CPU while preserving historical baseline contract."
+  ],
+  "findings": [],
+  "production_or_frozen_pcat_changed": false
+}

@@ -1,0 +1,87 @@
+{
+  "status": "COMPILE_CACHE_INDEPENDENT_REVIEW_PASS_REGRESSION_PENDING",
+  "scope": "Read-only source/diff/proof review. Approval of compile-only reuse mechanism and complete fresh execution route; not yet a successful broad regression or hardware/OS/timing claim.",
+  "source_sha256": {
+    "build/p06-ready-chain-regression-20261004-v3/compile_cache.py": "2ef55abce909649b3336f56caa29b00f93afbe7ab407b097870c29cadf35e2e7",
+    "build/p06-ready-chain-regression-20261004-v3/prepare_cache.py": "d9242291ca1a5ac5dfaf6cba6b1431856708ae668aa13ccafc988dab35648db6",
+    "build/p06-ready-chain-regression-20261004-v3/cache_controls.py": "580d504d63659cc05bdc8ba35b3e35a83525c7d8d7e0423dcb96498876245633",
+    "build/p06-ready-chain-regression-20261004-v3/run_regression.py": "e3decaf2b69bc8e660802421f960dc48309de37ea666bddc487add69e98305b0",
+    "build/p06-ready-chain-regression-20261004-v3/bin/verilator": "36e270d7fab3cc5a8c37f15ce8c5e359f82267a89d41b77294e2becf7ab92968",
+    "build/p06-ready-chain-regression-20261004-v3/cache-manifest.json": "e9e57c13a4d174c5597c9f958c64ce1e252b2092a9f2d4dc164a92f0332d07d9",
+    "build/p06-ready-chain-regression-20261004-v3/cache-controls.json": "5f6c01950d9b4ee470e7ee6142b284ac6bb6c63e21fe45090cc1a023d8d6c8bf",
+    "build/p06-ready-chain-regression-20261004-v3/CACHE_PROTOCOL.md": "b1c65693b8b27202bd923ca7b9c0ab37c3961bf992b9d506bf327b04ff4bd247",
+    "vendor/spk286/sim/unit/spk286_adjust_instructions_tb.sv": "e074e34034e2155cd52e503c29284f53202f0a00bf758d20ee195c12cb93e836",
+    "build/p06-ready-chain-adjust-20261004-v1/receipt.json": "69e48006c1134cd9881c1b258205a70a95ce6b12f964e76092e1508bd8b68d5c",
+    "build/p06-ready-chain-starvation-preflight-20261004-v1/receipt.json": "3008e0ff1e122837b0eb0b7443b9124322eae769bc1d987f2fb6819b6615eeda",
+    "scripts/test_at_landmark_dma.sh": "0fba7826ccc810c5fa151115416d74357c0919f531a1f5e2ff795ea1a6c3d28c"
+  },
+  "cache": {
+    "eligible_units": 70,
+    "positive_controls": 1,
+    "rejection_controls": 16,
+    "historical_bin_log_bindings": "Only v2 dual-completed units with unchanged historical cleanup SHA fingerprints.",
+    "compile_guard": "Literal original CLI and ordering except Mdir; original DAT S source/include closure and frozen hashes; scripts/toolchain SHA/metadata/version; historical receipts/logs; exact output path/cwd.",
+    "result_reuse": false,
+    "simulation_rerun": "Make/test scripts and vector generation unchanged; actual Verilator executables rerun; Icarus fresh; lint/smoke/state/SingleStep/Yosys forwarded normally.",
+    "added_evidence_guards": [
+      "Runner itself before/after hash",
+      "Control/preparer source hashes checked",
+      "Event wrapper/manifest hashes checked",
+      "Final copied binary hashes checked"
+    ]
+  },
+  "adjust_stimulus": {
+    "change": "Only CODE bus_status=D READY receives16extrafabriccycles; DATA5/6 unchanged.",
+    "exact_single_expression_plus_comment_diff": true,
+    "oracles_8184_preserved": true,
+    "stalls_assert_preserved": true,
+    "dual_cases": 8184,
+    "dual_checks": 1764540,
+    "dual_immediate_stalls": 16352
+  },
+  "preflight": {
+    "status": "STARVATION_PREFLIGHT_DUAL_PASS",
+    "dual_units": 3,
+    "source_edits": false,
+    "markers": {
+      "spk286_stack_frame_instructions": {
+        "iverilog": [
+          "STACK_FRAME_INSTRUCTIONS PASS: 10256 cases; 5144999 checks; 2120 immediate stalls"
+        ],
+        "verilator": [
+          "STACK_FRAME_INSTRUCTIONS PASS: 10256 cases; 5144999 checks; 2120 immediate stalls"
+        ]
+      },
+      "spk286_far_instructions": {
+        "verilator": [
+          "FAR_INSTRUCTIONS PASS: 6760 cases; 634450 checks; 216 immediate stalls"
+        ],
+        "iverilog": [
+          "FAR_INSTRUCTIONS PASS: 6760 cases; 634450 checks; 216 immediate stalls"
+        ]
+      },
+      "spk286_muldiv_instructions": {
+        "verilator": [
+          "MULDIV_INSTRUCTIONS PASS: 19556 directed CPU cases; 2389287 checks; 642 immediate stalls"
+        ],
+        "iverilog": [
+          "MULDIV_INSTRUCTIONS PASS: 19556 directed CPU cases; 2389287 checks; 642 immediate stalls"
+        ]
+      }
+    }
+  },
+  "static_forwarding_review": "No --binary -> execv real /usr/bin/verilator with unchanged args; unit misses -> real execv; hits copy only binary and labelled historical compile log, never simulation output.",
+  "observed_forwarding": "Author reports actual --version forwarding exactly Verilator5.020; unit/strict-lint/smoke forwarding will also occur through the real make run.",
+  "full_regression_final_audit": {
+    "status": "PENDING",
+    "required": [
+      "Actual makeRC0 plus new REGRESSION PASS",
+      "All source/snapshot/corpus/cache hashes before=after",
+      "Cache event/binary bindings",
+      "Full scope, actual run counts and explicit inherited skips"
+    ]
+  },
+  "tracked_edits_by_reviewer": false,
+  "new_simulations_by_reviewer": false,
+  "commit": false
+}

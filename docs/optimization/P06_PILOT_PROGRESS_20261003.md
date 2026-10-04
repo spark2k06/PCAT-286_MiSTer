@@ -291,3 +291,31 @@ preserved, not claimed as an Intel-required issue gap. Odd words, writes/RMW,
 bus/events, decoded lookahead and complete public profiles remain open.
 Production config, RBF and source selection remain unchanged. No total
 regression, fit or STA was run.
+
+## 2026-10-04 M6e: private full-CPU odd-word A1
+
+The [M6e private CPU milestone](P06_CORE_ODD_READ_CPU_PILOT_20261004.md) adds
+two-beat odd A1 READs using original first-byte/raw-word storage and TMP0.
+DATA ownership spans both logical cycles; the first READY cannot publish or
+release, and the second physical request starts after first Tc. Alignment
+adds two clocks through a separate event, while each READ half contributes
+its own actual waits. The minimum is five plus two plus READ waits; real
+dependencies still apply. Native Intel pin/issue phase accuracy is not claimed.
+
+Both simulators pass 2,143 timed cases and 43 identical trace pairs. Original
+and private MAX each pass 834 caller cases; frozen aligned A1 and consecutive
+warm/cold traces are preserved. Eight independent mutations are rejected.
+Four affected MAX units, strict CPU lint, microcode consistency, BIU MAX and
+aligned equivalence, duration equivalence and control-cone checks pass.
+
+The isolated BIU/duration increment is 30 generic cells/four register bits;
+no new payload buffer, queue capacity or PLL is introduced. This excludes
+full top/CPU/FPGA cost. Cancel drains accepted halves; reset aborts the original
+backend, while invalid HOLD scope remains stopped until reset. These are
+distinct acceptance contracts, not a claim of complete historical HOLD service.
+
+Production, config and selected RBF remain unchanged. No total regression,
+Quartus fit or STA was run. Next qualify writes/write-buffer overlap and RMW,
+then branches/events, decoded lookahead, DOS wrapper and complete public
+speeds. Physical collaborator calibration remains pending without blocking
+the provisional reference-based development.

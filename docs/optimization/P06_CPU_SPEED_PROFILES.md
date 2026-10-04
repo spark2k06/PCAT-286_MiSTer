@@ -3,7 +3,8 @@
 Estado: especificación futura, actualizada el 2026-10-04. Base: implementación
 única tras la limpieza P20, con CPU/puente/SDRAM sobre el reloj común de 50 MHz;
 P21 mantiene pendiente la aceptación del cierre de tiempos. No hay perfiles
-históricos implementados ni precisión temporal validada. Aplican los
+históricos completos integrados en el RBF. La validación temporal privada
+parcial se describe a continuación. Aplican los
 [requisitos comunes](README.md) y el
 [modelo de temporización SPK286](../../vendor/spk286/SPK286_TIMING_MODEL.md).
 
@@ -32,12 +33,15 @@ Tras reanudar la pausa de M5, el [piloto M6a de lecturas](P06_CORE_DATA_READ_PIL
 califica Ts/Tc de byte y palabra par en la BIU y servicio de operandos reales,
 con CODE desactivado y reutilizando la respuesta retenida. Es un componente
 privado: M6b ya valida la propiedad lógica compartida CODE/DATA y M6c conecta
-una primera lectura alineada a la CPU completa. Faltan las restantes operaciones.
+una primera lectura alineada a la CPU completa. M6d califica lecturas
+consecutivas y M6e añade A1 impar privado con dos accesos y corrección +2.
+Faltan las restantes operaciones.
 
 El desarrollo provisional de componentes temporales y sus pruebas dirigidas
 se registra en [el progreso del piloto](P06_PILOT_PROGRESS_20261003.md).
-La conexión privada cubre instrucciones de registro calificadas y una primera
-lectura alineada A1; todavía no hay un perfil histórico completo integrado al RBF.
+La conexión privada cubre instrucciones de registro calificadas y lecturas
+A1 alineadas e impares; todavía no hay un perfil histórico completo
+integrado al RBF.
 
 ## 1. Objetivo y alcance de precisión
 
@@ -348,3 +352,13 @@ matrix and targeted lifecycle/recovery cases; MAX remains trace-identical.
 It preserves the existing serialized handoff and does not accept its issue
 gap as an Intel requirement. Public speeds and remaining memory services
 are still pending.
+
+The [M6e private milestone](P06_CORE_ODD_READ_CPU_PILOT_20261004.md) extends A1
+to two-beat odd words, retaining the existing payload storage and DATA owner
+until final Tc. A single alignment event adds two clocks separately from
+each half's READ waits. Both simulators pass 2,143 timed cases and 43 identical
+trace pairs; MAX and frozen aligned traces remain unchanged. Eight specified
+negative controls, lint, affected units, microcode and bypass proofs pass.
+The isolated BIU/duration delta is +30 generic cells/+4 register bits, not
+complete FPGA ALMs. Writes/RMW, events, decoded lookahead and complete public
+speeds remain open; production config and RBF are unchanged.

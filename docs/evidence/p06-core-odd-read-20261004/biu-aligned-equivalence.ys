@@ -1,0 +1,19 @@
+read_verilog -sv /mnt/d/GitHub/PCAT-286_MiSTer/build/p06-odd-read-root-final2-20261004/m6c-component-source/private-rtl/spk286_biu.sv
+chparam -set P06_DATA_TIMING 1 -set P06_SHARED_TIMING 1 spk286_biu
+proc
+opt
+rename spk286_biu gold
+read_verilog -sv /mnt/d/GitHub/PCAT-286_MiSTer/build/p06-odd-read-root-final2-20261004/private-rtl/spk286_biu.sv
+chparam -set P06_DATA_TIMING 1 -set P06_SHARED_TIMING 1 spk286_biu
+proc
+opt
+rename spk286_biu gate
+cd gate
+rename genblk2.p06_data.state_q p06_data.state_q
+cd ..
+delete -output gate/p06_alignment_event
+equiv_make gold gate equiv
+hierarchy -top equiv
+equiv_simple
+equiv_induct -seq 4
+equiv_status -assert

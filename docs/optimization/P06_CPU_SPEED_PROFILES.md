@@ -40,7 +40,8 @@ Faltan las restantes operaciones.
 El desarrollo provisional de componentes temporales y sus pruebas dirigidas
 se registra en [el progreso del piloto](P06_PILOT_PROGRESS_20261003.md).
 La conexión privada cubre instrucciones de registro calificadas y lecturas
-A1 alineadas e impares; todavía no hay un perfil histórico completo
+A1 alineadas e impares, escrituras A3 y XOR RMW directo calificado;
+todavía no hay un perfil histórico completo
 integrado al RBF.
 
 ## 1. Objetivo y alcance de precisión
@@ -372,3 +373,18 @@ plus two for an odd word; WRITE waits extend real dependencies without being
 charged as READ waits. This does not close historical write-buffer EU overlap
 or full C08/C09/C10/C15. RMW, consecutive WRITE/READ ordering and remaining
 public-speed/event coverage remain open; production and selected RBF unchanged.
+
+The [M6g private milestone](P06_CORE_RMW_CPU_PILOT_20261004.md) qualifies
+bounded prefix-free `81 36 disp16 imm16` XOR word RMW. Original READ/TMP0,
+ALU/TMP2, WRITE disposition and COMMIT_FLAGS remain the functional sequence;
+FLAGS and retirement share the first permitted boundary after the store.
+Retained ModR/M metadata corrects the existing three-clock RI admission to
+seven once, then each odd reference adds two; only READ waits charge the EU
+budget. Both simulators pass 2,503 timed cases and 67 identical trace pairs.
+MAX, frozen READ/WRITE and register-stream traces are preserved. Nine specific
+mutants, lint, affected units, microcode and component bypass proofs pass.
+The isolated BIU/duration/executor-fragment increase is twenty generic cells
+and zero register bits, excluding full FPGA cost. Serialized dependencies
+make the aggregate seven/eleven-clock minimum nonbinding in the fastest
+observed cases; exact Intel issue phases and write-buffer EU overlap remain
+open. Production config, source selection and selected RBF are unchanged.

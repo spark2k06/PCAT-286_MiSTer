@@ -342,3 +342,34 @@ byte; the fixture checks this partial word explicitly. Historical single
 write-buffer EU overlap, consecutive WRITE/following READ, RMW, events and
 complete public speeds remain separate gates. Production config, source
 selection and selected RBF remain unchanged; no total regression, fit or STA.
+
+## 2026-10-04 M6g: private bounded XOR word RMW
+
+The [M6g private CPU milestone](P06_CORE_RMW_CPU_PILOT_20261004.md) qualifies
+prefix-free Real Mode `81 36 disp16 imm16`, retaining the original effective
+address, READ into TMP0, immediate into TMP1, ALU/TMP2, physical WRITE and
+COMMIT_FLAGS dependency. FLAGS and retirement share the first qualified
+boundary after actual WRITE disposition; no early ALU-result retirement.
+
+The original retained ModR/M identifies the memory form after admission.
+Its first CPU boundary adds four once to the existing three-clock RI budget,
+without another register. Odd READ and WRITE each add two; only READ waits
+charge the EU. Actual serialized dependencies produce earliest eight/twelve
+clocks, so the seven/eleven-clock minimum is not binding in those cases.
+No claim of exact Intel issue phases or write-buffer EU overlap is made.
+
+Both simulators pass 2,503 timed cases and 67 identical trace pairs. Each
+original/private MAX CPU passes 858 RMW cases; the frozen warm/cold A1, A3
+and 688-program register-stream references remain byte-identical. Nine
+specific mutations, four affected MAX units, strict lint, microcode,
+component bypass proofs and private-input cone checks pass. Formal executor
+coverage is the extracted real commit fragment, not the whole executor/CPU.
+
+The measured isolated increase is twenty generic cells and zero register
+bits, with an unchanged BIU and no new payload, queue capacity or PLL.
+Full top/CPU/FPGA resources, fit and STA are outside this milestone.
+Cancellation preserves accepted WRITE effects while suppressing FLAGS;
+reset can leave a partial word. Historical HOLD, consecutive WRITE/following
+READ, write-buffer overlap, branches/events, decoded lookahead, DOS wrapper
+and complete public speeds remain separate gates. Production config,
+source selection and selected RBF are unchanged. No total regression was run.

@@ -1,0 +1,432 @@
+{
+  "creator": "Yosys 0.33 (git sha1 2584903a060)",
+  "modules": {
+    "p06_instruction_duration": {
+      "attributes": {
+        "src": "/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-rmw-root-acceptance-20261004/private-rtl/p06_instruction_duration.sv:6.1-171.10",
+        "top": "00000000000000000000000000000001",
+        "hdlname": "\\p06_instruction_duration"
+      },
+      "parameter_default_values": {
+        "HISTORICAL": "0",
+        "P06_LATE_ALIGNMENT": "1",
+        "P06_RMW_TIMING": "1",
+        "P06_WRITE_ALIGNMENT": "1"
+      },
+      "ports": {
+        "clk": {
+          "direction": "input",
+          "bits": [ 2 ]
+        },
+        "reset": {
+          "direction": "input",
+          "bits": [ 3 ]
+        },
+        "cancel": {
+          "direction": "input",
+          "bits": [ 4 ]
+        },
+        "cpu_boundary": {
+          "direction": "input",
+          "bits": [ 5 ]
+        },
+        "start_valid": {
+          "direction": "input",
+          "bits": [ 6 ]
+        },
+        "start_ready": {
+          "direction": "output",
+          "bits": [ 7 ]
+        },
+        "instruction_form": {
+          "direction": "input",
+          "bits": [ 8, 9, 10, 11 ]
+        },
+        "real_mode": {
+          "direction": "input",
+          "bits": [ 12 ]
+        },
+        "prefix_free": {
+          "direction": "input",
+          "bits": [ 13 ]
+        },
+        "taken": {
+          "direction": "input",
+          "bits": [ 14 ]
+        },
+        "branch_outcome_known": {
+          "direction": "input",
+          "bits": [ 15 ]
+        },
+        "target_length_known": {
+          "direction": "input",
+          "bits": [ 16 ]
+        },
+        "next_length": {
+          "direction": "input",
+          "bits": [ 17, 18, 19, 20 ]
+        },
+        "operand_odd": {
+          "direction": "input",
+          "bits": [ 21 ]
+        },
+        "ea_base_index_disp": {
+          "direction": "input",
+          "bits": [ 22 ]
+        },
+        "alignment_event": {
+          "direction": "input",
+          "bits": [ 23 ]
+        },
+        "read_wait_event": {
+          "direction": "input",
+          "bits": [ 24 ]
+        },
+        "functional_done": {
+          "direction": "input",
+          "bits": [ 25 ]
+        },
+        "dependencies_ready": {
+          "direction": "input",
+          "bits": [ 26 ]
+        },
+        "retire_ready": {
+          "direction": "input",
+          "bits": [ 27 ]
+        },
+        "retire_enable": {
+          "direction": "output",
+          "bits": [ 28 ]
+        },
+        "dependency_blocked": {
+          "direction": "output",
+          "bits": [ "0" ]
+        },
+        "consumer_blocked": {
+          "direction": "output",
+          "bits": [ "0" ]
+        },
+        "metadata_qualified": {
+          "direction": "output",
+          "bits": [ "1" ]
+        },
+        "metadata_error": {
+          "direction": "output",
+          "bits": [ "0" ]
+        },
+        "timing_error": {
+          "direction": "output",
+          "bits": [ "0" ]
+        },
+        "active": {
+          "direction": "output",
+          "bits": [ "0" ]
+        },
+        "minimum_clocks": {
+          "direction": "output",
+          "bits": [ "0", "0", "0", "0", "0", "0" ]
+        },
+        "elapsed_clocks": {
+          "direction": "output",
+          "bits": [ "0", "0", "0", "0", "0", "0", "0", "0" ]
+        },
+        "scheduled_clocks": {
+          "direction": "output",
+          "bits": [ "0", "0", "0", "0", "0", "0", "0", "0" ]
+        },
+        "rmw_form_valid": {
+          "direction": "input",
+          "bits": [ 29 ]
+        }
+      },
+      "cells": {
+        "$abc$205$auto$blifparse.cc:386:parse_blif$206": {
+          "hide_name": 1,
+          "type": "$_NOR_",
+          "parameters": {
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 4 ],
+            "B": [ 3 ],
+            "Y": [ 7 ]
+          }
+        },
+        "$abc$205$auto$blifparse.cc:386:parse_blif$207": {
+          "hide_name": 1,
+          "type": "$_NAND_",
+          "parameters": {
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 7 ],
+            "B": [ 25 ],
+            "Y": [ 30 ]
+          }
+        },
+        "$abc$205$auto$blifparse.cc:386:parse_blif$208": {
+          "hide_name": 1,
+          "type": "$_ANDNOT_",
+          "parameters": {
+          },
+          "attributes": {
+          },
+          "port_directions": {
+            "A": "input",
+            "B": "input",
+            "Y": "output"
+          },
+          "connections": {
+            "A": [ 26 ],
+            "B": [ 30 ],
+            "Y": [ 28 ]
+          }
+        }
+      },
+      "netnames": {
+        "$abc$205$new_n8_": {
+          "hide_name": 1,
+          "bits": [ 30 ],
+          "attributes": {
+          }
+        },
+        "active": {
+          "hide_name": 0,
+          "bits": [ "0" ],
+          "attributes": {
+            "src": "/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-rmw-root-acceptance-20261004/private-rtl/p06_instruction_duration.sv:25.68-25.74"
+          }
+        },
+        "alignment_event": {
+          "hide_name": 0,
+          "bits": [ 23 ],
+          "attributes": {
+            "src": "/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-rmw-root-acceptance-20261004/private-rtl/p06_instruction_duration.sv:20.17-20.32"
+          }
+        },
+        "branch_outcome_known": {
+          "hide_name": 0,
+          "bits": [ 15 ],
+          "attributes": {
+            "src": "/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-rmw-root-acceptance-20261004/private-rtl/p06_instruction_duration.sv:13.48-13.68"
+          }
+        },
+        "cancel": {
+          "hide_name": 0,
+          "bits": [ 4 ],
+          "attributes": {
+            "src": "/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-rmw-root-acceptance-20261004/private-rtl/p06_instruction_duration.sv:9.29-9.35"
+          }
+        },
+        "clk": {
+          "hide_name": 0,
+          "bits": [ 2 ],
+          "attributes": {
+            "src": "/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-rmw-root-acceptance-20261004/private-rtl/p06_instruction_duration.sv:9.17-9.20"
+          }
+        },
+        "consumer_blocked": {
+          "hide_name": 0,
+          "bits": [ "0" ],
+          "attributes": {
+            "src": "/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-rmw-root-acceptance-20261004/private-rtl/p06_instruction_duration.sv:24.53-24.69"
+          }
+        },
+        "cpu_boundary": {
+          "hide_name": 0,
+          "bits": [ 5 ],
+          "attributes": {
+            "src": "/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-rmw-root-acceptance-20261004/private-rtl/p06_instruction_duration.sv:9.37-9.49"
+          }
+        },
+        "dependencies_ready": {
+          "hide_name": 0,
+          "bits": [ 26 ],
+          "attributes": {
+            "src": "/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-rmw-root-acceptance-20261004/private-rtl/p06_instruction_duration.sv:23.34-23.52"
+          }
+        },
+        "dependency_blocked": {
+          "hide_name": 0,
+          "bits": [ "0" ],
+          "attributes": {
+            "src": "/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-rmw-root-acceptance-20261004/private-rtl/p06_instruction_duration.sv:24.33-24.51"
+          }
+        },
+        "ea_base_index_disp": {
+          "hide_name": 0,
+          "bits": [ 22 ],
+          "attributes": {
+            "src": "/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-rmw-root-acceptance-20261004/private-rtl/p06_instruction_duration.sv:16.30-16.48"
+          }
+        },
+        "elapsed_clocks": {
+          "hide_name": 0,
+          "bits": [ "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-rmw-root-acceptance-20261004/private-rtl/p06_instruction_duration.sv:27.24-27.38"
+          }
+        },
+        "functional_done": {
+          "hide_name": 0,
+          "bits": [ 25 ],
+          "attributes": {
+            "src": "/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-rmw-root-acceptance-20261004/private-rtl/p06_instruction_duration.sv:23.17-23.32"
+          }
+        },
+        "instruction_form": {
+          "hide_name": 0,
+          "bits": [ 8, 9, 10, 11 ],
+          "attributes": {
+            "src": "/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-rmw-root-acceptance-20261004/private-rtl/p06_instruction_duration.sv:12.23-12.39"
+          }
+        },
+        "metadata_error": {
+          "hide_name": 0,
+          "bits": [ "0" ],
+          "attributes": {
+            "src": "/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-rmw-root-acceptance-20261004/private-rtl/p06_instruction_duration.sv:25.38-25.52"
+          }
+        },
+        "metadata_qualified": {
+          "hide_name": 0,
+          "bits": [ "1" ],
+          "attributes": {
+            "src": "/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-rmw-root-acceptance-20261004/private-rtl/p06_instruction_duration.sv:25.18-25.36"
+          }
+        },
+        "minimum_clocks": {
+          "hide_name": 0,
+          "bits": [ "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-rmw-root-acceptance-20261004/private-rtl/p06_instruction_duration.sv:26.24-26.38"
+          }
+        },
+        "next_length": {
+          "hide_name": 0,
+          "bits": [ 17, 18, 19, 20 ],
+          "attributes": {
+            "src": "/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-rmw-root-acceptance-20261004/private-rtl/p06_instruction_duration.sv:15.23-15.34"
+          }
+        },
+        "operand_odd": {
+          "hide_name": 0,
+          "bits": [ 21 ],
+          "attributes": {
+            "src": "/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-rmw-root-acceptance-20261004/private-rtl/p06_instruction_duration.sv:16.17-16.28"
+          }
+        },
+        "p06_form_increment": {
+          "hide_name": 0,
+          "bits": [ "0" ],
+          "attributes": {
+            "src": "/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-rmw-root-acceptance-20261004/private-rtl/p06_instruction_duration.sv:33.10-33.28"
+          }
+        },
+        "prefix_free": {
+          "hide_name": 0,
+          "bits": [ 13 ],
+          "attributes": {
+            "src": "/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-rmw-root-acceptance-20261004/private-rtl/p06_instruction_duration.sv:13.28-13.39"
+          }
+        },
+        "read_wait_event": {
+          "hide_name": 0,
+          "bits": [ 24 ],
+          "attributes": {
+            "src": "/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-rmw-root-acceptance-20261004/private-rtl/p06_instruction_duration.sv:22.17-22.32"
+          }
+        },
+        "real_mode": {
+          "hide_name": 0,
+          "bits": [ 12 ],
+          "attributes": {
+            "src": "/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-rmw-root-acceptance-20261004/private-rtl/p06_instruction_duration.sv:13.17-13.26"
+          }
+        },
+        "reset": {
+          "hide_name": 0,
+          "bits": [ 3 ],
+          "attributes": {
+            "src": "/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-rmw-root-acceptance-20261004/private-rtl/p06_instruction_duration.sv:9.22-9.27"
+          }
+        },
+        "retire_enable": {
+          "hide_name": 0,
+          "bits": [ 28 ],
+          "attributes": {
+            "src": "/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-rmw-root-acceptance-20261004/private-rtl/p06_instruction_duration.sv:24.18-24.31"
+          }
+        },
+        "retire_ready": {
+          "hide_name": 0,
+          "bits": [ 27 ],
+          "attributes": {
+            "src": "/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-rmw-root-acceptance-20261004/private-rtl/p06_instruction_duration.sv:23.54-23.66"
+          }
+        },
+        "rmw_form_valid": {
+          "hide_name": 0,
+          "bits": [ 29 ],
+          "attributes": {
+            "src": "/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-rmw-root-acceptance-20261004/private-rtl/p06_instruction_duration.sv:29.17-29.31"
+          }
+        },
+        "scheduled_clocks": {
+          "hide_name": 0,
+          "bits": [ "0", "0", "0", "0", "0", "0", "0", "0" ],
+          "attributes": {
+            "src": "/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-rmw-root-acceptance-20261004/private-rtl/p06_instruction_duration.sv:27.40-27.56"
+          }
+        },
+        "start_ready": {
+          "hide_name": 0,
+          "bits": [ 7 ],
+          "attributes": {
+            "src": "/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-rmw-root-acceptance-20261004/private-rtl/p06_instruction_duration.sv:11.18-11.29"
+          }
+        },
+        "start_valid": {
+          "hide_name": 0,
+          "bits": [ 6 ],
+          "attributes": {
+            "src": "/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-rmw-root-acceptance-20261004/private-rtl/p06_instruction_duration.sv:10.17-10.28"
+          }
+        },
+        "taken": {
+          "hide_name": 0,
+          "bits": [ 14 ],
+          "attributes": {
+            "src": "/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-rmw-root-acceptance-20261004/private-rtl/p06_instruction_duration.sv:13.41-13.46"
+          }
+        },
+        "target_length_known": {
+          "hide_name": 0,
+          "bits": [ 16 ],
+          "attributes": {
+            "src": "/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-rmw-root-acceptance-20261004/private-rtl/p06_instruction_duration.sv:14.17-14.36"
+          }
+        },
+        "timing_error": {
+          "hide_name": 0,
+          "bits": [ "0" ],
+          "attributes": {
+            "src": "/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-rmw-root-acceptance-20261004/private-rtl/p06_instruction_duration.sv:25.54-25.66"
+          }
+        }
+      }
+    }
+  }
+}

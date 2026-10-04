@@ -1,0 +1,14 @@
+{
+  "context": "Run with Python 3, Icarus and Verilator in the workspace Linux environment. Copy run_iopl.py, aggregate_compat.py and audit_max.py into a fresh build/<fresh-run> directory first. Replace <fresh-run> below. The original launch.py records the superseded 300-second IOPL attempt and is not the final recipe.",
+  "commands": [
+    ["python3", "scripts/test_p06_profile_compatibility.py", "--output", "build/<fresh-run>/shard-1", "--units", "execution,microcode_execution,alu_lifecycle,data_lifecycle,unary_lifecycle,prefix,event_lifecycle,string_zero_events,string_io_zero_events"],
+    ["python3", "scripts/test_p06_profile_compatibility.py", "--output", "build/<fresh-run>/shard-2", "--units", "string_io_lifecycle,scalar_io,xchg_hold_lock,loadall_integration,protected_entry,protected_system,protected_event_outer,odd_protected_stack,protected_task"],
+    ["python3", "scripts/test_p06_profile_compatibility.py", "--output", "build/<fresh-run>/shard-3-rest", "--units", "protected_task_iret,protected_task_state_fault,protected_task_privilege_outer,protected_retf,stack_frame_lifecycle,far_lifecycle,muldiv_lifecycle", "--dual-units", ""],
+    ["python3", "build/<fresh-run>/run_iopl.py"],
+    ["python3", "build/<fresh-run>/aggregate_compat.py"],
+    ["python3", "build/<fresh-run>/audit_max.py"]
+  ],
+  "independence": "The first four commands are independent. Run the aggregate only after all four pass; run the MAX audit after the aggregate.",
+  "coverage": {"iverilog": 202, "verilator": 64, "max_equivalence": 26, "dual_trace_pairs": 58, "unpaired_verilator_functional": 6},
+  "scope": "The six IOPL profiles above 6 MHz have Verilator functional assertions without Icarus trace pairing. IOPL MAX/6 MHz and seven other banks have canonical dual trace comparisons. Every MAX pair uses complete raw stream SHA256, byte counts and row counts. No hardware historical pin-timing claim."
+}

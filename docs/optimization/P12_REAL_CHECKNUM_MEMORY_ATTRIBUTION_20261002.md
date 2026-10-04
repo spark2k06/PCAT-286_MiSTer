@@ -604,3 +604,18 @@ select a causal board policy rather than a global score correction. Predict
 MAX retains dependency-driven accelerated execution. Actual physical clocks,
 board/BIOS identity and executable hash remain unverified; NOT_CALIBRATED
 still applies. No immediate RTL, clock, fit or RBF change is included here.
+
+### First general OSD candidate (2026-10-04)
+
+The [public candidate record](P06_OSD_CANDIDATE_20261004.md) now supersedes the
+earlier no-integration status for the current development milestone. CPU
+instruction intervals and normalized retained bus transfers are integrated
+with all eight reset-applied choices. MAX bypasses historical delays. READY
+capture stays on the fabric clock, while logical bus publication follows
+Ts/Tc. There is no public T-state switch or benchmark score multiplier.
+
+The initial candidate ties additional board READ-wait corrections to zero.
+Backend deadline misses retain real dependencies and are implementation
+extensions, not assumed physical motherboard waits. The different physical
+6/12 MHz CODE/DATA sensitivities remain calibration work; accepting a first
+synthesized selector does not close P12 or certify every nominal speed.

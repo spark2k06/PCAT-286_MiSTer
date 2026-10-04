@@ -1,10 +1,13 @@
 # P06 — Perfiles de CPU 6–25 MHz y MAX
 
-Estado: especificación futura, actualizada el 2026-10-04. Base: implementación
-única tras la limpieza P20, con CPU/puente/SDRAM sobre el reloj común de 50 MHz;
-P21 mantiene pendiente la aceptación del cierre de tiempos. No hay perfiles
-históricos completos integrados en el RBF. La validación temporal privada
-parcial se describe a continuación. Aplican los
+Status, 2026-10-04: the first general reset-applied OSD candidate is in directed
+validation. See [the public candidate record](P06_OSD_CANDIDATE_20261004.md) for
+its current integration, evidence and bitstream milestones. It uses one CPU
+and the existing common 50 MHz CPU/bridge/SDRAM clock. Historical instruction
+intervals and normalized bus timing are provisional; full internal EU/native
+pin timing and board-specific physical calibration remain open. P21 physical
+timing acceptance is separate. The dated private milestones below preserve
+their original limited scope. Aplican los
 [requisitos comunes](README.md) y el
 [modelo de temporización SPK286](../../vendor/spk286/SPK286_TIMING_MODEL.md).
 
@@ -44,8 +47,8 @@ El desarrollo provisional de componentes temporales y sus pruebas dirigidas
 se registra en [el progreso del piloto](P06_PILOT_PROGRESS_20261003.md).
 La conexión privada cubre instrucciones de registro calificadas y lecturas
 A1 alineadas e impares, escrituras A3 y XOR RMW directo calificado;
-todavía no hay un perfil histórico completo
-integrado al RBF.
+esa conexión privada conserva su alcance original. La integración general
+posterior se registra en el documento del candidato OSD enlazado al inicio.
 
 ## 1. Objetivo y alcance de precisión
 

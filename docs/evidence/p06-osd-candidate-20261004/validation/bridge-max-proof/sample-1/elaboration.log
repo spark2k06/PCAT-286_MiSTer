@@ -1,0 +1,460 @@
+
+ /----------------------------------------------------------------------------\
+ |                                                                            |
+ |  yosys -- Yosys Open SYnthesis Suite                                       |
+ |                                                                            |
+ |  Copyright (C) 2012 - 2020  Claire Xenia Wolf <claire@yosyshq.com>         |
+ |                                                                            |
+ |  Permission to use, copy, modify, and/or distribute this software for any  |
+ |  purpose with or without fee is hereby granted, provided that the above    |
+ |  copyright notice and this permission notice appear in all copies.         |
+ |                                                                            |
+ |  THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES  |
+ |  WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF          |
+ |  MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR   |
+ |  ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES    |
+ |  WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN     |
+ |  ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF   |
+ |  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.            |
+ |                                                                            |
+ \----------------------------------------------------------------------------/
+
+ Yosys 0.33 (git sha1 2584903a060)
+
+
+-- Running command `read_verilog -sv -DSYNTHESIS gold.sv gate.sv; chparam -set COMPLETE_ON_CPU_SAMPLE 1 bridge_gold bridge_gate; hierarchy -check; proc; memory; flatten; opt; write_json elaborated.json; write_rtlil elaborated.il;' --
+
+1. Executing Verilog-2005 frontend: gold.sv
+Parsing SystemVerilog input from `gold.sv' to AST representation.
+Generating RTLIL representation for module `\bridge_gold'.
+Successfully finished Verilog frontend.
+
+2. Executing Verilog-2005 frontend: gate.sv
+Parsing SystemVerilog input from `gate.sv' to AST representation.
+Generating RTLIL representation for module `\bridge_gate'.
+Successfully finished Verilog frontend.
+Parameter \COMPLETE_ON_CPU_SAMPLE = 1
+
+3. Executing AST frontend in derive mode using pre-parsed AST for module `\bridge_gold'.
+Parameter \COMPLETE_ON_CPU_SAMPLE = 1
+Generating RTLIL representation for module `$paramod\bridge_gold\COMPLETE_ON_CPU_SAMPLE=32'00000000000000000000000000000001'.
+Parameter \COMPLETE_ON_CPU_SAMPLE = 1
+
+4. Executing AST frontend in derive mode using pre-parsed AST for module `\bridge_gate'.
+Parameter \COMPLETE_ON_CPU_SAMPLE = 1
+Generating RTLIL representation for module `$paramod\bridge_gate\COMPLETE_ON_CPU_SAMPLE=32'00000000000000000000000000000001'.
+
+5. Executing HIERARCHY pass (managing design hierarchy).
+
+6. Executing PROC pass (convert processes to netlists).
+
+6.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Found and cleaned up 1 empty switch in `\bridge_gate.$proc$gate.sv:288$657'.
+Found and cleaned up 1 empty switch in `\bridge_gold.$proc$gold.sv:271$476'.
+Cleaned up 2 empty switches.
+
+6.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Marked 2 switch rules as full_case in process $proc$gate.sv:0$560 in module bridge_gate.
+Marked 4 switch rules as full_case in process $proc$gate.sv:0$580 in module bridge_gate.
+Marked 12 switch rules as full_case in process $proc$gate.sv:288$657 in module bridge_gate.
+Marked 2 switch rules as full_case in process $proc$gold.sv:0$386 in module bridge_gold.
+Marked 4 switch rules as full_case in process $proc$gold.sv:0$406 in module bridge_gold.
+Marked 11 switch rules as full_case in process $proc$gold.sv:271$476 in module bridge_gold.
+Removed a total of 0 dead cases.
+
+6.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 0 redundant assignments.
+Promoted 10 assignments to connections.
+
+6.4. Executing PROC_INIT pass (extract init attributes).
+
+6.5. Executing PROC_ARST pass (detect async resets in processes).
+
+6.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+<suppressed ~51 debug messages>
+
+6.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\bridge_gate.$proc$gate.sv:0$560'.
+     1/2: $1\request_direction_valid[0:0]
+     2/2: $1\request_status_valid[0:0]
+Creating decoders for process `\bridge_gate.$proc$gate.sv:0$580'.
+     1/4: $4\beat_byte_enable[1:0]
+     2/4: $3\beat_byte_enable[1:0]
+     3/4: $2\beat_byte_enable[1:0]
+     4/4: $1\beat_byte_enable[1:0]
+Creating decoders for process `\bridge_gate.$proc$gate.sv:288$657'.
+     1/17: $0\timing_admission_window_q[0:0]
+     2/17: $0\timing_active_q[0:0]
+     3/17: $0\timing_tc_q[0:0]
+     4/17: $0\cpu_data_in_q[15:0]
+     5/17: $0\complete_sampled_q[0:0]
+     6/17: $0\read_low_byte_q[7:0]
+     7/17: $0\beat_high_q[0:0]
+     8/17: $0\request_native_memory_q[0:0]
+     9/17: $0\request_native_word_q[0:0]
+    10/17: $0\request_two_beats_q[0:0]
+    11/17: $0\request_lock_q[0:0]
+    12/17: $0\request_status_q[3:0]
+    13/17: $0\request_write_q[0:0]
+    14/17: $0\request_data_q[15:0]
+    15/17: $0\request_address_q[23:0]
+    16/17: $0\state_q[3:0]
+    17/17: $0\protocol_error[0:0]
+Creating decoders for process `\bridge_gold.$proc$gold.sv:0$386'.
+     1/2: $1\request_direction_valid[0:0]
+     2/2: $1\request_status_valid[0:0]
+Creating decoders for process `\bridge_gold.$proc$gold.sv:0$406'.
+     1/4: $4\beat_byte_enable[1:0]
+     2/4: $3\beat_byte_enable[1:0]
+     3/4: $2\beat_byte_enable[1:0]
+     4/4: $1\beat_byte_enable[1:0]
+Creating decoders for process `\bridge_gold.$proc$gold.sv:271$476'.
+     1/14: $0\cpu_data_in_q[15:0]
+     2/14: $0\complete_sampled_q[0:0]
+     3/14: $0\read_low_byte_q[7:0]
+     4/14: $0\beat_high_q[0:0]
+     5/14: $0\request_native_memory_q[0:0]
+     6/14: $0\request_native_word_q[0:0]
+     7/14: $0\request_two_beats_q[0:0]
+     8/14: $0\request_lock_q[0:0]
+     9/14: $0\request_status_q[3:0]
+    10/14: $0\request_write_q[0:0]
+    11/14: $0\request_data_q[15:0]
+    12/14: $0\request_address_q[23:0]
+    13/14: $0\state_q[3:0]
+    14/14: $0\protocol_error[0:0]
+
+6.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+No latch inferred for signal `\bridge_gate.\request_status_valid' from process `\bridge_gate.$proc$gate.sv:0$560'.
+No latch inferred for signal `\bridge_gate.\request_lane_valid' from process `\bridge_gate.$proc$gate.sv:0$560'.
+No latch inferred for signal `\bridge_gate.\request_direction_valid' from process `\bridge_gate.$proc$gate.sv:0$560'.
+No latch inferred for signal `\bridge_gate.\live_request_valid' from process `\bridge_gate.$proc$gate.sv:0$560'.
+No latch inferred for signal `\bridge_gate.\beat_byte_enable' from process `\bridge_gate.$proc$gate.sv:0$580'.
+No latch inferred for signal `\bridge_gold.\request_status_valid' from process `\bridge_gold.$proc$gold.sv:0$386'.
+No latch inferred for signal `\bridge_gold.\request_lane_valid' from process `\bridge_gold.$proc$gold.sv:0$386'.
+No latch inferred for signal `\bridge_gold.\request_direction_valid' from process `\bridge_gold.$proc$gold.sv:0$386'.
+No latch inferred for signal `\bridge_gold.\live_request_valid' from process `\bridge_gold.$proc$gold.sv:0$386'.
+No latch inferred for signal `\bridge_gold.\beat_byte_enable' from process `\bridge_gold.$proc$gold.sv:0$406'.
+
+6.9. Executing PROC_DFF pass (convert process syncs to FFs).
+Creating register for signal `\bridge_gate.\protocol_error' using process `\bridge_gate.$proc$gate.sv:288$657'.
+  created $dff cell `$procdff$1348' with positive edge clock.
+Creating register for signal `\bridge_gate.\state_q' using process `\bridge_gate.$proc$gate.sv:288$657'.
+  created $dff cell `$procdff$1349' with positive edge clock.
+Creating register for signal `\bridge_gate.\request_address_q' using process `\bridge_gate.$proc$gate.sv:288$657'.
+  created $dff cell `$procdff$1350' with positive edge clock.
+Creating register for signal `\bridge_gate.\request_data_q' using process `\bridge_gate.$proc$gate.sv:288$657'.
+  created $dff cell `$procdff$1351' with positive edge clock.
+Creating register for signal `\bridge_gate.\request_write_q' using process `\bridge_gate.$proc$gate.sv:288$657'.
+  created $dff cell `$procdff$1352' with positive edge clock.
+Creating register for signal `\bridge_gate.\request_status_q' using process `\bridge_gate.$proc$gate.sv:288$657'.
+  created $dff cell `$procdff$1353' with positive edge clock.
+Creating register for signal `\bridge_gate.\request_lock_q' using process `\bridge_gate.$proc$gate.sv:288$657'.
+  created $dff cell `$procdff$1354' with positive edge clock.
+Creating register for signal `\bridge_gate.\request_two_beats_q' using process `\bridge_gate.$proc$gate.sv:288$657'.
+  created $dff cell `$procdff$1355' with positive edge clock.
+Creating register for signal `\bridge_gate.\request_native_word_q' using process `\bridge_gate.$proc$gate.sv:288$657'.
+  created $dff cell `$procdff$1356' with positive edge clock.
+Creating register for signal `\bridge_gate.\request_native_memory_q' using process `\bridge_gate.$proc$gate.sv:288$657'.
+  created $dff cell `$procdff$1357' with positive edge clock.
+Creating register for signal `\bridge_gate.\beat_high_q' using process `\bridge_gate.$proc$gate.sv:288$657'.
+  created $dff cell `$procdff$1358' with positive edge clock.
+Creating register for signal `\bridge_gate.\read_low_byte_q' using process `\bridge_gate.$proc$gate.sv:288$657'.
+  created $dff cell `$procdff$1359' with positive edge clock.
+Creating register for signal `\bridge_gate.\complete_sampled_q' using process `\bridge_gate.$proc$gate.sv:288$657'.
+  created $dff cell `$procdff$1360' with positive edge clock.
+Creating register for signal `\bridge_gate.\cpu_data_in_q' using process `\bridge_gate.$proc$gate.sv:288$657'.
+  created $dff cell `$procdff$1361' with positive edge clock.
+Creating register for signal `\bridge_gate.\timing_tc_q' using process `\bridge_gate.$proc$gate.sv:288$657'.
+  created $dff cell `$procdff$1362' with positive edge clock.
+Creating register for signal `\bridge_gate.\timing_active_q' using process `\bridge_gate.$proc$gate.sv:288$657'.
+  created $dff cell `$procdff$1363' with positive edge clock.
+Creating register for signal `\bridge_gate.\timing_admission_window_q' using process `\bridge_gate.$proc$gate.sv:288$657'.
+  created $dff cell `$procdff$1364' with positive edge clock.
+Creating register for signal `\bridge_gold.\protocol_error' using process `\bridge_gold.$proc$gold.sv:271$476'.
+  created $dff cell `$procdff$1365' with positive edge clock.
+Creating register for signal `\bridge_gold.\state_q' using process `\bridge_gold.$proc$gold.sv:271$476'.
+  created $dff cell `$procdff$1366' with positive edge clock.
+Creating register for signal `\bridge_gold.\request_address_q' using process `\bridge_gold.$proc$gold.sv:271$476'.
+  created $dff cell `$procdff$1367' with positive edge clock.
+Creating register for signal `\bridge_gold.\request_data_q' using process `\bridge_gold.$proc$gold.sv:271$476'.
+  created $dff cell `$procdff$1368' with positive edge clock.
+Creating register for signal `\bridge_gold.\request_write_q' using process `\bridge_gold.$proc$gold.sv:271$476'.
+  created $dff cell `$procdff$1369' with positive edge clock.
+Creating register for signal `\bridge_gold.\request_status_q' using process `\bridge_gold.$proc$gold.sv:271$476'.
+  created $dff cell `$procdff$1370' with positive edge clock.
+Creating register for signal `\bridge_gold.\request_lock_q' using process `\bridge_gold.$proc$gold.sv:271$476'.
+  created $dff cell `$procdff$1371' with positive edge clock.
+Creating register for signal `\bridge_gold.\request_two_beats_q' using process `\bridge_gold.$proc$gold.sv:271$476'.
+  created $dff cell `$procdff$1372' with positive edge clock.
+Creating register for signal `\bridge_gold.\request_native_word_q' using process `\bridge_gold.$proc$gold.sv:271$476'.
+  created $dff cell `$procdff$1373' with positive edge clock.
+Creating register for signal `\bridge_gold.\request_native_memory_q' using process `\bridge_gold.$proc$gold.sv:271$476'.
+  created $dff cell `$procdff$1374' with positive edge clock.
+Creating register for signal `\bridge_gold.\beat_high_q' using process `\bridge_gold.$proc$gold.sv:271$476'.
+  created $dff cell `$procdff$1375' with positive edge clock.
+Creating register for signal `\bridge_gold.\read_low_byte_q' using process `\bridge_gold.$proc$gold.sv:271$476'.
+  created $dff cell `$procdff$1376' with positive edge clock.
+Creating register for signal `\bridge_gold.\complete_sampled_q' using process `\bridge_gold.$proc$gold.sv:271$476'.
+  created $dff cell `$procdff$1377' with positive edge clock.
+Creating register for signal `\bridge_gold.\cpu_data_in_q' using process `\bridge_gold.$proc$gold.sv:271$476'.
+  created $dff cell `$procdff$1378' with positive edge clock.
+
+6.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+6.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Found and cleaned up 2 empty switches in `\bridge_gate.$proc$gate.sv:0$560'.
+Removing empty process `bridge_gate.$proc$gate.sv:0$560'.
+Found and cleaned up 4 empty switches in `\bridge_gate.$proc$gate.sv:0$580'.
+Removing empty process `bridge_gate.$proc$gate.sv:0$580'.
+Found and cleaned up 22 empty switches in `\bridge_gate.$proc$gate.sv:288$657'.
+Removing empty process `bridge_gate.$proc$gate.sv:288$657'.
+Found and cleaned up 2 empty switches in `\bridge_gold.$proc$gold.sv:0$386'.
+Removing empty process `bridge_gold.$proc$gold.sv:0$386'.
+Found and cleaned up 4 empty switches in `\bridge_gold.$proc$gold.sv:0$406'.
+Removing empty process `bridge_gold.$proc$gold.sv:0$406'.
+Found and cleaned up 17 empty switches in `\bridge_gold.$proc$gold.sv:271$476'.
+Removing empty process `bridge_gold.$proc$gold.sv:271$476'.
+Cleaned up 51 empty switches.
+
+6.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module bridge_gate.
+<suppressed ~73 debug messages>
+Optimizing module bridge_gold.
+<suppressed ~43 debug messages>
+
+7. Executing MEMORY pass.
+
+7.1. Executing OPT_MEM pass (optimize memories).
+Performed a total of 0 transformations.
+
+7.2. Executing OPT_MEM_PRIORITY pass (removing unnecessary memory write priority relations).
+Performed a total of 0 transformations.
+
+7.3. Executing OPT_MEM_FEEDBACK pass (finding memory read-to-write feedback paths).
+
+7.4. Executing MEMORY_BMUX2ROM pass (converting muxes to ROMs).
+
+7.5. Executing MEMORY_DFF pass (merging $dff cells to $memrd).
+
+7.6. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \bridge_gate..
+Finding unused cells or wires in module \bridge_gold..
+Removed 42 unused cells and 384 unused wires.
+<suppressed ~53 debug messages>
+
+7.7. Executing MEMORY_SHARE pass (consolidating $memrd/$memwr cells).
+
+7.8. Executing OPT_MEM_WIDEN pass (optimize memories where all ports are wide).
+Performed a total of 0 transformations.
+
+7.9. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \bridge_gate..
+Finding unused cells or wires in module \bridge_gold..
+
+7.10. Executing MEMORY_COLLECT pass (generating $mem cells).
+
+7.11. Executing MEMORY_MAP pass (converting memories to logic and flip-flops).
+
+8. Executing FLATTEN pass (flatten design).
+
+9. Executing OPT pass (performing simple optimizations).
+
+9.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module bridge_gate.
+Optimizing module bridge_gold.
+
+9.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\bridge_gate'.
+<suppressed ~183 debug messages>
+Finding identical cells in module `\bridge_gold'.
+<suppressed ~186 debug messages>
+Removed a total of 123 cells.
+
+9.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \bridge_gate..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+    dead port 1/2 on $mux $procmux$708.
+    dead port 1/2 on $mux $procmux$711.
+    dead port 1/2 on $mux $procmux$714.
+    dead port 1/2 on $mux $procmux$720.
+    dead port 1/2 on $mux $procmux$723.
+    dead port 1/2 on $mux $procmux$729.
+Running muxtree optimizer on module \bridge_gold..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+    dead port 1/2 on $mux $procmux$1065.
+    dead port 1/2 on $mux $procmux$1068.
+    dead port 1/2 on $mux $procmux$1071.
+    dead port 1/2 on $mux $procmux$1077.
+    dead port 1/2 on $mux $procmux$1080.
+    dead port 1/2 on $mux $procmux$1086.
+Removed 12 multiplexer ports.
+<suppressed ~58 debug messages>
+
+9.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \bridge_gate.
+    New ctrl vector for $pmux cell $procmux$1037: { $eq$gate.sv:165$547_Y $auto$opt_reduce.cc:134:opt_pmux$1380 }
+  Optimizing cells in module \bridge_gate.
+  Optimizing cells in module \bridge_gold.
+    New ctrl vector for $pmux cell $procmux$1331: { $eq$gold.sv:152$374_Y $auto$opt_reduce.cc:134:opt_pmux$1382 }
+  Optimizing cells in module \bridge_gold.
+Performed a total of 2 changes.
+
+9.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\bridge_gate'.
+<suppressed ~6 debug messages>
+Finding identical cells in module `\bridge_gold'.
+<suppressed ~6 debug messages>
+Removed a total of 4 cells.
+
+9.6. Executing OPT_DFF pass (perform DFF optimizations).
+Adding SRST signal on $procdff$1361 ($dff) from module bridge_gate (D = $procmux$811_Y, Q = \cpu_data_in_q, rval = 16'0000000000000000).
+Adding EN signal on $auto$ff.cc:266:slice$1383 ($sdff) from module bridge_gate (D = $procmux$811_Y, Q = \cpu_data_in_q).
+Adding SRST signal on $procdff$1360 ($dff) from module bridge_gate (D = $procmux$830_Y, Q = \complete_sampled_q, rval = 1'0).
+Adding SRST signal on $procdff$1359 ($dff) from module bridge_gate (D = $procmux$854_Y, Q = \read_low_byte_q, rval = 8'00000000).
+Adding EN signal on $auto$ff.cc:266:slice$1398 ($sdff) from module bridge_gate (D = $procmux$854_Y, Q = \read_low_byte_q).
+Adding SRST signal on $procdff$1358 ($dff) from module bridge_gate (D = $procmux$870_Y, Q = \beat_high_q, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$1418 ($sdff) from module bridge_gate (D = $procmux$870_Y, Q = \beat_high_q).
+Adding SRST signal on $procdff$1356 ($dff) from module bridge_gate (D = $procmux$903_Y, Q = \request_native_word_q, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$1430 ($sdff) from module bridge_gate (D = $logic_and$gate.sv:341$675_Y, Q = \request_native_word_q).
+Adding SRST signal on $procdff$1355 ($dff) from module bridge_gate (D = $procmux$918_Y, Q = \request_two_beats_q, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$1434 ($sdff) from module bridge_gate (D = $logic_and$gate.sv:336$674_Y, Q = \request_two_beats_q).
+Adding SRST signal on $procdff$1354 ($dff) from module bridge_gate (D = $procmux$933_Y, Q = \request_lock_q, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$1438 ($sdff) from module bridge_gate (D = $logic_and$gate.sv:335$666_Y, Q = \request_lock_q).
+Adding SRST signal on $procdff$1353 ($dff) from module bridge_gate (D = $procmux$948_Y, Q = \request_status_q, rval = 4'1111).
+Adding EN signal on $auto$ff.cc:266:slice$1442 ($sdff) from module bridge_gate (D = \cpu_bus_status, Q = \request_status_q).
+Adding SRST signal on $procdff$1352 ($dff) from module bridge_gate (D = $procmux$963_Y, Q = \request_write_q, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$1446 ($sdff) from module bridge_gate (D = \cpu_bus_write, Q = \request_write_q).
+Adding SRST signal on $procdff$1351 ($dff) from module bridge_gate (D = $procmux$978_Y, Q = \request_data_q, rval = 16'0000000000000000).
+Adding EN signal on $auto$ff.cc:266:slice$1450 ($sdff) from module bridge_gate (D = \cpu_data_out, Q = \request_data_q).
+Adding SRST signal on $procdff$1350 ($dff) from module bridge_gate (D = $procmux$993_Y, Q = \request_address_q, rval = 24'000000000000000000000000).
+Adding EN signal on $auto$ff.cc:266:slice$1454 ($sdff) from module bridge_gate (D = \cpu_address, Q = \request_address_q).
+Adding SRST signal on $procdff$1349 ($dff) from module bridge_gate (D = $procmux$1009_Y, Q = \state_q, rval = 4'0000).
+Adding EN signal on $auto$ff.cc:266:slice$1458 ($sdff) from module bridge_gate (D = $procmux$1009_Y, Q = \state_q).
+Adding SRST signal on $procdff$1348 ($dff) from module bridge_gate (D = $procmux$1037_Y, Q = \protocol_error, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$1472 ($sdff) from module bridge_gate (D = $procmux$1037_Y, Q = \protocol_error).
+Adding SRST signal on $procdff$1378 ($dff) from module bridge_gold (D = $procmux$1113_Y, Q = \cpu_data_in_q, rval = 16'0000000000000000).
+Adding EN signal on $auto$ff.cc:266:slice$1482 ($sdff) from module bridge_gold (D = $procmux$1113_Y, Q = \cpu_data_in_q).
+Adding SRST signal on $procdff$1377 ($dff) from module bridge_gold (D = $procmux$1129_Y, Q = \complete_sampled_q, rval = 1'0).
+Adding SRST signal on $procdff$1376 ($dff) from module bridge_gold (D = $procmux$1153_Y, Q = \read_low_byte_q, rval = 8'00000000).
+Adding EN signal on $auto$ff.cc:266:slice$1497 ($sdff) from module bridge_gold (D = $procmux$1153_Y, Q = \read_low_byte_q).
+Adding SRST signal on $procdff$1375 ($dff) from module bridge_gold (D = $procmux$1169_Y, Q = \beat_high_q, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$1517 ($sdff) from module bridge_gold (D = $procmux$1169_Y, Q = \beat_high_q).
+Adding SRST signal on $procdff$1373 ($dff) from module bridge_gold (D = $procmux$1202_Y, Q = \request_native_word_q, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$1529 ($sdff) from module bridge_gold (D = $logic_and$gold.sv:306$489_Y, Q = \request_native_word_q).
+Adding SRST signal on $procdff$1372 ($dff) from module bridge_gold (D = $procmux$1217_Y, Q = \request_two_beats_q, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$1533 ($sdff) from module bridge_gold (D = $logic_and$gold.sv:301$488_Y, Q = \request_two_beats_q).
+Adding SRST signal on $procdff$1371 ($dff) from module bridge_gold (D = $procmux$1232_Y, Q = \request_lock_q, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$1537 ($sdff) from module bridge_gold (D = $logic_and$gold.sv:300$480_Y, Q = \request_lock_q).
+Adding SRST signal on $procdff$1370 ($dff) from module bridge_gold (D = $procmux$1247_Y, Q = \request_status_q, rval = 4'1111).
+Adding EN signal on $auto$ff.cc:266:slice$1541 ($sdff) from module bridge_gold (D = \cpu_bus_status, Q = \request_status_q).
+Adding SRST signal on $procdff$1369 ($dff) from module bridge_gold (D = $procmux$1262_Y, Q = \request_write_q, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$1545 ($sdff) from module bridge_gold (D = \cpu_bus_write, Q = \request_write_q).
+Adding SRST signal on $procdff$1368 ($dff) from module bridge_gold (D = $procmux$1277_Y, Q = \request_data_q, rval = 16'0000000000000000).
+Adding EN signal on $auto$ff.cc:266:slice$1549 ($sdff) from module bridge_gold (D = \cpu_data_out, Q = \request_data_q).
+Adding SRST signal on $procdff$1367 ($dff) from module bridge_gold (D = $procmux$1292_Y, Q = \request_address_q, rval = 24'000000000000000000000000).
+Adding EN signal on $auto$ff.cc:266:slice$1553 ($sdff) from module bridge_gold (D = \cpu_address, Q = \request_address_q).
+Adding SRST signal on $procdff$1366 ($dff) from module bridge_gold (D = $procmux$1303_Y, Q = \state_q, rval = 4'0000).
+Adding EN signal on $auto$ff.cc:266:slice$1557 ($sdff) from module bridge_gold (D = $procmux$1303_Y, Q = \state_q).
+Adding SRST signal on $procdff$1365 ($dff) from module bridge_gold (D = $procmux$1331_Y, Q = \protocol_error, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$1571 ($sdff) from module bridge_gold (D = $procmux$1331_Y, Q = \protocol_error).
+
+9.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \bridge_gate..
+Finding unused cells or wires in module \bridge_gold..
+Removed 54 unused cells and 172 unused wires.
+<suppressed ~56 debug messages>
+
+9.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module bridge_gate.
+<suppressed ~4 debug messages>
+Optimizing module bridge_gold.
+<suppressed ~4 debug messages>
+
+9.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+9.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \bridge_gate..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \bridge_gold..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~44 debug messages>
+
+9.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \bridge_gate.
+  Optimizing cells in module \bridge_gold.
+Performed a total of 0 changes.
+
+9.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\bridge_gate'.
+<suppressed ~48 debug messages>
+Finding identical cells in module `\bridge_gold'.
+<suppressed ~48 debug messages>
+Removed a total of 32 cells.
+
+9.13. Executing OPT_DFF pass (perform DFF optimizations).
+
+9.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \bridge_gate..
+Finding unused cells or wires in module \bridge_gold..
+Removed 0 unused cells and 32 unused wires.
+<suppressed ~2 debug messages>
+
+9.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module bridge_gate.
+Optimizing module bridge_gold.
+
+9.16. Rerunning OPT passes. (Maybe there is more to do..)
+
+9.17. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \bridge_gate..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \bridge_gold..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~44 debug messages>
+
+9.18. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \bridge_gate.
+  Optimizing cells in module \bridge_gold.
+Performed a total of 0 changes.
+
+9.19. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\bridge_gate'.
+Finding identical cells in module `\bridge_gold'.
+Removed a total of 0 cells.
+
+9.20. Executing OPT_DFF pass (perform DFF optimizations).
+
+9.21. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \bridge_gate..
+Finding unused cells or wires in module \bridge_gold..
+
+9.22. Executing OPT_EXPR pass (perform const folding).
+Optimizing module bridge_gate.
+Optimizing module bridge_gold.
+
+9.23. Finished OPT passes. (There is nothing left to do.)
+
+10. Executing JSON backend.
+
+11. Executing RTLIL backend.
+Output filename: elaborated.il
+
+End of script. Logfile hash: bcd283f628, CPU: user 0.27s system 0.01s, MEM: 18.24 MB peak
+Yosys 0.33 (git sha1 2584903a060)
+Time spent: 23% 5x opt_expr (0 sec), 17% 5x opt_clean (0 sec), ...

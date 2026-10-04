@@ -58,7 +58,7 @@ module spk286_at_profile_bridge_tb;
             ticks = 0;
         end else begin
             if (boundary) ticks = ticks + 1;
-            if (state == 0 && valid && (!historical || boundary) && !drain_pending)
+            if (state == 0 && valid && (!historical || boundary || dut.timing_admission_window_q) && !drain_pending)
                 ts_tick = ticks;
             if (accept) begin
                 backend_pending <= 1;
@@ -86,6 +86,76 @@ module spk286_at_profile_bridge_tb;
     task automatic check(input bit condition, input string label_text);
         checks = checks + 1;
         if (!condition) $fatal(1, "PROFILE_BRIDGE_FAIL %s", label_text);
+    endtask
+    task automatic reset_retained_response;
+        integer timeout_count, old_publications;
+        begin
+            if (historical) begin
+                @(negedge clk);
+                status = 4'h5; write_cycle = 0; memory_width = 1;
+                address = 24'h102; bhe_n = 0; locked = 0; latency = 0;
+                valid = 1; timeout_count = 0; old_publications = publications;
+                while (state != 6 && timeout_count < 500) begin
+                    @(negedge clk); timeout_count = timeout_count + 1;
+                end
+                check(state == 6 && !ready, "physical response retained before Tc");
+                reset = 1; valid = 0;
+                repeat (3) @(negedge clk);
+                reset = 0;
+                repeat (15) @(negedge clk);
+                check(publications == old_publications && idle && !ready,
+                      "reset cancels retained logical publication without replay");
+            end
+        end
+    endtask
+    task automatic drain_barrier_test;
+        integer old_commands;
+        begin
+            @(negedge clk);
+            status = 4'h9; write_cycle = 0; memory_width = 0;
+            address = 24'h60; bhe_n = 1; locked = 0; valid = 1;
+            drain_pending = 1; old_commands = commands;
+            repeat (25) @(negedge clk);
+            check(commands == old_commands && !ready && !idle,
+                  "posted writes drain before peripheral admission");
+            valid = 0; drain_pending = 0;
+            repeat (3) @(negedge clk);
+            check(idle && !ready, "withdraw unaccepted request after barrier");
+        end
+    endtask
+    // The real BIU may hold valid high and replace its payload only after
+    // sampling READY. Identical adjacent requests are distinct transactions.
+    task automatic consecutive_reads;
+        integer old_publications, old_commands, old_captures, timeout_count;
+        integer terminal_tick, first_admission_tick;
+        begin
+            @(negedge clk);
+            status = 4'h5; write_cycle = 0; memory_width = 1;
+            address = 24'h100; bhe_n = 0; locked = 1; latency = 0;
+            old_commands = commands; old_captures = captures;
+            valid = 1;
+            for (integer n = 0; n < 8; n = n + 1) begin
+                old_publications = publications;
+                timeout_count = 0;
+                while (publications == old_publications && timeout_count < 500) begin
+                    @(negedge clk); timeout_count = timeout_count + 1;
+                end
+                check(publications == old_publications+1, "consecutive request publication");
+                check(sampled == 16'hC35A, "identical request data");
+                if (historical && n > 0)
+                    check(ts_tick == terminal_tick, "next Ts has no inserted idle CPU clock");
+                terminal_tick = ticks;
+                first_admission_tick = ts_tick;
+                check(!historical || terminal_tick-first_admission_tick == 2,
+                      "fast retained RAM takes exactly Ts plus Tc");
+                // valid/address intentionally remain identical across READY.
+            end
+            valid = 0; locked = 0;
+            repeat (3) @(negedge clk);
+            check(commands-old_commands == 8 && captures-old_captures == 8,
+                  "identical requests accepted/captured once each");
+            cases = cases + 8;
+        end
     endtask
     task automatic transfer(input integer delay_cycles, input logic [3:0] cycle_class,
                             input bit native_memory, input bit odd_address,
@@ -131,6 +201,9 @@ module spk286_at_profile_bridge_tb;
             repeat (3) @(negedge clk);
             reset = 0;
             check(active == 3'(p), "profile applied at reset");
+            reset_retained_response();
+            drain_barrier_test();
+            consecutive_reads();
             for (offset = 0; offset < 21; offset = offset + 1) begin
                 transfer(offset, 4'hD, 1, 0, 0, 0);
                 transfer(offset, 4'h5, 1, 0, 0, 1);

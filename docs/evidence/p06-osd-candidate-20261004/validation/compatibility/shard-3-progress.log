@@ -1,0 +1,60 @@
+PROFILE_COMPAT_PASS protected_task_iret MAX Icarus
+PROFILE_COMPAT_PASS protected_task_iret 6 Icarus
+PROFILE_COMPAT_PASS protected_task_iret 8 Icarus
+PROFILE_COMPAT_PASS protected_task_iret 10 Icarus
+PROFILE_COMPAT_PASS protected_task_iret 12.5 Icarus
+PROFILE_COMPAT_PASS protected_task_iret 16 Icarus
+PROFILE_COMPAT_PASS protected_task_iret 20 Icarus
+PROFILE_COMPAT_PASS protected_task_iret 25 Icarus
+PROFILE_MAX_PASS protected_task_iret
+PROFILE_COMPAT_PASS protected_task_state_fault MAX Icarus
+PROFILE_COMPAT_PASS protected_task_state_fault 6 Icarus
+PROFILE_COMPAT_PASS protected_task_state_fault 8 Icarus
+PROFILE_COMPAT_PASS protected_task_state_fault 10 Icarus
+PROFILE_COMPAT_PASS protected_task_state_fault 12.5 Icarus
+PROFILE_COMPAT_PASS protected_task_state_fault 16 Icarus
+PROFILE_COMPAT_PASS protected_task_state_fault 20 Icarus
+PROFILE_COMPAT_PASS protected_task_state_fault 25 Icarus
+PROFILE_MAX_PASS protected_task_state_fault
+PROFILE_COMPAT_PASS protected_task_privilege_outer MAX Icarus
+PROFILE_COMPAT_PASS protected_task_privilege_outer 6 Icarus
+PROFILE_COMPAT_PASS protected_task_privilege_outer 8 Icarus
+PROFILE_COMPAT_PASS protected_task_privilege_outer 10 Icarus
+PROFILE_COMPAT_PASS protected_task_privilege_outer 12.5 Icarus
+PROFILE_COMPAT_PASS protected_task_privilege_outer 16 Icarus
+PROFILE_COMPAT_PASS protected_task_privilege_outer 20 Icarus
+PROFILE_COMPAT_PASS protected_task_privilege_outer 25 Icarus
+PROFILE_MAX_PASS protected_task_privilege_outer
+PROFILE_COMPAT_PASS protected_retf MAX Icarus
+PROFILE_COMPAT_PASS protected_retf 6 Icarus
+PROFILE_COMPAT_PASS protected_retf 8 Icarus
+PROFILE_COMPAT_PASS protected_retf 10 Icarus
+PROFILE_COMPAT_PASS protected_retf 12.5 Icarus
+PROFILE_COMPAT_PASS protected_retf 16 Icarus
+PROFILE_COMPAT_PASS protected_retf 20 Icarus
+PROFILE_COMPAT_PASS protected_retf 25 Icarus
+PROFILE_MAX_PASS protected_retf
+PROFILE_COMPAT_PASS iopl_access MAX Icarus
+Traceback (most recent call last):
+  File "/mnt/d/GitHub/PCAT-286_MiSTer/scripts/test_p06_profile_compatibility.py", line 542, in <module>
+    main()
+  File "/mnt/d/GitHub/PCAT-286_MiSTer/scripts/test_p06_profile_compatibility.py", line 477, in main
+    result = test_run(["vvp", directory / "profiled.vvp"],
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/d/GitHub/PCAT-286_MiSTer/scripts/test_p06_profile_compatibility.py", line 306, in test_run
+    result = run([*args, f"+profile_trace={pipe}"], log, timeout=300, check=False)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/mnt/d/GitHub/PCAT-286_MiSTer/scripts/test_p06_profile_compatibility.py", line 45, in run
+    result = subprocess.run([str(item) for item in command], cwd=ROOT,
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/subprocess.py", line 550, in run
+    stdout, stderr = process.communicate(input, timeout=timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/subprocess.py", line 1209, in communicate
+    stdout, stderr = self._communicate(input, endtime, timeout)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/subprocess.py", line 2116, in _communicate
+    self._check_timeout(endtime, orig_timeout, stdout, stderr)
+  File "/usr/lib/python3.12/subprocess.py", line 1253, in _check_timeout
+    raise TimeoutExpired(
+subprocess.TimeoutExpired: Command '['vvp', '/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-profile-compat-final2-20261004/shard-3/iopl_access/profiled.vvp', '+profile=1', '+watchdog_multiplier=16', '+profile_trace=/tmp/p06-profile-trace-jdtlskdu/observer.csv']' timed out after 300 seconds

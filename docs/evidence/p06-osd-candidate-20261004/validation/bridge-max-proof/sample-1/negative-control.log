@@ -1,0 +1,972 @@
+
+ /----------------------------------------------------------------------------\
+ |                                                                            |
+ |  yosys -- Yosys Open SYnthesis Suite                                       |
+ |                                                                            |
+ |  Copyright (C) 2012 - 2020  Claire Xenia Wolf <claire@yosyshq.com>         |
+ |                                                                            |
+ |  Permission to use, copy, modify, and/or distribute this software for any  |
+ |  purpose with or without fee is hereby granted, provided that the above    |
+ |  copyright notice and this permission notice appear in all copies.         |
+ |                                                                            |
+ |  THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES  |
+ |  WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF          |
+ |  MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR   |
+ |  ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES    |
+ |  WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN     |
+ |  ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF   |
+ |  OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.            |
+ |                                                                            |
+ \----------------------------------------------------------------------------/
+
+ Yosys 0.33 (git sha1 2584903a060)
+
+
+-- Running command `read_verilog -sv -DSYNTHESIS gold.sv mutant.sv; chparam -set COMPLETE_ON_CPU_SAMPLE 1 bridge_gold bridge_gate; hierarchy -check; proc; memory; flatten; opt; equiv_make -blacklist blacklist.txt bridge_gold bridge_gate miter; hierarchy -top miter; async2sync; opt_clean; equiv_simple; equiv_induct -seq 4; equiv_status -assert' --
+
+1. Executing Verilog-2005 frontend: gold.sv
+Parsing SystemVerilog input from `gold.sv' to AST representation.
+Generating RTLIL representation for module `\bridge_gold'.
+Successfully finished Verilog frontend.
+
+2. Executing Verilog-2005 frontend: mutant.sv
+Parsing SystemVerilog input from `mutant.sv' to AST representation.
+Generating RTLIL representation for module `\bridge_gate'.
+Successfully finished Verilog frontend.
+Parameter \COMPLETE_ON_CPU_SAMPLE = 1
+
+3. Executing AST frontend in derive mode using pre-parsed AST for module `\bridge_gold'.
+Parameter \COMPLETE_ON_CPU_SAMPLE = 1
+Generating RTLIL representation for module `$paramod\bridge_gold\COMPLETE_ON_CPU_SAMPLE=32'00000000000000000000000000000001'.
+Parameter \COMPLETE_ON_CPU_SAMPLE = 1
+
+4. Executing AST frontend in derive mode using pre-parsed AST for module `\bridge_gate'.
+Parameter \COMPLETE_ON_CPU_SAMPLE = 1
+Generating RTLIL representation for module `$paramod\bridge_gate\COMPLETE_ON_CPU_SAMPLE=32'00000000000000000000000000000001'.
+
+5. Executing HIERARCHY pass (managing design hierarchy).
+
+6. Executing PROC pass (convert processes to netlists).
+
+6.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Found and cleaned up 1 empty switch in `\bridge_gate.$proc$mutant.sv:288$659'.
+Found and cleaned up 1 empty switch in `\bridge_gold.$proc$gold.sv:271$477'.
+Cleaned up 2 empty switches.
+
+6.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Marked 2 switch rules as full_case in process $proc$mutant.sv:0$561 in module bridge_gate.
+Marked 4 switch rules as full_case in process $proc$mutant.sv:0$581 in module bridge_gate.
+Marked 12 switch rules as full_case in process $proc$mutant.sv:288$659 in module bridge_gate.
+Marked 2 switch rules as full_case in process $proc$gold.sv:0$387 in module bridge_gold.
+Marked 4 switch rules as full_case in process $proc$gold.sv:0$407 in module bridge_gold.
+Marked 11 switch rules as full_case in process $proc$gold.sv:271$477 in module bridge_gold.
+Removed a total of 0 dead cases.
+
+6.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 0 redundant assignments.
+Promoted 10 assignments to connections.
+
+6.4. Executing PROC_INIT pass (extract init attributes).
+
+6.5. Executing PROC_ARST pass (detect async resets in processes).
+
+6.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+<suppressed ~51 debug messages>
+
+6.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\bridge_gate.$proc$mutant.sv:0$561'.
+     1/2: $1\request_direction_valid[0:0]
+     2/2: $1\request_status_valid[0:0]
+Creating decoders for process `\bridge_gate.$proc$mutant.sv:0$581'.
+     1/4: $4\beat_byte_enable[1:0]
+     2/4: $3\beat_byte_enable[1:0]
+     3/4: $2\beat_byte_enable[1:0]
+     4/4: $1\beat_byte_enable[1:0]
+Creating decoders for process `\bridge_gate.$proc$mutant.sv:288$659'.
+     1/17: $0\timing_admission_window_q[0:0]
+     2/17: $0\timing_active_q[0:0]
+     3/17: $0\timing_tc_q[0:0]
+     4/17: $0\cpu_data_in_q[15:0]
+     5/17: $0\complete_sampled_q[0:0]
+     6/17: $0\read_low_byte_q[7:0]
+     7/17: $0\beat_high_q[0:0]
+     8/17: $0\request_native_memory_q[0:0]
+     9/17: $0\request_native_word_q[0:0]
+    10/17: $0\request_two_beats_q[0:0]
+    11/17: $0\request_lock_q[0:0]
+    12/17: $0\request_status_q[3:0]
+    13/17: $0\request_write_q[0:0]
+    14/17: $0\request_data_q[15:0]
+    15/17: $0\request_address_q[23:0]
+    16/17: $0\state_q[3:0]
+    17/17: $0\protocol_error[0:0]
+Creating decoders for process `\bridge_gold.$proc$gold.sv:0$387'.
+     1/2: $1\request_direction_valid[0:0]
+     2/2: $1\request_status_valid[0:0]
+Creating decoders for process `\bridge_gold.$proc$gold.sv:0$407'.
+     1/4: $4\beat_byte_enable[1:0]
+     2/4: $3\beat_byte_enable[1:0]
+     3/4: $2\beat_byte_enable[1:0]
+     4/4: $1\beat_byte_enable[1:0]
+Creating decoders for process `\bridge_gold.$proc$gold.sv:271$477'.
+     1/14: $0\cpu_data_in_q[15:0]
+     2/14: $0\complete_sampled_q[0:0]
+     3/14: $0\read_low_byte_q[7:0]
+     4/14: $0\beat_high_q[0:0]
+     5/14: $0\request_native_memory_q[0:0]
+     6/14: $0\request_native_word_q[0:0]
+     7/14: $0\request_two_beats_q[0:0]
+     8/14: $0\request_lock_q[0:0]
+     9/14: $0\request_status_q[3:0]
+    10/14: $0\request_write_q[0:0]
+    11/14: $0\request_data_q[15:0]
+    12/14: $0\request_address_q[23:0]
+    13/14: $0\state_q[3:0]
+    14/14: $0\protocol_error[0:0]
+
+6.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+No latch inferred for signal `\bridge_gate.\request_status_valid' from process `\bridge_gate.$proc$mutant.sv:0$561'.
+No latch inferred for signal `\bridge_gate.\request_lane_valid' from process `\bridge_gate.$proc$mutant.sv:0$561'.
+No latch inferred for signal `\bridge_gate.\request_direction_valid' from process `\bridge_gate.$proc$mutant.sv:0$561'.
+No latch inferred for signal `\bridge_gate.\live_request_valid' from process `\bridge_gate.$proc$mutant.sv:0$561'.
+No latch inferred for signal `\bridge_gate.\beat_byte_enable' from process `\bridge_gate.$proc$mutant.sv:0$581'.
+No latch inferred for signal `\bridge_gold.\request_status_valid' from process `\bridge_gold.$proc$gold.sv:0$387'.
+No latch inferred for signal `\bridge_gold.\request_lane_valid' from process `\bridge_gold.$proc$gold.sv:0$387'.
+No latch inferred for signal `\bridge_gold.\request_direction_valid' from process `\bridge_gold.$proc$gold.sv:0$387'.
+No latch inferred for signal `\bridge_gold.\live_request_valid' from process `\bridge_gold.$proc$gold.sv:0$387'.
+No latch inferred for signal `\bridge_gold.\beat_byte_enable' from process `\bridge_gold.$proc$gold.sv:0$407'.
+
+6.9. Executing PROC_DFF pass (convert process syncs to FFs).
+Creating register for signal `\bridge_gate.\protocol_error' using process `\bridge_gate.$proc$mutant.sv:288$659'.
+  created $dff cell `$procdff$1350' with positive edge clock.
+Creating register for signal `\bridge_gate.\state_q' using process `\bridge_gate.$proc$mutant.sv:288$659'.
+  created $dff cell `$procdff$1351' with positive edge clock.
+Creating register for signal `\bridge_gate.\request_address_q' using process `\bridge_gate.$proc$mutant.sv:288$659'.
+  created $dff cell `$procdff$1352' with positive edge clock.
+Creating register for signal `\bridge_gate.\request_data_q' using process `\bridge_gate.$proc$mutant.sv:288$659'.
+  created $dff cell `$procdff$1353' with positive edge clock.
+Creating register for signal `\bridge_gate.\request_write_q' using process `\bridge_gate.$proc$mutant.sv:288$659'.
+  created $dff cell `$procdff$1354' with positive edge clock.
+Creating register for signal `\bridge_gate.\request_status_q' using process `\bridge_gate.$proc$mutant.sv:288$659'.
+  created $dff cell `$procdff$1355' with positive edge clock.
+Creating register for signal `\bridge_gate.\request_lock_q' using process `\bridge_gate.$proc$mutant.sv:288$659'.
+  created $dff cell `$procdff$1356' with positive edge clock.
+Creating register for signal `\bridge_gate.\request_two_beats_q' using process `\bridge_gate.$proc$mutant.sv:288$659'.
+  created $dff cell `$procdff$1357' with positive edge clock.
+Creating register for signal `\bridge_gate.\request_native_word_q' using process `\bridge_gate.$proc$mutant.sv:288$659'.
+  created $dff cell `$procdff$1358' with positive edge clock.
+Creating register for signal `\bridge_gate.\request_native_memory_q' using process `\bridge_gate.$proc$mutant.sv:288$659'.
+  created $dff cell `$procdff$1359' with positive edge clock.
+Creating register for signal `\bridge_gate.\beat_high_q' using process `\bridge_gate.$proc$mutant.sv:288$659'.
+  created $dff cell `$procdff$1360' with positive edge clock.
+Creating register for signal `\bridge_gate.\read_low_byte_q' using process `\bridge_gate.$proc$mutant.sv:288$659'.
+  created $dff cell `$procdff$1361' with positive edge clock.
+Creating register for signal `\bridge_gate.\complete_sampled_q' using process `\bridge_gate.$proc$mutant.sv:288$659'.
+  created $dff cell `$procdff$1362' with positive edge clock.
+Creating register for signal `\bridge_gate.\cpu_data_in_q' using process `\bridge_gate.$proc$mutant.sv:288$659'.
+  created $dff cell `$procdff$1363' with positive edge clock.
+Creating register for signal `\bridge_gate.\timing_tc_q' using process `\bridge_gate.$proc$mutant.sv:288$659'.
+  created $dff cell `$procdff$1364' with positive edge clock.
+Creating register for signal `\bridge_gate.\timing_active_q' using process `\bridge_gate.$proc$mutant.sv:288$659'.
+  created $dff cell `$procdff$1365' with positive edge clock.
+Creating register for signal `\bridge_gate.\timing_admission_window_q' using process `\bridge_gate.$proc$mutant.sv:288$659'.
+  created $dff cell `$procdff$1366' with positive edge clock.
+Creating register for signal `\bridge_gold.\protocol_error' using process `\bridge_gold.$proc$gold.sv:271$477'.
+  created $dff cell `$procdff$1367' with positive edge clock.
+Creating register for signal `\bridge_gold.\state_q' using process `\bridge_gold.$proc$gold.sv:271$477'.
+  created $dff cell `$procdff$1368' with positive edge clock.
+Creating register for signal `\bridge_gold.\request_address_q' using process `\bridge_gold.$proc$gold.sv:271$477'.
+  created $dff cell `$procdff$1369' with positive edge clock.
+Creating register for signal `\bridge_gold.\request_data_q' using process `\bridge_gold.$proc$gold.sv:271$477'.
+  created $dff cell `$procdff$1370' with positive edge clock.
+Creating register for signal `\bridge_gold.\request_write_q' using process `\bridge_gold.$proc$gold.sv:271$477'.
+  created $dff cell `$procdff$1371' with positive edge clock.
+Creating register for signal `\bridge_gold.\request_status_q' using process `\bridge_gold.$proc$gold.sv:271$477'.
+  created $dff cell `$procdff$1372' with positive edge clock.
+Creating register for signal `\bridge_gold.\request_lock_q' using process `\bridge_gold.$proc$gold.sv:271$477'.
+  created $dff cell `$procdff$1373' with positive edge clock.
+Creating register for signal `\bridge_gold.\request_two_beats_q' using process `\bridge_gold.$proc$gold.sv:271$477'.
+  created $dff cell `$procdff$1374' with positive edge clock.
+Creating register for signal `\bridge_gold.\request_native_word_q' using process `\bridge_gold.$proc$gold.sv:271$477'.
+  created $dff cell `$procdff$1375' with positive edge clock.
+Creating register for signal `\bridge_gold.\request_native_memory_q' using process `\bridge_gold.$proc$gold.sv:271$477'.
+  created $dff cell `$procdff$1376' with positive edge clock.
+Creating register for signal `\bridge_gold.\beat_high_q' using process `\bridge_gold.$proc$gold.sv:271$477'.
+  created $dff cell `$procdff$1377' with positive edge clock.
+Creating register for signal `\bridge_gold.\read_low_byte_q' using process `\bridge_gold.$proc$gold.sv:271$477'.
+  created $dff cell `$procdff$1378' with positive edge clock.
+Creating register for signal `\bridge_gold.\complete_sampled_q' using process `\bridge_gold.$proc$gold.sv:271$477'.
+  created $dff cell `$procdff$1379' with positive edge clock.
+Creating register for signal `\bridge_gold.\cpu_data_in_q' using process `\bridge_gold.$proc$gold.sv:271$477'.
+  created $dff cell `$procdff$1380' with positive edge clock.
+
+6.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+6.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Found and cleaned up 2 empty switches in `\bridge_gate.$proc$mutant.sv:0$561'.
+Removing empty process `bridge_gate.$proc$mutant.sv:0$561'.
+Found and cleaned up 4 empty switches in `\bridge_gate.$proc$mutant.sv:0$581'.
+Removing empty process `bridge_gate.$proc$mutant.sv:0$581'.
+Found and cleaned up 22 empty switches in `\bridge_gate.$proc$mutant.sv:288$659'.
+Removing empty process `bridge_gate.$proc$mutant.sv:288$659'.
+Found and cleaned up 2 empty switches in `\bridge_gold.$proc$gold.sv:0$387'.
+Removing empty process `bridge_gold.$proc$gold.sv:0$387'.
+Found and cleaned up 4 empty switches in `\bridge_gold.$proc$gold.sv:0$407'.
+Removing empty process `bridge_gold.$proc$gold.sv:0$407'.
+Found and cleaned up 17 empty switches in `\bridge_gold.$proc$gold.sv:271$477'.
+Removing empty process `bridge_gold.$proc$gold.sv:271$477'.
+Cleaned up 51 empty switches.
+
+6.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module bridge_gate.
+<suppressed ~77 debug messages>
+Optimizing module bridge_gold.
+<suppressed ~43 debug messages>
+
+7. Executing MEMORY pass.
+
+7.1. Executing OPT_MEM pass (optimize memories).
+Performed a total of 0 transformations.
+
+7.2. Executing OPT_MEM_PRIORITY pass (removing unnecessary memory write priority relations).
+Performed a total of 0 transformations.
+
+7.3. Executing OPT_MEM_FEEDBACK pass (finding memory read-to-write feedback paths).
+
+7.4. Executing MEMORY_BMUX2ROM pass (converting muxes to ROMs).
+
+7.5. Executing MEMORY_DFF pass (merging $dff cells to $memrd).
+
+7.6. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \bridge_gate..
+Finding unused cells or wires in module \bridge_gold..
+Removed 41 unused cells and 385 unused wires.
+<suppressed ~52 debug messages>
+
+7.7. Executing MEMORY_SHARE pass (consolidating $memrd/$memwr cells).
+
+7.8. Executing OPT_MEM_WIDEN pass (optimize memories where all ports are wide).
+Performed a total of 0 transformations.
+
+7.9. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \bridge_gate..
+Finding unused cells or wires in module \bridge_gold..
+
+7.10. Executing MEMORY_COLLECT pass (generating $mem cells).
+
+7.11. Executing MEMORY_MAP pass (converting memories to logic and flip-flops).
+
+8. Executing FLATTEN pass (flatten design).
+
+9. Executing OPT pass (performing simple optimizations).
+
+9.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module bridge_gate.
+Optimizing module bridge_gold.
+
+9.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\bridge_gate'.
+<suppressed ~183 debug messages>
+Finding identical cells in module `\bridge_gold'.
+<suppressed ~186 debug messages>
+Removed a total of 123 cells.
+
+9.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \bridge_gate..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+    dead port 1/2 on $mux $procmux$710.
+    dead port 1/2 on $mux $procmux$713.
+    dead port 1/2 on $mux $procmux$716.
+    dead port 1/2 on $mux $procmux$722.
+    dead port 1/2 on $mux $procmux$725.
+    dead port 1/2 on $mux $procmux$731.
+Running muxtree optimizer on module \bridge_gold..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+    dead port 1/2 on $mux $procmux$1067.
+    dead port 1/2 on $mux $procmux$1070.
+    dead port 1/2 on $mux $procmux$1073.
+    dead port 1/2 on $mux $procmux$1079.
+    dead port 1/2 on $mux $procmux$1082.
+    dead port 1/2 on $mux $procmux$1088.
+Removed 12 multiplexer ports.
+<suppressed ~58 debug messages>
+
+9.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \bridge_gate.
+    New ctrl vector for $pmux cell $procmux$1039: { $eq$mutant.sv:165$548_Y $auto$opt_reduce.cc:134:opt_pmux$1382 }
+  Optimizing cells in module \bridge_gate.
+  Optimizing cells in module \bridge_gold.
+    New ctrl vector for $pmux cell $procmux$1333: { $eq$gold.sv:152$375_Y $auto$opt_reduce.cc:134:opt_pmux$1384 }
+  Optimizing cells in module \bridge_gold.
+Performed a total of 2 changes.
+
+9.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\bridge_gate'.
+<suppressed ~6 debug messages>
+Finding identical cells in module `\bridge_gold'.
+<suppressed ~6 debug messages>
+Removed a total of 4 cells.
+
+9.6. Executing OPT_DFF pass (perform DFF optimizations).
+Adding SRST signal on $procdff$1363 ($dff) from module bridge_gate (D = $procmux$813_Y, Q = \cpu_data_in_q, rval = 16'0000000000000000).
+Adding EN signal on $auto$ff.cc:266:slice$1385 ($sdff) from module bridge_gate (D = $procmux$813_Y, Q = \cpu_data_in_q).
+Adding SRST signal on $procdff$1362 ($dff) from module bridge_gate (D = $procmux$832_Y, Q = \complete_sampled_q, rval = 1'0).
+Adding SRST signal on $procdff$1361 ($dff) from module bridge_gate (D = $procmux$856_Y, Q = \read_low_byte_q, rval = 8'00000000).
+Adding EN signal on $auto$ff.cc:266:slice$1400 ($sdff) from module bridge_gate (D = $procmux$856_Y, Q = \read_low_byte_q).
+Adding SRST signal on $procdff$1360 ($dff) from module bridge_gate (D = $procmux$872_Y, Q = \beat_high_q, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$1420 ($sdff) from module bridge_gate (D = $procmux$872_Y, Q = \beat_high_q).
+Adding SRST signal on $procdff$1358 ($dff) from module bridge_gate (D = $procmux$905_Y, Q = \request_native_word_q, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$1432 ($sdff) from module bridge_gate (D = $logic_and$mutant.sv:341$677_Y, Q = \request_native_word_q).
+Adding SRST signal on $procdff$1357 ($dff) from module bridge_gate (D = $procmux$920_Y, Q = \request_two_beats_q, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$1436 ($sdff) from module bridge_gate (D = $logic_and$mutant.sv:336$676_Y, Q = \request_two_beats_q).
+Adding SRST signal on $procdff$1356 ($dff) from module bridge_gate (D = $procmux$935_Y, Q = \request_lock_q, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$1440 ($sdff) from module bridge_gate (D = $logic_and$mutant.sv:335$668_Y, Q = \request_lock_q).
+Adding SRST signal on $procdff$1355 ($dff) from module bridge_gate (D = $procmux$950_Y, Q = \request_status_q, rval = 4'1111).
+Adding EN signal on $auto$ff.cc:266:slice$1444 ($sdff) from module bridge_gate (D = \cpu_bus_status, Q = \request_status_q).
+Adding SRST signal on $procdff$1354 ($dff) from module bridge_gate (D = $procmux$965_Y, Q = \request_write_q, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$1448 ($sdff) from module bridge_gate (D = \cpu_bus_write, Q = \request_write_q).
+Adding SRST signal on $procdff$1353 ($dff) from module bridge_gate (D = $procmux$980_Y, Q = \request_data_q, rval = 16'0000000000000000).
+Adding EN signal on $auto$ff.cc:266:slice$1452 ($sdff) from module bridge_gate (D = \cpu_data_out, Q = \request_data_q).
+Adding SRST signal on $procdff$1352 ($dff) from module bridge_gate (D = $procmux$995_Y, Q = \request_address_q, rval = 24'000000000000000000000000).
+Adding EN signal on $auto$ff.cc:266:slice$1456 ($sdff) from module bridge_gate (D = \cpu_address, Q = \request_address_q).
+Adding SRST signal on $procdff$1351 ($dff) from module bridge_gate (D = $procmux$1011_Y, Q = \state_q, rval = 4'0000).
+Adding EN signal on $auto$ff.cc:266:slice$1460 ($sdff) from module bridge_gate (D = $procmux$1011_Y, Q = \state_q).
+Adding SRST signal on $procdff$1350 ($dff) from module bridge_gate (D = $procmux$1039_Y, Q = \protocol_error, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$1474 ($sdff) from module bridge_gate (D = $procmux$1039_Y, Q = \protocol_error).
+Adding SRST signal on $procdff$1380 ($dff) from module bridge_gold (D = $procmux$1115_Y, Q = \cpu_data_in_q, rval = 16'0000000000000000).
+Adding EN signal on $auto$ff.cc:266:slice$1484 ($sdff) from module bridge_gold (D = $procmux$1115_Y, Q = \cpu_data_in_q).
+Adding SRST signal on $procdff$1379 ($dff) from module bridge_gold (D = $procmux$1131_Y, Q = \complete_sampled_q, rval = 1'0).
+Adding SRST signal on $procdff$1378 ($dff) from module bridge_gold (D = $procmux$1155_Y, Q = \read_low_byte_q, rval = 8'00000000).
+Adding EN signal on $auto$ff.cc:266:slice$1499 ($sdff) from module bridge_gold (D = $procmux$1155_Y, Q = \read_low_byte_q).
+Adding SRST signal on $procdff$1377 ($dff) from module bridge_gold (D = $procmux$1171_Y, Q = \beat_high_q, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$1519 ($sdff) from module bridge_gold (D = $procmux$1171_Y, Q = \beat_high_q).
+Adding SRST signal on $procdff$1375 ($dff) from module bridge_gold (D = $procmux$1204_Y, Q = \request_native_word_q, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$1531 ($sdff) from module bridge_gold (D = $logic_and$gold.sv:306$490_Y, Q = \request_native_word_q).
+Adding SRST signal on $procdff$1374 ($dff) from module bridge_gold (D = $procmux$1219_Y, Q = \request_two_beats_q, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$1535 ($sdff) from module bridge_gold (D = $logic_and$gold.sv:301$489_Y, Q = \request_two_beats_q).
+Adding SRST signal on $procdff$1373 ($dff) from module bridge_gold (D = $procmux$1234_Y, Q = \request_lock_q, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$1539 ($sdff) from module bridge_gold (D = $logic_and$gold.sv:300$481_Y, Q = \request_lock_q).
+Adding SRST signal on $procdff$1372 ($dff) from module bridge_gold (D = $procmux$1249_Y, Q = \request_status_q, rval = 4'1111).
+Adding EN signal on $auto$ff.cc:266:slice$1543 ($sdff) from module bridge_gold (D = \cpu_bus_status, Q = \request_status_q).
+Adding SRST signal on $procdff$1371 ($dff) from module bridge_gold (D = $procmux$1264_Y, Q = \request_write_q, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$1547 ($sdff) from module bridge_gold (D = \cpu_bus_write, Q = \request_write_q).
+Adding SRST signal on $procdff$1370 ($dff) from module bridge_gold (D = $procmux$1279_Y, Q = \request_data_q, rval = 16'0000000000000000).
+Adding EN signal on $auto$ff.cc:266:slice$1551 ($sdff) from module bridge_gold (D = \cpu_data_out, Q = \request_data_q).
+Adding SRST signal on $procdff$1369 ($dff) from module bridge_gold (D = $procmux$1294_Y, Q = \request_address_q, rval = 24'000000000000000000000000).
+Adding EN signal on $auto$ff.cc:266:slice$1555 ($sdff) from module bridge_gold (D = \cpu_address, Q = \request_address_q).
+Adding SRST signal on $procdff$1368 ($dff) from module bridge_gold (D = $procmux$1305_Y, Q = \state_q, rval = 4'0000).
+Adding EN signal on $auto$ff.cc:266:slice$1559 ($sdff) from module bridge_gold (D = $procmux$1305_Y, Q = \state_q).
+Adding SRST signal on $procdff$1367 ($dff) from module bridge_gold (D = $procmux$1333_Y, Q = \protocol_error, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$1573 ($sdff) from module bridge_gold (D = $procmux$1333_Y, Q = \protocol_error).
+
+9.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \bridge_gate..
+Finding unused cells or wires in module \bridge_gold..
+Removed 54 unused cells and 172 unused wires.
+<suppressed ~56 debug messages>
+
+9.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module bridge_gate.
+<suppressed ~4 debug messages>
+Optimizing module bridge_gold.
+<suppressed ~4 debug messages>
+
+9.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+9.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \bridge_gate..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \bridge_gold..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~44 debug messages>
+
+9.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \bridge_gate.
+  Optimizing cells in module \bridge_gold.
+Performed a total of 0 changes.
+
+9.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\bridge_gate'.
+<suppressed ~48 debug messages>
+Finding identical cells in module `\bridge_gold'.
+<suppressed ~48 debug messages>
+Removed a total of 32 cells.
+
+9.13. Executing OPT_DFF pass (perform DFF optimizations).
+
+9.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \bridge_gate..
+Finding unused cells or wires in module \bridge_gold..
+Removed 0 unused cells and 32 unused wires.
+<suppressed ~2 debug messages>
+
+9.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module bridge_gate.
+Optimizing module bridge_gold.
+
+9.16. Rerunning OPT passes. (Maybe there is more to do..)
+
+9.17. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \bridge_gate..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \bridge_gold..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~44 debug messages>
+
+9.18. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \bridge_gate.
+  Optimizing cells in module \bridge_gold.
+Performed a total of 0 changes.
+
+9.19. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\bridge_gate'.
+Finding identical cells in module `\bridge_gold'.
+Removed a total of 0 cells.
+
+9.20. Executing OPT_DFF pass (perform DFF optimizations).
+
+9.21. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \bridge_gate..
+Finding unused cells or wires in module \bridge_gold..
+
+9.22. Executing OPT_EXPR pass (perform const folding).
+Optimizing module bridge_gate.
+Optimizing module bridge_gold.
+
+9.23. Finished OPT passes. (There is nothing left to do.)
+
+10. Executing EQUIV_MAKE pass (creating equiv checking module).
+Presumably equivalent wires: at_a0_gold (\at_a0_gold), at_a0_gate (\at_a0_gate) -> at_a0
+Presumably equivalent wires: at_accept_gold (\at_accept_gold), at_accept_gate (\at_accept_gate) -> at_accept
+Presumably equivalent wires: at_accepted_gold (\at_accepted_gold), at_accepted_gate (\at_accepted_gate) -> at_accepted
+Presumably equivalent wires: at_address_gold (\at_address_gold), at_address_gate (\at_address_gate) -> at_address
+Presumably equivalent wires: at_bhe_n_gold (\at_bhe_n_gold), at_bhe_n_gate (\at_bhe_n_gate) -> at_bhe_n
+Presumably equivalent wires: at_byte_enable_gold (\at_byte_enable_gold), at_byte_enable_gate (\at_byte_enable_gate) -> at_byte_enable
+Presumably equivalent wires: at_code_fetch_gold (\at_code_fetch_gold), at_code_fetch_gate (\at_code_fetch_gate) -> at_code_fetch
+Presumably equivalent wires: at_command_valid_gold (\at_command_valid_gold), at_command_valid_gate (\at_command_valid_gate) -> at_command_valid
+Presumably equivalent wires: at_completed_gold (\at_completed_gold), at_completed_gate (\at_completed_gate) -> at_completed
+Presumably equivalent wires: at_cycle_class_gold (\at_cycle_class_gold), at_cycle_class_gate (\at_cycle_class_gate) -> at_cycle_class
+Presumably equivalent wires: at_data_oe_gold (\at_data_oe_gold), at_data_oe_gate (\at_data_oe_gate) -> at_data_oe
+Presumably equivalent wires: at_data_out_gold (\at_data_out_gold), at_data_out_gate (\at_data_out_gate) -> at_data_out
+Presumably equivalent wires: at_inta_gold (\at_inta_gold), at_inta_gate (\at_inta_gate) -> at_inta
+Presumably equivalent wires: at_io_gold (\at_io_gold), at_io_gate (\at_io_gate) -> at_io
+Presumably equivalent wires: at_lock_gold (\at_lock_gold), at_lock_gate (\at_lock_gate) -> at_lock
+Presumably equivalent wires: at_owner_gold (3'000), at_owner_gate (3'000) -> at_owner
+Presumably equivalent wires: at_read_data_gold (\at_read_data_gold), at_read_data_gate (\at_read_data_gate) -> at_read_data
+Presumably equivalent wires: at_read_data_valid_gold (\at_read_data_valid_gold), at_read_data_valid_gate (\at_read_data_valid_gate) -> at_read_data_valid
+Presumably equivalent wires: at_ready_gold (\at_ready_gold), at_ready_gate (\at_ready_gate) -> at_ready
+Presumably equivalent wires: at_response_valid_gold (\at_response_valid_gold), at_response_valid_gate (\at_response_valid_gate) -> at_response_valid
+Presumably equivalent wires: at_valid_gold (\at_valid_gold), at_valid_gate (\at_valid_gate) -> at_valid
+Presumably equivalent wires: at_write_gold (\at_write_gold), at_write_gate (\at_write_gate) -> at_write
+Presumably equivalent wires: beat_high_q_gold (\beat_high_q_gold), beat_high_q_gate (\beat_high_q_gate) -> beat_high_q
+Presumably equivalent wires: bridge_idle_gold (\bridge_idle_gold), bridge_idle_gate (\bridge_idle_gate) -> bridge_idle
+Presumably equivalent wires: clk_gold (\clk_gold), clk_gate (\clk_gate) -> clk
+Presumably equivalent wires: complete_sampled_q_gold (\complete_sampled_q_gold), complete_sampled_q_gate (\complete_sampled_q_gate) -> complete_sampled_q
+Presumably equivalent wires: cpu_address_gold (\cpu_address_gold), cpu_address_gate (\cpu_address_gate) -> cpu_address
+Presumably equivalent wires: cpu_bus_bhe_n_gold (\cpu_bus_bhe_n_gold), cpu_bus_bhe_n_gate (\cpu_bus_bhe_n_gate) -> cpu_bus_bhe_n
+Presumably equivalent wires: cpu_bus_lock_gold (\cpu_bus_lock_gold), cpu_bus_lock_gate (\cpu_bus_lock_gate) -> cpu_bus_lock
+Presumably equivalent wires: cpu_bus_status_gold (\cpu_bus_status_gold), cpu_bus_status_gate (\cpu_bus_status_gate) -> cpu_bus_status
+Presumably equivalent wires: cpu_bus_valid_gold (\cpu_bus_valid_gold), cpu_bus_valid_gate (\cpu_bus_valid_gate) -> cpu_bus_valid
+Presumably equivalent wires: cpu_bus_write_gold (\cpu_bus_write_gold), cpu_bus_write_gate (\cpu_bus_write_gate) -> cpu_bus_write
+Presumably equivalent wires: cpu_data_in_gold (\cpu_data_in_q_gold), cpu_data_in_gate (\cpu_data_in_q_gate) -> cpu_data_in
+Presumably equivalent wires: cpu_data_in_q_gold (\cpu_data_in_q_gold), cpu_data_in_q_gate (\cpu_data_in_q_gate) -> cpu_data_in_q
+Presumably equivalent wires: cpu_data_oe_gold (\cpu_data_oe_gold), cpu_data_oe_gate (\cpu_data_oe_gate) -> cpu_data_oe
+Presumably equivalent wires: cpu_data_out_gold (\cpu_data_out_gold), cpu_data_out_gate (\cpu_data_out_gate) -> cpu_data_out
+Presumably equivalent wires: cpu_io_word_capable_gold (\cpu_io_word_capable_gold), cpu_io_word_capable_gate (\cpu_io_word_capable_gate) -> cpu_io_word_capable
+Presumably equivalent wires: cpu_memory_word_capable_gold (\cpu_memory_word_capable_gold), cpu_memory_word_capable_gate (\cpu_memory_word_capable_gate) -> cpu_memory_word_capable
+Presumably equivalent wires: cpu_ready_gold (\at_response_valid_gold), cpu_ready_gate (\cpu_ready_gate) -> cpu_ready
+Presumably equivalent wires: cpu_sample_edge_gold (\cpu_sample_edge_gold), cpu_sample_edge_gate (\cpu_sample_edge_gate) -> cpu_sample_edge
+Presumably equivalent wires: debug_state_gold (\state_q_gold), debug_state_gate (\state_q_gate) -> debug_state
+Presumably equivalent wires: memory_drain_pending_gold (\memory_drain_pending_gold), memory_drain_pending_gate (\memory_drain_pending_gate) -> memory_drain_pending
+Presumably equivalent wires: protocol_error_gold (\protocol_error_gold), protocol_error_gate (\protocol_error_gate) -> protocol_error
+Presumably equivalent wires: read_low_byte_q_gold (\read_low_byte_q_gold), read_low_byte_q_gate (\read_low_byte_q_gate) -> read_low_byte_q
+Presumably equivalent wires: request_address_q_gold (\request_address_q_gold), request_address_q_gate (\request_address_q_gate) -> request_address_q
+Presumably equivalent wires: request_data_q_gold (\request_data_q_gold), request_data_q_gate (\request_data_q_gate) -> request_data_q
+Presumably equivalent wires: request_lock_q_gold (\request_lock_q_gold), request_lock_q_gate (\request_lock_q_gate) -> request_lock_q
+Presumably equivalent wires: request_native_word_q_gold (\request_native_word_q_gold), request_native_word_q_gate (\request_native_word_q_gate) -> request_native_word_q
+Presumably equivalent wires: request_status_q_gold (\request_status_q_gold), request_status_q_gate (\request_status_q_gate) -> request_status_q
+Presumably equivalent wires: request_two_beats_q_gold (\request_two_beats_q_gold), request_two_beats_q_gate (\request_two_beats_q_gate) -> request_two_beats_q
+Presumably equivalent wires: request_write_q_gold (\request_write_q_gold), request_write_q_gate (\request_write_q_gate) -> request_write_q
+Presumably equivalent wires: reset_gold (\reset_gold), reset_gate (\reset_gate) -> reset
+Presumably equivalent wires: retained_io_address_gold (\beat_address_gold), retained_io_address_gate (\beat_address_gate) -> retained_io_address
+Presumably equivalent wires: retained_io_byte_enable_gold (\beat_byte_enable_gold), retained_io_byte_enable_gate (\beat_byte_enable_gate) -> retained_io_byte_enable
+Presumably equivalent wires: retained_io_command_gold (\retained_io_command_gold), retained_io_command_gate (\retained_io_command_gate) -> retained_io_command
+Presumably equivalent wires: retained_io_data_oe_gold (\retained_io_data_oe_gold), retained_io_data_oe_gate (\retained_io_data_oe_gate) -> retained_io_data_oe
+Presumably equivalent wires: retained_io_data_out_gold (\retained_io_data_out_gold), retained_io_data_out_gate (\retained_io_data_out_gate) -> retained_io_data_out
+Presumably equivalent wires: retained_io_write_gold (\request_write_q_gold), retained_io_write_gate (\request_write_q_gate) -> retained_io_write
+Presumably equivalent wires: state_q_gold (\state_q_gold), state_q_gate (\state_q_gate) -> state_q
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$1388_gate ($ne): { $eq$mutant.sv:228$583_Y_gate \at_completed_gate } -> { $eq$mutant.sv:228$583_Y_gate \at_completed }
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$1390_gate ($ne): { $eq$mutant.sv:228$583_Y_gate \beat_byte_enable_gate [1] \request_is_inta_gate \request_native_word_q_gate \request_two_beats_q_gate \request_write_q_gate \at_completed_gate } -> { $eq$mutant.sv:228$583_Y_gate \retained_io_byte_enable [1] \request_is_inta_gate \request_native_word_q \request_two_beats_q \retained_io_write \at_completed }
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$1392_gate ($ne): { $eq$mutant.sv:228$583_Y_gate \request_write_q_gate \at_completed_gate } -> { $eq$mutant.sv:228$583_Y_gate \retained_io_write \at_completed }
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$1405_gate ($ne): { $eq$mutant.sv:228$583_Y_gate \beat_byte_enable_gate [1] \request_is_inta_gate \request_native_word_q_gate \request_two_beats_q_gate \request_write_q_gate \at_completed_gate } -> { $eq$mutant.sv:228$583_Y_gate \retained_io_byte_enable [1] \request_is_inta_gate \request_native_word_q \request_two_beats_q \retained_io_write \at_completed }
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$1407_gate ($ne): { $eq$mutant.sv:228$583_Y_gate \beat_byte_enable_gate [1] \request_is_inta_gate \request_native_word_q_gate \request_write_q_gate \at_completed_gate } -> { $eq$mutant.sv:228$583_Y_gate \retained_io_byte_enable [1] \request_is_inta_gate \request_native_word_q \retained_io_write \at_completed }
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$1409_gate ($ne): { $eq$mutant.sv:228$583_Y_gate \request_is_inta_gate \request_native_word_q_gate \request_write_q_gate \at_completed_gate } -> { $eq$mutant.sv:228$583_Y_gate \request_is_inta_gate \request_native_word_q \retained_io_write \at_completed }
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$1411_gate ($ne): { $eq$mutant.sv:228$583_Y_gate \request_is_inta_gate \request_write_q_gate \at_completed_gate } -> { $eq$mutant.sv:228$583_Y_gate \request_is_inta_gate \retained_io_write \at_completed }
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$1425_gate ($ne): { $logic_and$mutant.sv:402$684_Y_gate $eq$mutant.sv:228$583_Y_gate \at_completed_gate } -> { $logic_and$mutant.sv:402$684_Y_gate $eq$mutant.sv:228$583_Y_gate \at_completed }
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$1465_gate ($ne): { $logic_and$mutant.sv:438$690_Y_gate $logic_and$mutant.sv:436$688_Y_gate \at_response_valid_gate } -> { $logic_and$mutant.sv:438$690_Y_gate $logic_and$mutant.sv:436$688_Y_gate \cpu_ready }
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$1467_gate ($ne): { $logic_and$mutant.sv:436$688_Y_gate \at_response_valid_gate } -> { $logic_and$mutant.sv:436$688_Y_gate \cpu_ready }
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$1469_gate ($ne): { \at_command_valid_gate \at_accept_gate } -> { \at_command_valid \at_accept_gate }
+Changing input A of cell $auto$opt_reduce.cc:128:opt_pmux$1381_gate ($reduce_or): { $procmux$1013_CMP_gate $procmux$1027_CMP_gate $procmux$1028_CMP_gate $eq$mutant.sv:246$600_Y_gate $eq$mutant.sv:228$583_Y_gate \at_response_valid_gate \at_command_valid_gate } -> { $procmux$1013_CMP_gate $procmux$1027_CMP_gate $procmux$1028_CMP_gate $eq$mutant.sv:246$600_Y_gate $eq$mutant.sv:228$583_Y_gate \cpu_ready \at_command_valid }
+Changing input A of cell $eq$mutant.sv:165$548_gate ($logic_not): \state_q_gate -> \state_q
+Changing input A of cell $eq$mutant.sv:203$573_gate ($eq): \request_status_q_gate -> \request_status_q
+Changing input A of cell $eq$mutant.sv:204$574_gate ($eq): \request_status_q_gate -> \request_status_q
+Changing input A of cell $eq$mutant.sv:205$576_gate ($logic_not): \request_status_q_gate -> \request_status_q
+Changing input A of cell $eq$mutant.sv:206$577_gate ($eq): \request_status_q_gate -> \request_status_q
+Changing input A of cell $eq$mutant.sv:228$583_gate ($eq): \state_q_gate -> \state_q
+Changing input A of cell $eq$mutant.sv:246$600_gate ($eq): \state_q_gate -> \state_q
+Changing input A of cell $eq$mutant.sv:247$602_gate ($eq): \state_q_gate -> \state_q
+Changing input A of cell $eq$mutant.sv:274$641_gate ($eq): \state_q_gate -> \state_q
+Changing input A of cell $logic_and$mutant.sv:261$620_gate ($logic_and): \at_valid_gate -> \at_valid
+Changing input B of cell $logic_and$mutant.sv:261$620_gate ($logic_and): \request_write_q_gate -> \retained_io_write
+Changing input A of cell $logic_and$mutant.sv:264$627_gate ($logic_and): \at_valid_gate -> \at_valid
+Changing input A of cell $logic_and$mutant.sv:265$629_gate ($logic_and): \at_valid_gate -> \at_valid
+Changing input A of cell $logic_and$mutant.sv:267$636_gate ($logic_and): \at_valid_gate -> \at_valid
+Changing input B of cell $logic_and$mutant.sv:271$638_gate ($logic_and): \request_lock_q_gate -> \request_lock_q
+Changing input A of cell $logic_and$mutant.sv:272$640_gate ($logic_and): \at_command_valid_gate -> \at_command_valid
+Changing input A of cell $logic_and$mutant.sv:402$684_gate ($logic_and): \request_two_beats_q_gate -> \request_two_beats_q
+Changing input A of cell $logic_and$mutant.sv:438$690_gate ($logic_and): \complete_sampled_q_gate -> \complete_sampled_q
+Changing input A of cell $logic_and$mutant.sv:467$692_gate ($logic_and): \at_command_valid_gate -> \at_command_valid
+Changing input A of cell $logic_and$mutant.sv:475$698_gate ($logic_and): \request_write_q_gate -> \retained_io_write
+Changing input A of cell $logic_not$mutant.sv:254$613_gate ($logic_not): \beat_byte_enable_gate [1] -> \retained_io_byte_enable [1]
+Changing input A of cell $logic_not$mutant.sv:275$644_gate ($logic_not): \at_response_valid_gate -> \cpu_ready
+Changing input A of cell $logic_not$mutant.sv:402$683_gate ($logic_not): \beat_high_q_gate -> \beat_high_q
+Changing input A of cell $logic_not$mutant.sv:436$687_gate ($logic_not): \complete_sampled_q_gate -> \complete_sampled_q
+Changing input A of cell $logic_or$mutant.sv:229$586_gate ($logic_or): \request_write_q_gate -> \retained_io_write
+Changing input B of cell $logic_or$mutant.sv:246$603_gate ($logic_or): \at_command_valid_gate -> \at_command_valid
+Changing input A of cell $logic_or$mutant.sv:262$623_gate ($logic_or): \at_command_valid_gate -> \at_command_valid
+Changing input A of cell $ne$mutant.sv:271$637_gate ($reduce_bool): \state_q_gate -> \state_q
+Changing input A of cell $ne$mutant.sv:320$664_gate ($ne): \state_q_gate -> \state_q
+Changing input S of cell $procmux$1011_gate ($pmux): { $eq$mutant.sv:165$548_Y_gate $procmux$1028_CMP_gate $procmux$1027_CMP_gate $eq$mutant.sv:246$600_Y_gate \at_command_valid_gate $eq$mutant.sv:228$583_Y_gate $procmux$1013_CMP_gate \at_response_valid_gate } -> { $eq$mutant.sv:165$548_Y_gate $procmux$1028_CMP_gate $procmux$1027_CMP_gate $eq$mutant.sv:246$600_Y_gate \at_command_valid $eq$mutant.sv:228$583_Y_gate $procmux$1013_CMP_gate \cpu_ready }
+Changing input A of cell $procmux$1013_CMP0_gate ($eq): \state_q_gate -> \state_q
+Changing input S of cell $procmux$1020_gate ($mux): \at_completed_gate -> \at_completed
+Changing input A of cell $procmux$1027_CMP0_gate ($eq): \state_q_gate -> \state_q
+Changing input A of cell $procmux$1028_CMP0_gate ($eq): \state_q_gate -> \state_q
+Changing input S of cell $procmux$707_gate ($mux): \request_address_q_gate [0] -> \request_address_q [0]
+Changing input S of cell $procmux$719_gate ($mux): \request_two_beats_q_gate -> \request_two_beats_q
+Changing input S of cell $procmux$728_gate ($mux): \request_native_word_q_gate -> \request_native_word_q
+Changing input S of cell $procmux$795_gate ($mux): \request_two_beats_q_gate -> \request_two_beats_q
+Changing input B of cell $procmux$799_gate ($mux): { \at_read_data_gate [15:8] \read_low_byte_q_gate } -> { \at_read_data_gate [15:8] \read_low_byte_q }
+Changing input S of cell $procmux$799_gate ($mux): \request_two_beats_q_gate -> \request_two_beats_q
+Changing input S of cell $procmux$801_gate ($mux): \beat_byte_enable_gate [1] -> \retained_io_byte_enable [1]
+Changing input S of cell $procmux$804_gate ($mux): \request_native_word_q_gate -> \request_native_word_q
+Changing input S of cell $procmux$809_gate ($mux): \request_write_q_gate -> \retained_io_write
+Changing input S of cell $procmux$811_gate ($mux): \at_completed_gate -> \at_completed
+Changing input A of cell $procmux$821_gate ($mux): \complete_sampled_q_gate -> \complete_sampled_q
+Changing input S of cell $procmux$832_gate ($mux): \at_response_valid_gate -> \cpu_ready
+Changing input S of cell $procmux$841_gate ($mux): \request_two_beats_q_gate -> \request_two_beats_q
+Changing input S of cell $procmux$844_gate ($mux): \beat_byte_enable_gate [1] -> \retained_io_byte_enable [1]
+Changing input S of cell $procmux$847_gate ($mux): \request_native_word_q_gate -> \request_native_word_q
+Changing input S of cell $procmux$852_gate ($mux): \request_write_q_gate -> \retained_io_write
+Changing input S of cell $procmux$854_gate ($mux): \at_completed_gate -> \at_completed
+Changing input S of cell $procmux$870_gate ($mux): \at_completed_gate -> \at_completed
+Changing input S of cell $ternary$mutant.sv:209$579_gate ($mux): \beat_high_q_gate -> \beat_high_q
+Changing input S of cell $ternary$mutant.sv:217$582_gate ($mux): \beat_high_q_gate -> \beat_high_q
+Changing input A of cell $ternary$mutant.sv:251$608_gate ($mux): \request_status_q_gate -> \request_status_q
+Changing input A of cell $ternary$mutant.sv:252$609_gate ($mux): \beat_address_gate -> \retained_io_address
+Changing input A of cell $ternary$mutant.sv:253$610_gate ($mux): \beat_address_gate [0] -> \retained_io_address [0]
+Changing input A of cell $ternary$mutant.sv:255$616_gate ($mux): \beat_byte_enable_gate -> \retained_io_byte_enable
+Changing input B of cell $ternary$mutant.sv:256$618_gate ($mux): \request_data_q_gate -> \request_data_q
+Changing input S of cell $ternary$mutant.sv:256$618_gate ($mux): \request_native_word_q_gate -> \request_native_word_q
+Changing input A of cell $ternary$mutant.sv:256$619_gate ($mux): \retained_io_data_out_gate -> \retained_io_data_out
+Changing input A of cell $ternary$mutant.sv:257$617_gate ($mux): { 8'00000000 \request_data_q_gate [7:0] } -> { 8'00000000 \request_data_q [7:0] }
+Changing input B of cell $ternary$mutant.sv:257$617_gate ($mux): { \request_data_q_gate [15:8] 8'00000000 } -> { \request_data_q [15:8] 8'00000000 }
+Changing input S of cell $ternary$mutant.sv:257$617_gate ($mux): \beat_byte_enable_gate [1] -> \retained_io_byte_enable [1]
+Changing input A of cell $ternary$mutant.sv:264$626_gate ($mux): \request_write_q_gate -> \retained_io_write
+Changing input A of cell $add$mutant.sv:208$580_gate ($add): \request_address_q_gate -> \request_address_q
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$1487_gold ($ne): { $eq$gold.sv:215$409_Y_gold \at_completed_gold } -> { $eq$gold.sv:215$409_Y_gold \at_completed }
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$1489_gold ($ne): { $eq$gold.sv:215$409_Y_gold \beat_byte_enable_gold [1] \request_is_inta_gold \request_native_word_q_gold \request_two_beats_q_gold \request_write_q_gold \at_completed_gold } -> { $eq$gold.sv:215$409_Y_gold \retained_io_byte_enable [1] \request_is_inta_gold \request_native_word_q \request_two_beats_q \retained_io_write \at_completed }
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$1491_gold ($ne): { $eq$gold.sv:215$409_Y_gold \request_write_q_gold \at_completed_gold } -> { $eq$gold.sv:215$409_Y_gold \retained_io_write \at_completed }
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$1504_gold ($ne): { $eq$gold.sv:215$409_Y_gold \beat_byte_enable_gold [1] \request_is_inta_gold \request_native_word_q_gold \request_two_beats_q_gold \request_write_q_gold \at_completed_gold } -> { $eq$gold.sv:215$409_Y_gold \retained_io_byte_enable [1] \request_is_inta_gold \request_native_word_q \request_two_beats_q \retained_io_write \at_completed }
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$1506_gold ($ne): { $eq$gold.sv:215$409_Y_gold \beat_byte_enable_gold [1] \request_is_inta_gold \request_native_word_q_gold \request_write_q_gold \at_completed_gold } -> { $eq$gold.sv:215$409_Y_gold \retained_io_byte_enable [1] \request_is_inta_gold \request_native_word_q \retained_io_write \at_completed }
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$1508_gold ($ne): { $eq$gold.sv:215$409_Y_gold \request_is_inta_gold \request_native_word_q_gold \request_write_q_gold \at_completed_gold } -> { $eq$gold.sv:215$409_Y_gold \request_is_inta_gold \request_native_word_q \retained_io_write \at_completed }
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$1510_gold ($ne): { $eq$gold.sv:215$409_Y_gold \request_is_inta_gold \request_write_q_gold \at_completed_gold } -> { $eq$gold.sv:215$409_Y_gold \request_is_inta_gold \retained_io_write \at_completed }
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$1524_gold ($ne): { $logic_and$gold.sv:367$497_Y_gold $eq$gold.sv:215$409_Y_gold \at_completed_gold } -> { $logic_and$gold.sv:367$497_Y_gold $eq$gold.sv:215$409_Y_gold \at_completed }
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$1564_gold ($ne): { $logic_and$gold.sv:400$503_Y_gold $logic_and$gold.sv:398$501_Y_gold \at_response_valid_gold } -> { $logic_and$gold.sv:400$503_Y_gold $logic_and$gold.sv:398$501_Y_gold \cpu_ready }
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$1566_gold ($ne): { $logic_and$gold.sv:398$501_Y_gold \at_response_valid_gold } -> { $logic_and$gold.sv:398$501_Y_gold \cpu_ready }
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$1568_gold ($ne): { \at_command_valid_gold \at_accept_gold } -> { \at_command_valid \at_accept_gold }
+Changing input A of cell $auto$opt_reduce.cc:128:opt_pmux$1383_gold ($reduce_or): { $procmux$1322_CMP_gold $procmux$1321_CMP_gold $procmux$1307_CMP_gold $eq$gold.sv:233$425_Y_gold $eq$gold.sv:215$409_Y_gold \at_response_valid_gold \at_command_valid_gold } -> { $procmux$1322_CMP_gold $procmux$1321_CMP_gold $procmux$1307_CMP_gold $eq$gold.sv:233$425_Y_gold $eq$gold.sv:215$409_Y_gold \cpu_ready \at_command_valid }
+Changing input A of cell $eq$gold.sv:152$375_gold ($logic_not): \state_q_gold -> \state_q
+Changing input A of cell $eq$gold.sv:190$399_gold ($eq): \request_status_q_gold -> \request_status_q
+Changing input A of cell $eq$gold.sv:191$400_gold ($eq): \request_status_q_gold -> \request_status_q
+Changing input A of cell $eq$gold.sv:192$402_gold ($logic_not): \request_status_q_gold -> \request_status_q
+Changing input A of cell $eq$gold.sv:193$403_gold ($eq): \request_status_q_gold -> \request_status_q
+Changing input A of cell $eq$gold.sv:215$409_gold ($eq): \state_q_gold -> \state_q
+Changing input A of cell $eq$gold.sv:233$425_gold ($eq): \state_q_gold -> \state_q
+Changing input A of cell $eq$gold.sv:234$427_gold ($eq): \state_q_gold -> \state_q
+Changing input A of cell $eq$gold.sv:261$466_gold ($eq): \state_q_gold -> \state_q
+Changing input A of cell $logic_and$gold.sv:248$445_gold ($logic_and): \at_valid_gold -> \at_valid
+Changing input B of cell $logic_and$gold.sv:248$445_gold ($logic_and): \request_write_q_gold -> \retained_io_write
+Changing input A of cell $logic_and$gold.sv:251$452_gold ($logic_and): \at_valid_gold -> \at_valid
+Changing input A of cell $logic_and$gold.sv:252$454_gold ($logic_and): \at_valid_gold -> \at_valid
+Changing input A of cell $logic_and$gold.sv:254$461_gold ($logic_and): \at_valid_gold -> \at_valid
+Changing input B of cell $logic_and$gold.sv:258$463_gold ($logic_and): \request_lock_q_gold -> \request_lock_q
+Changing input A of cell $logic_and$gold.sv:259$465_gold ($logic_and): \at_command_valid_gold -> \at_command_valid
+Changing input A of cell $logic_and$gold.sv:367$497_gold ($logic_and): \request_two_beats_q_gold -> \request_two_beats_q
+Changing input A of cell $logic_and$gold.sv:400$503_gold ($logic_and): \complete_sampled_q_gold -> \complete_sampled_q
+Changing input A of cell $logic_and$gold.sv:429$505_gold ($logic_and): \at_command_valid_gold -> \at_command_valid
+Changing input A of cell $logic_and$gold.sv:437$511_gold ($logic_and): \request_write_q_gold -> \retained_io_write
+Changing input A of cell $logic_not$gold.sv:241$438_gold ($logic_not): \beat_byte_enable_gold [1] -> \retained_io_byte_enable [1]
+Changing input A of cell $logic_not$gold.sv:367$496_gold ($logic_not): \beat_high_q_gold -> \beat_high_q
+Changing input A of cell $logic_not$gold.sv:398$500_gold ($logic_not): \complete_sampled_q_gold -> \complete_sampled_q
+Changing input A of cell $logic_or$gold.sv:216$412_gold ($logic_or): \request_write_q_gold -> \retained_io_write
+Changing input B of cell $logic_or$gold.sv:233$428_gold ($logic_or): \at_command_valid_gold -> \at_command_valid
+Changing input A of cell $logic_or$gold.sv:249$448_gold ($logic_or): \at_command_valid_gold -> \at_command_valid
+Changing input A of cell $ne$gold.sv:258$462_gold ($reduce_bool): \state_q_gold -> \state_q
+Changing input A of cell $ne$gold.sv:288$478_gold ($ne): \state_q_gold -> \state_q
+Changing input S of cell $procmux$1064_gold ($mux): \request_address_q_gold [0] -> \request_address_q [0]
+Changing input S of cell $procmux$1076_gold ($mux): \request_two_beats_q_gold -> \request_two_beats_q
+Changing input S of cell $procmux$1085_gold ($mux): \request_native_word_q_gold -> \request_native_word_q
+Changing input S of cell $procmux$1097_gold ($mux): \request_two_beats_q_gold -> \request_two_beats_q
+Changing input B of cell $procmux$1101_gold ($mux): { \at_read_data_gold [15:8] \read_low_byte_q_gold } -> { \at_read_data_gold [15:8] \read_low_byte_q }
+Changing input S of cell $procmux$1101_gold ($mux): \request_two_beats_q_gold -> \request_two_beats_q
+Changing input S of cell $procmux$1103_gold ($mux): \beat_byte_enable_gold [1] -> \retained_io_byte_enable [1]
+Changing input S of cell $procmux$1106_gold ($mux): \request_native_word_q_gold -> \request_native_word_q
+Changing input S of cell $procmux$1111_gold ($mux): \request_write_q_gold -> \retained_io_write
+Changing input S of cell $procmux$1113_gold ($mux): \at_completed_gold -> \at_completed
+Changing input A of cell $procmux$1123_gold ($mux): \complete_sampled_q_gold -> \complete_sampled_q
+Changing input S of cell $procmux$1131_gold ($mux): \at_response_valid_gold -> \cpu_ready
+Changing input S of cell $procmux$1140_gold ($mux): \request_two_beats_q_gold -> \request_two_beats_q
+Changing input S of cell $procmux$1143_gold ($mux): \beat_byte_enable_gold [1] -> \retained_io_byte_enable [1]
+Changing input S of cell $procmux$1146_gold ($mux): \request_native_word_q_gold -> \request_native_word_q
+Changing input S of cell $procmux$1151_gold ($mux): \request_write_q_gold -> \retained_io_write
+Changing input S of cell $procmux$1153_gold ($mux): \at_completed_gold -> \at_completed
+Changing input S of cell $procmux$1169_gold ($mux): \at_completed_gold -> \at_completed
+Changing input S of cell $procmux$1305_gold ($pmux): { $eq$gold.sv:152$375_Y_gold $procmux$1322_CMP_gold $procmux$1321_CMP_gold $eq$gold.sv:233$425_Y_gold \at_command_valid_gold $eq$gold.sv:215$409_Y_gold $procmux$1307_CMP_gold \at_response_valid_gold } -> { $eq$gold.sv:152$375_Y_gold $procmux$1322_CMP_gold $procmux$1321_CMP_gold $eq$gold.sv:233$425_Y_gold \at_command_valid $eq$gold.sv:215$409_Y_gold $procmux$1307_CMP_gold \cpu_ready }
+Changing input A of cell $procmux$1307_CMP0_gold ($eq): \state_q_gold -> \state_q
+Changing input S of cell $procmux$1314_gold ($mux): \at_completed_gold -> \at_completed
+Changing input A of cell $procmux$1321_CMP0_gold ($eq): \state_q_gold -> \state_q
+Changing input A of cell $procmux$1322_CMP0_gold ($eq): \state_q_gold -> \state_q
+Changing input S of cell $ternary$gold.sv:196$405_gold ($mux): \beat_high_q_gold -> \beat_high_q
+Changing input S of cell $ternary$gold.sv:204$408_gold ($mux): \beat_high_q_gold -> \beat_high_q
+Changing input A of cell $ternary$gold.sv:238$433_gold ($mux): \request_status_q_gold -> \request_status_q
+Changing input A of cell $ternary$gold.sv:239$434_gold ($mux): \beat_address_gold -> \retained_io_address
+Changing input A of cell $ternary$gold.sv:240$435_gold ($mux): \beat_address_gold [0] -> \retained_io_address [0]
+Changing input A of cell $ternary$gold.sv:242$441_gold ($mux): \beat_byte_enable_gold -> \retained_io_byte_enable
+Changing input B of cell $ternary$gold.sv:243$443_gold ($mux): \request_data_q_gold -> \request_data_q
+Changing input S of cell $ternary$gold.sv:243$443_gold ($mux): \request_native_word_q_gold -> \request_native_word_q
+Changing input A of cell $ternary$gold.sv:243$444_gold ($mux): \retained_io_data_out_gold -> \retained_io_data_out
+Changing input A of cell $ternary$gold.sv:244$442_gold ($mux): { 8'00000000 \request_data_q_gold [7:0] } -> { 8'00000000 \request_data_q [7:0] }
+Changing input B of cell $ternary$gold.sv:244$442_gold ($mux): { \request_data_q_gold [15:8] 8'00000000 } -> { \request_data_q [15:8] 8'00000000 }
+Changing input S of cell $ternary$gold.sv:244$442_gold ($mux): \beat_byte_enable_gold [1] -> \retained_io_byte_enable [1]
+Changing input A of cell $ternary$gold.sv:251$451_gold ($mux): \request_write_q_gold -> \retained_io_write
+Changing input A of cell $add$gold.sv:195$406_gold ($add): \request_address_q_gold -> \request_address_q
+
+11. Executing HIERARCHY pass (managing design hierarchy).
+
+11.1. Analyzing design hierarchy..
+Top module:  \miter
+
+11.2. Analyzing design hierarchy..
+Top module:  \miter
+Removing unused module `\bridge_gate'.
+Removing unused module `\bridge_gold'.
+Removed 2 unused modules.
+
+12. Executing ASYNC2SYNC pass.
+
+13. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \miter..
+Removed 17 unused cells and 2 unused wires.
+<suppressed ~19 debug messages>
+
+14. Executing EQUIV_SIMPLE pass.
+Found 188 unproven $equiv cells (38 groups) in miter:
+  Trying to prove $equiv for \cpu_ready: failed.
+ Grouping SAT models for \cpu_data_in:
+  Trying to prove $equiv for \cpu_data_in [0]: failed.
+  Trying to prove $equiv for \cpu_data_in [1]: failed.
+  Trying to prove $equiv for \cpu_data_in [2]: failed.
+  Trying to prove $equiv for \cpu_data_in [3]: failed.
+  Trying to prove $equiv for \cpu_data_in [4]: failed.
+  Trying to prove $equiv for \cpu_data_in [5]: failed.
+  Trying to prove $equiv for \cpu_data_in [6]: failed.
+  Trying to prove $equiv for \cpu_data_in [7]: failed.
+  Trying to prove $equiv for \cpu_data_in [8]: failed.
+  Trying to prove $equiv for \cpu_data_in [9]: failed.
+  Trying to prove $equiv for \cpu_data_in [10]: failed.
+  Trying to prove $equiv for \cpu_data_in [11]: failed.
+  Trying to prove $equiv for \cpu_data_in [12]: failed.
+  Trying to prove $equiv for \cpu_data_in [13]: failed.
+  Trying to prove $equiv for \cpu_data_in [14]: failed.
+  Trying to prove $equiv for \cpu_data_in [15]: failed.
+  Trying to prove $equiv for \at_valid: success!
+  Trying to prove $equiv for \at_command_valid: success!
+ Grouping SAT models for \at_cycle_class:
+  Trying to prove $equiv for \at_cycle_class [0]: success!
+  Trying to prove $equiv for \at_cycle_class [1]: success!
+  Trying to prove $equiv for \at_cycle_class [2]: success!
+  Trying to prove $equiv for \at_cycle_class [3]: success!
+ Grouping SAT models for \at_address:
+  Trying to prove $equiv for \at_address [0]: success!
+  Trying to prove $equiv for \at_address [1]: success!
+  Trying to prove $equiv for \at_address [2]: success!
+  Trying to prove $equiv for \at_address [3]: success!
+  Trying to prove $equiv for \at_address [4]: success!
+  Trying to prove $equiv for \at_address [5]: success!
+  Trying to prove $equiv for \at_address [6]: success!
+  Trying to prove $equiv for \at_address [7]: success!
+  Trying to prove $equiv for \at_address [8]: success!
+  Trying to prove $equiv for \at_address [9]: success!
+  Trying to prove $equiv for \at_address [10]: success!
+  Trying to prove $equiv for \at_address [11]: success!
+  Trying to prove $equiv for \at_address [12]: success!
+  Trying to prove $equiv for \at_address [13]: success!
+  Trying to prove $equiv for \at_address [14]: success!
+  Trying to prove $equiv for \at_address [15]: success!
+  Trying to prove $equiv for \at_address [16]: success!
+  Trying to prove $equiv for \at_address [17]: success!
+  Trying to prove $equiv for \at_address [18]: success!
+  Trying to prove $equiv for \at_address [19]: success!
+  Trying to prove $equiv for \at_address [20]: success!
+  Trying to prove $equiv for \at_address [21]: success!
+  Trying to prove $equiv for \at_address [22]: success!
+  Trying to prove $equiv for \at_address [23]: success!
+  Trying to prove $equiv for \at_a0: success!
+  Trying to prove $equiv for \at_bhe_n: success!
+ Grouping SAT models for \at_byte_enable:
+  Trying to prove $equiv for \at_byte_enable [0]: success!
+  Trying to prove $equiv for \at_byte_enable [1]: success!
+ Grouping SAT models for \at_data_out:
+  Trying to prove $equiv for \at_data_out [0]: success!
+  Trying to prove $equiv for \at_data_out [1]: success!
+  Trying to prove $equiv for \at_data_out [2]: success!
+  Trying to prove $equiv for \at_data_out [3]: success!
+  Trying to prove $equiv for \at_data_out [4]: success!
+  Trying to prove $equiv for \at_data_out [5]: success!
+  Trying to prove $equiv for \at_data_out [6]: success!
+  Trying to prove $equiv for \at_data_out [7]: success!
+  Trying to prove $equiv for \at_data_out [8]: success!
+  Trying to prove $equiv for \at_data_out [9]: success!
+  Trying to prove $equiv for \at_data_out [10]: success!
+  Trying to prove $equiv for \at_data_out [11]: success!
+  Trying to prove $equiv for \at_data_out [12]: success!
+  Trying to prove $equiv for \at_data_out [13]: success!
+  Trying to prove $equiv for \at_data_out [14]: success!
+  Trying to prove $equiv for \at_data_out [15]: success!
+  Trying to prove $equiv for \at_data_oe: success!
+  Trying to prove $equiv for \at_write: success!
+  Trying to prove $equiv for \at_io: success!
+  Trying to prove $equiv for \at_inta: success!
+  Trying to prove $equiv for \at_code_fetch: success!
+  Trying to prove $equiv for \at_lock: success!
+  Trying to prove $equiv for \at_accepted: success!
+  Trying to prove $equiv for \at_completed: success!
+  Trying to prove $equiv for \at_response_valid: success!
+  Trying to prove $equiv for \bridge_idle: success!
+ Grouping SAT models for \debug_state:
+  Trying to prove $equiv for \debug_state [0]: failed.
+  Trying to prove $equiv for \debug_state [1]: failed.
+  Trying to prove $equiv for \debug_state [2]: failed.
+  Trying to prove $equiv for \debug_state [3]: failed.
+  Trying to prove $equiv for \retained_io_command: success!
+ Grouping SAT models for \retained_io_address:
+  Trying to prove $equiv for \retained_io_address [0]: success!
+  Trying to prove $equiv for \retained_io_address [1]: success!
+  Trying to prove $equiv for \retained_io_address [2]: success!
+  Trying to prove $equiv for \retained_io_address [3]: success!
+  Trying to prove $equiv for \retained_io_address [4]: success!
+  Trying to prove $equiv for \retained_io_address [5]: success!
+  Trying to prove $equiv for \retained_io_address [6]: success!
+  Trying to prove $equiv for \retained_io_address [7]: success!
+  Trying to prove $equiv for \retained_io_address [8]: success!
+  Trying to prove $equiv for \retained_io_address [9]: success!
+  Trying to prove $equiv for \retained_io_address [10]: success!
+  Trying to prove $equiv for \retained_io_address [11]: success!
+  Trying to prove $equiv for \retained_io_address [12]: success!
+  Trying to prove $equiv for \retained_io_address [13]: success!
+  Trying to prove $equiv for \retained_io_address [14]: success!
+  Trying to prove $equiv for \retained_io_address [15]: success!
+  Trying to prove $equiv for \retained_io_address [16]: success!
+  Trying to prove $equiv for \retained_io_address [17]: success!
+  Trying to prove $equiv for \retained_io_address [18]: success!
+  Trying to prove $equiv for \retained_io_address [19]: success!
+  Trying to prove $equiv for \retained_io_address [20]: success!
+  Trying to prove $equiv for \retained_io_address [21]: success!
+  Trying to prove $equiv for \retained_io_address [22]: success!
+  Trying to prove $equiv for \retained_io_address [23]: success!
+  Trying to prove $equiv for \retained_io_write: failed.
+ Grouping SAT models for \retained_io_byte_enable:
+  Trying to prove $equiv for \retained_io_byte_enable [0]: success!
+  Trying to prove $equiv for \retained_io_byte_enable [1]: success!
+ Grouping SAT models for \retained_io_data_out:
+  Trying to prove $equiv for \retained_io_data_out [0]: success!
+  Trying to prove $equiv for \retained_io_data_out [1]: success!
+  Trying to prove $equiv for \retained_io_data_out [2]: success!
+  Trying to prove $equiv for \retained_io_data_out [3]: success!
+  Trying to prove $equiv for \retained_io_data_out [4]: success!
+  Trying to prove $equiv for \retained_io_data_out [5]: success!
+  Trying to prove $equiv for \retained_io_data_out [6]: success!
+  Trying to prove $equiv for \retained_io_data_out [7]: success!
+  Trying to prove $equiv for \retained_io_data_out [8]: success!
+  Trying to prove $equiv for \retained_io_data_out [9]: success!
+  Trying to prove $equiv for \retained_io_data_out [10]: success!
+  Trying to prove $equiv for \retained_io_data_out [11]: success!
+  Trying to prove $equiv for \retained_io_data_out [12]: success!
+  Trying to prove $equiv for \retained_io_data_out [13]: success!
+  Trying to prove $equiv for \retained_io_data_out [14]: success!
+  Trying to prove $equiv for \retained_io_data_out [15]: success!
+  Trying to prove $equiv for \retained_io_data_oe: success!
+  Trying to prove $equiv for \protocol_error: failed.
+ Grouping SAT models for \state_q:
+  Trying to prove $equiv for \state_q [0]: failed.
+  Trying to prove $equiv for \state_q [1]: failed.
+  Trying to prove $equiv for \state_q [2]: failed.
+  Trying to prove $equiv for \state_q [3]: failed.
+ Grouping SAT models for \request_address_q:
+  Trying to prove $equiv for \request_address_q [0]: failed.
+  Trying to prove $equiv for \request_address_q [1]: failed.
+  Trying to prove $equiv for \request_address_q [2]: failed.
+  Trying to prove $equiv for \request_address_q [3]: failed.
+  Trying to prove $equiv for \request_address_q [4]: failed.
+  Trying to prove $equiv for \request_address_q [5]: failed.
+  Trying to prove $equiv for \request_address_q [6]: failed.
+  Trying to prove $equiv for \request_address_q [7]: failed.
+  Trying to prove $equiv for \request_address_q [8]: failed.
+  Trying to prove $equiv for \request_address_q [9]: failed.
+  Trying to prove $equiv for \request_address_q [10]: failed.
+  Trying to prove $equiv for \request_address_q [11]: failed.
+  Trying to prove $equiv for \request_address_q [12]: failed.
+  Trying to prove $equiv for \request_address_q [13]: failed.
+  Trying to prove $equiv for \request_address_q [14]: failed.
+  Trying to prove $equiv for \request_address_q [15]: failed.
+  Trying to prove $equiv for \request_address_q [16]: failed.
+  Trying to prove $equiv for \request_address_q [17]: failed.
+  Trying to prove $equiv for \request_address_q [18]: failed.
+  Trying to prove $equiv for \request_address_q [19]: failed.
+  Trying to prove $equiv for \request_address_q [20]: failed.
+  Trying to prove $equiv for \request_address_q [21]: failed.
+  Trying to prove $equiv for \request_address_q [22]: failed.
+  Trying to prove $equiv for \request_address_q [23]: failed.
+ Grouping SAT models for \request_data_q:
+  Trying to prove $equiv for \request_data_q [0]: failed.
+  Trying to prove $equiv for \request_data_q [1]: failed.
+  Trying to prove $equiv for \request_data_q [2]: failed.
+  Trying to prove $equiv for \request_data_q [3]: failed.
+  Trying to prove $equiv for \request_data_q [4]: failed.
+  Trying to prove $equiv for \request_data_q [5]: failed.
+  Trying to prove $equiv for \request_data_q [6]: failed.
+  Trying to prove $equiv for \request_data_q [7]: failed.
+  Trying to prove $equiv for \request_data_q [8]: failed.
+  Trying to prove $equiv for \request_data_q [9]: failed.
+  Trying to prove $equiv for \request_data_q [10]: failed.
+  Trying to prove $equiv for \request_data_q [11]: failed.
+  Trying to prove $equiv for \request_data_q [12]: failed.
+  Trying to prove $equiv for \request_data_q [13]: failed.
+  Trying to prove $equiv for \request_data_q [14]: failed.
+  Trying to prove $equiv for \request_data_q [15]: failed.
+ Grouping SAT models for \request_status_q:
+  Trying to prove $equiv for \request_status_q [0]: failed.
+  Trying to prove $equiv for \request_status_q [1]: failed.
+  Trying to prove $equiv for \request_status_q [2]: failed.
+  Trying to prove $equiv for \request_status_q [3]: failed.
+  Trying to prove $equiv for \request_lock_q: failed.
+  Trying to prove $equiv for \request_two_beats_q: failed.
+  Trying to prove $equiv for \request_native_word_q: failed.
+  Trying to prove $equiv for \beat_high_q: failed.
+ Grouping SAT models for \read_low_byte_q:
+  Trying to prove $equiv for \read_low_byte_q [0]: failed.
+  Trying to prove $equiv for \read_low_byte_q [1]: failed.
+  Trying to prove $equiv for \read_low_byte_q [2]: failed.
+  Trying to prove $equiv for \read_low_byte_q [3]: failed.
+  Trying to prove $equiv for \read_low_byte_q [4]: failed.
+  Trying to prove $equiv for \read_low_byte_q [5]: failed.
+  Trying to prove $equiv for \read_low_byte_q [6]: failed.
+  Trying to prove $equiv for \read_low_byte_q [7]: failed.
+  Trying to prove $equiv for \complete_sampled_q: failed.
+Proved 104 previously unproven $equiv cells.
+
+15. Executing EQUIV_INDUCT pass.
+Found 84 unproven $equiv cells in module miter:
+  Proving existence of base case for step 1. (21618 clauses over 8243 variables)
+  Proof for base case failed. Circuit inherently diverges!
+Proved 0 previously unproven $equiv cells.
+
+16. Executing EQUIV_STATUS pass.
+Found 191 $equiv cells in miter:
+  Of those cells 107 are proven and 84 are unproven.
+  Unproven $equiv $auto$equiv_make.cc:257:find_same_wires$1648: \cpu_data_in_q_gold [0] \cpu_data_in_q_gate [0]
+  Unproven $equiv $auto$equiv_make.cc:257:find_same_wires$1649: \cpu_data_in_q_gold [1] \cpu_data_in_q_gate [1]
+  Unproven $equiv $auto$equiv_make.cc:257:find_same_wires$1650: \cpu_data_in_q_gold [2] \cpu_data_in_q_gate [2]
+  Unproven $equiv $auto$equiv_make.cc:257:find_same_wires$1651: \cpu_data_in_q_gold [3] \cpu_data_in_q_gate [3]
+  Unproven $equiv $auto$equiv_make.cc:257:find_same_wires$1652: \cpu_data_in_q_gold [4] \cpu_data_in_q_gate [4]
+  Unproven $equiv $auto$equiv_make.cc:257:find_same_wires$1653: \cpu_data_in_q_gold [5] \cpu_data_in_q_gate [5]
+  Unproven $equiv $auto$equiv_make.cc:257:find_same_wires$1654: \cpu_data_in_q_gold [6] \cpu_data_in_q_gate [6]
+  Unproven $equiv $auto$equiv_make.cc:257:find_same_wires$1655: \cpu_data_in_q_gold [7] \cpu_data_in_q_gate [7]
+  Unproven $equiv $auto$equiv_make.cc:257:find_same_wires$1656: \cpu_data_in_q_gold [8] \cpu_data_in_q_gate [8]
+  Unproven $equiv $auto$equiv_make.cc:257:find_same_wires$1657: \cpu_data_in_q_gold [9] \cpu_data_in_q_gate [9]
+  Unproven $equiv $auto$equiv_make.cc:257:find_same_wires$1658: \cpu_data_in_q_gold [10] \cpu_data_in_q_gate [10]
+  Unproven $equiv $auto$equiv_make.cc:257:find_same_wires$1659: \cpu_data_in_q_gold [11] \cpu_data_in_q_gate [11]
+  Unproven $equiv $auto$equiv_make.cc:257:find_same_wires$1660: \cpu_data_in_q_gold [12] \cpu_data_in_q_gate [12]
+  Unproven $equiv $auto$equiv_make.cc:257:find_same_wires$1661: \cpu_data_in_q_gold [13] \cpu_data_in_q_gate [13]
+  Unproven $equiv $auto$equiv_make.cc:257:find_same_wires$1662: \cpu_data_in_q_gold [14] \cpu_data_in_q_gate [14]
+  Unproven $equiv $auto$equiv_make.cc:257:find_same_wires$1663: \cpu_data_in_q_gold [15] \cpu_data_in_q_gate [15]
+  Unproven $equiv $auto$equiv_make.cc:257:find_same_wires$1680: \at_response_valid_gold \cpu_ready_gate
+  Unproven $equiv $auto$equiv_make.cc:257:find_same_wires$1681: \state_q_gold [0] \state_q_gate [0]
+  Unproven $equiv $auto$equiv_make.cc:257:find_same_wires$1682: \state_q_gold [1] \state_q_gate [1]
+  Unproven $equiv $auto$equiv_make.cc:257:find_same_wires$1683: \state_q_gold [2] \state_q_gate [2]
+  Unproven $equiv $auto$equiv_make.cc:257:find_same_wires$1684: \state_q_gold [3] \state_q_gate [3]
+  Unproven $equiv $auto$equiv_make.cc:257:find_same_wires$1685: \protocol_error_gold \protocol_error_gate
+  Unproven $equiv $auto$equiv_make.cc:257:find_same_wires$1786: \request_write_q_gold \request_write_q_gate
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1645: \beat_high_q_gold \beat_high_q_gate
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1647: \complete_sampled_q_gold \complete_sampled_q_gate
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1686: \read_low_byte_q_gold [0] \read_low_byte_q_gate [0]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1687: \read_low_byte_q_gold [1] \read_low_byte_q_gate [1]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1688: \read_low_byte_q_gold [2] \read_low_byte_q_gate [2]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1689: \read_low_byte_q_gold [3] \read_low_byte_q_gate [3]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1690: \read_low_byte_q_gold [4] \read_low_byte_q_gate [4]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1691: \read_low_byte_q_gold [5] \read_low_byte_q_gate [5]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1692: \read_low_byte_q_gold [6] \read_low_byte_q_gate [6]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1693: \read_low_byte_q_gold [7] \read_low_byte_q_gate [7]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1694: \request_address_q_gold [0] \request_address_q_gate [0]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1695: \request_address_q_gold [1] \request_address_q_gate [1]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1696: \request_address_q_gold [2] \request_address_q_gate [2]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1697: \request_address_q_gold [3] \request_address_q_gate [3]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1698: \request_address_q_gold [4] \request_address_q_gate [4]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1699: \request_address_q_gold [5] \request_address_q_gate [5]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1700: \request_address_q_gold [6] \request_address_q_gate [6]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1701: \request_address_q_gold [7] \request_address_q_gate [7]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1702: \request_address_q_gold [8] \request_address_q_gate [8]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1703: \request_address_q_gold [9] \request_address_q_gate [9]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1704: \request_address_q_gold [10] \request_address_q_gate [10]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1705: \request_address_q_gold [11] \request_address_q_gate [11]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1706: \request_address_q_gold [12] \request_address_q_gate [12]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1707: \request_address_q_gold [13] \request_address_q_gate [13]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1708: \request_address_q_gold [14] \request_address_q_gate [14]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1709: \request_address_q_gold [15] \request_address_q_gate [15]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1710: \request_address_q_gold [16] \request_address_q_gate [16]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1711: \request_address_q_gold [17] \request_address_q_gate [17]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1712: \request_address_q_gold [18] \request_address_q_gate [18]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1713: \request_address_q_gold [19] \request_address_q_gate [19]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1714: \request_address_q_gold [20] \request_address_q_gate [20]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1715: \request_address_q_gold [21] \request_address_q_gate [21]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1716: \request_address_q_gold [22] \request_address_q_gate [22]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1717: \request_address_q_gold [23] \request_address_q_gate [23]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1718: \request_data_q_gold [0] \request_data_q_gate [0]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1719: \request_data_q_gold [1] \request_data_q_gate [1]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1720: \request_data_q_gold [2] \request_data_q_gate [2]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1721: \request_data_q_gold [3] \request_data_q_gate [3]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1722: \request_data_q_gold [4] \request_data_q_gate [4]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1723: \request_data_q_gold [5] \request_data_q_gate [5]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1724: \request_data_q_gold [6] \request_data_q_gate [6]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1725: \request_data_q_gold [7] \request_data_q_gate [7]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1726: \request_data_q_gold [8] \request_data_q_gate [8]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1727: \request_data_q_gold [9] \request_data_q_gate [9]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1728: \request_data_q_gold [10] \request_data_q_gate [10]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1729: \request_data_q_gold [11] \request_data_q_gate [11]
+  Unproven $equiv $auto$equiv_make.cc:294:find_same_wires$1730: \request_data_q_gold [12] \request_data_q_gate [12]
+  Unproven $equiv $auto$equiv_make.cc:294:findERROR: Found 84 unproven $equiv cells in 'equiv_status -assert'.

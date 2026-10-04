@@ -1,0 +1,695 @@
+// Compact instruction minima for provisional historical CPU profiles.
+// Reuses the functional decoder's entry and current-instruction metadata;
+// this module neither decodes instruction bytes nor advances the CPU/BIU.
+// Intel 80286 Programmer's Reference Manual 210498-005, Appendix B supplies
+// documented bases. These are total lower bounds, not additional EU delays.
+// Add the B-6 EA correction and actual extra MEMORY READ waits separately.
+// Add +2 once for EACH actual odd-word reference, including stack/descriptor
+// references: operand_odd is retained for ABI compatibility, not charged here.
+// READY, operand/result availability, ownership, redirect and commit remain
+// real dependencies even after a deadline. WRITE/IO waits are not EU charges.
+// estimated identifies omitted target-length/gate/task distinctions, native
+// fallback and undocumented forms; it is not a claim of cycle accuracy.
+`ifndef SPK286_INSTRUCTION_TIMING_SV_INCLUDED
+`define SPK286_INSTRUCTION_TIMING_SV_INCLUDED
+`timescale 1ns/1ps
+module spk286_instruction_timing (
+    input logic [7:0] opcode,
+    input logic extended_opcode,
+    input logic [10-1:0] micro_entry,
+    input logic modrm_valid,
+    input logic [1:0] modrm_mode,
+    input logic [2:0] modrm_reg, modrm_rm,
+    input logic protected_mode,
+    input logic [1:0] CPL,
+    input logic operand_odd,
+    input logic branch_known, branch_taken,
+    input logic count_known,
+    input logic [4:0] count,
+    input logic [1:0] repeat_kind,
+    output logic qualified, estimated,
+    output logic requires_modrm, requires_outcome, requires_count,
+    output logic [9:0] base_clocks,
+    output logic [9:0] repeat_setup_clocks, repeat_iteration_clocks,
+    output logic permits_read_wait,
+    output logic [2:0] ea_clocks
+);
+        localparam integer MC_FORMAT_VERSION = 27;
+    localparam integer MC_ADDR_WIDTH = 10;
+    localparam integer MC_WORD_WIDTH = 8;
+    localparam integer MC_DEPTH = 743;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_INVALID = 8'd0;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_FETCH_IMM16 = 8'd1;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_MOVE = 8'd2;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_END = 8'd3;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_DECODE_MODRM = 8'd4;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_READ_REG16 = 8'd5;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_READ_RM16 = 8'd6;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_WRITE_REG16 = 8'd7;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_WRITE_RM16 = 8'd8;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_READ_REG16_TMP1 = 8'd9;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_READ_RM16_TMP1 = 8'd10;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_FETCH_IMM16_TMP1 = 8'd11;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_FETCH_IMM8S_TMP1 = 8'd12;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_READ_DST16 = 8'd13;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_ALU = 8'd14;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_WRITE_RESULT_REG16 = 8'd15;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_WRITE_RESULT_RM16 = 8'd16;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_WRITE_RESULT_DST = 8'd17;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_COMMIT_FLAGS = 8'd18;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_CHECK_RM16 = 8'd19;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_FETCH_IMM8S_TMP0 = 8'd20;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_PUSH16 = 8'd21;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_POP16 = 8'd22;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_READ_IP16 = 8'd23;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_TARGET_REL16 = 8'd24;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_TARGET_ABS16 = 8'd25;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_REDIRECT = 8'd26;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_ADJUST_SP16 = 8'd27;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_COUNT = 8'd28;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_FETCH_IMM8 = 8'd29;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_READ_FLAGS = 8'd30;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_RESTORE_FLAGS = 8'd31;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_SET_IF = 8'd32;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_HALT = 8'd33;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_REQUEST_EVENT = 8'd34;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_EVENT_ACK = 8'd35;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_EVENT_FLAGS = 8'd36;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_EVENT_CS = 8'd37;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_EVENT_IP = 8'd38;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_CLEAR_IF_TF = 8'd39;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_VECTOR_IP = 8'd40;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_VECTOR_CS = 8'd41;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_CONTEXT_COMMIT = 8'd42;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_POP16_TMP1 = 8'd43;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_POP16_TMP2 = 8'd44;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_IRET_COMMIT = 8'd45;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_READ_REG8 = 8'd46;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_READ_RM8 = 8'd47;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_WRITE_REG8 = 8'd48;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_WRITE_RM8 = 8'd49;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_FETCH_IMM8_TMP1 = 8'd50;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_READ_REG8_TMP1 = 8'd51;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_READ_RM8_TMP1 = 8'd52;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_READ_DST8 = 8'd53;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_MOVE8 = 8'd54;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_WRITE_RESULT_REG8 = 8'd55;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_WRITE_RESULT_RM8 = 8'd56;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_WRITE_RESULT_DST8 = 8'd57;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_FLAGS_DECODED = 8'd58;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_SIGN_EXTEND8 = 8'd59;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_SIGN_FILL16 = 8'd60;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_CONST_ONE_TMP1 = 8'd61;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_SHIFT = 8'd62;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_COUNT_LOW_TMP1 = 8'd63;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_READ_EA = 8'd64;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_WRITE_REG8_TMP1 = 8'd65;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_WRITE_REG16_TMP1 = 8'd66;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_READ_TARGET16_TMP1 = 8'd67;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_MOVE_SOURCE16_TMP1 = 8'd68;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_SET_ADDRESS_TMP1 = 8'd69;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_ADD_BASE_TMP0_TMP1 = 8'd70;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_DISPATCH_DECODED = 8'd71;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_CONST_ZERO_TMP1 = 8'd72;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_CONST_ONES_TMP1 = 8'd73;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_ADJUST = 8'd74;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_CHECK_ARITHMETIC = 8'd75;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_READ_SEG16_TMP0 = 8'd76;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_WRITE_SEG16_TMP0 = 8'd77;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_READ_AX_TMP0 = 8'd78;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_READ_CX_TMP0 = 8'd79;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_READ_DX_TMP0 = 8'd80;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_READ_BX_TMP0 = 8'd81;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_READ_SP_TMP0 = 8'd82;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_READ_BP_TMP0 = 8'd83;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_READ_SI_TMP0 = 8'd84;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_READ_DI_TMP0 = 8'd85;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_WRITE_AX_TMP0 = 8'd86;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_WRITE_CX_TMP0 = 8'd87;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_WRITE_DX_TMP0 = 8'd88;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_WRITE_BX_TMP0 = 8'd89;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_WRITE_SP_TMP0 = 8'd90;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_WRITE_BP_TMP0 = 8'd91;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_WRITE_SI_TMP0 = 8'd92;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_WRITE_DI_TMP0 = 8'd93;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_SAVE_AUX_TMP0 = 8'd94;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_RESTORE_AUX_TMP0 = 8'd95;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_SAVE_ALLOCATION_TMP0 = 8'd96;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_LOAD_COUNTER_TMP1 = 8'd97;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_DECREMENT_COUNTER = 8'd98;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_BRANCH_ZERO = 8'd99;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_BRANCH_NONZERO = 8'd100;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_CHECK_PUSH8 = 8'd101;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_CHECK_POP8 = 8'd102;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_BEGIN_STACK_CURSOR = 8'd103;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_CHECK_STACK_TMP0 = 8'd104;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_SET_STACK_ADDRESS_TMP0 = 8'd105;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_READ_STACK_ADDRESS_TMP0 = 8'd106;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_DECREMENT_STACK_ADDRESS = 8'd107;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_ALLOCATE_STACK = 8'd108;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_CHECK_RM32 = 8'd109;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_SET_EA_PLUS2 = 8'd110;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_CHECK_BOUNDS = 8'd111;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_READ_STACK_CURSOR_TMP0 = 8'd112;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_CHECK_PUSH2 = 8'd113;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_CHECK_POP2 = 8'd114;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_ADD_ALLOCATION_SP = 8'd115;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_SYSTEM_STORE_GDTR = 8'd136;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_SYSTEM_STORE_IDTR = 8'd137;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_SYSTEM_LOAD_GDTR = 8'd138;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_SYSTEM_LOAD_IDTR = 8'd139;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_SYSTEM_STORE_MSW = 8'd140;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_SYSTEM_LOAD_MSW = 8'd141;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_SYSTEM_STORE_LDTR = 8'd142;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_SYSTEM_STORE_TR = 8'd143;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_SYSTEM_LOAD_LDTR = 8'd144;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_SYSTEM_LOAD_TR = 8'd145;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_SYSTEM_VERIFY_READ = 8'd146;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_SYSTEM_VERIFY_WRITE = 8'd147;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_SYSTEM_LOAD_ACCESS = 8'd148;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_SYSTEM_LOAD_LIMIT = 8'd149;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_SYSTEM_ARPL_CHECK = 8'd166;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_SYSTEM_ARPL = 8'd167;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_SYSTEM_CLTS = 8'd168;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_TASK_SWITCH = 8'd169;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_TASK_RETURN = 8'd170;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_LOADALL = 8'd171;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_CARRY_FILL8 = 8'd172;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_CHECK_PROTECTED_MODE = 8'd193;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_CHECK_SYSTEM_PRIVILEGE = 8'd194;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_CHECK_IO_PRIVILEGE = 8'd195;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_CHECK_NPX_ESC = 8'd196;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_CHECK_NPX_WAIT = 8'd197;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_DECODE_ALU_RM16_REG16 = 8'd173;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_DECODE_ALU_REG16_RM16 = 8'd174;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_DECODE_ALU_RM8_REG8 = 8'd175;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_DECODE_ALU_REG8_RM8 = 8'd176;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_DECODE_MOV_RM16_REG16 = 8'd177;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_DECODE_MOV_REG16_RM16 = 8'd178;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_DECODE_MOV_RM8_REG8 = 8'd179;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_DECODE_MOV_REG8_RM8 = 8'd180;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_DECODE_UNARY_RM16 = 8'd190;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_DECODE_UNARY_RM8 = 8'd191;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_EXEC_INC_DEC_DST16 = 8'd192;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_FETCH_ALU_DST16_IMM16 = 8'd181;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_FETCH_ALU_DST8_IMM8 = 8'd182;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_FETCH_ALU_RM16_IMM16 = 8'd183;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_FETCH_ALU_RM16_IMM8S = 8'd184;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_FETCH_ALU_RM8_IMM8 = 8'd185;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_FETCH_MOV_DST16_IMM16 = 8'd186;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_FETCH_MOV_DST8_IMM8 = 8'd187;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_FETCH_MOV_RM16_IMM16 = 8'd188;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_FETCH_MOV_RM8_IMM8 = 8'd189;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_VALIDATE_CS = 8'd150;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_VALIDATE_EVENT_GATE = 8'd151;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_EVENT_GATE_IP = 8'd152;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_EVENT_GATE_CS = 8'd153;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_CLEAR_EVENT_FLAGS = 8'd154;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_PUSH_EVENT_ERROR = 8'd155;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_VALIDATE_IRET_CS = 8'd156;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_IRET_OUTER_FRAME = 8'd157;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_VALIDATE_IRET_SS = 8'd158;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_VALIDATE_CALL_GATE = 8'd159;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_VALIDATE_CALL_CS = 8'd160;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_VALIDATE_CALL_STACK = 8'd161;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_VALIDATE_CALL_SS = 8'd162;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_CALL_GATE_STACK_SWITCH = 8'd163;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_CHECK_CALL_FRAME = 8'd164;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_COPY_CALL_PARAMETERS = 8'd165;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_BRANCH_REPEAT_EMPTY = 8'd121;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_STEP_STRING_SOURCE = 8'd122;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_STEP_STRING_DEST = 8'd123;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_REPEAT_COUNT = 8'd124;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_READ_STRING_TMP0 = 8'd125;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_READ_STRING_TMP1 = 8'd126;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_WRITE_STRING_TMP0 = 8'd127;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_BRANCH_REPEAT_CONTINUE = 8'd128;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_READ_STRING_ACCUMULATOR = 8'd129;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_WRITE_STRING_ACCUMULATOR = 8'd130;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_IO_READ8 = 8'd131;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_IO_READ16 = 8'd132;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_IO_WRITE8 = 8'd133;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_IO_WRITE16 = 8'd134;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_FETCH_PORT = 8'd135;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_MULDIV8 = 8'd116;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_MULDIV16 = 8'd117;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_IMUL_IMM16 = 8'd118;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_WRITE_RESULT_AX16 = 8'd119;
+    localparam logic [MC_WORD_WIDTH-1:0] MC_WRITE_RESULT_DX16 = 8'd120;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_MOV_R16_IMM16 = 10'd0;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_MOV_RM16_R16 = 10'd3;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_MOV_R16_RM16 = 10'd7;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_ALU_RM16_R16 = 10'd11;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_ALU_R16_RM16 = 10'd18;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_ALU_AX_IMM16 = 10'd25;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_ALU_RM16_IMM16 = 10'd31;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_ALU_RM16_IMM8S = 10'd38;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_PUSH_R16 = 10'd45;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_POP_R16 = 10'd48;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_PUSH_IMM16 = 10'd51;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_PUSH_IMM8S = 10'd54;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_POP_RM16 = 10'd57;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_GROUP5_NEAR = 10'd61;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_CALL_REL16 = 10'd67;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_JMP_REL16 = 10'd73;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_BRANCH_REL8 = 10'd77;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_LOOP_REL8 = 10'd81;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_RET_NEAR = 10'd86;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_RET_IMM16 = 10'd90;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_PUSH_FLAGS = 10'd96;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_POP_FLAGS = 10'd99;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_CONTROL_IF = 10'd102;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_HALT_CPU = 10'd104;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_SOFTWARE_EVENT = 10'd106;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_SOFTWARE_EVENT_IMM8 = 10'd108;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_INTERRUPT_RETURN = 10'd111;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_EVENT_ENTRY = 10'd120;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_EVENT_ENTRY_PROTECTED = 10'd137;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_MOV_R8_IMM8 = 10'd159;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_MOV_RM8_R8 = 10'd162;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_MOV_R8_RM8 = 10'd166;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_MOV_RM8_IMM8 = 10'd170;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_MOV_RM16_IMM16 = 10'd174;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_ALU_RM8_R8 = 10'd178;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_ALU_R8_RM8 = 10'd185;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_ALU_AL_IMM8 = 10'd192;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_ALU_RM8_IMM8 = 10'd198;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_CONTROL_FLAGS = 10'd205;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_LOAD_FLAGS_BYTE = 10'd207;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_EXTEND_BYTE = 10'd210;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_EXTEND_WORD = 10'd214;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_INC_DEC_R16 = 10'd218;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_SHIFT_RM8_ONE = 10'd224;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_SHIFT_RM8_CL = 10'd231;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_SHIFT_RM8_IMM8 = 10'd238;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_SHIFT_RM16_ONE = 10'd245;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_SHIFT_RM16_CL = 10'd252;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_SHIFT_RM16_IMM8 = 10'd259;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_LEA_R16_M = 10'd266;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_EXCHANGE_RM8_R8 = 10'd270;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_EXCHANGE_RM16_R16 = 10'd276;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_EXCHANGE_SOURCE_TARGET16 = 10'd282;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_LOAD_DIRECT8 = 10'd287;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_LOAD_DIRECT16 = 10'd292;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_STORE_DIRECT8 = 10'd297;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_STORE_DIRECT16 = 10'd302;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_LOAD_BASE_INDEX8 = 10'd307;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_GROUP3_DISPATCH = 10'd313;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_GROUP5_DISPATCH = 10'd315;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_NOT_RM8 = 10'd317;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_NOT_RM16 = 10'd324;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_NEG_RM8 = 10'd331;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_NEG_RM16 = 10'd338;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_INC_DEC_RM8 = 10'd345;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_INC_DEC_RM16 = 10'd352;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_ADJUST_DIRECT = 10'd359;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_ADJUST_RADIX = 10'd366;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_MOV_RM16_SEG = 10'd373;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_MOV_SEG_RM16 = 10'd377;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_PUSH_SEG = 10'd381;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_POP_SEG = 10'd384;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_PUSH_ALL = 10'd387;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_POP_ALL = 10'd407;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_ENTER_FRAME = 10'd424;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_LEAVE_FRAME = 10'd449;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_CHECK_BOUNDS = 10'd455;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_LOAD_POINTER = 10'd464;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_CALL_FAR_IMM = 10'd474;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_JMP_FAR_IMM = 10'd492;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_CALL_FAR_RM = 10'd498;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_JMP_FAR_RM = 10'd519;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_RET_FAR = 10'd528;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_RET_FAR_IMM = 10'd536;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_MULDIV_RM8 = 10'd547;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_MULDIV_RM16 = 10'd554;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_IMUL_R16_RM16_IMM16 = 10'd562;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_IMUL_R16_RM16_IMM8S = 10'd569;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_STRING_MOVE = 10'd576;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_STRING_COMPARE = 10'd584;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_STRING_STORE = 10'd595;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_STRING_LOAD = 10'd602;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_STRING_SCAN = 10'd609;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_IN_AL_PORT = 10'd619;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_IN_AX_PORT = 10'd624;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_OUT_PORT_AL = 10'd629;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_OUT_PORT_AX = 10'd634;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_STRING_INPUT_BYTE = 10'd639;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_STRING_INPUT_WORD = 10'd648;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_STRING_OUTPUT_BYTE = 10'd657;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_STRING_OUTPUT_WORD = 10'd666;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_ESC_NO_COPROCESSOR = 10'd675;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_WAIT_NO_COPROCESSOR = 10'd679;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_SYSTEM_GROUP_0F01 = 10'd681;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_SYSTEM_STORE_GDTR = 10'd683;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_SYSTEM_STORE_IDTR = 10'd685;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_SYSTEM_LOAD_GDTR = 10'd687;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_SYSTEM_LOAD_IDTR = 10'd689;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_SYSTEM_STORE_MSW = 10'd691;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_SYSTEM_LOAD_MSW = 10'd693;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_SYSTEM_GROUP_0F00 = 10'd695;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_SYSTEM_STORE_LDTR = 10'd697;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_SYSTEM_STORE_TR = 10'd700;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_SYSTEM_LOAD_LDTR = 10'd703;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_SYSTEM_LOAD_TR = 10'd707;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_SYSTEM_VERIFY_READ = 10'd711;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_SYSTEM_VERIFY_WRITE = 10'd715;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_SYSTEM_LOAD_ACCESS = 10'd719;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_SYSTEM_LOAD_LIMIT = 10'd724;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_SYSTEM_ARPL = 10'd729;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_SYSTEM_CLTS = 10'd735;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_LOADALL = 10'd737;
+    localparam logic [MC_ADDR_WIDTH-1:0] MC_ENTRY_LOAD_CARRY_BYTE = 10'd739;
+    wire memory_form = modrm_mode != 2'b11;
+    // Privilege validity and escape decoding belong to the real decoder and
+    // services. This table never grants permission to an invalid instruction.
+    wire unused_context = ^{extended_opcode, CPL, operand_odd};
+    logic string_form;
+
+    always_comb begin
+        // An unclassified legal entry explicitly remains a positive estimated
+        // lower bound. It cannot stall boot awaiting metadata it does not use.
+        base_clocks = 10'd2;
+        estimated = 1'b0;
+        requires_modrm = 1'b0;
+        requires_outcome = 1'b0;
+        requires_count = 1'b0;
+        repeat_setup_clocks = 10'd0;
+        repeat_iteration_clocks = 10'd0;
+        permits_read_wait = 1'b1;
+        string_form = 1'b0;
+        ea_clocks = 3'd0;
+        case (micro_entry)
+            MC_ENTRY_MOV_R16_IMM16, MC_ENTRY_MOV_R8_IMM8: begin
+                base_clocks = 10'd2; permits_read_wait = 1'b0;
+            end
+            MC_ENTRY_MOV_RM16_R16, MC_ENTRY_MOV_RM8_R8,
+            MC_ENTRY_MOV_RM16_IMM16, MC_ENTRY_MOV_RM8_IMM8,
+            MC_ENTRY_MOV_RM16_SEG: begin
+                requires_modrm = 1'b1;
+                base_clocks = memory_form ? 10'd3 : 10'd2;
+                permits_read_wait = 1'b0;
+            end
+            MC_ENTRY_MOV_R16_RM16, MC_ENTRY_MOV_R8_RM8: begin
+                requires_modrm = 1'b1;
+                base_clocks = memory_form ? 10'd5 : 10'd2;
+            end
+            MC_ENTRY_MOV_SEG_RM16: begin
+                requires_modrm = 1'b1;
+                base_clocks = protected_mode ? (memory_form ? 10'd19 : 10'd17) :
+                                              (memory_form ? 10'd5 : 10'd2);
+            end
+            MC_ENTRY_ALU_RM16_R16, MC_ENTRY_ALU_RM8_R8: begin
+                requires_modrm = 1'b1;
+                base_clocks = memory_form ?
+                    ((opcode == 8'h84 || opcode == 8'h85) ? 10'd6 : 10'd7) : 10'd2;
+            end
+            MC_ENTRY_ALU_R16_RM16, MC_ENTRY_ALU_R8_RM8: begin
+                requires_modrm = 1'b1;
+                base_clocks = memory_form ? (opcode[5:3] == 3'd7 ? 10'd6 : 10'd7) : 10'd2;
+            end
+            MC_ENTRY_ALU_AX_IMM16, MC_ENTRY_ALU_AL_IMM8: begin
+                base_clocks = 10'd3; permits_read_wait = 1'b0;
+            end
+            MC_ENTRY_ALU_RM16_IMM16, MC_ENTRY_ALU_RM16_IMM8S,
+            MC_ENTRY_ALU_RM8_IMM8: begin
+                requires_modrm = 1'b1;
+                base_clocks = memory_form ? (modrm_reg == 3'd7 ? 10'd6 : 10'd7) : 10'd3;
+            end
+            MC_ENTRY_INC_DEC_R16, MC_ENTRY_EXTEND_BYTE, MC_ENTRY_EXTEND_WORD,
+            MC_ENTRY_LOAD_FLAGS_BYTE, MC_ENTRY_CONTROL_FLAGS,
+            MC_ENTRY_SYSTEM_CLTS: begin
+                base_clocks = 10'd2; permits_read_wait = 1'b0;
+            end
+            MC_ENTRY_CONTROL_IF: begin
+                base_clocks = opcode == 8'hFA ? 10'd3 : 10'd2;
+                permits_read_wait = 1'b0;
+            end
+            MC_ENTRY_HALT_CPU: begin
+                base_clocks = 10'd2; permits_read_wait = 1'b0;
+            end
+            MC_ENTRY_ADJUST_DIRECT: begin
+                base_clocks = 10'd3; permits_read_wait = 1'b0;
+            end
+            MC_ENTRY_ADJUST_RADIX: begin
+                base_clocks = opcode == 8'hD4 ? 10'd16 : 10'd14;
+                permits_read_wait = 1'b0;
+            end
+            MC_ENTRY_INC_DEC_RM8, MC_ENTRY_INC_DEC_RM16,
+            MC_ENTRY_NOT_RM8, MC_ENTRY_NOT_RM16, MC_ENTRY_NEG_RM8, MC_ENTRY_NEG_RM16: begin
+                requires_modrm = 1'b1;
+                base_clocks = memory_form ? 10'd7 : 10'd2;
+            end
+            MC_ENTRY_EXCHANGE_RM8_R8, MC_ENTRY_EXCHANGE_RM16_R16: begin
+                requires_modrm = 1'b1;
+                base_clocks = memory_form ? 10'd5 : 10'd3;
+            end
+            MC_ENTRY_EXCHANGE_SOURCE_TARGET16: begin
+                base_clocks = 10'd3; permits_read_wait = 1'b0;
+            end
+            MC_ENTRY_LEA_R16_M: begin
+                requires_modrm = 1'b1;
+                base_clocks = 10'd3; permits_read_wait = 1'b0;
+            end
+            MC_ENTRY_LOAD_DIRECT8, MC_ENTRY_LOAD_DIRECT16, MC_ENTRY_LOAD_BASE_INDEX8:
+                base_clocks = 10'd5;
+            MC_ENTRY_STORE_DIRECT8, MC_ENTRY_STORE_DIRECT16: begin
+                base_clocks = 10'd3; permits_read_wait = 1'b0;
+            end
+            MC_ENTRY_PUSH_R16, MC_ENTRY_PUSH_SEG, MC_ENTRY_PUSH_IMM16,
+            MC_ENTRY_PUSH_IMM8S, MC_ENTRY_PUSH_FLAGS: begin
+                base_clocks = 10'd3; permits_read_wait = 1'b0;
+            end
+            MC_ENTRY_POP_R16, MC_ENTRY_POP_RM16, MC_ENTRY_POP_FLAGS,
+            MC_ENTRY_LEAVE_FRAME: begin
+                base_clocks = 10'd5;
+                requires_modrm = micro_entry == MC_ENTRY_POP_RM16;
+            end
+            MC_ENTRY_POP_SEG: base_clocks = protected_mode ? 10'd20 : 10'd5;
+            MC_ENTRY_PUSH_ALL: begin
+                base_clocks = 10'd17; permits_read_wait = 1'b0;
+            end
+            MC_ENTRY_POP_ALL: base_clocks = 10'd19;
+            MC_ENTRY_ENTER_FRAME: begin
+                requires_count = 1'b1;
+                // count is the INITIAL nesting level, not the live loop counter.
+                base_clocks = count == 5'd0 ? 10'd11 : count == 5'd1 ? 10'd15 :
+                              10'd12 + {3'd0, count, 2'b00};
+            end
+            MC_ENTRY_CHECK_BOUNDS: begin
+                requires_modrm = 1'b1; base_clocks = 10'd13;
+            end
+            MC_ENTRY_LOAD_POINTER: begin
+                requires_modrm = 1'b1;
+                base_clocks = protected_mode ? 10'd21 : 10'd7;
+            end
+            MC_ENTRY_SHIFT_RM8_ONE, MC_ENTRY_SHIFT_RM16_ONE: begin
+                requires_modrm = 1'b1;
+                base_clocks = memory_form ? 10'd7 : 10'd2;
+            end
+            MC_ENTRY_SHIFT_RM8_CL, MC_ENTRY_SHIFT_RM16_CL,
+            MC_ENTRY_SHIFT_RM8_IMM8, MC_ENTRY_SHIFT_RM16_IMM8: begin
+                requires_modrm = 1'b1; requires_count = 1'b1;
+                // Intel B-90/B-97: count is masked to five bits, before any
+                // functional rotate modulo8/9/16/17 reduction.
+                base_clocks = (memory_form ? 10'd8 : 10'd5) + {5'd0, count};
+            end
+            MC_ENTRY_GROUP3_DISPATCH, MC_ENTRY_MULDIV_RM8, MC_ENTRY_MULDIV_RM16: begin
+                requires_modrm = 1'b1;
+                case (modrm_reg)
+                    3'd0: base_clocks = memory_form ? 10'd6 : 10'd3; // TEST
+                    3'd2, 3'd3: base_clocks = memory_form ? 10'd7 : 10'd2;
+                    3'd4, 3'd5: base_clocks = (opcode[0] ? 10'd21 : 10'd13) +
+                                                    (memory_form ? 10'd3 : 10'd0);
+                    3'd6: base_clocks = (opcode[0] ? 10'd22 : 10'd14) +
+                                                    (memory_form ? 10'd3 : 10'd0);
+                    3'd7: base_clocks = (opcode[0] ? 10'd25 : 10'd17) +
+                                                    (memory_form ? 10'd3 : 10'd0);
+                    default: begin base_clocks = 10'd2; estimated = 1'b1; end
+                endcase
+            end
+            MC_ENTRY_IMUL_R16_RM16_IMM16, MC_ENTRY_IMUL_R16_RM16_IMM8S: begin
+                requires_modrm = 1'b1;
+                base_clocks = memory_form ? 10'd24 : 10'd21;
+            end
+            MC_ENTRY_GROUP5_DISPATCH, MC_ENTRY_GROUP5_NEAR: begin
+                requires_modrm = 1'b1;
+                case (modrm_reg)
+                    3'd0, 3'd1: base_clocks = memory_form ? 10'd7 : 10'd2;
+                    3'd2, 3'd4: begin
+                        base_clocks = memory_form ? 10'd11 : 10'd7;
+                        estimated = 1'b1; // next target instruction length absent
+                    end
+                    3'd3: begin
+                        base_clocks = protected_mode ? 10'd29 : 10'd16;
+                        estimated = 1'b1; // gate/task and target length absent
+                    end
+                    3'd5: begin
+                        base_clocks = protected_mode ? 10'd26 : 10'd15;
+                        estimated = 1'b1;
+                    end
+                    3'd6: base_clocks = memory_form ? 10'd5 : 10'd3;
+                    default: begin base_clocks = 10'd2; estimated = 1'b1; end
+                endcase
+            end
+            MC_ENTRY_CALL_REL16, MC_ENTRY_JMP_REL16: begin
+                base_clocks = 10'd7; estimated = 1'b1;
+            end
+            MC_ENTRY_BRANCH_REL8: begin
+                requires_outcome = opcode != 8'hEB;
+                base_clocks = (opcode == 8'hEB || branch_taken) ? 10'd7 : 10'd3;
+                estimated = opcode == 8'hEB || !branch_known || branch_taken;
+            end
+            MC_ENTRY_LOOP_REL8: begin
+                requires_outcome = 1'b1;
+                base_clocks = branch_taken ? 10'd8 : 10'd4;
+                estimated = opcode == 8'hE3 && (!branch_known || branch_taken);
+            end
+            MC_ENTRY_RET_NEAR, MC_ENTRY_RET_IMM16: begin
+                base_clocks = 10'd11; estimated = 1'b1;
+            end
+            MC_ENTRY_CALL_FAR_IMM: begin
+                base_clocks = protected_mode ? 10'd26 : 10'd13; estimated = 1'b1;
+            end
+            MC_ENTRY_JMP_FAR_IMM: begin
+                base_clocks = protected_mode ? 10'd23 : 10'd11; estimated = 1'b1;
+            end
+            MC_ENTRY_CALL_FAR_RM: begin
+                requires_modrm = 1'b1;
+                base_clocks = protected_mode ? 10'd29 : 10'd16; estimated = 1'b1;
+            end
+            MC_ENTRY_JMP_FAR_RM: begin
+                requires_modrm = 1'b1;
+                base_clocks = protected_mode ? 10'd26 : 10'd15; estimated = 1'b1;
+            end
+            MC_ENTRY_RET_FAR, MC_ENTRY_RET_FAR_IMM: begin
+                base_clocks = protected_mode ? 10'd25 : 10'd15; estimated = 1'b1;
+            end
+            MC_ENTRY_INTERRUPT_RETURN: begin
+                base_clocks = protected_mode ? 10'd31 : 10'd17; estimated = 1'b1;
+            end
+            MC_ENTRY_SOFTWARE_EVENT, MC_ENTRY_SOFTWARE_EVENT_IMM8: begin
+                requires_outcome = opcode == 8'hCE;
+                base_clocks = opcode == 8'hCE && !branch_taken ? 10'd3 :
+                    protected_mode ? 10'd40 : opcode == 8'hCE ? 10'd24 : 10'd23;
+                estimated = !(opcode == 8'hCE && branch_known && !branch_taken);
+            end
+            MC_ENTRY_EVENT_ENTRY: begin
+                base_clocks = 10'd23; estimated = 1'b1;
+            end
+            MC_ENTRY_EVENT_ENTRY_PROTECTED: begin
+                base_clocks = 10'd40; estimated = 1'b1;
+            end
+            MC_ENTRY_STRING_MOVE, MC_ENTRY_STRING_INPUT_BYTE, MC_ENTRY_STRING_INPUT_WORD,
+            MC_ENTRY_STRING_OUTPUT_BYTE, MC_ENTRY_STRING_OUTPUT_WORD: begin
+                string_form = 1'b1; base_clocks = 10'd5;
+                repeat_setup_clocks = 10'd5; repeat_iteration_clocks = 10'd4;
+            end
+            MC_ENTRY_STRING_COMPARE: begin
+                string_form = 1'b1; base_clocks = 10'd8;
+                repeat_setup_clocks = 10'd5; repeat_iteration_clocks = 10'd9;
+            end
+            MC_ENTRY_STRING_STORE: begin
+                string_form = 1'b1; base_clocks = 10'd3; permits_read_wait = 1'b0;
+                repeat_setup_clocks = 10'd4; repeat_iteration_clocks = 10'd3;
+            end
+            MC_ENTRY_STRING_LOAD: begin
+                string_form = 1'b1; base_clocks = 10'd5;
+                // REP LODS is accepted functionally; Intel B-92 gives no row.
+                repeat_setup_clocks = 10'd5; repeat_iteration_clocks = 10'd5;
+                estimated = repeat_kind != 2'd0;
+            end
+            MC_ENTRY_STRING_SCAN: begin
+                string_form = 1'b1; base_clocks = 10'd7;
+                repeat_setup_clocks = 10'd5; repeat_iteration_clocks = 10'd5;
+            end
+            MC_ENTRY_IN_AL_PORT, MC_ENTRY_IN_AX_PORT: begin
+                base_clocks = 10'd5; permits_read_wait = 1'b0;
+            end
+            MC_ENTRY_OUT_PORT_AL, MC_ENTRY_OUT_PORT_AX: begin
+                base_clocks = 10'd3; permits_read_wait = 1'b0;
+            end
+            MC_ENTRY_WAIT_NO_COPROCESSOR: begin
+                base_clocks = 10'd3; permits_read_wait = 1'b0;
+            end
+            MC_ENTRY_ESC_NO_COPROCESSOR: begin
+                // CPU syntax/fault path only. No invented 80287 duration.
+                requires_modrm = 1'b1; base_clocks = 10'd2; estimated = 1'b1;
+            end
+            MC_ENTRY_SYSTEM_GROUP_0F00: begin
+                requires_modrm = 1'b1;
+                case (modrm_reg)
+                    3'd0, 3'd1: begin
+                        base_clocks = memory_form ? 10'd3 : 10'd2;
+                        permits_read_wait = 1'b0;
+                    end
+                    3'd2, 3'd3: base_clocks = memory_form ? 10'd19 : 10'd17;
+                    3'd4, 3'd5: base_clocks = memory_form ? 10'd16 : 10'd14;
+                    default: begin base_clocks = 10'd2; estimated = 1'b1; end
+                endcase
+            end
+            MC_ENTRY_SYSTEM_GROUP_0F01: begin
+                requires_modrm = 1'b1;
+                case (modrm_reg)
+                    3'd0, 3'd2: base_clocks = 10'd11;
+                    3'd1, 3'd3: base_clocks = 10'd12;
+                    3'd4: base_clocks = memory_form ? 10'd3 : 10'd2;
+                    3'd6: base_clocks = memory_form ? 10'd6 : 10'd3;
+                    default: begin base_clocks = 10'd2; estimated = 1'b1; end
+                endcase
+                if (modrm_reg <= 3'd1 || modrm_reg == 3'd4) permits_read_wait = 1'b0;
+            end
+            MC_ENTRY_SYSTEM_STORE_GDTR, MC_ENTRY_SYSTEM_LOAD_GDTR: begin
+                requires_modrm = 1'b1; base_clocks = 10'd11;
+                permits_read_wait = micro_entry == MC_ENTRY_SYSTEM_LOAD_GDTR;
+            end
+            MC_ENTRY_SYSTEM_STORE_IDTR, MC_ENTRY_SYSTEM_LOAD_IDTR: begin
+                requires_modrm = 1'b1; base_clocks = 10'd12;
+                permits_read_wait = micro_entry == MC_ENTRY_SYSTEM_LOAD_IDTR;
+            end
+            MC_ENTRY_SYSTEM_STORE_MSW, MC_ENTRY_SYSTEM_STORE_LDTR, MC_ENTRY_SYSTEM_STORE_TR: begin
+                requires_modrm = 1'b1; base_clocks = memory_form ? 10'd3 : 10'd2;
+                permits_read_wait = 1'b0;
+            end
+            MC_ENTRY_SYSTEM_LOAD_MSW: begin
+                requires_modrm = 1'b1; base_clocks = memory_form ? 10'd6 : 10'd3;
+            end
+            MC_ENTRY_SYSTEM_LOAD_LDTR, MC_ENTRY_SYSTEM_LOAD_TR: begin
+                requires_modrm = 1'b1; base_clocks = memory_form ? 10'd19 : 10'd17;
+            end
+            MC_ENTRY_SYSTEM_VERIFY_READ, MC_ENTRY_SYSTEM_VERIFY_WRITE,
+            MC_ENTRY_SYSTEM_LOAD_ACCESS, MC_ENTRY_SYSTEM_LOAD_LIMIT: begin
+                requires_modrm = 1'b1; base_clocks = memory_form ? 10'd16 : 10'd14;
+            end
+            MC_ENTRY_SYSTEM_ARPL: begin
+                requires_modrm = 1'b1; base_clocks = memory_form ? 10'd11 : 10'd10;
+            end
+            MC_ENTRY_LOADALL: begin
+                // Undocumented instruction: native86Box x86_ops_misc.h
+                // opLOADALL uses195. This explicit fallback is estimated.
+                base_clocks = 10'd195; estimated = 1'b1;
+            end
+            MC_ENTRY_LOAD_CARRY_BYTE: begin
+                // Undocumented SALC: native opSETALC uses timing_rr (=2).
+                base_clocks = 10'd2; estimated = 1'b1; permits_read_wait = 1'b0;
+            end
+            default: begin base_clocks = 10'd2; estimated = 1'b1; end
+        endcase
+        // B-6 correction applies once to base+index+displacement, not once per
+        // micro-operation or operand reference. Register/direct forms add0.
+        if (requires_modrm && modrm_valid && memory_form &&
+            (modrm_mode == 2'd1 || modrm_mode == 2'd2) && modrm_rm <= 3'd3)
+            ea_clocks = 3'd1;
+        if (!string_form || repeat_kind == 2'd0) begin
+            repeat_setup_clocks = 10'd0;
+            repeat_iteration_clocks = 10'd0;
+            // Non-string REP has no documented duration; preserve semantics.
+            if (!string_form && repeat_kind != 2'd0) estimated = 1'b1;
+        end else if (repeat_kind == 2'd1 &&
+                     micro_entry != MC_ENTRY_STRING_COMPARE && micro_entry != MC_ENTRY_STRING_SCAN)
+            estimated = 1'b1; // REPNE on unconditional strings not tabulated
+        qualified = (!requires_modrm || modrm_valid) &&
+                    (!requires_outcome || branch_known) &&
+                    (!requires_count || count_known);
+    end
+endmodule
+`endif

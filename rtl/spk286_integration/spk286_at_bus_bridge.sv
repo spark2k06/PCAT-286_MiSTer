@@ -116,8 +116,9 @@ module spk286_at_bus_bridge #(
     logic [15:0] cpu_data_in_q;
     logic        timing_tc_q;
     logic        timing_active_q;
+    logic        timing_admission_window_q;
     wire historical = timing_historical === 1'b1;
-    wire timing_admit = !historical || timing_cpu_boundary;
+    wire timing_admit = !historical || timing_cpu_boundary || timing_admission_window_q;
     // Admission is the beginning of Ts. The following boundary begins Tc;
     // the next boundary is the earliest terminal READY sample (two clocks).
     wire timing_terminal = !historical ||
@@ -302,13 +303,20 @@ module spk286_at_bus_bridge #(
             cpu_data_in_q      <= 16'd0;
             timing_tc_q        <= 1'b0;
             timing_active_q    <= 1'b0;
+            timing_admission_window_q <= 1'b0;
             protocol_error     <= 1'b0;
         end else begin
+            if (timing_cpu_boundary || !historical)
+                timing_admission_window_q <= 1'b0;
             if (historical && timing_active_q && timing_cpu_boundary)
                 timing_tc_q <= 1'b1;
             if (cpu_ready) begin
                 timing_active_q <= 1'b0;
                 timing_tc_q <= 1'b0;
+                // A level-held BIU presents the NEXT request after this edge.
+                // Admit it on a subsequent fabric edge in this same virtual
+                // interval, never by replaying the just-completed request.
+                timing_admission_window_q <= historical;
             end
             if (state_q != STATE_COMPLETE)
                 complete_sampled_q <= 1'b0;
@@ -317,6 +325,7 @@ module spk286_at_bus_bridge #(
                     if (cpu_bus_valid && timing_admit && !drain_barrier) begin
                         timing_active_q <= historical;
                         timing_tc_q <= 1'b0;
+                        timing_admission_window_q <= 1'b0;
                         // Snapshot is performed once per request.  No edge or
                         // payload comparison is used as a delimiter, so an
                         // identical request held back-to-back is accepted.

@@ -175,3 +175,29 @@ The evidence is preserved in
 and the host image peer; they do not run DOS COPY, MiSTer Main, an SD-card
 filesystem or physical image remounting. Hardware COPY/remount confirmation
 remains the final check of the user's complete scenario.
+
+## Follow-up static audit
+
+The production `DMA_REGISTERED_MEMORY_COMPLETION=1` binding matches the new
+bank. The ACK edge uses the final retained byte before the controller's
+`dma_has_terminated` can introduce filler zeros. The completion interlock
+keeps the active channel stable until the endpoint consumes it.
+
+The local MiSTer Main `x86.cpp` floppy path sends 512 `spi_w16` operations,
+each containing one useful byte, rather than 256 packed words. This matches
+the management FIFO's low-eight-bit convention and the directed peer. Its
+FIFO address `F2FF` and the bank's `F20F` decode to the same register. DMA RAM
+reads bypass the code/data hits; RAM writes update matching data-buffer lanes
+and invalidate matching code lines. No further concrete floppy defect was
+identified by this audit.
+
+One separate Sound Blaster coverage gap was identified: the production
+endpoint first accepts when the memory response becomes valid, while DMA
+acceptance and completion occur on separate edges. The memory port can retire
+READY between those edges and later recapture the still-valid DMA request,
+potentially reading the same RAM beat twice. This is a static hypothesis about
+an existing integration cost, not a measured regression or corruption. The
+SB component bank does not compose that memory-port handshake; the SB machine
+bank checks detection with memory DMA disabled. A future composed SB playback
+test should count backend reads per delivered byte before changing that path.
+The floppy payload fix preserves the live-response phase used by Sound Blaster.

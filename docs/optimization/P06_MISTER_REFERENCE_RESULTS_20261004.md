@@ -178,3 +178,13 @@ The new raw file, unchanged validator output and comparison are archived
 separately in `docs/evidence/p06-mister-repeat25-20261004`; the original
 capture is preserved. CPU/profile adjustment remains pending while the
 floppy correction is compiled and validated.
+
+For a directed follow-up, the R0 difference of gross and baseline medians
+conditionally corresponds to 9.998–10.214 nominal clocks per iteration at
+6–20 MHz, but 16.205 at 25 MHz. That locates the added elapsed cost in the
+ALU/fetch workload; these subtracted medians do not isolate EU cycles. Trace
+32 iterations of baseline and the unchanged R0 bytes at 20 and 25 MHz, first
+with ideal RAM, then with the actual bridge/code buffer. Record instruction
+metadata/deadline, raw retirement, permitted retirement, implementation
+extension, processor boundaries and CODE acceptance/READY/refill to distinguish
+functional lateness from fetch/admission phasing.

@@ -1,0 +1,185 @@
+%Warning-PINMISSING: rtl/common/floppy.v:897:1: Cell has missing pin: 'full'
+  897 | fifo_to_floppy_inst (
+      | ^~~~~~~~~~~~~~~~~~~
+                     ... For warning description see https://verilator.org/warn/PINMISSING?v=5.020
+                     ... Use "/* verilator lint_off PINMISSING */" and lint_on around source to disable this message.
+%Warning-WIDTHTRUNC: rtl/common/floppy.v:83:25: Logical operator LOGNOT expects 1 bit on the LHS, but LHS's VARREF 'mgmt_address' generates 4 bits.
+                                              : ... note: In instance 'spk286_at_floppy_write_protect_tb.dut.u_fdc'
+   83 | assign mgmt_readdata = (!mgmt_address) ? {selected_drive[0], sd_sector[14:0]} : (&mgmt_address) ? fifo_readdata : 16'd1;
+      |                         ^
+%Warning-WIDTHEXPAND: rtl/common/floppy.v:83:97: Operator COND expects 16 bits on the Conditional True, but Conditional True's VARREF 'fifo_readdata' generates 8 bits.
+                                               : ... note: In instance 'spk286_at_floppy_write_protect_tb.dut.u_fdc'
+   83 | assign mgmt_readdata = (!mgmt_address) ? {selected_drive[0], sd_sector[14:0]} : (&mgmt_address) ? fifo_readdata : 16'd1;
+      |                                                                                                 ^
+%Warning-WIDTHTRUNC: rtl/common/floppy.v:297:78: Logical operator LOGNOT expects 1 bit on the LHS, but LHS's VARREF 'command_left' generates 4 bits.
+                                               : ... note: In instance 'spk286_at_floppy_write_protect_tb.dut.u_fdc'
+  297 | wire command_first = io_write && write_address == 3'h5 && state == S_IDLE && !command_left && ~busy;
+      |                                                                              ^
+%Warning-WIDTHTRUNC: rtl/common/floppy.v:298:75: Logical operator LOGAND expects 1 bit on the RHS, but RHS's VARREF 'command_left' generates 4 bits.
+                                               : ... note: In instance 'spk286_at_floppy_write_protect_tb.dut.u_fdc'
+  298 | wire command_next  = io_write && write_address == 3'h5 && state == S_IDLE &&  command_left;
+      |                                                                           ^~
+%Warning-WIDTHEXPAND: rtl/common/floppy.v:303:33: Operator ASSIGNDLY expects 72 bits on the Assign RHS, but Assign RHS's VARREF 'io_writedata' generates 8 bits.
+                                                : ... note: In instance 'spk286_at_floppy_write_protect_tb.dut.u_fdc'
+  303 |  else if(command_first) command <= io_writedata;
+      |                                 ^~
+%Warning-WIDTHTRUNC: rtl/common/floppy.v:323:24: Logical operator LOGAND expects 1 bit on the RHS, but RHS's VARREF 'command_at_first' generates 4 bits.
+                                               : ... note: In instance 'spk286_at_floppy_write_protect_tb.dut.u_fdc'
+  323 |  else if(command_first && command_at_first) command_size <= command_at_first;
+      |                        ^~
+%Warning-WIDTHTRUNC: rtl/common/floppy.v:329:24: Logical operator LOGAND expects 1 bit on the RHS, but RHS's VARREF 'command_at_first' generates 4 bits.
+                                               : ... note: In instance 'spk286_at_floppy_write_protect_tb.dut.u_fdc'
+  329 |  else if(command_first && command_at_first) command_left <= command_at_first;
+      |                        ^~
+%Warning-WIDTHTRUNC: rtl/common/floppy.v:459:48: Logical operator LOGNOT expects 1 bit on the LHS, but LHS's VARREF 'command_wait_counter' generates 16 bits.
+                                               : ... note: In instance 'spk286_at_floppy_write_protect_tb.dut.u_fdc'
+  459 | wire cmd_read_id_finished = state == S_WAIT && !command_wait_counter && cmd_read_id_in_progress;
+      |                                                ^
+%Warning-WIDTHTRUNC: rtl/common/floppy.v:506:43: Logical operator LOGAND expects 1 bit on the RHS, but RHS's VARREF 'reset_sensei' generates 3 bits.
+                                               : ... note: In instance 'spk286_at_floppy_write_protect_tb.dut.u_fdc'
+  506 |  else if(cmd_sense_interrupt_status_start && reset_sensei) reset_sensei <= reset_sensei - 3'd1;
+      |                                           ^~
+%Warning-WIDTHTRUNC: rtl/common/floppy.v:532:10: Logical operator LOGNOT expects 1 bit on the LHS, but LHS's VARREF 'delay_rate' generates 28 bits.
+                                               : ... note: In instance 'spk286_at_floppy_write_protect_tb.dut.u_fdc'
+  532 |  else if(!delay_rate && !delay_srt && delay_steps) delay_steps <= delay_steps - 8'd1;
+      |          ^
+%Warning-WIDTHTRUNC: rtl/common/floppy.v:532:25: Logical operator LOGNOT expects 1 bit on the LHS, but LHS's VARREF 'delay_srt' generates 4 bits.
+                                               : ... note: In instance 'spk286_at_floppy_write_protect_tb.dut.u_fdc'
+  532 |  else if(!delay_rate && !delay_srt && delay_steps) delay_steps <= delay_steps - 8'd1;
+      |                         ^
+%Warning-WIDTHTRUNC: rtl/common/floppy.v:532:36: Logical operator LOGAND expects 1 bit on the RHS, but RHS's VARREF 'delay_steps' generates 8 bits.
+                                               : ... note: In instance 'spk286_at_floppy_write_protect_tb.dut.u_fdc'
+  532 |  else if(!delay_rate && !delay_srt && delay_steps) delay_steps <= delay_steps - 8'd1;
+      |                                    ^~
+%Warning-WIDTHTRUNC: rtl/common/floppy.v:541:10: Logical operator LOGNOT expects 1 bit on the LHS, but LHS's VARREF 'delay_rate' generates 28 bits.
+                                               : ... note: In instance 'spk286_at_floppy_write_protect_tb.dut.u_fdc'
+  541 |  else if(!delay_rate && delay_steps) delay_srt <= specify_srt;
+      |          ^
+%Warning-WIDTHTRUNC: rtl/common/floppy.v:541:22: Logical operator LOGAND expects 1 bit on the RHS, but RHS's VARREF 'delay_steps' generates 8 bits.
+                                               : ... note: In instance 'spk286_at_floppy_write_protect_tb.dut.u_fdc'
+  541 |  else if(!delay_rate && delay_steps) delay_srt <= specify_srt;
+      |                      ^~
+%Warning-WIDTHTRUNC: rtl/common/floppy.v:540:10: Logical operator LOGNOT expects 1 bit on the LHS, but LHS's VARREF 'delay_rate' generates 28 bits.
+                                               : ... note: In instance 'spk286_at_floppy_write_protect_tb.dut.u_fdc'
+  540 |  else if(!delay_rate && delay_srt)   delay_srt <= delay_srt - 4'd1;
+      |          ^
+%Warning-WIDTHTRUNC: rtl/common/floppy.v:540:22: Logical operator LOGAND expects 1 bit on the RHS, but RHS's VARREF 'delay_srt' generates 4 bits.
+                                               : ... note: In instance 'spk286_at_floppy_write_protect_tb.dut.u_fdc'
+  540 |  else if(!delay_rate && delay_srt)   delay_srt <= delay_srt - 4'd1;
+      |                      ^~
+%Warning-WIDTHTRUNC: rtl/common/floppy.v:550:20: Logical operator LOGOR expects 1 bit on the LHS, but LHS's VARREF 'delay_srt' generates 4 bits.
+                                               : ... note: In instance 'spk286_at_floppy_write_protect_tb.dut.u_fdc'
+  550 |  else if(delay_srt || delay_steps) delay_adder_r <= delay_adder;
+      |                    ^~
+%Warning-WIDTHTRUNC: rtl/common/floppy.v:550:20: Logical operator LOGOR expects 1 bit on the RHS, but RHS's VARREF 'delay_steps' generates 8 bits.
+                                               : ... note: In instance 'spk286_at_floppy_write_protect_tb.dut.u_fdc'
+  550 |  else if(delay_srt || delay_steps) delay_adder_r <= delay_adder;
+      |                    ^~
+%Warning-WIDTHTRUNC: rtl/common/floppy.v:561:20: Logical operator LOGOR expects 1 bit on the LHS, but LHS's VARREF 'delay_srt' generates 4 bits.
+                                               : ... note: In instance 'spk286_at_floppy_write_protect_tb.dut.u_fdc'
+  561 |  else if(delay_srt || delay_steps) delay_rate <= delay_adder;
+      |                    ^~
+%Warning-WIDTHTRUNC: rtl/common/floppy.v:561:20: Logical operator LOGOR expects 1 bit on the RHS, but RHS's VARREF 'delay_steps' generates 8 bits.
+                                               : ... note: In instance 'spk286_at_floppy_write_protect_tb.dut.u_fdc'
+  561 |  else if(delay_srt || delay_steps) delay_rate <= delay_adder;
+      |                    ^~
+%Warning-WIDTHTRUNC: rtl/common/floppy.v:560:7: Logical operator IF expects 1 bit on the If, but If's VARREF 'delay_rate' generates 28 bits.
+                                              : ... note: In instance 'spk286_at_floppy_write_protect_tb.dut.u_fdc'
+  560 |  else if(delay_rate)               delay_rate <= delay_rate + delay_adder_r;
+      |       ^~
+%Warning-WIDTHTRUNC: rtl/common/floppy.v:564:25: Logical operator LOGNOT expects 1 bit on the LHS, but LHS's VARREF 'delay_steps' generates 8 bits.
+                                               : ... note: In instance 'spk286_at_floppy_write_protect_tb.dut.u_fdc'
+  564 | wire delay_last_cycle = !delay_steps && !delay_srt && delay_rate == 16'd1;
+      |                         ^
+%Warning-WIDTHTRUNC: rtl/common/floppy.v:564:41: Logical operator LOGNOT expects 1 bit on the LHS, but LHS's VARREF 'delay_srt' generates 4 bits.
+                                               : ... note: In instance 'spk286_at_floppy_write_protect_tb.dut.u_fdc'
+  564 | wire delay_last_cycle = !delay_steps && !delay_srt && delay_rate == 16'd1;
+      |                                         ^
+%Warning-WIDTHEXPAND: rtl/common/floppy.v:564:66: Operator EQ expects 28 bits on the RHS, but RHS's CONST '16'h1' generates 16 bits.
+                                                : ... note: In instance 'spk286_at_floppy_write_protect_tb.dut.u_fdc'
+  564 | wire delay_last_cycle = !delay_steps && !delay_srt && delay_rate == 16'd1;
+      |                                                                  ^~
+%Warning-WIDTHTRUNC: rtl/common/floppy.v:570:43: Logical operator LOGAND expects 1 bit on the RHS, but RHS's VARREF 'reset_sensei' generates 3 bits.
+                                               : ... note: In instance 'spk286_at_floppy_write_protect_tb.dut.u_fdc'
+  570 |  else if(cmd_sense_interrupt_status_start && reset_sensei) status_reg0_temp <= { 4'hC, 2'b00, reset_sensei_drive };
+      |                                           ^~
+%Warning-WIDTHTRUNC: rtl/common/floppy.v:644:19: Logical operator LOGNOT expects 1 bit on the LHS, but LHS's VARREF 'format_sector_count' generates 8 bits.
+                                               : ... note: In instance 'spk286_at_floppy_write_protect_tb.dut.u_fdc'
+  644 |  (execute_ndma && !format_sector_count)
+      |                   ^
+%Warning-WIDTHTRUNC: rtl/common/floppy.v:665:40: Logical operator LOGAND expects 1 bit on the RHS, but RHS's VARREF 'reply_left' generates 4 bits.
+                                               : ... note: In instance 'spk286_at_floppy_write_protect_tb.dut.u_fdc'
+  665 |  else if(io_read && io_address == 3'h5 && reply_left)                         reply_left <= reply_left - 3'd1;
+      |                                        ^~
+%Warning-WIDTHTRUNC: rtl/common/floppy.v:684:145: Logical operator LOGNOT expects 1 bit on the LHS, but LHS's ARRAYSEL generates 8 bits.
+                                                : ... note: In instance 'spk286_at_floppy_write_protect_tb.dut.u_fdc'
+  684 |  else if(cmd_get_status_start)                                             reply <= { 72'd0, 1'b0, media_writeprotected[io_writedata[0]], 1'b1, !cylinder[io_writedata[0]], 1'b1, io_writedata[2], 1'b0, io_writedata[0] };
+      |                                                                                                                                                 ^
+%Warning-WIDTHTRUNC: rtl/common/floppy.v:685:43: Logical operator LOGAND expects 1 bit on the RHS, but RHS's VARREF 'reset_sensei' generates 3 bits.
+                                               : ... note: In instance 'spk286_at_floppy_write_protect_tb.dut.u_fdc'
+  685 |  else if(cmd_sense_interrupt_status_start && reset_sensei)                 reply <= { 64'd0, cylinder[selected_drive[0]], 4'hC, 2'b00, reset_sensei_drive };
+      |                                           ^~
+%Warning-WIDTHTRUNC: rtl/common/floppy.v:762:29: Logical operator LOGNOT expects 1 bit on the LHS, but LHS's VARREF 'command_wait_counter' generates 16 bits.
+                                               : ... note: In instance 'spk286_at_floppy_write_protect_tb.dut.u_fdc'
+  762 |  else if(state == S_WAIT && !command_wait_counter && ~cmd_read_id_in_progress) state <= S_CHECK_TC;
+      |                             ^
+%Warning-WIDTHTRUNC: rtl/common/floppy.v:752:29: Logical operator LOGNOT expects 1 bit on the LHS, but LHS's VARREF 'command_wait_counter' generates 16 bits.
+                                               : ... note: In instance 'spk286_at_floppy_write_protect_tb.dut.u_fdc'
+  752 |  else if(state == S_WAIT && !command_wait_counter && cmd_read_id_in_progress)  state <= S_IDLE;
+      |                             ^
+%Warning-WIDTHTRUNC: rtl/common/floppy.v:745:38: Logical operator LOGNOT expects 1 bit on the LHS, but LHS's VARREF 'mult_b' generates 8 bits.
+                                               : ... note: In instance 'spk286_at_floppy_write_protect_tb.dut.u_fdc'
+  745 |  else if(state == S_COUNT_LOGICAL && !mult_b && cmd_format_in_progress)        state <= S_PREPARE;
+      |                                      ^
+%Warning-WIDTHTRUNC: rtl/common/floppy.v:734:38: Logical operator LOGNOT expects 1 bit on the LHS, but LHS's VARREF 'mult_b' generates 8 bits.
+                                               : ... note: In instance 'spk286_at_floppy_write_protect_tb.dut.u_fdc'
+  734 |  else if(state == S_COUNT_LOGICAL && !mult_b && cmd_write_normal_in_progress)  state <= S_WAIT_FOR_FULL_WRITE_FIFO;
+      |                                      ^
+%Warning-WIDTHTRUNC: rtl/common/floppy.v:727:38: Logical operator LOGNOT expects 1 bit on the LHS, but LHS's VARREF 'mult_b' generates 8 bits.
+                                               : ... note: In instance 'spk286_at_floppy_write_protect_tb.dut.u_fdc'
+  727 |  else if(state == S_COUNT_LOGICAL && !mult_b && cmd_read_normal_in_progress)   state <= S_PREPARE;
+      |                                      ^
+%Warning-WIDTHTRUNC: rtl/common/floppy.v:772:26: Logical operator LOGAND expects 1 bit on the RHS, but RHS's VARREF 'command_wait_counter' generates 16 bits.
+                                               : ... note: In instance 'spk286_at_floppy_write_protect_tb.dut.u_fdc'
+  772 |  else if(state == S_WAIT && command_wait_counter) command_wait_counter <= command_wait_counter - 16'd1;
+      |                          ^~
+%Warning-WIDTHEXPAND: sim/spk286_integration/spk286_at_floppy_write_protect_tb.sv:153:64: Operator XOR expects 32 bits on the RHS, but RHS's CONST '8'ha5' generates 8 bits.
+                                                                                        : ... note: In instance 'spk286_at_floppy_write_protect_tb'
+  153 |         if (reading && dma_transfer_data_out[7:0] !== 8'(index ^ 8'hA5))
+      |                                                                ^
+%Warning-WIDTHEXPAND: sim/spk286_integration/spk286_at_floppy_write_protect_tb.sv:189:65: Operator XOR expects 32 bits on the RHS, but RHS's CONST '8'h5a' generates 8 bits.
+                                                                                        : ... note: In instance 'spk286_at_floppy_write_protect_tb'
+  189 |             if (value[7:0] !== (format ? filler : 8'(byte_index ^ 8'h5A)))
+      |                                                                 ^
+%Warning-WIDTHTRUNC: sim/spk286_integration/spk286_at_floppy_write_protect_tb.sv:202:36: Operator ASSIGN expects 1 bits on the Assign RHS, but Assign RHS's AND generates 32 bits.
+                                                                                       : ... note: In instance 'spk286_at_floppy_write_protect_tb'
+  202 |                     protected_disk = ((osd_mask | host_mask) >> drive) & 1;
+      |                                    ^
+%Warning-WIDTHEXPAND: sim/spk286_integration/spk286_at_floppy_write_protect_tb.sv:211:68: Operator XOR expects 32 bits on the RHS, but RHS's CONST '8'ha5' generates 8 bits.
+                                                                                        : ... note: In instance 'spk286_at_floppy_write_protect_tb'
+  211 |                         management_write(16'hF2FF, {8'd0, 8'(index ^ 8'hA5)});
+      |                                                                    ^
+%Warning-WIDTHEXPAND: sim/spk286_integration/spk286_at_floppy_write_protect_tb.sv:223:47: Operator XOR expects 32 bits on the RHS, but RHS's CONST '8'h5a' generates 8 bits.
+                                                                                        : ... note: In instance 'spk286_at_floppy_write_protect_tb'
+  223 |                             dma_byte(8'(index ^ 8'h5A), index == 511, 0, index);
+      |                                               ^
+make: Entering directory '/mnt/d/GitHub/PCAT-286_MiSTer/build/at-floppy-write-protect-20261004-v4/verilator-obj'
+g++ -Os  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -c -o verilated.o /usr/share/verilator/include/verilated.cpp
+g++ -Os  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -c -o verilated_timing.o /usr/share/verilator/include/verilated_timing.cpp
+g++ -Os  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -c -o verilated_threads.o /usr/share/verilator/include/verilated_threads.cpp
+g++ -Os  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -x c++-header Vspk286_at_floppy_write_protect_tb__pch.h -o Vspk286_at_floppy_write_protect_tb__pch.h.fast.gch
+g++   -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -x c++-header Vspk286_at_floppy_write_protect_tb__pch.h -o Vspk286_at_floppy_write_protect_tb__pch.h.slow.gch
+echo "" > Vspk286_at_floppy_write_protect_tb__ALL.verilator_deplist.tmp
+g++ -Os  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -include Vspk286_at_floppy_write_protect_tb__pch.h.fast -c -o Vspk286_at_floppy_write_protect_tb.o Vspk286_at_floppy_write_protect_tb.cpp
+g++ -Os  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -include Vspk286_at_floppy_write_protect_tb__pch.h.fast -c -o Vspk286_at_floppy_write_protect_tb___024root__DepSet_hd3927332__0.o Vspk286_at_floppy_write_protect_tb___024root__DepSet_hd3927332__0.cpp
+g++ -Os  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -include Vspk286_at_floppy_write_protect_tb__pch.h.fast -c -o Vspk286_at_floppy_write_protect_tb___024root__DepSet_hd3927332__1.o Vspk286_at_floppy_write_protect_tb___024root__DepSet_hd3927332__1.cpp
+g++ -Os  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -include Vspk286_at_floppy_write_protect_tb__pch.h.fast -c -o Vspk286_at_floppy_write_protect_tb___024root__DepSet_h90ed2a5f__0.o Vspk286_at_floppy_write_protect_tb___024root__DepSet_h90ed2a5f__0.cpp
+g++ -Os  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -include Vspk286_at_floppy_write_protect_tb__pch.h.fast -c -o Vspk286_at_floppy_write_protect_tb__main.o Vspk286_at_floppy_write_protect_tb__main.cpp
+g++   -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -include Vspk286_at_floppy_write_protect_tb__pch.h.slow -c -o Vspk286_at_floppy_write_protect_tb___024root__Slow.o Vspk286_at_floppy_write_protect_tb___024root__Slow.cpp
+g++   -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -include Vspk286_at_floppy_write_protect_tb__pch.h.slow -c -o Vspk286_at_floppy_write_protect_tb___024root__DepSet_hd3927332__0__Slow.o Vspk286_at_floppy_write_protect_tb___024root__DepSet_hd3927332__0__Slow.cpp
+g++   -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -include Vspk286_at_floppy_write_protect_tb__pch.h.slow -c -o Vspk286_at_floppy_write_protect_tb___024root__DepSet_h90ed2a5f__0__Slow.o Vspk286_at_floppy_write_protect_tb___024root__DepSet_h90ed2a5f__0__Slow.cpp
+g++   -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -include Vspk286_at_floppy_write_protect_tb__pch.h.slow -c -o Vspk286_at_floppy_write_protect_tb__Syms.o Vspk286_at_floppy_write_protect_tb__Syms.cpp
+Archive ar -rcs Vspk286_at_floppy_write_protect_tb__ALL.a Vspk286_at_floppy_write_protect_tb.o Vspk286_at_floppy_write_protect_tb___024root__DepSet_hd3927332__0.o Vspk286_at_floppy_write_protect_tb___024root__DepSet_hd3927332__1.o Vspk286_at_floppy_write_protect_tb___024root__DepSet_h90ed2a5f__0.o Vspk286_at_floppy_write_protect_tb__main.o Vspk286_at_floppy_write_protect_tb___024root__Slow.o Vspk286_at_floppy_write_protect_tb___024root__DepSet_hd3927332__0__Slow.o Vspk286_at_floppy_write_protect_tb___024root__DepSet_h90ed2a5f__0__Slow.o Vspk286_at_floppy_write_protect_tb__Syms.o
+g++     verilated.o verilated_timing.o verilated_threads.o Vspk286_at_floppy_write_protect_tb__ALL.a    -pthread -lpthread -latomic   -o test_vlt
+rm Vspk286_at_floppy_write_protect_tb__ALL.verilator_deplist.tmp
+make: Leaving directory '/mnt/d/GitHub/PCAT-286_MiSTer/build/at-floppy-write-protect-20261004-v4/verilator-obj'

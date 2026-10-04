@@ -169,6 +169,16 @@ MAX per-edge traces remain identical to production. Generic control cost is
 22 bits / 284 cells; MAX control disappears. BIU/IU timing and physical
 calibration are still open, including the measured dispatch gap in P06-IU01.
 
+The [M4 private CODE/fetch connection](P06_CORE_FETCH_PILOT_20261004.md) now
+reuses the real response slot for capture at any fabric edge and publication
+at qualified Ts/Tc boundaries. It validates 297 queue/fetch scenarios, 208
+warm exact register minima, 208 cold functional cases, lifecycle and explicit
+unsupported bus guards. MAX remains equivalent, including a sequential fetch
+proof. Isolated fetch cost is +4 FF / +95 generic cells; full FPGA cost is
+unmeasured. Data/INTA/HOLD/LOCK and IU/event timing remain open. Complete initial
+development against 86Box while physical calibration is pending, as authorized
+on 2026-10-04; retain explicit Intel/native differences.
+
 - Map the qualified forms to actual decode/start/issue/commit milestones,
   reuse existing retention and validate fetch/redirect/ownership/events.
 - Catalogue the full T286REF timer/setup/return wrapper before running that

@@ -23,7 +23,10 @@ contraste. Ya hay componentes provisionales de reloj, bus retenido y primeras
 duraciones con pruebas dirigidas. El [piloto M3 de registro](P06_CORE_REGISTER_PILOT_20261004.md)
 ya conecta arranque y compromiso temporal a una CPU completa privada, con
 mínimos de 2/3 relojes, equivalencia MAX y cancelaciones validados. Quedan el
-bus/fetch histórico, los hitos restantes y la referencia física.
+bus completo histórico, los hitos restantes y la referencia física. El
+[piloto M4 de fetch](P06_CORE_FETCH_PILOT_20261004.md) ya conecta Ts/Tc de CODE
+con la respuesta retenida y seis bytes con reservas; su ámbito sigue siendo
+privado y no incluye datos/INTA/HOLD/LOCK ni toda la planificación de instrucciones.
 
 El desarrollo provisional de componentes temporales y sus pruebas dirigidas
 se registra en [el progreso del piloto](P06_PILOT_PROGRESS_20261003.md).

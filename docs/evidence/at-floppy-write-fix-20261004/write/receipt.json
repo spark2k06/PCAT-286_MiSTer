@@ -1,0 +1,98 @@
+{
+  "status": "AT_FLOPPY_WRITE_COMPOSED_DIRECTED_PASS",
+  "source_sha256": {
+    "rtl/spk286_integration/spk286_at_dma.sv": "c3b373cce39afe768e7e48486cda7c73db65f105312c269ee0d36ac54c53f8c0",
+    "rtl/spk286_integration/spk286_at_mister_memory_port.sv": "52c66296d8b4627916cede00bf0d112ce22e2e317412e0d636c75166105cb00c",
+    "rtl/spk286_integration/spk286_at_sdram_read_buffer.sv": "ebd04fe4d4aa756b0cbf5598465d31b9a750a7b01d9f8ff0ce2ae4e42bf38308",
+    "rtl/spk286_integration/spk286_at_sdram_data_buffer.sv": "e6724ac5dc81bd195c46d171e5b7d46b6bbac3ff7dc031331c732655ae62da1a",
+    "rtl/spk286_integration/spk286_at_posted_write_buffer.sv": "80ac20efb13a8db4c5f2ae288667939aa488832bf58bef3e5b5dab3b0fee688c",
+    "rtl/spk286_integration/spk286_at_fdc.sv": "bd5b6ae3f8647c1a32b05d3e8f4bf6faf34eef7872e30dcf7029c4df0eb31397",
+    "rtl/common/floppy.v": "e73f9759fd9681d28b86a0c159298f475ba8a8ed5d45da96c1123e260b8b4f13",
+    "rtl/common/simple_fifo.v": "4ca29128eee799d48f17dfca551cd74071a0eb4c0dc2699733c67e9a0fa24f46",
+    "sim/spk286_integration/spk286_at_floppy_write_tb.sv": "ceefc4ae0733ec88853ef44b95859afadd4fc0797009fdbe221514da9e8a1649"
+  },
+  "machine_sha256": "9111b3ecef28a08899c5ce76786f86decabb459bb2b44d1fab3229e77c22f12d",
+  "runner_sha256": "4ef10e65971bd381b60e357e55eec88227eefd5521e1d155b2bc716c2ca2cff9",
+  "baseline_ref": "7cb6e2efb942e8d49b0f1ed44613e1d186a450d7",
+  "baseline_machine_sha256": "a22857dd28ea92b816b60e60fce20a2210bd01f5431a4e107943a660b27938ef",
+  "baseline_endpoint_connection": "(dma_active_channel < 3'd4) &&\n                                 dma_transfer_byte_enable[1] ?\n                                 {8'h00, dma_memory_data_in[15:8]} :\n                                 dma_memory_data_in",
+  "endpoint_connection": "dma_endpoint_data",
+  "extracted_region_sha256": "0657c77ece678454fa27293f44cdb47f1ecbd98045851e0b029fdee88a47ee98",
+  "adapter_transform": "Only wire [15:0] dma_endpoint_data = becomes assign dma_endpoint_data = because the generated module exposes the same net as an output port; all payload logic is copied literally.",
+  "scope": "Production DMA + memory port + P03 code buffer + RAM data buffer + posted buffer + FDC/FIFO; source-extracted machine payload adapter. Five 512-byte WRITE DATA sectors, four READ DATA readbacks, even/odd start, decrement, auto-init/reuse, stalls, TC/IRQ/results and HPS LBA/payload checks. Adapter checks: channel1 live response, channel5 retained 16-bit word, transfer/response/read capture guards and reset.",
+  "limits": "Physical SDRAM is an abstract RAM responder, with response data withdrawn immediately after READY. Host image is a byte array transferred over real FDC management ports; no MiSTer HPS software, actual SD-card filesystem or CPU instructions.",
+  "runs": [
+    {
+      "variant": "corrected",
+      "simulator": "iverilog",
+      "adapter_sha256": "621738db39697898c35ca5efba8e5e56a7b9503c6091658bb26c6092997b496e",
+      "build": {
+        "exit_code": 0,
+        "elapsed_seconds": 0.168,
+        "log": "build/floppy-write-directed-20261004-v3/corrected/iverilog-build.log",
+        "log_sha256": "6b2e7fd74b4ca9c4a0fae8e949d46ea507e3077a4f855da64cf07bfe876834f9"
+      },
+      "execution": {
+        "exit_code": 0,
+        "elapsed_seconds": 5.283,
+        "log": "build/floppy-write-directed-20261004-v3/corrected/iverilog-run.log",
+        "log_sha256": "18c5a83993ae4f74216149d7dfbd26707d5fbd683f6f828356bb6dfdd9bea02c"
+      },
+      "expected_failure": false
+    },
+    {
+      "variant": "corrected",
+      "simulator": "verilator",
+      "adapter_sha256": "621738db39697898c35ca5efba8e5e56a7b9503c6091658bb26c6092997b496e",
+      "build": {
+        "exit_code": 0,
+        "elapsed_seconds": 23.837,
+        "log": "build/floppy-write-directed-20261004-v3/corrected/verilator-build.log",
+        "log_sha256": "827ff611ef8f47b58937d292d5f95a35bbb25fd03a0cb083413ca547ebd61bb6"
+      },
+      "execution": {
+        "exit_code": 0,
+        "elapsed_seconds": 0.118,
+        "log": "build/floppy-write-directed-20261004-v3/corrected/verilator-run.log",
+        "log_sha256": "470662ffcfcd9b0b6c9deefd7ea3e1cc5c7bfa5c325237e5c3a3f13300fad65c"
+      },
+      "expected_failure": false
+    },
+    {
+      "variant": "original-negative",
+      "simulator": "iverilog",
+      "adapter_sha256": "fbb46b7b78f9f6b934e8ec77eb35fc5ad3b834f236dd00261e449b5de6a52433",
+      "build": {
+        "exit_code": 0,
+        "elapsed_seconds": 0.167,
+        "log": "build/floppy-write-directed-20261004-v3/original-negative/iverilog-build.log",
+        "log_sha256": "6b2e7fd74b4ca9c4a0fae8e949d46ea507e3077a4f855da64cf07bfe876834f9"
+      },
+      "execution": {
+        "exit_code": 1,
+        "elapsed_seconds": 0.067,
+        "log": "build/floppy-write-directed-20261004-v3/original-negative/iverilog-run.log",
+        "log_sha256": "216242f0653e9dc72001ea5bc5f98f2d78ae8635d3e04abef441fbbc699882c2"
+      },
+      "expected_failure": true
+    },
+    {
+      "variant": "original-negative",
+      "simulator": "verilator",
+      "adapter_sha256": "fbb46b7b78f9f6b934e8ec77eb35fc5ad3b834f236dd00261e449b5de6a52433",
+      "build": {
+        "exit_code": 0,
+        "elapsed_seconds": 23.537,
+        "log": "build/floppy-write-directed-20261004-v3/original-negative/verilator-build.log",
+        "log_sha256": "2a4a31257dc8f168032301b05fd8602298782743214b4d97e3c11800ffc81592"
+      },
+      "execution": {
+        "exit_code": -6,
+        "elapsed_seconds": 0.72,
+        "log": "build/floppy-write-directed-20261004-v3/original-negative/verilator-run.log",
+        "log_sha256": "b1db26fda57cc3b85737f3f4fbcfc2ebe3ce4c60179ff4d88063a1741bc28f85"
+      },
+      "expected_failure": true
+    }
+  ]
+}

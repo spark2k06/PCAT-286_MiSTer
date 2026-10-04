@@ -139,5 +139,39 @@ Directed acceptance still to implement and run:
 6. Preserve existing sector reads and Sound Blaster DMA behavior. Bind any
    accepted correction and directed evidence to its source revision.
 
-This turn performs static investigation only. No CPU/core functional source,
-config or RBF is changed; no new test, regression or synthesis is run.
+The original investigation was static. The following follow-up implements
+and tests the correction; it does not change that historical evidence.
+
+## Correction and directed validation
+
+`spk286_at_machine.sv` now captures the normalized DMA memory response while
+the current transfer and its response are valid. During the registered
+memory-to-device completion it supplies that retained value. During the
+valid-response phase it continues supplying the live value, as Sound Blaster
+requires. Completion, channel selection, terminal count and DMA addressing
+are unchanged.
+
+The new `scripts/test_at_floppy_write.py` bank extracts the actual machine
+adapter and its endpoint binding. It composes the production DMA controller,
+serialized memory port, P03 code buffer, data buffer, posted-write buffer and
+FDC/FIFO. The RAM responder withdraws its data immediately after READY.
+Both Icarus and Verilator check:
+
+- Five 512-byte WRITE DATA transfers, comparing all 2,560 host-bound bytes.
+- Four 512-byte READ DATA readbacks, comparing all 2,048 destination bytes.
+- Even/odd addresses, decrement, variable response stalls, terminal count,
+  IRQ6, result bytes, management LBA and auto-initialize followed by another
+  write without reprogramming the DMA channel.
+- A negative control using the original machine connection from `7cb6e2`.
+  It must fail on FIFO byte 0: expected `A7`, observed `00`.
+
+Additional directed banks validate DMA registers in both simulators, Sound
+Blaster DMA and machine detection, and the actual CPU/AT diagnostic in all
+eight speed profiles. The simulation bus driver and Sound Blaster machine
+runner have been updated to include the existing CPU profile interface.
+
+The evidence is preserved in
+`docs/evidence/at-floppy-write-fix-20261004`. The tests model physical SDRAM
+and the host image peer; they do not run DOS COPY, MiSTer Main, an SD-card
+filesystem or physical image remounting. Hardware COPY/remount confirmation
+remains the final check of the user's complete scenario.

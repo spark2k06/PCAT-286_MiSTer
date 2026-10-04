@@ -1,0 +1,149 @@
+%Warning-TIMESCALEMOD: rtl/sound/sb_dsp.sv:59:8: Timescale missing on this module as other modules have it (IEEE 1800-2017 3.14.2.3)
+   59 | module sb_dsp
+      |        ^~~~~~
+                       rtl/spk286_integration/spk286_at_sound.sv:22:8: ... Location of module with timescale
+   22 | module spk286_at_sound (
+      |        ^~~~~~~~~~~~~~~
+                       ... For warning description see https://verilator.org/warn/TIMESCALEMOD?v=5.020
+                       ... Use "/* verilator lint_off TIMESCALEMOD */" and lint_on around source to disable this message.
+%Warning-TIMESCALEMOD: rtl/sound/sb_dma_glue.sv:36:8: Timescale missing on this module as other modules have it (IEEE 1800-2017 3.14.2.3)
+   36 | module sb_dma_glue (
+      |        ^~~~~~~~~~~
+                       rtl/spk286_integration/spk286_at_sound.sv:22:8: ... Location of module with timescale
+   22 | module spk286_at_sound (
+      |        ^~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: rtl/sound/sb_mixer.sv:28:8: Timescale missing on this module as other modules have it (IEEE 1800-2017 3.14.2.3)
+   28 | module sb_mixer (
+      |        ^~~~~~~~
+                       rtl/spk286_integration/spk286_at_sound.sv:22:8: ... Location of module with timescale
+   22 | module spk286_at_sound (
+      |        ^~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: rtl/sound/sb_volume.sv:20:8: Timescale missing on this module as other modules have it (IEEE 1800-2017 3.14.2.3)
+   20 | module sb_volume
+      |        ^~~~~~~~~
+                       rtl/spk286_integration/spk286_at_sound.sv:22:8: ... Location of module with timescale
+   22 | module spk286_at_sound (
+      |        ^~~~~~~~~~~~~~~
+%Warning-TIMESCALEMOD: rtl/sound/soundblaster.sv:39:8: Timescale missing on this module as other modules have it (IEEE 1800-2017 3.14.2.3)
+   39 | module soundblaster (
+      |        ^~~~~~~~~~~~
+                       rtl/spk286_integration/spk286_at_sound.sv:22:8: ... Location of module with timescale
+   22 | module spk286_at_sound (
+      |        ^~~~~~~~~~~~~~~
+%Warning-WIDTHEXPAND: rtl/sound/sb_volume.sv:94:35: Operator COND expects 17 bits on the Conditional True, but Conditional True's SEL generates 16 bits.
+                                                  : ... note: In instance 'spk286_at_soundblaster_tb.sound.GEN_SOUND_BLASTER.u_soundblaster.u_volume'
+   94 |                               sbp ?  sbp_gain_lut[volume_3bit*16 +: 16] : 
+      |                                   ^
+%Warning-WIDTHEXPAND: rtl/sound/sb_volume.sv:94:35: Operator COND expects 17 bits on the Conditional False, but Conditional False's SEL generates 16 bits.
+                                                  : ... note: In instance 'spk286_at_soundblaster_tb.sound.GEN_SOUND_BLASTER.u_soundblaster.u_volume'
+   94 |                               sbp ?  sbp_gain_lut[volume_3bit*16 +: 16] : 
+      |                                   ^
+%Warning-WIDTHEXPAND: rtl/sound/sb_volume.sv:105:27: Operator EQ expects 32 bits on the LHS, but LHS's VARREF 'ch' generates 3 bits.
+                                                   : ... note: In instance 'spk286_at_soundblaster_tb.sound.GEN_SOUND_BLASTER.u_soundblaster.u_volume'
+  105 |  ch                <= (ch == NUM_CH-1) ? 1'b0 : ch + 1'b1;
+      |                           ^~
+%Warning-WIDTHEXPAND: rtl/sound/sb_volume.sv:105:40: Operator COND expects 3 bits on the Conditional True, but Conditional True's CONST '1'h0' generates 1 bits.
+                                                   : ... note: In instance 'spk286_at_soundblaster_tb.sound.GEN_SOUND_BLASTER.u_soundblaster.u_volume'
+  105 |  ch                <= (ch == NUM_CH-1) ? 1'b0 : ch + 1'b1;
+      |                                        ^
+%Warning-WIDTHTRUNC: rtl/sound/sb_dsp.sv:202:25: Logical operator LOGNOT expects 1 bit on the LHS, but LHS's VARREF 'write_left' generates 2 bits.
+                                               : ... note: In instance 'spk286_at_soundblaster_tb.sound.GEN_SOUND_BLASTER.u_soundblaster.u_dsp'
+  202 | wire       cmd_start  = !write_left && io_write && io_address == 4'hC && (~midi_uart_mode && ~highspeed_mode);
+      |                         ^
+%Warning-WIDTHTRUNC: rtl/sound/sb_dsp.sv:203:37: Logical operator LOGAND expects 1 bit on the LHS, but LHS's VARREF 'write_left' generates 2 bits.
+                                               : ... note: In instance 'spk286_at_soundblaster_tb.sound.GEN_SOUND_BLASTER.u_soundblaster.u_dsp'
+  203 | wire       cmd_cont   =  write_left && io_write && io_address == 4'hC;
+      |                                     ^~
+%Warning-WIDTHTRUNC: rtl/sound/sb_dsp.sv:215:10: Logical operator LOGNOT expects 1 bit on the LHS, but LHS's VARREF 'write_left' generates 2 bits.
+                                               : ... note: In instance 'spk286_at_soundblaster_tb.sound.GEN_SOUND_BLASTER.u_soundblaster.u_dsp'
+  215 |  else if(!write_left)     cmd_recv <= 1'd0;
+      |          ^
+%Warning-WIDTHTRUNC: rtl/sound/sb_dsp.sv:375:56: Logical operator LOGOR expects 1 bit on the LHS, but LHS's VARREF 'read_buffer_size' generates 2 bits.
+                                               : ... note: In instance 'spk286_at_soundblaster_tb.sound.GEN_SOUND_BLASTER.u_soundblaster.u_dsp'
+  375 | wire read_ready = ~midi_uart_mode && (read_buffer_size || copy_cnt);
+      |                                                        ^~
+%Warning-WIDTHTRUNC: rtl/sound/sb_dsp.sv:375:56: Logical operator LOGOR expects 1 bit on the RHS, but RHS's VARREF 'copy_cnt' generates 6 bits.
+                                               : ... note: In instance 'spk286_at_soundblaster_tb.sound.GEN_SOUND_BLASTER.u_soundblaster.u_dsp'
+  375 | wire read_ready = ~midi_uart_mode && (read_buffer_size || copy_cnt);
+      |                                                        ^~
+%Warning-WIDTHTRUNC: rtl/sound/sb_dsp.sv:394:21: Logical operator LOGAND expects 1 bit on the RHS, but RHS's VARREF 'read_buffer_size' generates 2 bits.
+                                               : ... note: In instance 'spk286_at_soundblaster_tb.sound.GEN_SOUND_BLASTER.u_soundblaster.u_dsp'
+  394 |  else if(read_reply && read_buffer_size) read_buffer_size <= read_buffer_size - 2'd1;
+      |                     ^~
+%Warning-WIDTHTRUNC: rtl/sound/sb_dsp.sv:392:7: Logical operator IF expects 1 bit on the If, but If's VARREF 'cmd' generates 8 bits.
+                                              : ... note: In instance 'spk286_at_soundblaster_tb.sound.GEN_SOUND_BLASTER.u_soundblaster.u_dsp'
+  392 |  else if(cmd)                            read_buffer_size <= 2'd0;  
+      |       ^~
+%Warning-WIDTHTRUNC: rtl/sound/sb_dsp.sv:405:21: Logical operator LOGAND expects 1 bit on the RHS, but RHS's VARREF 'copy_cnt' generates 6 bits.
+                                               : ... note: In instance 'spk286_at_soundblaster_tb.sound.GEN_SOUND_BLASTER.u_soundblaster.u_dsp'
+  405 |  else if(read_reply && copy_cnt)         copy_cnt <= copy_cnt - 1'd1;
+      |                     ^~
+%Warning-WIDTHTRUNC: rtl/sound/sb_dsp.sv:404:7: Logical operator IF expects 1 bit on the If, but If's VARREF 'cmd' generates 8 bits.
+                                              : ... note: In instance 'spk286_at_soundblaster_tb.sound.GEN_SOUND_BLASTER.u_soundblaster.u_dsp'
+  404 |  else if(cmd)                            copy_cnt <= 6'd0;
+      |       ^~
+%Warning-WIDTHTRUNC: rtl/sound/sb_dsp.sv:433:7: Logical operator IF expects 1 bit on the If, but If's VARREF 'copy_cnt' generates 6 bits.
+                                              : ... note: In instance 'spk286_at_soundblaster_tb.sound.GEN_SOUND_BLASTER.u_soundblaster.u_dsp'
+  433 |  else if(copy_cnt)                       read_buffer[15:8] <= COPY_STR_SB16[(copy_cnt*8) +:8];
+      |       ^~
+%Warning-WIDTHTRUNC: rtl/sound/sb_dsp.sv:432:21: Logical operator LOGAND expects 1 bit on the RHS, but RHS's VARREF 'read_buffer_size' generates 2 bits.
+                                               : ... note: In instance 'spk286_at_soundblaster_tb.sound.GEN_SOUND_BLASTER.u_soundblaster.u_dsp'
+  432 |  else if(read_reply && read_buffer_size) read_buffer[15:8] <= read_buffer[7:0];  
+      |                     ^~
+%Warning-WIDTHTRUNC: rtl/sound/sb_dsp.sv:503:43: Logical operator LOGNOT expects 1 bit on the LHS, but LHS's VARREF 'len_left' generates 16 bits.
+                                               : ... note: In instance 'spk286_at_soundblaster_tb.sound.GEN_SOUND_BLASTER.u_soundblaster.u_dsp'
+  503 | wire pause_finished  = pause_decrement && !len_left;
+      |                                           ^
+%Warning-WIDTHEXPAND: rtl/sound/sb_dsp.sv:531:58: Operator ASSIGNDLY expects 28 bits on the Assign RHS, but Assign RHS's SEL generates 16 bits.
+                                                : ... note: In instance 'spk286_at_soundblaster_tb.sound.GEN_SOUND_BLASTER.u_soundblaster.u_dsp'
+  531 |  else if(cmd_set_sample_rate)                    clk_smp <= write_buffer[15:0];
+      |                                                          ^~
+%Warning-WIDTHTRUNC: rtl/sound/sb_dsp.sv:555:2: Logical operator IF expects 1 bit on the If, but If's VARREF 'cnt' generates 8 bits.
+                                              : ... note: In instance 'spk286_at_soundblaster_tb.sound.GEN_SOUND_BLASTER.u_soundblaster.u_dsp'
+  555 |  if(cnt) cnt <= cnt + 1'd1;
+      |  ^~
+%Warning-WIDTHTRUNC: rtl/sound/sb_dsp.sv:658:44: Logical operator LOGNOT expects 1 bit on the LHS, but LHS's VARREF 'adpcm_wait' generates 2 bits.
+                                               : ... note: In instance 'spk286_at_soundblaster_tb.sound.GEN_SOUND_BLASTER.u_soundblaster.u_dsp'
+  658 |  else if(dma_in_progress && timer_0_isr && !adpcm_wait && ~pause_active)  dma_normal_req <= 1'b1;
+      |                                            ^
+%Warning-WIDTHTRUNC: rtl/sound/sb_dsp.sv:665:57: Logical operator LOGNOT expects 1 bit on the LHS, but LHS's VARREF 'len_left' generates 16 bits.
+                                               : ... note: In instance 'spk286_at_soundblaster_tb.sound.GEN_SOUND_BLASTER.u_soundblaster.u_dsp'
+  665 | wire dma_finished = dma_in_progress && ~dma_autoinit && !len_left && (
+      |                                                         ^
+%Warning-WIDTHTRUNC: rtl/sound/sb_dsp.sv:670:60: Logical operator LOGNOT expects 1 bit on the LHS, but LHS's VARREF 'len_left' generates 16 bits.
+                                               : ... note: In instance 'spk286_at_soundblaster_tb.sound.GEN_SOUND_BLASTER.u_soundblaster.u_dsp'
+  670 | wire dma_auto_restart = dma_in_progress && dma_autoinit && !len_left && (
+      |                                                            ^
+%Warning-WIDTHTRUNC: rtl/sound/sb_dsp.sv:678:3: Logical operator LOGNOT expects 1 bit on the LHS, but LHS's VARREF 'adpcm_wait' generates 2 bits.
+                                              : ... note: In instance 'spk286_at_soundblaster_tb.sound.GEN_SOUND_BLASTER.u_soundblaster.u_dsp'
+  678 |  (!adpcm_wait || (adpcm_type != ADPCM_NONE && adpcm_wait == 2'd1)) && 
+      |   ^
+%Warning-WIDTHTRUNC: rtl/sound/sb_dsp.sv:883:33: Logical operator LOGAND expects 1 bit on the RHS, but RHS's VARREF 'adpcm_wait' generates 2 bits.
+                                               : ... note: In instance 'spk286_at_soundblaster_tb.sound.GEN_SOUND_BLASTER.u_soundblaster.u_dsp'
+  883 | wire adpcm_output = timer_0_isr && adpcm_wait;
+      |                                 ^~
+%Warning-WIDTHEXPAND: rtl/sound/soundblaster.sv:83:74: Operator EQ expects 16 bits on the LHS, but LHS's SEL generates 12 bits.
+                                                     : ... note: In instance 'spk286_at_soundblaster_tb.sound.GEN_SOUND_BLASTER.u_soundblaster'
+   83 |     wire    block_select = enable && ~address_enable_n && (address[15:4] == (16'h0220 >> 4));
+      |                                                                          ^~
+make: Entering directory '/mnt/d/GitHub/PCAT-286_MiSTer/build/at-floppy-fix-sb-20261004/verilator-obj'
+g++ -Os  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -c -o verilated.o /usr/share/verilator/include/verilated.cpp
+g++ -Os  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -c -o verilated_timing.o /usr/share/verilator/include/verilated_timing.cpp
+g++ -Os  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -c -o verilated_threads.o /usr/share/verilator/include/verilated_threads.cpp
+g++ -Os  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -x c++-header Vspk286_at_soundblaster_tb__pch.h -o Vspk286_at_soundblaster_tb__pch.h.fast.gch
+g++ -Os  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -include Vspk286_at_soundblaster_tb__pch.h.fast -c -o Vspk286_at_soundblaster_tb.o Vspk286_at_soundblaster_tb.cpp
+g++ -Os  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -include Vspk286_at_soundblaster_tb__pch.h.fast -c -o Vspk286_at_soundblaster_tb___024root__DepSet_hff094370__0.o Vspk286_at_soundblaster_tb___024root__DepSet_hff094370__0.cpp
+g++ -Os  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -include Vspk286_at_soundblaster_tb__pch.h.fast -c -o Vspk286_at_soundblaster_tb___024root__DepSet_hff094370__1.o Vspk286_at_soundblaster_tb___024root__DepSet_hff094370__1.cpp
+g++ -Os  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -include Vspk286_at_soundblaster_tb__pch.h.fast -c -o Vspk286_at_soundblaster_tb___024root__DepSet_h4ad36b11__0.o Vspk286_at_soundblaster_tb___024root__DepSet_h4ad36b11__0.cpp
+g++ -Os  -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -include Vspk286_at_soundblaster_tb__pch.h.fast -c -o Vspk286_at_soundblaster_tb__main.o Vspk286_at_soundblaster_tb__main.cpp
+g++   -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -x c++-header Vspk286_at_soundblaster_tb__pch.h -o Vspk286_at_soundblaster_tb__pch.h.slow.gch
+g++   -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -include Vspk286_at_soundblaster_tb__pch.h.slow -c -o Vspk286_at_soundblaster_tb__ConstPool_0.o Vspk286_at_soundblaster_tb__ConstPool_0.cpp
+g++   -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -include Vspk286_at_soundblaster_tb__pch.h.slow -c -o Vspk286_at_soundblaster_tb___024root__Slow.o Vspk286_at_soundblaster_tb___024root__Slow.cpp
+g++   -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -include Vspk286_at_soundblaster_tb__pch.h.slow -c -o Vspk286_at_soundblaster_tb___024root__DepSet_hff094370__0__Slow.o Vspk286_at_soundblaster_tb___024root__DepSet_hff094370__0__Slow.cpp
+g++   -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -include Vspk286_at_soundblaster_tb__pch.h.slow -c -o Vspk286_at_soundblaster_tb___024root__DepSet_h4ad36b11__0__Slow.o Vspk286_at_soundblaster_tb___024root__DepSet_h4ad36b11__0__Slow.cpp
+g++   -I.  -MMD -I/usr/share/verilator/include -I/usr/share/verilator/include/vltstd -DVM_COVERAGE=0 -DVM_SC=0 -DVM_TRACE=0 -DVM_TRACE_FST=0 -DVM_TRACE_VCD=0 -faligned-new -fcf-protection=none -Wno-bool-operation -Wno-overloaded-virtual -Wno-shadow -Wno-sign-compare -Wno-uninitialized -Wno-unused-but-set-parameter -Wno-unused-but-set-variable -Wno-unused-parameter -Wno-unused-variable     -DVL_TIME_CONTEXT   -fcoroutines -include Vspk286_at_soundblaster_tb__pch.h.slow -c -o Vspk286_at_soundblaster_tb__Syms.o Vspk286_at_soundblaster_tb__Syms.cpp
+echo "" > Vspk286_at_soundblaster_tb__ALL.verilator_deplist.tmp
+Archive ar -rcs Vspk286_at_soundblaster_tb__ALL.a Vspk286_at_soundblaster_tb.o Vspk286_at_soundblaster_tb___024root__DepSet_hff094370__0.o Vspk286_at_soundblaster_tb___024root__DepSet_hff094370__1.o Vspk286_at_soundblaster_tb___024root__DepSet_h4ad36b11__0.o Vspk286_at_soundblaster_tb__main.o Vspk286_at_soundblaster_tb__ConstPool_0.o Vspk286_at_soundblaster_tb___024root__Slow.o Vspk286_at_soundblaster_tb___024root__DepSet_hff094370__0__Slow.o Vspk286_at_soundblaster_tb___024root__DepSet_h4ad36b11__0__Slow.o Vspk286_at_soundblaster_tb__Syms.o
+g++     verilated.o verilated_timing.o verilated_threads.o Vspk286_at_soundblaster_tb__ALL.a    -pthread -lpthread -latomic   -o sb_vlt
+rm Vspk286_at_soundblaster_tb__ALL.verilator_deplist.tmp
+make: Leaving directory '/mnt/d/GitHub/PCAT-286_MiSTer/build/at-floppy-fix-sb-20261004/verilator-obj'

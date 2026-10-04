@@ -156,3 +156,17 @@ La verificación histórica de esta nota cubría lectura de sectores y escritura
 de puertos/comandos. La corrección del payload y su prueba dirigida de sector
 RAM a FDC, lectura posterior y remontaje siguen pendientes. Esta actualización
 documenta el hallazgo; no modifica RTL ni acredita una corrección probada.
+
+## 2026-10-04 corrección DMA de escritura y pruebas dirigidas
+
+La actualización posterior retiene la respuesta de memoria y su selección de
+byte hasta el ACK registrado que consume el FDC. El banco compuesto nuevo
+comprueba cinco escrituras de sector y cuatro lecturas posteriores en Icarus
+y Verilator, con direcciones pares/impares, decremento, esperas y autoinit.
+La conexión anterior reproduce el fallo enviando `00` en lugar de `A7`.
+
+Las pruebas y sus límites se detallan en
+[la investigación actualizada](AT_FLOPPY_WRITE_CORRUPTION_20261004.md).
+También pasan los bancos dirigidos de DMA y Sound Blaster y el diagnóstico
+de integración en los ocho perfiles. Queda por confirmar COPY, desmontaje y
+remontaje de una imagen desechable en MiSTer con el RBF nuevo.

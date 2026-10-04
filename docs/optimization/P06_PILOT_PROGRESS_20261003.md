@@ -200,3 +200,21 @@ this excludes top/executor qualification and is not a complete FPGA delta.
 M3/M4 frozen evidence remains valid. Full decoded lookahead, bus/event and speed
 integration remain open. Work is **paused at the user's request**; no new
 development, fit or regression starts until the user resumes.
+
+## 2026-10-04 resumed: M6a isolated real BIU READ
+
+The user resumed work after the M5 pause. The [M6a component milestone](P06_CORE_DATA_READ_PILOT_20261004.md)
+now qualifies byte/aligned-word READ timing through the real BIU and operand
+service, with CODE disabled. It reuses the existing response storage and
+captures READY on every fabric edge while publishing only at qualified Ts/Tc.
+The independent 432-case matrix, 33 lifecycle cases and 42 scope guards pass
+both simulators; MAX unit/full CPU compatibility and BIU sequential
+equivalence pass. A specific early-publication mutant is rejected.
+
+The net isolated restricted BIU delta is +2 register bits / +54 generic cells,
+including static pruning of unqualified CODE/ACK/HOLD/LOCK services. It is not
+the complete timed BIU or FPGA cost. Shared CODE/DATA logical ownership and
+full CPU memory issue/commit remain the next gate; odd words, writes, I/O,
+events, decoded IU lookahead and full speed/machine integration are still
+open. Production, the selected RBF and the previous frozen evidence are
+unchanged. Only directed acceptance was run, not a total regression or fit.

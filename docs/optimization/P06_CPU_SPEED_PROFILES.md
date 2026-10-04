@@ -28,6 +28,12 @@ bus completo histórico, los hitos restantes y la referencia física. El
 con la respuesta retenida y seis bytes con reservas; su ámbito sigue siendo
 privado y no incluye datos/INTA/HOLD/LOCK ni toda la planificación de instrucciones.
 
+Tras reanudar la pausa de M5, el [piloto M6a de lecturas](P06_CORE_DATA_READ_PILOT_20261004.md)
+califica Ts/Tc de byte y palabra par en la BIU y servicio de operandos reales,
+con CODE desactivado y reutilizando la respuesta retenida. Es un componente
+privado: faltan propiedad lógica compartida CODE/DATA, temporización de
+instrucciones de memoria en la CPU completa y las restantes operaciones.
+
 El desarrollo provisional de componentes temporales y sus pruebas dirigidas
 se registra en [el progreso del piloto](P06_PILOT_PROGRESS_20261003.md).
 La conexión privada cubre únicamente instrucciones de registro calificadas;

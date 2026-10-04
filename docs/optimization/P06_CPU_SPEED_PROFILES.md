@@ -362,3 +362,13 @@ negative controls, lint, affected units, microcode and bypass proofs pass.
 The isolated BIU/duration delta is +30 generic cells/+4 register bits, not
 complete FPGA ALMs. Writes/RMW, events, decoded lookahead and complete public
 speeds remain open; production config and RBF are unchanged.
+
+The [M6f private milestone](P06_CORE_WRITE_CPU_PILOT_20261004.md) qualifies
+serialized A3 aligned/odd writes with mutable-memory checks at every physical
+acceptance. Both simulators pass 2,227 timed cases and 47 identical pairs;
+MAX and prior READ traces are preserved. The isolated increment is 13 generic
+cells and one control bit, without new payload capacity. The minimum is three
+plus two for an odd word; WRITE waits extend real dependencies without being
+charged as READ waits. This does not close historical write-buffer EU overlap
+or full C08/C09/C10/C15. RMW, consecutive WRITE/READ ordering and remaining
+public-speed/event coverage remain open; production and selected RBF unchanged.

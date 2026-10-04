@@ -319,3 +319,26 @@ Quartus fit or STA was run. Next qualify writes/write-buffer overlap and RMW,
 then branches/events, decoded lookahead, DOS wrapper and complete public
 speeds. Physical collaborator calibration remains pending without blocking
 the provisional reference-based development.
+
+## 2026-10-04 M6f: private serialized A3 WRITE
+
+The [M6f private CPU milestone](P06_CORE_WRITE_CPU_PILOT_20261004.md) qualifies
+aligned and two-beat odd A3 using the original address/payload and operand
+response. END retains functional completion after final Tc; retirement waits
+for the qualified boundary and three/five-clock minimum. Odd alignment has
+its own eligibility bit. WRITE waits remain real bus dependencies and do not
+increment the EU budget as READ waits.
+
+Both simulators pass 2,227 timed cases and 47 identical trace pairs, original
+and private MAX each pass 834 WRITE vectors, and the M6e warm/cold READ matrix
+remains byte-identical. Eight mutations, four affected MAX units, microcode,
+strict lint, bypass proofs and private-input cone checks pass. The isolated
+BIU/duration increment is 13 generic cells and one control bit, with no new
+payload buffer, queue capacity or PLL; this is not complete FPGA ALM cost.
+
+Cancellation drains accepted writes without reverting their physical effects.
+Reset interrupts the original backend and may leave an already written low
+byte; the fixture checks this partial word explicitly. Historical single
+write-buffer EU overlap, consecutive WRITE/following READ, RMW, events and
+complete public speeds remain separate gates. Production config, source
+selection and selected RBF remain unchanged; no total regression, fit or STA.

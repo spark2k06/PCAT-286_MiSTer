@@ -1,0 +1,1281 @@
+
+-- Executing script file `/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/biu-write-off-equivalence.ys' --
+
+1. Executing Verilog-2005 frontend: /mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv
+Parsing SystemVerilog input from `/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv' to AST representation.
+Generating RTLIL representation for module `\spk286_biu'.
+Successfully finished Verilog frontend.
+Parameter \P06_DATA_TIMING = 1
+Parameter \P06_SHARED_TIMING = 1
+Parameter \P06_ODD_READ_TIMING = 1
+
+2. Executing AST frontend in derive mode using pre-parsed AST for module `\spk286_biu'.
+Parameter \P06_DATA_TIMING = 1
+Parameter \P06_SHARED_TIMING = 1
+Parameter \P06_ODD_READ_TIMING = 1
+Generating RTLIL representation for module `$paramod$4c60f8c99ea763fddb7a7f9b6bdf65936f78abb9\spk286_biu'.
+
+3. Executing PROC pass (convert processes to netlists).
+
+3.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Found and cleaned up 1 empty switch in `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:294$242'.
+Cleaned up 1 empty switch.
+
+3.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Marked 2 switch rules as full_case in process $proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:250$210 in module spk286_biu.
+Marked 3 switch rules as full_case in process $proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:262$225 in module spk286_biu.
+Marked 1 switch rules as full_case in process $proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:294$242 in module spk286_biu.
+Marked 2 switch rules as full_case in process $proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:308$244 in module spk286_biu.
+Marked 1 switch rules as full_case in process $proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:111$365 in module spk286_biu.
+Removed a total of 0 dead cases.
+
+3.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 0 redundant assignments.
+Promoted 0 assignments to connections.
+
+3.4. Executing PROC_INIT pass (extract init attributes).
+
+3.5. Executing PROC_ARST pass (detect async resets in processes).
+
+3.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+<suppressed ~36 debug messages>
+
+3.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:250$210'.
+     1/1: $0\hlda[0:0]
+Creating decoders for process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:262$225'.
+     1/6: $0\ack_canceled_q[0:0]
+     2/6: $0\lock_chain_q[0:0]
+     3/6: $0\ack_second_q[0:0]
+     4/6: $0\ack_active_q[0:0]
+     5/6: $0\ack_vector[7:0]
+     6/6: $0\ack_response_valid[0:0]
+Creating decoders for process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:294$242'.
+     1/2: $0\owner_q[1:0]
+     2/2: $0\owner_valid_q[0:0]
+Creating decoders for process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:308$244'.
+     1/11: $0\raw_data_read_data[15:0]
+     2/11: $0\raw_data_response_valid[0:0]
+     3/11: $0\low_byte_q[7:0]
+     4/11: $0\write_data_q[15:0]
+     5/11: $0\address_q[23:0]
+     6/11: $0\io_q[0:0]
+     7/11: $0\byte_q[0:0]
+     8/11: $0\canceled_q[0:0]
+     9/11: $0\second_q[0:0]
+    10/11: $0\write_q[0:0]
+    11/11: $0\data_active_q[0:0]
+Creating decoders for process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:111$365'.
+     1/2: $0\p06_data.state_q[2:0]
+     2/2: $0\p06_scope_error[0:0]
+
+3.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+
+3.9. Executing PROC_DFF pass (convert process syncs to FFs).
+Creating register for signal `\spk286_biu.\hlda' using process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:250$210'.
+  created $dff cell `$procdff$646' with positive edge clock.
+Creating register for signal `\spk286_biu.\ack_response_valid' using process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:262$225'.
+  created $dff cell `$procdff$647' with positive edge clock.
+Creating register for signal `\spk286_biu.\ack_vector' using process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:262$225'.
+  created $dff cell `$procdff$648' with positive edge clock.
+Creating register for signal `\spk286_biu.\ack_active_q' using process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:262$225'.
+  created $dff cell `$procdff$649' with positive edge clock.
+Creating register for signal `\spk286_biu.\ack_second_q' using process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:262$225'.
+  created $dff cell `$procdff$650' with positive edge clock.
+Creating register for signal `\spk286_biu.\lock_chain_q' using process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:262$225'.
+  created $dff cell `$procdff$651' with positive edge clock.
+Creating register for signal `\spk286_biu.\ack_canceled_q' using process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:262$225'.
+  created $dff cell `$procdff$652' with positive edge clock.
+Creating register for signal `\spk286_biu.\owner_valid_q' using process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:294$242'.
+  created $dff cell `$procdff$653' with positive edge clock.
+Creating register for signal `\spk286_biu.\owner_q' using process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:294$242'.
+  created $dff cell `$procdff$654' with positive edge clock.
+Creating register for signal `\spk286_biu.\data_active_q' using process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:308$244'.
+  created $dff cell `$procdff$655' with positive edge clock.
+Creating register for signal `\spk286_biu.\write_q' using process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:308$244'.
+  created $dff cell `$procdff$656' with positive edge clock.
+Creating register for signal `\spk286_biu.\second_q' using process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:308$244'.
+  created $dff cell `$procdff$657' with positive edge clock.
+Creating register for signal `\spk286_biu.\canceled_q' using process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:308$244'.
+  created $dff cell `$procdff$658' with positive edge clock.
+Creating register for signal `\spk286_biu.\byte_q' using process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:308$244'.
+  created $dff cell `$procdff$659' with positive edge clock.
+Creating register for signal `\spk286_biu.\io_q' using process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:308$244'.
+  created $dff cell `$procdff$660' with positive edge clock.
+Creating register for signal `\spk286_biu.\address_q' using process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:308$244'.
+  created $dff cell `$procdff$661' with positive edge clock.
+Creating register for signal `\spk286_biu.\write_data_q' using process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:308$244'.
+  created $dff cell `$procdff$662' with positive edge clock.
+Creating register for signal `\spk286_biu.\low_byte_q' using process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:308$244'.
+  created $dff cell `$procdff$663' with positive edge clock.
+Creating register for signal `\spk286_biu.\raw_data_response_valid' using process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:308$244'.
+  created $dff cell `$procdff$664' with positive edge clock.
+Creating register for signal `\spk286_biu.\raw_data_read_data' using process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:308$244'.
+  created $dff cell `$procdff$665' with positive edge clock.
+Creating register for signal `\spk286_biu.\p06_scope_error' using process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:111$365'.
+  created $dff cell `$procdff$666' with positive edge clock.
+Creating register for signal `\spk286_biu.\p06_data.state_q' using process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:111$365'.
+  created $dff cell `$procdff$667' with positive edge clock.
+
+3.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+3.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Found and cleaned up 4 empty switches in `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:250$210'.
+Removing empty process `spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:250$210'.
+Found and cleaned up 10 empty switches in `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:262$225'.
+Removing empty process `spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:262$225'.
+Found and cleaned up 4 empty switches in `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:294$242'.
+Removing empty process `spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:294$242'.
+Found and cleaned up 7 empty switches in `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:308$244'.
+Removing empty process `spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:308$244'.
+Found and cleaned up 11 empty switches in `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:111$365'.
+Removing empty process `spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:111$365'.
+Cleaned up 36 empty switches.
+
+3.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spk286_biu.
+<suppressed ~41 debug messages>
+
+4. Executing OPT pass (performing simple optimizations).
+
+4.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spk286_biu.
+
+4.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spk286_biu'.
+<suppressed ~234 debug messages>
+Removed a total of 78 cells.
+
+4.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \spk286_biu..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+      Replacing known input bits on port A of cell $procmux$430: $procmux$425_Y -> 1'0
+      Replacing known input bits on port B of cell $procmux$467: $procmux$464_Y -> 1'1
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~37 debug messages>
+
+4.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \spk286_biu.
+  Optimizing cells in module \spk286_biu.
+Performed a total of 3 changes.
+
+4.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spk286_biu'.
+<suppressed ~9 debug messages>
+Removed a total of 3 cells.
+
+4.6. Executing OPT_DFF pass (perform DFF optimizations).
+Adding SRST signal on $procdff$655 ($dff) from module spk286_biu (D = $procmux$615_Y, Q = \data_active_q, rval = 1'0).
+Adding SRST signal on $procdff$653 ($dff) from module spk286_biu (D = $procmux$523_Y, Q = \owner_valid_q, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$669 ($sdff) from module spk286_biu (D = $procmux$523_Y, Q = \owner_valid_q).
+Adding SRST signal on $procdff$660 ($dff) from module spk286_biu (D = $procmux$571_Y, Q = \io_q, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$673 ($sdff) from module spk286_biu (D = \data_io, Q = \io_q).
+Adding SRST signal on $procdff$656 ($dff) from module spk286_biu (D = $procmux$605_Y, Q = \write_q, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$675 ($sdff) from module spk286_biu (D = \data_write, Q = \write_q).
+Adding SRST signal on $procdff$662 ($dff) from module spk286_biu (D = $procmux$556_Y, Q = \write_data_q, rval = 16'0000000000000000).
+Adding EN signal on $auto$ff.cc:266:slice$677 ($sdff) from module spk286_biu (D = \data_write_data, Q = \write_data_q).
+Adding SRST signal on $procdff$648 ($dff) from module spk286_biu (D = $procmux$493_Y, Q = \ack_vector, rval = 8'00000000).
+Adding EN signal on $auto$ff.cc:266:slice$679 ($sdff) from module spk286_biu (D = \data_in [7:0], Q = \ack_vector).
+Adding SRST signal on $procdff$666 ($dff) from module spk286_biu (D = $procmux$641_Y, Q = \p06_scope_error, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$683 ($sdff) from module spk286_biu (D = 1'1, Q = \p06_scope_error).
+Adding SRST signal on $procdff$667 ($dff) from module spk286_biu (D = $procmux$634_Y, Q = \p06_data.state_q, rval = 3'000).
+Adding EN signal on $auto$ff.cc:266:slice$685 ($sdff) from module spk286_biu (D = $procmux$634_Y, Q = \p06_data.state_q).
+Adding SRST signal on $procdff$663 ($dff) from module spk286_biu (D = $procmux$551_Y, Q = \low_byte_q, rval = 8'00000000).
+Adding EN signal on $auto$ff.cc:266:slice$695 ($sdff) from module spk286_biu (D = \data_in [15:8], Q = \low_byte_q).
+Adding SRST signal on $procdff$664 ($dff) from module spk286_biu (D = $procmux$543_Y, Q = \raw_data_response_valid, rval = 1'0).
+Adding SRST signal on $procdff$665 ($dff) from module spk286_biu (D = $procmux$531_Y, Q = \raw_data_read_data, rval = 16'0000000000000000).
+Adding EN signal on $auto$ff.cc:266:slice$700 ($sdff) from module spk286_biu (D = $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:332$252_Y, Q = \raw_data_read_data).
+Adding SRST signal on $procdff$654 ($dff) from module spk286_biu (D = $procmux$514_Y [0], Q = \owner_q [0], rval = 1'0).
+Adding SRST signal on $procdff$654 ($dff) from module spk286_biu (D = $procmux$512_Y [1], Q = \owner_q [1], rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$707 ($sdff) from module spk286_biu (D = 1'0, Q = \owner_q [1]).
+Adding EN signal on $auto$ff.cc:266:slice$706 ($sdff) from module spk286_biu (D = $procmux$514_Y [0], Q = \owner_q [0]).
+Adding SRST signal on $procdff$657 ($dff) from module spk286_biu (D = $procmux$600_Y, Q = \second_q, rval = 1'0).
+Adding SRST signal on $procdff$658 ($dff) from module spk286_biu (D = $procmux$590_Y, Q = \canceled_q, rval = 1'0).
+Adding SRST signal on $procdff$647 ($dff) from module spk286_biu (D = $procmux$505_Y, Q = \ack_response_valid, rval = 1'0).
+Adding SRST signal on $procdff$649 ($dff) from module spk286_biu (D = $procmux$483_Y, Q = \ack_active_q, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$719 ($sdff) from module spk286_biu (D = $procmux$483_Y, Q = \ack_active_q).
+Adding SRST signal on $procdff$650 ($dff) from module spk286_biu (D = $procmux$471_Y, Q = \ack_second_q, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$729 ($sdff) from module spk286_biu (D = $procmux$471_Y, Q = \ack_second_q).
+Adding SRST signal on $procdff$651 ($dff) from module spk286_biu (D = $procmux$459_Y, Q = \lock_chain_q, rval = 1'0).
+Adding SRST signal on $procdff$652 ($dff) from module spk286_biu (D = $procmux$440_Y, Q = \ack_canceled_q, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$738 ($sdff) from module spk286_biu (D = $procmux$440_Y, Q = \ack_canceled_q).
+Adding SRST signal on $procdff$661 ($dff) from module spk286_biu (D = $procmux$566_Y, Q = \address_q, rval = 24'000000000000000000000000).
+Adding SRST signal on $procdff$659 ($dff) from module spk286_biu (D = $procmux$576_Y, Q = \byte_q, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$747 ($sdff) from module spk286_biu (D = \data_byte, Q = \byte_q).
+Setting constant 0-bit at position 0 on $auto$ff.cc:266:slice$710 ($sdffe) from module spk286_biu.
+
+4.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spk286_biu..
+Removed 48 unused cells and 316 unused wires.
+<suppressed ~50 debug messages>
+
+4.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spk286_biu.
+<suppressed ~7 debug messages>
+
+4.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+4.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \spk286_biu..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~28 debug messages>
+
+4.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \spk286_biu.
+Performed a total of 0 changes.
+
+4.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spk286_biu'.
+<suppressed ~6 debug messages>
+Removed a total of 2 cells.
+
+4.13. Executing OPT_DFF pass (perform DFF optimizations).
+Setting constant 0-bit at position 0 on $procdff$646 ($dff) from module spk286_biu.
+
+4.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spk286_biu..
+Removed 0 unused cells and 8 unused wires.
+<suppressed ~3 debug messages>
+
+4.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spk286_biu.
+<suppressed ~4 debug messages>
+
+4.16. Rerunning OPT passes. (Maybe there is more to do..)
+
+4.17. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \spk286_biu..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~28 debug messages>
+
+4.18. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \spk286_biu.
+Performed a total of 0 changes.
+
+4.19. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spk286_biu'.
+Removed a total of 0 cells.
+
+4.20. Executing OPT_DFF pass (perform DFF optimizations).
+
+4.21. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spk286_biu..
+Removed 0 unused cells and 4 unused wires.
+<suppressed ~1 debug messages>
+
+4.22. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spk286_biu.
+
+4.23. Rerunning OPT passes. (Maybe there is more to do..)
+
+4.24. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \spk286_biu..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~28 debug messages>
+
+4.25. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \spk286_biu.
+Performed a total of 0 changes.
+
+4.26. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spk286_biu'.
+Removed a total of 0 cells.
+
+4.27. Executing OPT_DFF pass (perform DFF optimizations).
+
+4.28. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spk286_biu..
+
+4.29. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spk286_biu.
+
+4.30. Finished OPT passes. (There is nothing left to do.)
+Renaming module \spk286_biu to \gold.
+
+5. Executing Verilog-2005 frontend: /mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv
+Parsing SystemVerilog input from `/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv' to AST representation.
+Generating RTLIL representation for module `\spk286_biu'.
+Successfully finished Verilog frontend.
+Parameter \P06_DATA_TIMING = 1
+Parameter \P06_SHARED_TIMING = 1
+Parameter \P06_ODD_READ_TIMING = 1
+
+6. Executing AST frontend in derive mode using pre-parsed AST for module `\spk286_biu'.
+Parameter \P06_DATA_TIMING = 1
+Parameter \P06_SHARED_TIMING = 1
+Parameter \P06_ODD_READ_TIMING = 1
+Generating RTLIL representation for module `$paramod$4c60f8c99ea763fddb7a7f9b6bdf65936f78abb9\spk286_biu'.
+
+7. Executing PROC pass (convert processes to netlists).
+
+7.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Found and cleaned up 1 empty switch in `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:305$994'.
+Cleaned up 1 empty switch.
+
+7.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Marked 2 switch rules as full_case in process $proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:261$962 in module spk286_biu.
+Marked 3 switch rules as full_case in process $proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:273$977 in module spk286_biu.
+Marked 1 switch rules as full_case in process $proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:305$994 in module spk286_biu.
+Marked 2 switch rules as full_case in process $proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:319$996 in module spk286_biu.
+Marked 1 switch rules as full_case in process $proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:122$1120 in module spk286_biu.
+Removed a total of 0 dead cases.
+
+7.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 0 redundant assignments.
+Promoted 0 assignments to connections.
+
+7.4. Executing PROC_INIT pass (extract init attributes).
+
+7.5. Executing PROC_ARST pass (detect async resets in processes).
+
+7.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+<suppressed ~36 debug messages>
+
+7.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:261$962'.
+     1/1: $0\hlda[0:0]
+Creating decoders for process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:273$977'.
+     1/6: $0\ack_canceled_q[0:0]
+     2/6: $0\lock_chain_q[0:0]
+     3/6: $0\ack_second_q[0:0]
+     4/6: $0\ack_active_q[0:0]
+     5/6: $0\ack_vector[7:0]
+     6/6: $0\ack_response_valid[0:0]
+Creating decoders for process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:305$994'.
+     1/2: $0\owner_q[1:0]
+     2/2: $0\owner_valid_q[0:0]
+Creating decoders for process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:319$996'.
+     1/11: $0\raw_data_read_data[15:0]
+     2/11: $0\raw_data_response_valid[0:0]
+     3/11: $0\low_byte_q[7:0]
+     4/11: $0\write_data_q[15:0]
+     5/11: $0\address_q[23:0]
+     6/11: $0\io_q[0:0]
+     7/11: $0\byte_q[0:0]
+     8/11: $0\canceled_q[0:0]
+     9/11: $0\second_q[0:0]
+    10/11: $0\write_q[0:0]
+    11/11: $0\data_active_q[0:0]
+Creating decoders for process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:122$1120'.
+     1/2: $0\p06_data.state_q[2:0]
+     2/2: $0\p06_scope_error[0:0]
+
+7.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+
+7.9. Executing PROC_DFF pass (convert process syncs to FFs).
+Creating register for signal `\spk286_biu.\hlda' using process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:261$962'.
+  created $dff cell `$procdff$1401' with positive edge clock.
+Creating register for signal `\spk286_biu.\ack_response_valid' using process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:273$977'.
+  created $dff cell `$procdff$1402' with positive edge clock.
+Creating register for signal `\spk286_biu.\ack_vector' using process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:273$977'.
+  created $dff cell `$procdff$1403' with positive edge clock.
+Creating register for signal `\spk286_biu.\ack_active_q' using process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:273$977'.
+  created $dff cell `$procdff$1404' with positive edge clock.
+Creating register for signal `\spk286_biu.\ack_second_q' using process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:273$977'.
+  created $dff cell `$procdff$1405' with positive edge clock.
+Creating register for signal `\spk286_biu.\lock_chain_q' using process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:273$977'.
+  created $dff cell `$procdff$1406' with positive edge clock.
+Creating register for signal `\spk286_biu.\ack_canceled_q' using process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:273$977'.
+  created $dff cell `$procdff$1407' with positive edge clock.
+Creating register for signal `\spk286_biu.\owner_valid_q' using process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:305$994'.
+  created $dff cell `$procdff$1408' with positive edge clock.
+Creating register for signal `\spk286_biu.\owner_q' using process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:305$994'.
+  created $dff cell `$procdff$1409' with positive edge clock.
+Creating register for signal `\spk286_biu.\data_active_q' using process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:319$996'.
+  created $dff cell `$procdff$1410' with positive edge clock.
+Creating register for signal `\spk286_biu.\write_q' using process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:319$996'.
+  created $dff cell `$procdff$1411' with positive edge clock.
+Creating register for signal `\spk286_biu.\second_q' using process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:319$996'.
+  created $dff cell `$procdff$1412' with positive edge clock.
+Creating register for signal `\spk286_biu.\canceled_q' using process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:319$996'.
+  created $dff cell `$procdff$1413' with positive edge clock.
+Creating register for signal `\spk286_biu.\byte_q' using process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:319$996'.
+  created $dff cell `$procdff$1414' with positive edge clock.
+Creating register for signal `\spk286_biu.\io_q' using process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:319$996'.
+  created $dff cell `$procdff$1415' with positive edge clock.
+Creating register for signal `\spk286_biu.\address_q' using process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:319$996'.
+  created $dff cell `$procdff$1416' with positive edge clock.
+Creating register for signal `\spk286_biu.\write_data_q' using process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:319$996'.
+  created $dff cell `$procdff$1417' with positive edge clock.
+Creating register for signal `\spk286_biu.\low_byte_q' using process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:319$996'.
+  created $dff cell `$procdff$1418' with positive edge clock.
+Creating register for signal `\spk286_biu.\raw_data_response_valid' using process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:319$996'.
+  created $dff cell `$procdff$1419' with positive edge clock.
+Creating register for signal `\spk286_biu.\raw_data_read_data' using process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:319$996'.
+  created $dff cell `$procdff$1420' with positive edge clock.
+Creating register for signal `\spk286_biu.\p06_scope_error' using process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:122$1120'.
+  created $dff cell `$procdff$1421' with positive edge clock.
+Creating register for signal `\spk286_biu.\p06_data.state_q' using process `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:122$1120'.
+  created $dff cell `$procdff$1422' with positive edge clock.
+
+7.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+7.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Found and cleaned up 4 empty switches in `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:261$962'.
+Removing empty process `spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:261$962'.
+Found and cleaned up 10 empty switches in `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:273$977'.
+Removing empty process `spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:273$977'.
+Found and cleaned up 4 empty switches in `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:305$994'.
+Removing empty process `spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:305$994'.
+Found and cleaned up 7 empty switches in `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:319$996'.
+Removing empty process `spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:319$996'.
+Found and cleaned up 11 empty switches in `\spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:122$1120'.
+Removing empty process `spk286_biu.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:122$1120'.
+Cleaned up 36 empty switches.
+
+7.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spk286_biu.
+<suppressed ~45 debug messages>
+Optimizing module gold.
+
+8. Executing OPT pass (performing simple optimizations).
+
+8.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module spk286_biu.
+Optimizing module gold.
+
+8.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spk286_biu'.
+<suppressed ~234 debug messages>
+Finding identical cells in module `\gold'.
+Removed a total of 78 cells.
+
+8.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \spk286_biu..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+      Replacing known input bits on port B of cell $procmux$1222: $procmux$1219_Y -> 1'1
+      Replacing known input bits on port A of cell $procmux$1185: $procmux$1180_Y -> 1'0
+  Analyzing evaluation results.
+Running muxtree optimizer on module \gold..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~65 debug messages>
+
+8.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \spk286_biu.
+  Optimizing cells in module \spk286_biu.
+  Optimizing cells in module \gold.
+Performed a total of 3 changes.
+
+8.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\spk286_biu'.
+<suppressed ~9 debug messages>
+Finding identical cells in module `\gold'.
+Removed a total of 3 cells.
+
+8.6. Executing OPT_DFF pass (perform DFF optimizations).
+Adding SRST signal on $procdff$1407 ($dff) from module spk286_biu (D = $procmux$1195_Y, Q = \ack_canceled_q, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$1423 ($sdff) from module spk286_biu (D = $procmux$1195_Y, Q = \ack_canceled_q).
+Adding SRST signal on $procdff$1413 ($dff) from module spk286_biu (D = $procmux$1345_Y, Q = \canceled_q, rval = 1'0).
+Adding SRST signal on $procdff$1408 ($dff) from module spk286_biu (D = $procmux$1278_Y, Q = \owner_valid_q, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$1432 ($sdff) from module spk286_biu (D = $procmux$1278_Y, Q = \owner_valid_q).
+Adding SRST signal on $procdff$1409 ($dff) from module spk286_biu (D = $procmux$1267_Y [1], Q = \owner_q [1], rval = 1'0).
+Adding SRST signal on $procdff$1409 ($dff) from module spk286_biu (D = $procmux$1269_Y [0], Q = \owner_q [0], rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$1439 ($sdff) from module spk286_biu (D = $procmux$1269_Y [0], Q = \owner_q [0]).
+Adding EN signal on $auto$ff.cc:266:slice$1436 ($sdff) from module spk286_biu (D = 1'0, Q = \owner_q [1]).
+Adding SRST signal on $procdff$1414 ($dff) from module spk286_biu (D = $procmux$1331_Y, Q = \byte_q, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$1444 ($sdff) from module spk286_biu (D = \data_byte, Q = \byte_q).
+Adding SRST signal on $procdff$1421 ($dff) from module spk286_biu (D = $procmux$1396_Y, Q = \p06_scope_error, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$1446 ($sdff) from module spk286_biu (D = 1'1, Q = \p06_scope_error).
+Adding SRST signal on $procdff$1422 ($dff) from module spk286_biu (D = $procmux$1389_Y, Q = \p06_data.state_q, rval = 3'000).
+Adding EN signal on $auto$ff.cc:266:slice$1448 ($sdff) from module spk286_biu (D = $procmux$1389_Y, Q = \p06_data.state_q).
+Adding SRST signal on $procdff$1416 ($dff) from module spk286_biu (D = $procmux$1321_Y, Q = \address_q, rval = 24'000000000000000000000000).
+Adding SRST signal on $procdff$1417 ($dff) from module spk286_biu (D = $procmux$1311_Y, Q = \write_data_q, rval = 16'0000000000000000).
+Adding EN signal on $auto$ff.cc:266:slice$1459 ($sdff) from module spk286_biu (D = \data_write_data, Q = \write_data_q).
+Adding SRST signal on $procdff$1418 ($dff) from module spk286_biu (D = $procmux$1306_Y, Q = \low_byte_q, rval = 8'00000000).
+Adding EN signal on $auto$ff.cc:266:slice$1461 ($sdff) from module spk286_biu (D = \data_in [15:8], Q = \low_byte_q).
+Adding SRST signal on $procdff$1419 ($dff) from module spk286_biu (D = $procmux$1298_Y, Q = \raw_data_response_valid, rval = 1'0).
+Adding SRST signal on $procdff$1420 ($dff) from module spk286_biu (D = $procmux$1286_Y, Q = \raw_data_read_data, rval = 16'0000000000000000).
+Adding EN signal on $auto$ff.cc:266:slice$1466 ($sdff) from module spk286_biu (D = $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:343$1004_Y, Q = \raw_data_read_data).
+Adding SRST signal on $procdff$1406 ($dff) from module spk286_biu (D = $procmux$1214_Y, Q = \lock_chain_q, rval = 1'0).
+Adding SRST signal on $procdff$1410 ($dff) from module spk286_biu (D = $procmux$1370_Y, Q = \data_active_q, rval = 1'0).
+Adding SRST signal on $procdff$1411 ($dff) from module spk286_biu (D = $procmux$1360_Y, Q = \write_q, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$1474 ($sdff) from module spk286_biu (D = \data_write, Q = \write_q).
+Adding SRST signal on $procdff$1403 ($dff) from module spk286_biu (D = $procmux$1248_Y, Q = \ack_vector, rval = 8'00000000).
+Adding EN signal on $auto$ff.cc:266:slice$1476 ($sdff) from module spk286_biu (D = \data_in [7:0], Q = \ack_vector).
+Adding SRST signal on $procdff$1402 ($dff) from module spk286_biu (D = $procmux$1260_Y, Q = \ack_response_valid, rval = 1'0).
+Adding SRST signal on $procdff$1404 ($dff) from module spk286_biu (D = $procmux$1238_Y, Q = \ack_active_q, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$1483 ($sdff) from module spk286_biu (D = $procmux$1238_Y, Q = \ack_active_q).
+Adding SRST signal on $procdff$1405 ($dff) from module spk286_biu (D = $procmux$1226_Y, Q = \ack_second_q, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$1493 ($sdff) from module spk286_biu (D = $procmux$1226_Y, Q = \ack_second_q).
+Adding SRST signal on $procdff$1415 ($dff) from module spk286_biu (D = $procmux$1326_Y, Q = \io_q, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$1501 ($sdff) from module spk286_biu (D = \data_io, Q = \io_q).
+Adding SRST signal on $procdff$1412 ($dff) from module spk286_biu (D = $procmux$1355_Y, Q = \second_q, rval = 1'0).
+Setting constant 0-bit at position 0 on $auto$ff.cc:266:slice$1443 ($sdffe) from module spk286_biu.
+
+8.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \spk286_biu..
+Finding unused cells or wires in module \gold..
+Removed 49 unused cells and 321 unused wires.
+<suppressed ~51 debug messages>
+
+8.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module gold.
+Optimizing module spk286_biu.
+<suppressed ~7 debug messages>
+
+8.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+8.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \gold..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \spk286_biu..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~56 debug messages>
+
+8.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \gold.
+  Optimizing cells in module \spk286_biu.
+Performed a total of 0 changes.
+
+8.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\gold'.
+Finding identical cells in module `\spk286_biu'.
+<suppressed ~6 debug messages>
+Removed a total of 2 cells.
+
+8.13. Executing OPT_DFF pass (perform DFF optimizations).
+Setting constant 0-bit at position 0 on $procdff$1401 ($dff) from module spk286_biu.
+
+8.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \gold..
+Finding unused cells or wires in module \spk286_biu..
+Removed 0 unused cells and 8 unused wires.
+<suppressed ~3 debug messages>
+
+8.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module gold.
+Optimizing module spk286_biu.
+<suppressed ~4 debug messages>
+
+8.16. Rerunning OPT passes. (Maybe there is more to do..)
+
+8.17. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \gold..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \spk286_biu..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~56 debug messages>
+
+8.18. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \gold.
+  Optimizing cells in module \spk286_biu.
+Performed a total of 0 changes.
+
+8.19. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\gold'.
+Finding identical cells in module `\spk286_biu'.
+Removed a total of 0 cells.
+
+8.20. Executing OPT_DFF pass (perform DFF optimizations).
+
+8.21. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \gold..
+Finding unused cells or wires in module \spk286_biu..
+Removed 0 unused cells and 4 unused wires.
+<suppressed ~1 debug messages>
+
+8.22. Executing OPT_EXPR pass (perform const folding).
+Optimizing module gold.
+Optimizing module spk286_biu.
+
+8.23. Rerunning OPT passes. (Maybe there is more to do..)
+
+8.24. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \gold..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Running muxtree optimizer on module \spk286_biu..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~56 debug messages>
+
+8.25. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \gold.
+  Optimizing cells in module \spk286_biu.
+Performed a total of 0 changes.
+
+8.26. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\gold'.
+Finding identical cells in module `\spk286_biu'.
+Removed a total of 0 cells.
+
+8.27. Executing OPT_DFF pass (perform DFF optimizations).
+
+8.28. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \gold..
+Finding unused cells or wires in module \spk286_biu..
+
+8.29. Executing OPT_EXPR pass (perform const folding).
+Optimizing module gold.
+Optimizing module spk286_biu.
+
+8.30. Finished OPT passes. (There is nothing left to do.)
+Renaming module \spk286_biu to \gate.
+
+9. Executing EQUIV_MAKE pass (creating equiv checking module).
+Presumably equivalent wires: ack_active_q_gold (\ack_active_q_gold), ack_active_q_gate (\ack_active_q_gate) -> ack_active_q
+Presumably equivalent wires: ack_canceled_q_gold (\ack_canceled_q_gold), ack_canceled_q_gate (\ack_canceled_q_gate) -> ack_canceled_q
+Presumably equivalent wires: ack_request_gold (\ack_request_gold), ack_request_gate (\ack_request_gate) -> ack_request
+Presumably equivalent wires: ack_request_ready_gold (1'0), ack_request_ready_gate (1'0) -> ack_request_ready
+Presumably equivalent wires: ack_response_ready_gold (\ack_response_ready_gold), ack_response_ready_gate (\ack_response_ready_gate) -> ack_response_ready
+Presumably equivalent wires: ack_response_valid_gold (\ack_response_valid_gold), ack_response_valid_gate (\ack_response_valid_gate) -> ack_response_valid
+Presumably equivalent wires: ack_second_q_gold (\ack_second_q_gold), ack_second_q_gate (\ack_second_q_gate) -> ack_second_q
+Presumably equivalent wires: ack_vector_gold (\ack_vector_gold), ack_vector_gate (\ack_vector_gate) -> ack_vector
+Presumably equivalent wires: address_gold (\address_gold), address_gate (\address_gate) -> address
+Presumably equivalent wires: address_q_gold (\address_q_gold), address_q_gate (\address_q_gate) -> address_q
+Presumably equivalent wires: bus_bhe_n_gold (\bus_bhe_n_gold), bus_bhe_n_gate (\bus_bhe_n_gate) -> bus_bhe_n
+Presumably equivalent wires: bus_lock_gold (\bus_lock_gold), bus_lock_gate (\bus_lock_gate) -> bus_lock
+Presumably equivalent wires: bus_status_gold (\bus_status_gold), bus_status_gate (\bus_status_gate) -> bus_status
+Presumably equivalent wires: bus_valid_gold (\bus_valid_gold), bus_valid_gate (\bus_valid_gate) -> bus_valid
+Presumably equivalent wires: bus_write_gold (\bus_write_gold), bus_write_gate (\bus_write_gate) -> bus_write
+Presumably equivalent wires: byte_q_gold (\byte_q_gold), byte_q_gate (\byte_q_gate) -> byte_q
+Presumably equivalent wires: cancel_data_gold (\cancel_data_gold), cancel_data_gate (\cancel_data_gate) -> cancel_data
+Presumably equivalent wires: canceled_q_gold (\canceled_q_gold), canceled_q_gate (\canceled_q_gate) -> canceled_q
+Presumably equivalent wires: clk_gold (\clk_gold), clk_gate (\clk_gate) -> clk
+Presumably equivalent wires: code_address_gold (\code_address_gold), code_address_gate (\code_address_gate) -> code_address
+Presumably equivalent wires: code_bhe_n_gold (\code_bhe_n_gold), code_bhe_n_gate (\code_bhe_n_gate) -> code_bhe_n
+Presumably equivalent wires: code_ready_gold (\code_ready_gold), code_ready_gate (\code_ready_gate) -> code_ready
+Presumably equivalent wires: code_valid_gold (\code_valid_gold), code_valid_gate (\code_valid_gate) -> code_valid
+Presumably equivalent wires: data_active_q_gold (\data_active_q_gold), data_active_q_gate (\data_active_q_gate) -> data_active_q
+Presumably equivalent wires: data_address_gold (\data_address_gold), data_address_gate (\data_address_gate) -> data_address
+Presumably equivalent wires: data_byte_gold (\data_byte_gold), data_byte_gate (\data_byte_gate) -> data_byte
+Presumably equivalent wires: data_complete_gold (\data_complete_gold), data_complete_gate (\data_complete_gate) -> data_complete
+Presumably equivalent wires: data_in_gold (\data_in_gold), data_in_gate (\data_in_gate) -> data_in
+Presumably equivalent wires: data_io_gold (\data_io_gold), data_io_gate (\data_io_gate) -> data_io
+Presumably equivalent wires: data_oe_gold (\bus_write_gold), data_oe_gate (\bus_write_gate) -> data_oe
+Presumably equivalent wires: data_out_gold (\data_out_gold), data_out_gate (\data_out_gate) -> data_out
+Presumably equivalent wires: data_read_data_gold (\data_read_data_gold), data_read_data_gate (\data_read_data_gate) -> data_read_data
+Presumably equivalent wires: data_request_gold (\data_request_gold), data_request_gate (\data_request_gate) -> data_request
+Presumably equivalent wires: data_request_ready_gold (\data_request_ready_gold), data_request_ready_gate (\data_request_ready_gate) -> data_request_ready
+Presumably equivalent wires: data_response_ready_gold (\data_response_ready_gold), data_response_ready_gate (\data_response_ready_gate) -> data_response_ready
+Presumably equivalent wires: data_response_valid_gold (\data_response_valid_gold), data_response_valid_gate (\data_response_valid_gate) -> data_response_valid
+Presumably equivalent wires: data_write_gold (\data_write_gold), data_write_gate (\data_write_gate) -> data_write
+Presumably equivalent wires: data_write_data_gold (\data_write_data_gold), data_write_data_gate (\data_write_data_gate) -> data_write_data
+Presumably equivalent wires: hlda_gold (1'0), hlda_gate (1'0) -> hlda
+Presumably equivalent wires: hold_request_gold (\hold_request_gold), hold_request_gate (\hold_request_gate) -> hold_request
+Presumably equivalent wires: io_q_gold (\io_q_gold), io_q_gate (\io_q_gate) -> io_q
+Presumably equivalent wires: lock_chain_q_gold (\lock_chain_q_gold), lock_chain_q_gate (\lock_chain_q_gate) -> lock_chain_q
+Presumably equivalent wires: lock_request_gold (\lock_request_gold), lock_request_gate (\lock_request_gate) -> lock_request
+Presumably equivalent wires: low_byte_q_gold (\low_byte_q_gold), low_byte_q_gate (\low_byte_q_gate) -> low_byte_q
+Presumably equivalent wires: owner_q_gold ({ 1'0 \owner_q_gold [0] }), owner_q_gate ({ 1'0 \owner_q_gate [0] }) -> owner_q
+Presumably equivalent wires: owner_valid_q_gold (\owner_valid_q_gold), owner_valid_q_gate (\owner_valid_q_gate) -> owner_valid_q
+Presumably equivalent wires: p06_admit_gold (\p06_admit_gold), p06_admit_gate (\p06_admit_gate) -> p06_admit
+Presumably equivalent wires: p06_alignment_event_gold (\p06_alignment_event_gold), p06_alignment_event_gate (\p06_alignment_event_gate) -> p06_alignment_event
+Presumably equivalent wires: p06_board_ready_gold (\p06_board_ready_gold), p06_board_ready_gate (\p06_board_ready_gate) -> p06_board_ready
+Presumably equivalent wires: p06_capture_gold (\data_complete_gold), p06_capture_gate (\data_complete_gate) -> p06_capture
+Presumably equivalent wires: p06_code_admission_gold (\p06_code_admission_gold), p06_code_admission_gate (\p06_code_admission_gate) -> p06_code_admission
+Presumably equivalent wires: p06_code_canceled_gold (\p06_code_canceled_gold), p06_code_canceled_gate (\p06_code_canceled_gate) -> p06_code_canceled
+Presumably equivalent wires: p06_code_complete_gold (\p06_code_complete_gold), p06_code_complete_gate (\p06_code_complete_gate) -> p06_code_complete
+Presumably equivalent wires: p06_code_issue_gold (\p06_code_issue_gold), p06_code_issue_gate (\p06_code_issue_gate) -> p06_code_issue
+Presumably equivalent wires: p06_complete_gold (\p06_complete_gold), p06_complete_gate (\p06_complete_gate) -> p06_complete
+Presumably equivalent wires: p06_cpu_boundary_gold (\p06_cpu_boundary_gold), p06_cpu_boundary_gate (\p06_cpu_boundary_gate) -> p06_cpu_boundary
+Presumably equivalent wires: p06_data.available_gold (\p06_data.available_gold), p06_data.available_gate (\p06_data.available_gate) -> p06_data.available
+Presumably equivalent wires: p06_data.final_capture_gold (\p06_data.final_capture_gold), p06_data.final_capture_gate (\p06_data.final_capture_gate) -> p06_data.final_capture
+Presumably equivalent wires: p06_data.first_available_gold (\p06_data.first_available_gold), p06_data.first_available_gate (\p06_data.first_available_gate) -> p06_data.first_available
+Presumably equivalent wires: p06_data.first_complete_gold (\p06_data.first_complete_gold), p06_data.first_complete_gate (\p06_data.first_complete_gate) -> p06_data.first_complete
+Presumably equivalent wires: p06_data.sample_tc_gold (\p06_data.sample_tc_gold), p06_data.sample_tc_gate (\p06_data.sample_tc_gate) -> p06_data.sample_tc
+Presumably equivalent wires: p06_data.scope_block_gold (\p06_scope_block_gold), p06_data.scope_block_gate (\p06_scope_block_gate) -> p06_data.scope_block
+Presumably equivalent wires: p06_data.state_q_gold (\p06_data.state_q_gold), p06_data.state_q_gate (\p06_data.state_q_gate) -> p06_data.state_q
+Presumably equivalent wires: p06_data.tc_phase_gold (\p06_data.tc_phase_gold), p06_data.tc_phase_gate (\p06_data.tc_phase_gate) -> p06_data.tc_phase
+Presumably equivalent wires: p06_data.unsupported_bus_gold (\p06_data.unsupported_bus_gold), p06_data.unsupported_bus_gate (\p06_data.unsupported_bus_gate) -> p06_data.unsupported_bus
+Presumably equivalent wires: p06_data.unsupported_data_gold (\p06_data.unsupported_data_gold), p06_data.unsupported_data_gate (\p06_data.unsupported_data_gate) -> p06_data.unsupported_data
+Presumably equivalent wires: p06_data_candidate_gold (\p06_data_candidate_gold), p06_data_candidate_gate (\p06_data_candidate_gate) -> p06_data_candidate
+Presumably equivalent wires: p06_data_idle_gold (\p06_data_idle_gold), p06_data_idle_gate (\p06_data_idle_gate) -> p06_data_idle
+Presumably equivalent wires: p06_first_complete_gold (\p06_data.first_complete_gold), p06_first_complete_gate (\p06_data.first_complete_gate) -> p06_first_complete
+Presumably equivalent wires: p06_physical_data_enable_gold (\p06_physical_data_enable_gold), p06_physical_data_enable_gate (\p06_physical_data_enable_gate) -> p06_physical_data_enable
+Presumably equivalent wires: p06_read_wait_event_gold (\p06_read_wait_event_gold), p06_read_wait_event_gate (\p06_read_wait_event_gate) -> p06_read_wait_event
+Presumably equivalent wires: p06_response_fire_gold (\p06_response_fire_gold), p06_response_fire_gate (\p06_response_fire_gate) -> p06_response_fire
+Presumably equivalent wires: p06_scope_block_gold (\p06_scope_block_gold), p06_scope_block_gate (\p06_scope_block_gate) -> p06_scope_block
+Presumably equivalent wires: p06_scope_error_gold (\p06_scope_error_gold), p06_scope_error_gate (\p06_scope_error_gate) -> p06_scope_error
+Presumably equivalent wires: p06_shared.code_abort_gold (\p06_shared.code_abort_gold), p06_shared.code_abort_gate (\p06_shared.code_abort_gate) -> p06_shared.code_abort
+Presumably equivalent wires: p06_shared.code_owned_gold (\p06_shared.code_owned_gold), p06_shared.code_owned_gate (\p06_shared.code_owned_gate) -> p06_shared.code_owned
+Presumably equivalent wires: p06_shared.data_abort_gold (\p06_shared.data_abort_gold), p06_shared.data_abort_gate (\p06_shared.data_abort_gate) -> p06_shared.data_abort
+Presumably equivalent wires: p06_shared.data_owned_gold (\p06_shared.data_owned_gold), p06_shared.data_owned_gate (\p06_shared.data_owned_gate) -> p06_shared.data_owned
+Presumably equivalent wires: p06_shared.free_owner_gold (\p06_shared.free_owner_gold), p06_shared.free_owner_gate (\p06_shared.free_owner_gate) -> p06_shared.free_owner
+Presumably equivalent wires: p06_shared_data_grant_gold (\p06_shared.free_owner_gold), p06_shared_data_grant_gate (\p06_shared.free_owner_gate) -> p06_shared_data_grant
+Presumably equivalent wires: p06_shared_release_gold (\p06_shared_release_gold), p06_shared_release_gate (\p06_shared_release_gate) -> p06_shared_release
+Presumably equivalent wires: raw_data_read_data_gold (\raw_data_read_data_gold), raw_data_read_data_gate (\raw_data_read_data_gate) -> raw_data_read_data
+Presumably equivalent wires: raw_data_response_valid_gold (\raw_data_response_valid_gold), raw_data_response_valid_gate (\raw_data_response_valid_gate) -> raw_data_response_valid
+Presumably equivalent wires: ready_gold (\ready_gold), ready_gate (\ready_gate) -> ready
+Presumably equivalent wires: reset_gold (\reset_gold), reset_gate (\reset_gate) -> reset
+Presumably equivalent wires: second_q_gold (\second_q_gold), second_q_gate (\second_q_gate) -> second_q
+Presumably equivalent wires: select_ack_gold (\select_ack_gold), select_ack_gate (\select_ack_gate) -> select_ack
+Presumably equivalent wires: select_data_gold (\select_data_gold), select_data_gate (\select_data_gate) -> select_data
+Presumably equivalent wires: selected_owner_gold (\selected_owner_gold), selected_owner_gate (\selected_owner_gate) -> selected_owner
+Presumably equivalent wires: write_data_q_gold (\write_data_q_gold), write_data_q_gate (\write_data_q_gate) -> write_data_q
+Presumably equivalent wires: write_q_gold (\write_q_gold), write_q_gate (\write_q_gate) -> write_q
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$1428_gate ($ne): { \ack_active_q_gate \cancel_data_gate } -> { \ack_active_q \cancel_data_gate }
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$1435_gate ($reduce_bool): { \p06_shared_release_gate $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:136$1128_Y_gate \p06_code_issue_gate } -> { \p06_shared_release $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:136$1128_Y_gate \p06_code_issue_gate }
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$1453_gate ($reduce_bool): { $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:135$1127_Y_gate \p06_complete_gate \p06_data.first_complete_gate $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:136$1128_Y_gate \p06_cpu_boundary_gate } -> { $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:135$1127_Y_gate \p06_complete \p06_data.first_complete $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:136$1128_Y_gate \p06_cpu_boundary_gate }
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$1455_gate ($ne): { $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:135$1127_Y_gate $eq$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:127$1122_Y_gate $eq$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:120$1113_Y_gate \p06_complete_gate $eq$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:105$1080_Y_gate \p06_data.first_complete_gate $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:136$1128_Y_gate \p06_cpu_boundary_gate } -> { $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:135$1127_Y_gate $eq$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:127$1122_Y_gate $eq$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:120$1113_Y_gate \p06_complete $eq$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:105$1080_Y_gate \p06_data.first_complete $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:136$1128_Y_gate \p06_cpu_boundary_gate }
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$1488_gate ($ne): { $auto$opt_dff.cc:194:make_patterns_logic$1489_gate \ack_second_q_gate \ready_gate } -> { $auto$opt_dff.cc:194:make_patterns_logic$1489_gate \ack_second_q \ready_gate }
+Changing input A of cell $auto$opt_dff.cc:220:make_patterns_logic$1464_gate ($reduce_and): { $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:337$1000_Y_gate \data_complete_gate } -> { $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:337$1000_Y_gate \data_complete }
+Changing input A of cell $auto$opt_dff.cc:220:make_patterns_logic$1471_gate ($reduce_and): { $auto$rtlil.cc:2401:Not$1469_gate \data_complete_gate } -> { $auto$rtlil.cc:2401:Not$1469_gate \data_complete }
+Changing input A of cell $auto$opt_dff.cc:220:make_patterns_logic$1479_gate ($reduce_and): { $auto$opt_dff.cc:194:make_patterns_logic$1489_gate \ack_second_q_gate \ready_gate } -> { $auto$opt_dff.cc:194:make_patterns_logic$1489_gate \ack_second_q \ready_gate }
+Changing input A of cell $eq$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:105$1080_gate ($eq): \p06_data.state_q_gate -> \p06_data.state_q
+Changing input A of cell $eq$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:108$1091_gate ($eq): \p06_data.state_q_gate -> \p06_data.state_q
+Changing input A of cell $eq$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:120$1113_gate ($eq): \p06_data.state_q_gate -> \p06_data.state_q
+Changing input A of cell $eq$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:127$1122_gate ($eq): \p06_data.state_q_gate -> \p06_data.state_q
+Changing input A of cell $eq$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:212$1133_gate ($logic_not): { 1'0 \owner_q_gate [0] } -> { 1'0 \owner_q [0] }
+Changing input A of cell $eq$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:246$912_gate ($eq): \selected_owner_gate -> \selected_owner
+Changing input A of cell $eq$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:247$913_gate ($eq): \selected_owner_gate -> \selected_owner
+Changing input A of cell $eq$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:81$1025_gate ($logic_not): \p06_data.state_q_gate -> \p06_data.state_q
+Changing input A of cell $eq$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:88$1034_gate ($eq): \p06_data.state_q_gate -> \p06_data.state_q
+Changing input A of cell $eq$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:88$1035_gate ($eq): \p06_data.state_q_gate -> \p06_data.state_q
+Changing input A of cell $eq$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:88$1037_gate ($eq): \p06_data.state_q_gate -> \p06_data.state_q
+Changing input B of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:102$1068_gate ($logic_and): \p06_data.tc_phase_gate -> \p06_data.tc_phase
+Changing input A of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:106$1083_gate ($logic_and): \p06_data.sample_tc_gate -> \p06_data.sample_tc
+Changing input B of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:106$1085_gate ($logic_and): \p06_data.available_gate -> \p06_data.available
+Changing input B of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:108$1092_gate ($logic_and): \raw_data_response_valid_gate -> \raw_data_response_valid
+Changing input B of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:111$1096_gate ($logic_and): \p06_data.final_capture_gate -> \p06_data.final_capture
+Changing input B of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:114$1108_gate ($logic_and): \p06_data_idle_gate -> \p06_data_idle
+Changing input B of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:114$1109_gate ($logic_and): \p06_shared.free_owner_gate -> \p06_shared.free_owner
+Changing input B of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:135$1127_gate ($logic_and): \p06_response_fire_gate -> \p06_response_fire
+Changing input A of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:212$1134_gate ($logic_and): \owner_valid_q_gate -> \owner_valid_q
+Changing input A of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:213$1136_gate ($logic_and): \owner_valid_q_gate -> \owner_valid_q
+Changing input B of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:213$1136_gate ($logic_and): \owner_q_gate [0] -> \owner_q [0]
+Changing input A of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:219$1144_gate ($logic_and): \p06_shared.code_owned_gate -> \p06_shared.code_owned
+Changing input A of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:220$1142_gate ($logic_and): \p06_shared.code_abort_gate -> \p06_shared.code_abort
+Changing input A of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:221$1153_gate ($logic_and): \p06_shared.data_owned_gate -> \p06_shared.data_owned
+Changing input A of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:222$1151_gate ($logic_and): \p06_shared.data_abort_gate -> \p06_shared.data_abort
+Changing input B of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:227$1164_gate ($logic_and): \p06_data_idle_gate -> \p06_data_idle
+Changing input B of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:231$1177_gate ($logic_and): \p06_shared.free_owner_gate -> \p06_shared.free_owner
+Changing input B of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:241$894_gate ($logic_and): \p06_admit_gate -> \p06_admit
+Changing input A of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:248$917_gate ($logic_and): \data_active_q_gate -> \data_active_q
+Changing input B of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:248$917_gate ($logic_and): \p06_physical_data_enable_gate -> \p06_physical_data_enable
+Changing input A of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:250$928_gate ($logic_and): \bus_valid_gate -> \bus_valid
+Changing input B of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:250$928_gate ($logic_and): \select_data_gate -> \select_data
+Changing input B of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:250$929_gate ($logic_and): \write_q_gate -> \write_q
+Changing input A of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:257$950_gate ($logic_and): \bus_valid_gate -> \bus_valid
+Changing input A of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:259$959_gate ($logic_and): \bus_valid_gate -> \bus_valid
+Changing input B of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:259$959_gate ($logic_and): \select_ack_gate -> \select_ack
+Changing input A of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:278$978_gate ($logic_and): \ack_response_valid_gate -> \ack_response_valid
+Changing input A of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:296$988_gate ($logic_and): \data_complete_gate -> \data_complete
+Changing input B of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:296$989_gate ($logic_and): \write_q_gate -> \write_q
+Changing input B of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:311$995_gate ($logic_and): \data_request_ready_gate -> \data_request_ready
+Changing input A of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:337$1000_gate ($logic_and): \address_q_gate [0] -> \address_q [0]
+Changing input A of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:70$882_gate ($logic_and): \data_response_valid_gate -> \data_response_valid
+Changing input A of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:85$1026_gate ($logic_and): \data_complete_gate -> \data_complete
+Changing input B of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:85$1026_gate ($logic_and): \address_q_gate [0] -> \address_q [0]
+Changing input A of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:86$1032_gate ($logic_and): \data_complete_gate -> \data_complete
+Changing input B of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:89$1047_gate ($logic_and): \p06_data.tc_phase_gate -> \p06_data.tc_phase
+Changing input A of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:91$1049_gate ($logic_and): \p06_data.sample_tc_gate -> \p06_data.sample_tc
+Changing input B of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:91$1051_gate ($logic_and): \p06_data.first_available_gate -> \p06_data.first_available
+Changing input A of cell $logic_not$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:103$1065_gate ($logic_not): \p06_scope_error_gate -> \p06_scope_error
+Changing input A of cell $logic_not$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:119$1111_gate ($logic_not): \second_q_gate -> \second_q
+Changing input A of cell $logic_not$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:224$1155_gate ($logic_not): \owner_valid_q_gate -> \owner_valid_q
+Changing input A of cell $logic_not$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:232$1178_gate ($logic_not): \p06_data_candidate_gate -> \p06_data_candidate
+Changing input A of cell $logic_not$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:241$886_gate ($logic_not): \data_active_q_gate -> \data_active_q
+Changing input A of cell $logic_not$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:241$888_gate ($logic_not): \raw_data_response_valid_gate -> \raw_data_response_valid
+Changing input A of cell $logic_not$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:241$890_gate ($logic_not): \ack_active_q_gate -> \ack_active_q
+Changing input A of cell $logic_not$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:248$918_gate ($logic_not): \lock_chain_q_gate -> \lock_chain_q
+Changing input A of cell $logic_not$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:249$924_gate ($logic_not): \bus_valid_gate -> \bus_valid
+Changing input A of cell $logic_not$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:251$932_gate ($logic_not): \address_q_gate [0] -> \address_q [0]
+Changing input A of cell $logic_not$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:256$942_gate ($logic_not): \select_data_gate -> \select_data
+Changing input A of cell $logic_not$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:257$951_gate ($logic_not): \select_ack_gate -> \select_ack
+Changing input A of cell $logic_not$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:289$984_gate ($logic_not): \ack_canceled_q_gate -> \ack_canceled_q
+Changing input A of cell $logic_not$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:296$990_gate ($logic_not): \io_q_gate -> \io_q
+Changing input A of cell $logic_not$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:296$992_gate ($logic_not): \byte_q_gate -> \byte_q
+Changing input A of cell $logic_not$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:345$1005_gate ($logic_not): \canceled_q_gate -> \canceled_q
+Changing input A of cell $logic_not$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:346$1009_gate ($logic_not): \p06_response_fire_gate -> \p06_response_fire
+Changing input A of cell $logic_not$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:90$1044_gate ($logic_not): \p06_scope_block_gate -> \p06_scope_block
+Changing input B of cell $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:108$1093_gate ($logic_or): \p06_complete_gate -> \p06_complete
+Changing input A of cell $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:119$1112_gate ($logic_or): \byte_q_gate -> \byte_q
+Changing input B of cell $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:119$1118_gate ($logic_or): \canceled_q_gate -> \canceled_q
+Changing input B of cell $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:119$1119_gate ($logic_or): \p06_scope_error_gate -> \p06_scope_error
+Changing input A of cell $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:125$1121_gate ($logic_or): \p06_data.unsupported_data_gate -> \p06_data.unsupported_data
+Changing input B of cell $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:125$1121_gate ($logic_or): \p06_data.unsupported_bus_gate -> \p06_data.unsupported_bus
+Changing input B of cell $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:214$1137_gate ($logic_or): \p06_scope_block_gate -> \p06_scope_block
+Changing input B of cell $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:215$1138_gate ($logic_or): \canceled_q_gate -> \canceled_q
+Changing input B of cell $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:215$1139_gate ($logic_or): \p06_scope_block_gate -> \p06_scope_block
+Changing input B of cell $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:220$1141_gate ($logic_or): \code_ready_gate -> \code_ready
+Changing input A of cell $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:221$1152_gate ($logic_or): \p06_complete_gate -> \p06_complete
+Changing input B of cell $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:222$1150_gate ($logic_or): \p06_data.final_capture_gate -> \p06_data.final_capture
+Changing input B of cell $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:224$1156_gate ($logic_or): \p06_shared_release_gate -> \p06_shared_release
+Changing input B of cell $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:249$925_gate ($logic_or): \select_ack_gate -> \select_ack
+Changing input A of cell $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:259$960_gate ($logic_or): \lock_chain_q_gate -> \lock_chain_q
+Changing input B of cell $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:290$986_gate ($logic_or): \ack_canceled_q_gate -> \ack_canceled_q
+Changing input A of cell $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:79$1023_gate ($logic_or): \p06_scope_error_gate -> \p06_scope_error
+Changing input B of cell $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:79$1023_gate ($logic_or): \p06_data.unsupported_data_gate -> \p06_data.unsupported_data
+Changing input B of cell $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:79$1024_gate ($logic_or): \p06_data.unsupported_bus_gate -> \p06_data.unsupported_bus
+Changing input A of cell $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:84$1029_gate ($logic_or): \second_q_gate -> \second_q
+Changing input B of cell $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:86$1031_gate ($logic_or): \byte_q_gate -> \byte_q
+Changing input A of cell $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:87$1033_gate ($logic_or): \raw_data_response_valid_gate -> \raw_data_response_valid
+Changing input B of cell $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:87$1033_gate ($logic_or): \p06_data.final_capture_gate -> \p06_data.final_capture
+Changing input A of cell $ne$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:106$1082_gate ($ne): \p06_data.state_q_gate -> \p06_data.state_q
+Changing input S of cell $procmux$1193_gate ($mux): \ack_active_q_gate -> \ack_active_q
+Changing input S of cell $procmux$1203_gate ($mux): \ack_second_q_gate -> \ack_second_q
+Changing input A of cell $procmux$1207_gate ($mux): \lock_chain_q_gate -> \lock_chain_q
+Changing input S of cell $procmux$1212_gate ($mux): \ack_active_q_gate -> \ack_active_q
+Changing input S of cell $procmux$1234_gate ($mux): \ack_second_q_gate -> \ack_second_q
+Changing input A of cell $procmux$1253_gate ($mux): \ack_response_valid_gate -> \ack_response_valid
+Changing input S of cell $procmux$1256_gate ($mux): \ack_second_q_gate -> \ack_second_q
+Changing input S of cell $procmux$1274_gate ($mux): \p06_shared_release_gate -> \p06_shared_release
+Changing input A of cell $procmux$1291_gate ($mux): \raw_data_response_valid_gate -> \raw_data_response_valid
+Changing input S of cell $procmux$1291_gate ($mux): \p06_response_fire_gate -> \p06_response_fire
+Changing input S of cell $procmux$1298_gate ($mux): \data_complete_gate -> \data_complete
+Changing input A of cell $procmux$1316_gate ($mux): \address_q_gate -> \address_q
+Changing input S of cell $procmux$1321_gate ($mux): \data_complete_gate -> \data_complete
+Changing input A of cell $procmux$1336_gate ($mux): \canceled_q_gate -> \canceled_q
+Changing input S of cell $procmux$1336_gate ($mux): \data_active_q_gate -> \data_active_q
+Changing input A of cell $procmux$1338_gate ($mux): \canceled_q_gate -> \canceled_q
+Changing input S of cell $procmux$1345_gate ($mux): \data_complete_gate -> \data_complete
+Changing input A of cell $procmux$1350_gate ($mux): \second_q_gate -> \second_q
+Changing input S of cell $procmux$1355_gate ($mux): \data_complete_gate -> \data_complete
+Changing input A of cell $procmux$1365_gate ($mux): \data_active_q_gate -> \data_active_q
+Changing input S of cell $procmux$1370_gate ($mux): \data_complete_gate -> \data_complete
+Changing input S of cell $procmux$1383_gate ($mux): \p06_data.first_complete_gate -> \p06_data.first_complete
+Changing input S of cell $procmux$1385_gate ($mux): \p06_complete_gate -> \p06_complete
+Changing input A of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:111$1100_gate ($mux): \raw_data_read_data_gate -> \raw_data_read_data
+Changing input S of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:245$909_gate ($mux): \data_active_q_gate -> \data_active_q
+Changing input S of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:245$910_gate ($mux): \ack_active_q_gate -> \ack_active_q
+Changing input B of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:245$911_gate ($mux): { 1'0 \owner_q_gate [0] } -> { 1'0 \owner_q [0] }
+Changing input S of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:245$911_gate ($mux): \owner_valid_q_gate -> \owner_valid_q
+Changing input S of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:248$921_gate ($mux): \select_data_gate -> \select_data
+Changing input B of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:248$922_gate ($mux): \ack_active_q_gate -> \ack_active_q
+Changing input S of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:248$922_gate ($mux): \select_ack_gate -> \select_ack
+Changing input B of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:249$926_gate ($mux): \address_q_gate -> \address_q
+Changing input S of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:249$926_gate ($mux): \select_data_gate -> \select_data
+Changing input A of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:251$933_gate ($mux): \second_q_gate -> \second_q
+Changing input S of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:251$933_gate ($mux): \byte_q_gate -> \byte_q
+Changing input S of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:251$934_gate ($mux): \select_data_gate -> \select_data
+Changing input S of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:252$940_gate ($mux): \bus_write_gate -> \data_oe
+Changing input B of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:253$939_gate ($mux): { \write_data_q_gate [7:0] 8'00000000 } -> { \write_data_q [7:0] 8'00000000 }
+Changing input S of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:253$939_gate ($mux): \address_q_gate [0] -> \address_q [0]
+Changing input A of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:254$937_gate ($mux): \write_data_q_gate -> \write_data_q
+Changing input B of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:254$937_gate ($mux): { 8'00000000 \write_data_q_gate [7:0] } -> { 8'00000000 \write_data_q [7:0] }
+Changing input S of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:254$937_gate ($mux): \byte_q_gate -> \byte_q
+Changing input B of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:254$938_gate ($mux): { 8'00000000 \write_data_q_gate [15:8] } -> { 8'00000000 \write_data_q [15:8] }
+Changing input S of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:254$938_gate ($mux): \second_q_gate -> \second_q
+Changing input S of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:256$943_gate ($mux): \write_q_gate -> \write_q
+Changing input S of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:256$944_gate ($mux): \write_q_gate -> \write_q
+Changing input S of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:256$945_gate ($mux): \io_q_gate -> \io_q
+Changing input S of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:256$946_gate ($mux): \select_data_gate -> \select_data
+Changing input S of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:256$947_gate ($mux): \select_ack_gate -> \select_ack
+Changing input S of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:256$948_gate ($mux): \bus_valid_gate -> \bus_valid
+Changing input S of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:343$1002_gate ($mux): \address_q_gate [0] -> \address_q [0]
+Changing input S of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:343$1004_gate ($mux): \byte_q_gate -> \byte_q
+Changing input B of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:344$1003_gate ($mux): { \data_in_gate [7:0] \low_byte_q_gate } -> { \data_in_gate [7:0] \low_byte_q }
+Changing input S of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:344$1003_gate ($mux): \second_q_gate -> \second_q
+Changing input A of cell $add$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/private-rtl/spk286_biu.sv:339$1001_gate ($add): \address_q_gate -> \address_q
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$672_gold ($reduce_bool): { \p06_shared_release_gold $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:125$373_Y_gold \p06_code_issue_gold } -> { \p06_shared_release $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:125$373_Y_gold \p06_code_issue_gold }
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$690_gold ($reduce_bool): { $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:124$372_Y_gold \p06_complete_gold \p06_data.first_complete_gold $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:125$373_Y_gold \p06_cpu_boundary_gold } -> { $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:124$372_Y_gold \p06_complete \p06_data.first_complete $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:125$373_Y_gold \p06_cpu_boundary_gold }
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$692_gold ($ne): { $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:124$372_Y_gold $eq$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:116$367_Y_gold $eq$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:109$358_Y_gold \p06_complete_gold $eq$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:117$368_Y_gold \p06_data.first_complete_gold $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:125$373_Y_gold \p06_cpu_boundary_gold } -> { $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:124$372_Y_gold $eq$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:116$367_Y_gold $eq$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:109$358_Y_gold \p06_complete $eq$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:117$368_Y_gold \p06_data.first_complete $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:125$373_Y_gold \p06_cpu_boundary_gold }
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$724_gold ($ne): { $auto$opt_dff.cc:194:make_patterns_logic$725_gold \ack_second_q_gold \ready_gold } -> { $auto$opt_dff.cc:194:make_patterns_logic$725_gold \ack_second_q \ready_gold }
+Changing input A of cell $auto$opt_dff.cc:195:make_patterns_logic$743_gold ($ne): { \ack_active_q_gold \cancel_data_gold } -> { \ack_active_q \cancel_data_gold }
+Changing input A of cell $auto$opt_dff.cc:220:make_patterns_logic$682_gold ($reduce_and): { $auto$opt_dff.cc:194:make_patterns_logic$725_gold \ack_second_q_gold \ready_gold } -> { $auto$opt_dff.cc:194:make_patterns_logic$725_gold \ack_second_q \ready_gold }
+Changing input A of cell $auto$opt_dff.cc:220:make_patterns_logic$698_gold ($reduce_and): { $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:326$248_Y_gold \data_complete_gold } -> { $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:326$248_Y_gold \data_complete }
+Changing input A of cell $auto$opt_dff.cc:220:make_patterns_logic$705_gold ($reduce_and): { $auto$rtlil.cc:2401:Not$703_gold \data_complete_gold } -> { $auto$rtlil.cc:2401:Not$703_gold \data_complete }
+Changing input A of cell $eq$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:109$358_gold ($eq): \p06_data.state_q_gold -> \p06_data.state_q
+Changing input A of cell $eq$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:116$367_gold ($eq): \p06_data.state_q_gold -> \p06_data.state_q
+Changing input A of cell $eq$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:201$378_gold ($logic_not): { 1'0 \owner_q_gold [0] } -> { 1'0 \owner_q [0] }
+Changing input A of cell $eq$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:235$160_gold ($eq): \selected_owner_gold -> \selected_owner
+Changing input A of cell $eq$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:236$161_gold ($eq): \selected_owner_gold -> \selected_owner
+Changing input A of cell $eq$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:70$271_gold ($logic_not): \p06_data.state_q_gold -> \p06_data.state_q
+Changing input A of cell $eq$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:77$280_gold ($eq): \p06_data.state_q_gold -> \p06_data.state_q
+Changing input A of cell $eq$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:77$281_gold ($eq): \p06_data.state_q_gold -> \p06_data.state_q
+Changing input A of cell $eq$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:77$283_gold ($eq): \p06_data.state_q_gold -> \p06_data.state_q
+Changing input A of cell $eq$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:94$325_gold ($eq): \p06_data.state_q_gold -> \p06_data.state_q
+Changing input A of cell $eq$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:97$336_gold ($eq): \p06_data.state_q_gold -> \p06_data.state_q
+Changing input B of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:100$341_gold ($logic_and): \p06_data.final_capture_gold -> \p06_data.final_capture
+Changing input B of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:103$353_gold ($logic_and): \p06_data_idle_gold -> \p06_data_idle
+Changing input B of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:103$354_gold ($logic_and): \p06_shared.free_owner_gold -> \p06_shared.free_owner
+Changing input B of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:124$372_gold ($logic_and): \p06_response_fire_gold -> \p06_response_fire
+Changing input A of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:201$379_gold ($logic_and): \owner_valid_q_gold -> \owner_valid_q
+Changing input A of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:202$381_gold ($logic_and): \owner_valid_q_gold -> \owner_valid_q
+Changing input B of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:202$381_gold ($logic_and): \owner_q_gold [0] -> \owner_q [0]
+Changing input A of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:208$389_gold ($logic_and): \p06_shared.code_owned_gold -> \p06_shared.code_owned
+Changing input A of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:209$387_gold ($logic_and): \p06_shared.code_abort_gold -> \p06_shared.code_abort
+Changing input A of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:210$398_gold ($logic_and): \p06_shared.data_owned_gold -> \p06_shared.data_owned
+Changing input A of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:211$396_gold ($logic_and): \p06_shared.data_abort_gold -> \p06_shared.data_abort
+Changing input B of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:216$409_gold ($logic_and): \p06_data_idle_gold -> \p06_data_idle
+Changing input B of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:220$422_gold ($logic_and): \p06_shared.free_owner_gold -> \p06_shared.free_owner
+Changing input B of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:230$142_gold ($logic_and): \p06_admit_gold -> \p06_admit
+Changing input A of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:237$165_gold ($logic_and): \data_active_q_gold -> \data_active_q
+Changing input B of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:237$165_gold ($logic_and): \p06_physical_data_enable_gold -> \p06_physical_data_enable
+Changing input A of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:239$176_gold ($logic_and): \bus_valid_gold -> \bus_valid
+Changing input B of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:239$176_gold ($logic_and): \select_data_gold -> \select_data
+Changing input B of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:239$177_gold ($logic_and): \write_q_gold -> \write_q
+Changing input A of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:246$198_gold ($logic_and): \bus_valid_gold -> \bus_valid
+Changing input A of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:248$207_gold ($logic_and): \bus_valid_gold -> \bus_valid
+Changing input B of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:248$207_gold ($logic_and): \select_ack_gold -> \select_ack
+Changing input A of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:267$226_gold ($logic_and): \ack_response_valid_gold -> \ack_response_valid
+Changing input A of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:285$236_gold ($logic_and): \data_complete_gold -> \data_complete
+Changing input B of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:285$237_gold ($logic_and): \write_q_gold -> \write_q
+Changing input B of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:300$243_gold ($logic_and): \data_request_ready_gold -> \data_request_ready
+Changing input A of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:326$248_gold ($logic_and): \address_q_gold [0] -> \address_q [0]
+Changing input A of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:59$130_gold ($logic_and): \data_response_valid_gold -> \data_response_valid
+Changing input A of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:74$272_gold ($logic_and): \data_complete_gold -> \data_complete
+Changing input B of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:74$272_gold ($logic_and): \address_q_gold [0] -> \address_q [0]
+Changing input A of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:75$278_gold ($logic_and): \data_complete_gold -> \data_complete
+Changing input B of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:78$293_gold ($logic_and): \p06_data.tc_phase_gold -> \p06_data.tc_phase
+Changing input A of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:80$295_gold ($logic_and): \p06_data.sample_tc_gold -> \p06_data.sample_tc
+Changing input B of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:80$297_gold ($logic_and): \p06_data.first_available_gold -> \p06_data.first_available
+Changing input B of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:91$313_gold ($logic_and): \p06_data.tc_phase_gold -> \p06_data.tc_phase
+Changing input A of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:95$328_gold ($logic_and): \p06_data.sample_tc_gold -> \p06_data.sample_tc
+Changing input B of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:95$330_gold ($logic_and): \p06_data.available_gold -> \p06_data.available
+Changing input B of cell $logic_and$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:97$337_gold ($logic_and): \raw_data_response_valid_gold -> \raw_data_response_valid
+Changing input A of cell $logic_not$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:108$356_gold ($logic_not): \second_q_gold -> \second_q
+Changing input A of cell $logic_not$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:213$400_gold ($logic_not): \owner_valid_q_gold -> \owner_valid_q
+Changing input A of cell $logic_not$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:221$423_gold ($logic_not): \p06_data_candidate_gold -> \p06_data_candidate
+Changing input A of cell $logic_not$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:230$134_gold ($logic_not): \data_active_q_gold -> \data_active_q
+Changing input A of cell $logic_not$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:230$136_gold ($logic_not): \raw_data_response_valid_gold -> \raw_data_response_valid
+Changing input A of cell $logic_not$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:230$138_gold ($logic_not): \ack_active_q_gold -> \ack_active_q
+Changing input A of cell $logic_not$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:237$166_gold ($logic_not): \lock_chain_q_gold -> \lock_chain_q
+Changing input A of cell $logic_not$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:238$172_gold ($logic_not): \bus_valid_gold -> \bus_valid
+Changing input A of cell $logic_not$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:240$180_gold ($logic_not): \address_q_gold [0] -> \address_q [0]
+Changing input A of cell $logic_not$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:245$190_gold ($logic_not): \select_data_gold -> \select_data
+Changing input A of cell $logic_not$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:246$199_gold ($logic_not): \select_ack_gold -> \select_ack
+Changing input A of cell $logic_not$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:278$232_gold ($logic_not): \ack_canceled_q_gold -> \ack_canceled_q
+Changing input A of cell $logic_not$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:285$238_gold ($logic_not): \io_q_gold -> \io_q
+Changing input A of cell $logic_not$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:285$240_gold ($logic_not): \byte_q_gold -> \byte_q
+Changing input A of cell $logic_not$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:334$253_gold ($logic_not): \canceled_q_gold -> \canceled_q
+Changing input A of cell $logic_not$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:335$257_gold ($logic_not): \p06_response_fire_gold -> \p06_response_fire
+Changing input A of cell $logic_not$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:79$290_gold ($logic_not): \p06_scope_block_gold -> \p06_scope_block
+Changing input A of cell $logic_not$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:92$310_gold ($logic_not): \p06_scope_error_gold -> \p06_scope_error
+Changing input A of cell $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:108$357_gold ($logic_or): \byte_q_gold -> \byte_q
+Changing input B of cell $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:108$363_gold ($logic_or): \canceled_q_gold -> \canceled_q
+Changing input B of cell $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:108$364_gold ($logic_or): \p06_scope_error_gold -> \p06_scope_error
+Changing input A of cell $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:114$366_gold ($logic_or): \p06_data.unsupported_data_gold -> \p06_data.unsupported_data
+Changing input B of cell $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:114$366_gold ($logic_or): \p06_data.unsupported_bus_gold -> \p06_data.unsupported_bus
+Changing input B of cell $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:203$382_gold ($logic_or): \p06_scope_block_gold -> \p06_scope_block
+Changing input B of cell $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:204$383_gold ($logic_or): \canceled_q_gold -> \canceled_q
+Changing input B of cell $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:204$384_gold ($logic_or): \p06_scope_block_gold -> \p06_scope_block
+Changing input B of cell $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:209$386_gold ($logic_or): \code_ready_gold -> \code_ready
+Changing input A of cell $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:210$397_gold ($logic_or): \p06_complete_gold -> \p06_complete
+Changing input B of cell $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:211$395_gold ($logic_or): \p06_data.final_capture_gold -> \p06_data.final_capture
+Changing input B of cell $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:213$401_gold ($logic_or): \p06_shared_release_gold -> \p06_shared_release
+Changing input B of cell $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:238$173_gold ($logic_or): \select_ack_gold -> \select_ack
+Changing input A of cell $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:248$208_gold ($logic_or): \lock_chain_q_gold -> \lock_chain_q
+Changing input B of cell $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:279$234_gold ($logic_or): \ack_canceled_q_gold -> \ack_canceled_q
+Changing input A of cell $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:68$269_gold ($logic_or): \p06_scope_error_gold -> \p06_scope_error
+Changing input B of cell $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:68$269_gold ($logic_or): \p06_data.unsupported_data_gold -> \p06_data.unsupported_data
+Changing input B of cell $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:68$270_gold ($logic_or): \p06_data.unsupported_bus_gold -> \p06_data.unsupported_bus
+Changing input A of cell $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:73$275_gold ($logic_or): \second_q_gold -> \second_q
+Changing input B of cell $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:75$277_gold ($logic_or): \byte_q_gold -> \byte_q
+Changing input A of cell $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:76$279_gold ($logic_or): \raw_data_response_valid_gold -> \raw_data_response_valid
+Changing input B of cell $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:76$279_gold ($logic_or): \p06_data.final_capture_gold -> \p06_data.final_capture
+Changing input B of cell $logic_or$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:97$338_gold ($logic_or): \p06_complete_gold -> \p06_complete
+Changing input A of cell $ne$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:95$327_gold ($ne): \p06_data.state_q_gold -> \p06_data.state_q
+Changing input S of cell $procmux$438_gold ($mux): \ack_active_q_gold -> \ack_active_q
+Changing input S of cell $procmux$448_gold ($mux): \ack_second_q_gold -> \ack_second_q
+Changing input A of cell $procmux$452_gold ($mux): \lock_chain_q_gold -> \lock_chain_q
+Changing input S of cell $procmux$457_gold ($mux): \ack_active_q_gold -> \ack_active_q
+Changing input S of cell $procmux$479_gold ($mux): \ack_second_q_gold -> \ack_second_q
+Changing input A of cell $procmux$498_gold ($mux): \ack_response_valid_gold -> \ack_response_valid
+Changing input S of cell $procmux$501_gold ($mux): \ack_second_q_gold -> \ack_second_q
+Changing input S of cell $procmux$519_gold ($mux): \p06_shared_release_gold -> \p06_shared_release
+Changing input A of cell $procmux$536_gold ($mux): \raw_data_response_valid_gold -> \raw_data_response_valid
+Changing input S of cell $procmux$536_gold ($mux): \p06_response_fire_gold -> \p06_response_fire
+Changing input S of cell $procmux$543_gold ($mux): \data_complete_gold -> \data_complete
+Changing input A of cell $procmux$561_gold ($mux): \address_q_gold -> \address_q
+Changing input S of cell $procmux$566_gold ($mux): \data_complete_gold -> \data_complete
+Changing input A of cell $procmux$581_gold ($mux): \canceled_q_gold -> \canceled_q
+Changing input S of cell $procmux$581_gold ($mux): \data_active_q_gold -> \data_active_q
+Changing input A of cell $procmux$583_gold ($mux): \canceled_q_gold -> \canceled_q
+Changing input S of cell $procmux$590_gold ($mux): \data_complete_gold -> \data_complete
+Changing input A of cell $procmux$595_gold ($mux): \second_q_gold -> \second_q
+Changing input S of cell $procmux$600_gold ($mux): \data_complete_gold -> \data_complete
+Changing input A of cell $procmux$610_gold ($mux): \data_active_q_gold -> \data_active_q
+Changing input S of cell $procmux$615_gold ($mux): \data_complete_gold -> \data_complete
+Changing input S of cell $procmux$628_gold ($mux): \p06_data.first_complete_gold -> \p06_data.first_complete
+Changing input S of cell $procmux$630_gold ($mux): \p06_complete_gold -> \p06_complete
+Changing input A of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:100$345_gold ($mux): \raw_data_read_data_gold -> \raw_data_read_data
+Changing input S of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:234$157_gold ($mux): \data_active_q_gold -> \data_active_q
+Changing input S of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:234$158_gold ($mux): \ack_active_q_gold -> \ack_active_q
+Changing input B of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:234$159_gold ($mux): { 1'0 \owner_q_gold [0] } -> { 1'0 \owner_q [0] }
+Changing input S of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:234$159_gold ($mux): \owner_valid_q_gold -> \owner_valid_q
+Changing input S of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:237$169_gold ($mux): \select_data_gold -> \select_data
+Changing input B of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:237$170_gold ($mux): \ack_active_q_gold -> \ack_active_q
+Changing input S of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:237$170_gold ($mux): \select_ack_gold -> \select_ack
+Changing input B of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:238$174_gold ($mux): \address_q_gold -> \address_q
+Changing input S of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:238$174_gold ($mux): \select_data_gold -> \select_data
+Changing input A of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:240$181_gold ($mux): \second_q_gold -> \second_q
+Changing input S of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:240$181_gold ($mux): \byte_q_gold -> \byte_q
+Changing input S of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:240$182_gold ($mux): \select_data_gold -> \select_data
+Changing input S of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:241$188_gold ($mux): \bus_write_gold -> \data_oe
+Changing input B of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:242$187_gold ($mux): { \write_data_q_gold [7:0] 8'00000000 } -> { \write_data_q [7:0] 8'00000000 }
+Changing input S of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:242$187_gold ($mux): \address_q_gold [0] -> \address_q [0]
+Changing input A of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:243$185_gold ($mux): \write_data_q_gold -> \write_data_q
+Changing input B of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:243$185_gold ($mux): { 8'00000000 \write_data_q_gold [7:0] } -> { 8'00000000 \write_data_q [7:0] }
+Changing input S of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:243$185_gold ($mux): \byte_q_gold -> \byte_q
+Changing input B of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:243$186_gold ($mux): { 8'00000000 \write_data_q_gold [15:8] } -> { 8'00000000 \write_data_q [15:8] }
+Changing input S of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:243$186_gold ($mux): \second_q_gold -> \second_q
+Changing input S of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:245$191_gold ($mux): \write_q_gold -> \write_q
+Changing input S of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:245$192_gold ($mux): \write_q_gold -> \write_q
+Changing input S of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:245$193_gold ($mux): \io_q_gold -> \io_q
+Changing input S of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:245$194_gold ($mux): \select_data_gold -> \select_data
+Changing input S of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:245$195_gold ($mux): \select_ack_gold -> \select_ack
+Changing input S of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:245$196_gold ($mux): \bus_valid_gold -> \bus_valid
+Changing input S of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:332$250_gold ($mux): \address_q_gold [0] -> \address_q [0]
+Changing input S of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:332$252_gold ($mux): \byte_q_gold -> \byte_q
+Changing input B of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:333$251_gold ($mux): { \data_in_gold [7:0] \low_byte_q_gold } -> { \data_in_gold [7:0] \low_byte_q }
+Changing input S of cell $ternary$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:333$251_gold ($mux): \second_q_gold -> \second_q
+Changing input A of cell $add$/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-write-root-acceptance2-20261004/m6e-component-source/private-rtl/spk286_biu.sv:328$249_gold ($add): \address_q_gold -> \address_q
+
+10. Executing HIERARCHY pass (managing design hierarchy).
+
+10.1. Analyzing design hierarchy..
+Top module:  \equiv
+
+10.2. Analyzing design hierarchy..
+Top module:  \equiv
+Removing unused module `\gate'.
+Removing unused module `\gold'.
+Removed 2 unused modules.
+
+11. Executing EQUIV_SIMPLE pass.
+Found 194 unproven $equiv cells (67 groups) in equiv:
+  Trying to prove $equiv for \p06_scope_error: failed.
+  Trying to prove $equiv for \p06_code_admission: success!
+  Trying to prove $equiv for \p06_scope_block: success!
+  Trying to prove $equiv for \p06_read_wait_event: success!
+  Trying to prove $equiv for \p06_alignment_event: success!
+  Trying to prove $equiv for \hlda: success!
+  Trying to prove $equiv for \ack_request_ready: success!
+  Trying to prove $equiv for \ack_response_valid: failed.
+ Grouping SAT models for \ack_vector:
+  Trying to prove $equiv for \ack_vector [0]: failed.
+  Trying to prove $equiv for \ack_vector [1]: failed.
+  Trying to prove $equiv for \ack_vector [2]: failed.
+  Trying to prove $equiv for \ack_vector [3]: failed.
+  Trying to prove $equiv for \ack_vector [4]: failed.
+  Trying to prove $equiv for \ack_vector [5]: failed.
+  Trying to prove $equiv for \ack_vector [6]: failed.
+  Trying to prove $equiv for \ack_vector [7]: failed.
+  Trying to prove $equiv for \bus_lock: success!
+  Trying to prove $equiv for \code_ready: success!
+  Trying to prove $equiv for \data_request_ready: success!
+  Trying to prove $equiv for \data_response_valid: success!
+ Grouping SAT models for \data_read_data:
+  Trying to prove $equiv for \data_read_data [0]: success!
+  Trying to prove $equiv for \data_read_data [1]: success!
+  Trying to prove $equiv for \data_read_data [2]: success!
+  Trying to prove $equiv for \data_read_data [3]: success!
+  Trying to prove $equiv for \data_read_data [4]: success!
+  Trying to prove $equiv for \data_read_data [5]: success!
+  Trying to prove $equiv for \data_read_data [6]: success!
+  Trying to prove $equiv for \data_read_data [7]: success!
+  Trying to prove $equiv for \data_read_data [8]: success!
+  Trying to prove $equiv for \data_read_data [9]: success!
+  Trying to prove $equiv for \data_read_data [10]: success!
+  Trying to prove $equiv for \data_read_data [11]: success!
+  Trying to prove $equiv for \data_read_data [12]: success!
+  Trying to prove $equiv for \data_read_data [13]: success!
+  Trying to prove $equiv for \data_read_data [14]: success!
+  Trying to prove $equiv for \data_read_data [15]: success!
+ Grouping SAT models for \address:
+  Trying to prove $equiv for \address [0]: success!
+  Trying to prove $equiv for \address [1]: success!
+  Trying to prove $equiv for \address [2]: success!
+  Trying to prove $equiv for \address [3]: success!
+  Trying to prove $equiv for \address [4]: success!
+  Trying to prove $equiv for \address [5]: success!
+  Trying to prove $equiv for \address [6]: success!
+  Trying to prove $equiv for \address [7]: success!
+  Trying to prove $equiv for \address [8]: success!
+  Trying to prove $equiv for \address [9]: success!
+  Trying to prove $equiv for \address [10]: success!
+  Trying to prove $equiv for \address [11]: success!
+  Trying to prove $equiv for \address [12]: success!
+  Trying to prove $equiv for \address [13]: success!
+  Trying to prove $equiv for \address [14]: success!
+  Trying to prove $equiv for \address [15]: success!
+  Trying to prove $equiv for \address [16]: success!
+  Trying to prove $equiv for \address [17]: success!
+  Trying to prove $equiv for \address [18]: success!
+  Trying to prove $equiv for \address [19]: success!
+  Trying to prove $equiv for \address [20]: success!
+  Trying to prove $equiv for \address [21]: success!
+  Trying to prove $equiv for \address [22]: success!
+  Trying to prove $equiv for \address [23]: success!
+ Grouping SAT models for \data_out:
+  Trying to prove $equiv for \data_out [0]: success!
+  Trying to prove $equiv for \data_out [1]: success!
+  Trying to prove $equiv for \data_out [2]: success!
+  Trying to prove $equiv for \data_out [3]: success!
+  Trying to prove $equiv for \data_out [4]: success!
+  Trying to prove $equiv for \data_out [5]: success!
+  Trying to prove $equiv for \data_out [6]: success!
+  Trying to prove $equiv for \data_out [7]: success!
+  Trying to prove $equiv for \data_out [8]: success!
+  Trying to prove $equiv for \data_out [9]: success!
+  Trying to prove $equiv for \data_out [10]: success!
+  Trying to prove $equiv for \data_out [11]: success!
+  Trying to prove $equiv for \data_out [12]: success!
+  Trying to prove $equiv for \data_out [13]: success!
+  Trying to prove $equiv for \data_out [14]: success!
+  Trying to prove $equiv for \data_out [15]: success!
+  Trying to prove $equiv for \data_oe: success!
+  Trying to prove $equiv for \bus_valid: success!
+  Trying to prove $equiv for \bus_write: success!
+  Trying to prove $equiv for \bus_bhe_n: success!
+ Grouping SAT models for \bus_status:
+  Trying to prove $equiv for \bus_status [0]: success!
+  Trying to prove $equiv for \bus_status [1]: success!
+  Trying to prove $equiv for \bus_status [2]: success!
+  Trying to prove $equiv for \bus_status [3]: success!
+  Trying to prove $equiv for \data_active_q: failed.
+  Trying to prove $equiv for \write_q: failed.
+  Trying to prove $equiv for \second_q: failed.
+  Trying to prove $equiv for \canceled_q: failed.
+  Trying to prove $equiv for \byte_q: failed.
+  Trying to prove $equiv for \io_q: failed.
+ Grouping SAT models for \address_q:
+  Trying to prove $equiv for \address_q [0]: failed.
+  Trying to prove $equiv for \address_q [1]: failed.
+  Trying to prove $equiv for \address_q [2]: failed.
+  Trying to prove $equiv for \address_q [3]: failed.
+  Trying to prove $equiv for \address_q [4]: failed.
+  Trying to prove $equiv for \address_q [5]: failed.
+  Trying to prove $equiv for \address_q [6]: failed.
+  Trying to prove $equiv for \address_q [7]: failed.
+  Trying to prove $equiv for \address_q [8]: failed.
+  Trying to prove $equiv for \address_q [9]: failed.
+  Trying to prove $equiv for \address_q [10]: failed.
+  Trying to prove $equiv for \address_q [11]: failed.
+  Trying to prove $equiv for \address_q [12]: failed.
+  Trying to prove $equiv for \address_q [13]: failed.
+  Trying to prove $equiv for \address_q [14]: failed.
+  Trying to prove $equiv for \address_q [15]: failed.
+  Trying to prove $equiv for \address_q [16]: failed.
+  Trying to prove $equiv for \address_q [17]: failed.
+  Trying to prove $equiv for \address_q [18]: failed.
+  Trying to prove $equiv for \address_q [19]: failed.
+  Trying to prove $equiv for \address_q [20]: failed.
+  Trying to prove $equiv for \address_q [21]: failed.
+  Trying to prove $equiv for \address_q [22]: failed.
+  Trying to prove $equiv for \address_q [23]: failed.
+ Grouping SAT models for \write_data_q:
+  Trying to prove $equiv for \write_data_q [0]: failed.
+  Trying to prove $equiv for \write_data_q [1]: failed.
+  Trying to prove $equiv for \write_data_q [2]: failed.
+  Trying to prove $equiv for \write_data_q [3]: failed.
+  Trying to prove $equiv for \write_data_q [4]: failed.
+  Trying to prove $equiv for \write_data_q [5]: failed.
+  Trying to prove $equiv for \write_data_q [6]: failed.
+  Trying to prove $equiv for \write_data_q [7]: failed.
+  Trying to prove $equiv for \write_data_q [8]: failed.
+  Trying to prove $equiv for \write_data_q [9]: failed.
+  Trying to prove $equiv for \write_data_q [10]: failed.
+  Trying to prove $equiv for \write_data_q [11]: failed.
+  Trying to prove $equiv for \write_data_q [12]: failed.
+  Trying to prove $equiv for \write_data_q [13]: failed.
+  Trying to prove $equiv for \write_data_q [14]: failed.
+  Trying to prove $equiv for \write_data_q [15]: failed.
+ Grouping SAT models for \low_byte_q:
+  Trying to prove $equiv for \low_byte_q [0]: failed.
+  Trying to prove $equiv for \low_byte_q [1]: failed.
+  Trying to prove $equiv for \low_byte_q [2]: failed.
+  Trying to prove $equiv for \low_byte_q [3]: failed.
+  Trying to prove $equiv for \low_byte_q [4]: failed.
+  Trying to prove $equiv for \low_byte_q [5]: failed.
+  Trying to prove $equiv for \low_byte_q [6]: failed.
+  Trying to prove $equiv for \low_byte_q [7]: failed.
+  Trying to prove $equiv for \owner_valid_q: failed.
+  Trying to prove $equiv for \select_data: success!
+  Trying to prove $equiv for \select_ack: success!
+  Trying to prove $equiv for \data_complete: success!
+ Grouping SAT models for \owner_q:
+  Trying to prove $equiv for \owner_q [0]: failed.
+  Trying to prove $equiv for \owner_q [1]: success!
+ Grouping SAT models for \selected_owner:
+  Trying to prove $equiv for \selected_owner [0]: success!
+  Trying to prove $equiv for \selected_owner [1]: success!
+  Trying to prove $equiv for \ack_active_q: failed.
+  Trying to prove $equiv for \ack_second_q: failed.
+  Trying to prove $equiv for \lock_chain_q: failed.
+  Trying to prove $equiv for \ack_canceled_q: failed.
+  Trying to prove $equiv for \raw_data_response_valid: failed.
+ Grouping SAT models for \raw_data_read_data:
+  Trying to prove $equiv for \raw_data_read_data [0]: failed.
+  Trying to prove $equiv for \raw_data_read_data [1]: failed.
+  Trying to prove $equiv for \raw_data_read_data [2]: failed.
+  Trying to prove $equiv for \raw_data_read_data [3]: failed.
+  Trying to prove $equiv for \raw_data_read_data [4]: failed.
+  Trying to prove $equiv for \raw_data_read_data [5]: failed.
+  Trying to prove $equiv for \raw_data_read_data [6]: failed.
+  Trying to prove $equiv for \raw_data_read_data [7]: failed.
+  Trying to prove $equiv for \raw_data_read_data [8]: failed.
+  Trying to prove $equiv for \raw_data_read_data [9]: failed.
+  Trying to prove $equiv for \raw_data_read_data [10]: failed.
+  Trying to prove $equiv for \raw_data_read_data [11]: failed.
+  Trying to prove $equiv for \raw_data_read_data [12]: failed.
+  Trying to prove $equiv for \raw_data_read_data [13]: failed.
+  Trying to prove $equiv for \raw_data_read_data [14]: failed.
+  Trying to prove $equiv for \raw_data_read_data [15]: failed.
+  Trying to prove $equiv for \p06_admit: success!
+  Trying to prove $equiv for \p06_response_fire: success!
+  Trying to prove $equiv for \p06_physical_data_enable: success!
+  Trying to prove $equiv for \p06_capture: success!
+  Trying to prove $equiv for \p06_complete: success!
+  Trying to prove $equiv for \p06_first_complete: success!
+  Trying to prove $equiv for \p06_shared_data_grant: success!
+  Trying to prove $equiv for \p06_shared_release: success!
+  Trying to prove $equiv for \p06_data_candidate: success!
+  Trying to prove $equiv for \p06_data_idle: success!
+ Grouping SAT models for \p06_data.state_q:
+  Trying to prove $equiv for \p06_data.state_q [0]: failed.
+  Trying to prove $equiv for \p06_data.state_q [1]: failed.
+  Trying to prove $equiv for \p06_data.state_q [2]: failed.
+  Trying to prove $equiv for \p06_data.unsupported_data: success!
+  Trying to prove $equiv for \p06_data.unsupported_bus: success!
+  Trying to prove $equiv for \p06_data.scope_block: success!
+  Trying to prove $equiv for \p06_data.first_available: success!
+  Trying to prove $equiv for \p06_data.final_capture: success!
+  Trying to prove $equiv for \p06_data.available: success!
+  Trying to prove $equiv for \p06_data.tc_phase: success!
+  Trying to prove $equiv for \p06_data.sample_tc: success!
+  Trying to prove $equiv for \p06_data.first_complete: success!
+  Trying to prove $equiv for \p06_shared.code_owned: success!
+  Trying to prove $equiv for \p06_shared.data_owned: success!
+  Trying to prove $equiv for \p06_shared.code_abort: success!
+  Trying to prove $equiv for \p06_shared.data_abort: success!
+  Trying to prove $equiv for \p06_shared.free_owner: success!
+Proved 104 previously unproven $equiv cells.
+
+12. Executing EQUIV_INDUCT pass.
+Found 90 unproven $equiv cells in module equiv:
+  Proving existence of base case for step 1. (19848 clauses over 7699 variables)
+  Proving induction step 1. (43658 clauses over 16674 variables)
+  Proof for induction step holds. Entire workset of 90 cells proven!
+Proved 90 previously unproven $equiv cells.
+
+13. Executing EQUIV_STATUS pass.
+Found 194 $equiv cells in equiv:
+  Of those cells 194 are proven and 0 are unproven.
+  Equivalence successfully proven!
+
+End of script. Logfile hash: 6e51e5856a, CPU: user 0.60s system 0.02s, MEM: 26.12 MB peak
+Yosys 0.33 (git sha1 2584903a060)
+Time spent: 22% 1x equiv_induct (0 sec), 19% 1x equiv_simple (0 sec), ...

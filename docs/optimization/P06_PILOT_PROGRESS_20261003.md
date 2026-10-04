@@ -218,3 +218,30 @@ full CPU memory issue/commit remain the next gate; odd words, writes, I/O,
 events, decoded IU lookahead and full speed/machine integration are still
 open. Production, the selected RBF and the previous frozen evidence are
 unchanged. Only directed acceptance was run, not a total regression or fit.
+
+## 2026-10-04 M6b: shared CODE/READ logical ownership
+
+The [M6b component milestone](P06_CORE_SHARED_BUS_PILOT_20261004.md) combines
+real fetch/queue, operand and BIU. Existing owner registers retain CODE or DATA
+through logical Tc after an early physical READY. All 972 transition cases
+require opposite-class issue on the completing Tc; paused result consumers do
+not retain the bus. Eligible unaccepted DATA has priority, while held accepted
+requests and occupied result slots do not block CODE falsely.
+
+Both simulators pass 1,087 cases: 972 transitions, 8 queue/consumer/metadata
+stress cases and 107 cancel/reset/scope cases. Independent mandatory-grant,
+physical-presence, cursor, result, queue and owner oracles pass; two distinct
+mutants fail their required assertions. Eight affected MAX unit benches and
+208 full-CPU MAX cases pass, with original/private edge traces equal. Both
+MAX component sequential proofs keep private inputs arbitrary and generic
+netlists establish that those controls have no MAX cone.
+
+The isolated timed mappings are BIU 540 cells/78 register bits and fetch
+605/102, with original/MAX 504/88 and 508/98. Static pruning of unsupported
+services prevents treating these net deltas as full CPU or FPGA overhead.
+M3/M4/M5/M6a frozen audits pass. Production, config and selected RBF are
+unchanged; no complete regression or Quartus fit was run.
+
+Next is private full-CPU aligned READ issue/result/architectural commit.
+Consecutive DATA reuse, odd words, writes/write-buffer overlap, I/O, events,
+EU-demand lookahead and full speed/machine integration remain open.

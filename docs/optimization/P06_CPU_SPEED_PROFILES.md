@@ -323,3 +323,10 @@ Mantener MAX disponible, sin retardos históricos artificiales y con todas las
 dependencias reales. La asignación de bits OSD del único selector de velocidad
 sigue pendiente del inventario de integración. La referencia física pendiente
 no bloquea el desarrollo ni su aceptación provisional frente a 86Box.
+
+El [hito privado M6b](P06_CORE_SHARED_BUS_PILOT_20261004.md) ya valida propiedad
+lógica compartida CODE/READ mediante fetch, cola, operand y BIU reales: 1.087
+casos en ambos simuladores, con 972 cambios de propietario en el mismo Tc.
+MAX conserva sus trazas originales. Esto no habilita todavía perfiles en el
+core: falta integrar y validar los hitos de instrucciones completas de
+memoria, los servicios restantes y cada velocidad declarada.

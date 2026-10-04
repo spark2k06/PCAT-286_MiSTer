@@ -1,0 +1,575 @@
+{
+  "status": "FLOPPY_FIX_NEW_RBF_MEASURED_HARDWARE_CONFIRMATION_PENDING",
+  "source_revision": "f7587e618aba9dd69104fbf918ec8bc24958c3a7",
+  "source_count": 1344,
+  "snapshot_git_status": "## beta-05\n M scripts/test_at_landmark_dma.sh\n",
+  "manifest_sha256": "dc1e9acb684fdb0a5a2965ac34e9346add419c35205379871eba59a68f5a41ee",
+  "generated_changes": {
+    "build_id.v": {
+      "before": "92194b42e011765f82d684c65b168e8a17d9df0916b4b5b7c429a1970259f3a7",
+      "compiled": "b0621fcb81a99f5e97e67d3681c4ff0888baa6d54f43aa9ddc69753d04ffa3e4"
+    }
+  },
+  "validation": {
+    "write": {
+      "path": "docs/evidence/at-floppy-write-fix-20261004/write/receipt.json",
+      "sha256": "552f63167331e4a3c421eb35d24087922e044d3e9f43b35a78b5522629524b40",
+      "scope": "Production DMA + memory port + P03 code buffer + RAM data buffer + posted buffer + FDC/FIFO; source-extracted machine payload adapter. Five 512-byte WRITE DATA sectors, four READ DATA readbacks, even/odd start, decrement, auto-init/reuse, stalls, TC/IRQ/results and HPS LBA/payload checks. Adapter checks: channel1 live response, channel5 retained 16-bit word, transfer/response/read capture guards and reset."
+    },
+    "protection": {
+      "path": "docs/evidence/at-floppy-write-protect-20261004/matrix/receipt.json",
+      "sha256": "a6662196cc15ba53f9d7f9acab7d6d6e8fb94cff3a55dfebbaa581d12e20c3bc",
+      "scope": "All 4 OSD masks x all 4 host readonly masks x both drives. Every case checks Sense Drive Status and a full permitted read. 24 protected WRITE DATA and 24 protected FORMAT commands must report write protection without DMA/HPS-write requests. 8 unprotected writes compare all 512 host bytes and complete; 8 unprotected formats compare the first sector filler."
+    },
+    "profiles": {
+      "path": "docs/evidence/at-floppy-write-fix-20261004/profiles/receipt.json",
+      "sha256": "046e222c879b95d62b07cc6786317f46dd9e6485d303538f3ec6c267b5ea0228",
+      "scope": "One production CPU plus AT bridge/arbiter/devices, diagnostic ROM, all 8 profiles. No complete OS/regression/timing-accuracy claim."
+    }
+  },
+  "unchanged_cpu_clock_config_files": 588,
+  "compile_warnings": 858,
+  "resources": {
+    "equivalent_alms": 31278,
+    "registers": 38073,
+    "memory_bits": 3301019,
+    "m10k": 416,
+    "dsp": 39,
+    "plls": 3,
+    "placed_alms": 36619,
+    "placed_alms_percent": 87.3753280839895
+  },
+  "delta_from_previous_osd": {
+    "equivalent_alms": 527,
+    "registers": 143,
+    "memory_bits": 0,
+    "m10k": 0,
+    "dsp": 0,
+    "plls": 0,
+    "placed_alms": 256
+  },
+  "cpu_resources": {
+    "alm_needed": 7280.9,
+    "alm_placed": 8101.0,
+    "registers": 5351.0,
+    "io_registers": 0.0,
+    "memory_bits": 9216.0,
+    "m10k": 1.0,
+    "dsp": 0.0
+  },
+  "feature_configuration": {
+    "ENABLE_SB": "1",
+    "ENABLE_OPL2": "1",
+    "ENABLE_CMS": "1",
+    "ENABLE_TANDY_AUDIO": "1",
+    "ENABLE_MIDI": "1"
+  },
+  "placement_seed": 1,
+  "timing_ns": {
+    "7_slow_1100mv_100c": {
+      "global": {
+        "setup": -16.181,
+        "hold": 0.128,
+        "recovery": 2.425,
+        "removal": 0.497
+      },
+      "clk50_internal": {
+        "setup": -16.181,
+        "hold": 0.234
+      },
+      "clk50_incoming": {
+        "setup": -16.181,
+        "hold": 0.234
+      },
+      "cpu": {
+        "setup": -16.181,
+        "hold": 0.25
+      },
+      "cpu_bridge": {
+        "setup": -5.899,
+        "hold": 1.017
+      },
+      "bridge_cpu": {
+        "setup": 1.542,
+        "hold": 0.435
+      },
+      "memory_port": {
+        "setup": -6.377,
+        "hold": 0.448
+      },
+      "code_buffer": {
+        "setup": -7.497,
+        "hold": 0.448
+      },
+      "data_buffer": {
+        "setup": -6.935,
+        "hold": 0.444
+      },
+      "data_buffer_outputs": {
+        "setup": -3.31,
+        "hold": 0.45
+      },
+      "sdram_owner": {
+        "setup": -7.973,
+        "hold": 0.425
+      },
+      "sdram_owner_internal": {
+        "setup": 7.5,
+        "hold": 0.425
+      },
+      "keyboard": {
+        "setup": 6.56,
+        "hold": 0.43
+      },
+      "prebios_stage2": {
+        "setup": 32.317,
+        "hold": 0.91
+      },
+      "video": {
+        "setup": -4.604,
+        "hold": 0.331
+      },
+      "sdram_input": {
+        "setup": 5.185,
+        "hold": 7.504
+      },
+      "sdram_output": {
+        "setup": 4.492,
+        "hold": 2.94
+      }
+    },
+    "7_slow_1100mv_-40c": {
+      "global": {
+        "setup": -16.531,
+        "hold": 0.024,
+        "recovery": 2.575,
+        "removal": 0.382
+      },
+      "clk50_internal": {
+        "setup": -16.531,
+        "hold": 0.221
+      },
+      "clk50_incoming": {
+        "setup": -16.531,
+        "hold": 0.221
+      },
+      "cpu": {
+        "setup": -16.531,
+        "hold": 0.24
+      },
+      "cpu_bridge": {
+        "setup": -5.878,
+        "hold": 0.921
+      },
+      "bridge_cpu": {
+        "setup": 1.937,
+        "hold": 0.424
+      },
+      "memory_port": {
+        "setup": -6.891,
+        "hold": 0.468
+      },
+      "code_buffer": {
+        "setup": -8.044,
+        "hold": 0.448
+      },
+      "data_buffer": {
+        "setup": -7.244,
+        "hold": 0.433
+      },
+      "data_buffer_outputs": {
+        "setup": -2.874,
+        "hold": 0.423
+      },
+      "sdram_owner": {
+        "setup": -8.443,
+        "hold": 0.433
+      },
+      "sdram_owner_internal": {
+        "setup": 7.13,
+        "hold": 0.433
+      },
+      "keyboard": {
+        "setup": 6.658,
+        "hold": 0.435
+      },
+      "prebios_stage2": {
+        "setup": 32.355,
+        "hold": 0.835
+      },
+      "video": {
+        "setup": -4.118,
+        "hold": 0.284
+      },
+      "sdram_input": {
+        "setup": 5.51,
+        "hold": 7.197
+      },
+      "sdram_output": {
+        "setup": 5.327,
+        "hold": 2.355
+      }
+    },
+    "MIN_fast_1100mv_100c": {
+      "global": {
+        "setup": 1.409,
+        "hold": 0.133,
+        "recovery": 4.478,
+        "removal": 0.281
+      },
+      "clk50_internal": {
+        "setup": 1.409,
+        "hold": 0.133
+      },
+      "clk50_incoming": {
+        "setup": 1.409,
+        "hold": 0.133
+      },
+      "cpu": {
+        "setup": 1.409,
+        "hold": 0.134
+      },
+      "cpu_bridge": {
+        "setup": 5.999,
+        "hold": 0.587
+      },
+      "bridge_cpu": {
+        "setup": 10.162,
+        "hold": 0.211
+      },
+      "memory_port": {
+        "setup": 6.295,
+        "hold": 0.182
+      },
+      "code_buffer": {
+        "setup": 5.367,
+        "hold": 0.181
+      },
+      "data_buffer": {
+        "setup": 5.754,
+        "hold": 0.182
+      },
+      "data_buffer_outputs": {
+        "setup": 7.512,
+        "hold": 0.182
+      },
+      "sdram_owner": {
+        "setup": 5.233,
+        "hold": 0.182
+      },
+      "sdram_owner_internal": {
+        "setup": 13.914,
+        "hold": 0.182
+      },
+      "keyboard": {
+        "setup": 12.511,
+        "hold": 0.181
+      },
+      "prebios_stage2": {
+        "setup": 33.422,
+        "hold": 0.567
+      },
+      "video": {
+        "setup": 5.742,
+        "hold": 0.178
+      },
+      "sdram_input": {
+        "setup": 7.73,
+        "hold": 5.473
+      },
+      "sdram_output": {
+        "setup": 8.716,
+        "hold": 0.829
+      }
+    },
+    "MIN_fast_1100mv_-40c": {
+      "global": {
+        "setup": 2.747,
+        "hold": 0.074,
+        "recovery": 4.709,
+        "removal": 0.158
+      },
+      "clk50_internal": {
+        "setup": 3.995,
+        "hold": 0.114
+      },
+      "clk50_incoming": {
+        "setup": 2.747,
+        "hold": 0.114
+      },
+      "cpu": {
+        "setup": 3.995,
+        "hold": 0.117
+      },
+      "cpu_bridge": {
+        "setup": 8.15,
+        "hold": 0.453
+      },
+      "bridge_cpu": {
+        "setup": 11.593,
+        "hold": 0.188
+      },
+      "memory_port": {
+        "setup": 8.194,
+        "hold": 0.168
+      },
+      "code_buffer": {
+        "setup": 7.476,
+        "hold": 0.145
+      },
+      "data_buffer": {
+        "setup": 7.936,
+        "hold": 0.168
+      },
+      "data_buffer_outputs": {
+        "setup": 9.277,
+        "hold": 0.168
+      },
+      "sdram_owner": {
+        "setup": 7.396,
+        "hold": 0.168
+      },
+      "sdram_owner_internal": {
+        "setup": 14.606,
+        "hold": 0.168
+      },
+      "keyboard": {
+        "setup": 13.501,
+        "hold": 0.168
+      },
+      "prebios_stage2": {
+        "setup": 33.589,
+        "hold": 0.453
+      },
+      "video": {
+        "setup": 6.296,
+        "hold": 0.162
+      },
+      "sdram_input": {
+        "setup": 8.126,
+        "hold": 5.0
+      },
+      "sdram_output": {
+        "setup": 10.453,
+        "hold": 0.174
+      }
+    }
+  },
+  "global_setup_hold_recovery_removal_nonnegative": false,
+  "rbf": {
+    "path": "D:\\GitHub\\PCAT-286_MiSTer\\build\\at-floppy-fix-wp-allfeatures-20261004\\work\\output_files\\PCAT-286.rbf",
+    "bytes": 4134436,
+    "sha256": "3f3b12883c261068b582c1a7dc2c2037677a25bb02463d8974ffe88cf2c8eab3"
+  },
+  "sof_sha256": "7327d75be98f3e9108af9f0fcea254533cd942b9edb8f65d87eb332a0a4c8178",
+  "compiled_rom": {
+    "status": "COMPILED_M10K_IMAGE_ALL_1024_WORDS_AND_READ_ALIGNMENT_PARAMETERS_PASS",
+    "run": "D:\\GitHub\\PCAT-286_MiSTer\\build\\at-floppy-fix-wp-allfeatures-20261004",
+    "mif": "db\\PCAT-286.ram0_spk286_microcode_sync_rom_d1673526.hdl.mif",
+    "mif_sha256": "de71f9cc7f6c2ee832443ce33b22e4df030d4a9734aedd35987ba8a0d079bc47",
+    "contract_sha256": "507b4735677fc16b0c306c8477f6a3e90110506bfe7e05141e29cce7c3d28582",
+    "manifest_sha256": "dc1e9acb684fdb0a5a2965ac34e9346add419c35205379871eba59a68f5a41ee",
+    "valid_words": 743,
+    "invalid_words": 281,
+    "parameters": {
+      "OPERATION_MODE": "ROM",
+      "WIDTH_A": "9",
+      "WIDTHAD_A": "10",
+      "NUMWORDS_A": "1024",
+      "OUTDATA_REG_A": "UNREGISTERED",
+      "ADDRESS_ACLR_A": "NONE",
+      "OUTDATA_ACLR_A": "NONE",
+      "INDATA_ACLR_A": "NONE",
+      "WRCONTROL_ACLR_A": "NONE",
+      "RAM_BLOCK_TYPE": "M10K",
+      "INIT_FILE": "db/PCAT-286.ram0_spk286_microcode_sync_rom_d1673526.hdl.mif"
+    },
+    "scope": "actual mapped memory image and primitive configuration; functional/source proofs separate; not physical timing closure or hardware validation"
+  },
+  "scope": "New Quartus bitstream with source-bound directed floppy, protection and 8-profile checks. Historical speed calibration, full OS regression and physical DOS COPY/remount are separate.",
+  "artifacts": {
+    "compile.log": "6e89babbb3efe287b1a180bea8d7783b7f828c35df51e0da2f56527c644fd088",
+    "container-image.txt": "c1eaecb21831c6ce8676ef3571c1043c5cbf07ae367b7106c749f0d20859b093",
+    "manifest.json": "dc1e9acb684fdb0a5a2965ac34e9346add419c35205379871eba59a68f5a41ee",
+    "git-status.txt": "184b0824042761a89d82cc68a1d65fcaf3e3ef6de7915287e8b5430595a9026d",
+    "tracked.patch": "9e45de018236e305032b628c064663bceb0a84e3e3b43ba63e8da9ec2db141ad",
+    "compile-started.txt": "78add6231666fb7a85d0f83abd9ce92fb4ab9f42eb24e987c0ee93c7e320ebac",
+    "bitstreams.sha256": "61b24c17b4b42156c64376f14e83a59204c8e70b34da5a4b31892fa7e3f3be85",
+    "rbf-info.txt": "45653ee8b1788865af5eeb82fd484e3301e087f0d39cc3222745ae419cfddd23",
+    "project-check.log": "476274d7ded258cdda3c0d1502ae324285b8364a4dd779d417ad1b133ce9ea34",
+    "profile-check.log": "26eb279cf9f4a1715671f2fef9865fa9588f4de892934af2e505987124a62fef",
+    "timing.log": "a5922da66381592d10b632dd80dd742e973a9b45172d8ed4bd9e73c32a9c9d9b",
+    "work/output_files/PCAT-286.fit.rpt": "ad4306a66ec04613eff4c57abcc06e7df1ae545785db077f04176c5c61b5c570",
+    "work/output_files/PCAT-286.fit.summary": "22f983ee49eb6c009eae5f2be790f3883150a5dc7a35841bfc675e9afd2e5c4b",
+    "work/output_files/PCAT-286.sta.rpt": "cee90a2af66e7f3b650c621bf29282ad808dd221ff38cbb8fd46e600adba77ef",
+    "work/output_files/PCAT-286.sta.summary": "818d9a807bdc4eddd2980f1a9b6df712b954ad88adaba69e06ab3edf89180702",
+    "work/output_files/PCAT-286.map.summary": "01fbebfe4ad623e7e5da4066f1d1a3d607162293fe86b4ac506d7f4a7d35204e",
+    "work/db/PCAT-286.ram0_spk286_microcode_sync_rom_d1673526.hdl.mif": "de71f9cc7f6c2ee832443ce33b22e4df030d4a9734aedd35987ba8a0d079bc47",
+    "timing/7_slow_1100mv_-40c/bridge_cpu_hold.rpt": "5df61c8227d56e94fc6b82c11a2fb8e49212aeff3c607bb4c71b250c97298319",
+    "timing/7_slow_1100mv_-40c/bridge_cpu_setup.rpt": "042a419c0780645618afe894beb07f8ec9caae56ef56bf624ae0c7d7d01b2c8e",
+    "timing/7_slow_1100mv_-40c/check_timing.rpt": "aae309114f35e49388861bfeb924d2b4c8fa23626f467db5f1dce517ccfa3b7e",
+    "timing/7_slow_1100mv_-40c/clk50_incoming_hold.rpt": "e4e92e637b42ec6974821b9c8e8664080b84d21ecdff10d7463d3bded36094fd",
+    "timing/7_slow_1100mv_-40c/clk50_incoming_setup.rpt": "e79f34758b1950b5ab0234a4395519ec9871353303b9961f02767abf182b768a",
+    "timing/7_slow_1100mv_-40c/clk50_internal_hold.rpt": "6e209e86345ae4f1b5b27ef101e15c6ced6b2db50bb40a8ef60c13f38f3e5ab4",
+    "timing/7_slow_1100mv_-40c/clk50_internal_setup.rpt": "bf341c512e514b2ef2c86df1d4692adce86638cddfedd85e8cff368ff1dc6d52",
+    "timing/7_slow_1100mv_-40c/clocks.rpt": "3d0178b44a5a879a8e3180936a780e47158ff171e75304e23ee0578b6abb7e88",
+    "timing/7_slow_1100mv_-40c/code_buffer_hold.rpt": "b5f1d67b2880f598599dcb0ab7774619adc0ac697de0250156671641e982bdbe",
+    "timing/7_slow_1100mv_-40c/code_buffer_setup.rpt": "2b0b401f3ebac55d71fd30c6dc92d1c502062963a86a0ab134e04920ccd602e9",
+    "timing/7_slow_1100mv_-40c/cpu_bridge_hold.rpt": "c923e7aedabc3f0e13ff784da6777f73bfbe21a94b0e462136fdb61dc9da3c79",
+    "timing/7_slow_1100mv_-40c/cpu_bridge_setup.rpt": "c41dcf0ebf8c2e38f87579c4c927e7168908c5a66dbe219b447ba4b750593ece",
+    "timing/7_slow_1100mv_-40c/cpu_hold.rpt": "c05cfbfde7392d4e236b9863f39f050b68371e6730da249f68ebcb5ae83edfa0",
+    "timing/7_slow_1100mv_-40c/cpu_setup.rpt": "3319754e84285ac7c63049f4c00803a94ae4ef7dcc982b94514f649ac2aeb22a",
+    "timing/7_slow_1100mv_-40c/data_buffer_hold.rpt": "51f6789ff05c5b4ec2fd19087d35ecb885c35acc73f890ad1184e4f42c223a4e",
+    "timing/7_slow_1100mv_-40c/data_buffer_outputs_hold.rpt": "08902e47748bdc4cc1954739ab6e94c497861ff695dbd2b2b13dfc30ee2682fa",
+    "timing/7_slow_1100mv_-40c/data_buffer_outputs_setup.rpt": "ed58dc30ae29de2a7ad4192fabc498b1ff756aeb8e8d3f0675971a371c762df7",
+    "timing/7_slow_1100mv_-40c/data_buffer_setup.rpt": "382cebb47d853461ce2f4b8e3008e898eec55fb9e34cf34502e284b0a3482946",
+    "timing/7_slow_1100mv_-40c/exceptions.rpt": "86cf87a422e1f3231cc303e14104cc2f56e05406d4edc6ea43abf73da28047e5",
+    "timing/7_slow_1100mv_-40c/fmax.rpt": "fc6b9ff17062d3674ca1ce927ac59727e6766bc0b5c93f786e4047bfdd20ec42",
+    "timing/7_slow_1100mv_-40c/global_hold.rpt": "e98567a278661cb8a38098d3de79d9fba9538cb56ad26fd201abcb32a631a920",
+    "timing/7_slow_1100mv_-40c/global_recovery.rpt": "47abe2b9dd7758786dcdbbbe7273fe12d2fb4b989c6767f13a1fd8a9a69f8ed8",
+    "timing/7_slow_1100mv_-40c/global_removal.rpt": "6ba1cad77064d3aae25fd04ee397c9a243089a84a0ba8040b2a68af7af1b3360",
+    "timing/7_slow_1100mv_-40c/global_setup.rpt": "f0428dcf9186324c68c06d0c26a58fbe17f6cb134e82b7ed6e054a2494366fef",
+    "timing/7_slow_1100mv_-40c/keyboard_hold.rpt": "7c6bc2923c013d4e303a74e0beb1e88109bf6635ecab4b1ddb2218ed36f5fc2a",
+    "timing/7_slow_1100mv_-40c/keyboard_setup.rpt": "eca7b7e291275bc15ca2946e81ecfcd1fd99b68679f91adf3c16f9016c8fe260",
+    "timing/7_slow_1100mv_-40c/memory_port_hold.rpt": "d7f9f7f4327be5d53b347bf3e8c4401db0d02d08910772e24171211b83c6e26f",
+    "timing/7_slow_1100mv_-40c/memory_port_setup.rpt": "c1ef86627de4aa6e5477e740ec60c5ce3bc51407457e51b7cc2732f042d3914f",
+    "timing/7_slow_1100mv_-40c/prebios_stage2_hold.rpt": "20e2c5482f0fd04a848b230c7b1328b56cc5d4f46791cd75dd1df63d913725df",
+    "timing/7_slow_1100mv_-40c/prebios_stage2_setup.rpt": "d890eb839532f79b32b052b6f83fc29aabd17f66cc9b8f03f59e8d6e40952d79",
+    "timing/7_slow_1100mv_-40c/sdram_input_hold.rpt": "f865c89f58a846221c087da13052252786944a962c8d7a07705ea26ffa17b878",
+    "timing/7_slow_1100mv_-40c/sdram_input_setup.rpt": "844152ef8c54199055023dbfb44c43bd357b7ad288c794ff8a85cc2061e40216",
+    "timing/7_slow_1100mv_-40c/sdram_output_hold.rpt": "50108b133bf94194727dd92be166038d08ce984e675e9bc53d4232ddd1ff7bc1",
+    "timing/7_slow_1100mv_-40c/sdram_output_setup.rpt": "2046dd2a5f4c23a75e46c6107d8cecdc1d5daf92dfa318924aa8e37f32107f19",
+    "timing/7_slow_1100mv_-40c/sdram_owner_hold.rpt": "5fc75cef7e2881ce22fd835d894eedfae86275445b9db45698b1c3148e61ed0c",
+    "timing/7_slow_1100mv_-40c/sdram_owner_internal_hold.rpt": "d206e6b770aafe0505ffaa1bd63adc913c318cc9e645b47ab919767cc10e6a95",
+    "timing/7_slow_1100mv_-40c/sdram_owner_internal_setup.rpt": "ec3ba85c8a749db11cf550edb04b800200cfd29c645d2c4f1cb263b521be1a89",
+    "timing/7_slow_1100mv_-40c/sdram_owner_setup.rpt": "05d12b582f3a6fa796f9d7c5f96a0b0566a3e87a0a8950b1f8115495298a4529",
+    "timing/7_slow_1100mv_-40c/unconstrained.rpt": "30f62230a2999533e4924546b49fe52bcc7977722ce58ac054ac2754664060f9",
+    "timing/7_slow_1100mv_-40c/video_hold.rpt": "c6d56680b03f0682b3dbf614ac6c750fa8ba7536c2181d485bcf1f4f5f222e38",
+    "timing/7_slow_1100mv_-40c/video_setup.rpt": "075d86c8c14cf97a78f72bb5a0636761f3b1b2c03311633eff3ae14e53c22a30",
+    "timing/7_slow_1100mv_100c/bridge_cpu_hold.rpt": "36154ec2dd9ba218c38fdf035d47f9235301730e720a4f55bcce4e2b8ee79e6e",
+    "timing/7_slow_1100mv_100c/bridge_cpu_setup.rpt": "40d3f5af2cfc773c0747f19502191330e69cfcce8a759a0769bb68c94da80986",
+    "timing/7_slow_1100mv_100c/check_timing.rpt": "aae309114f35e49388861bfeb924d2b4c8fa23626f467db5f1dce517ccfa3b7e",
+    "timing/7_slow_1100mv_100c/clk50_incoming_hold.rpt": "4403f14f8b39c19005d3e91f7587a18081d8c2d4c94effa5abf391fc8f05d974",
+    "timing/7_slow_1100mv_100c/clk50_incoming_setup.rpt": "50b4998c5a83bc1babbeadb0cdb069519d2ec65bcc75140e56b3a5cd7905ad7b",
+    "timing/7_slow_1100mv_100c/clk50_internal_hold.rpt": "39a8b4ed03ced27e3761c81c80048a8be435b450819a631e9873477e7060d0ee",
+    "timing/7_slow_1100mv_100c/clk50_internal_setup.rpt": "7e99a7a201b6d01edca21ce1a4b01ff46bb500e8ccbfd0072fa95eed43fbc96f",
+    "timing/7_slow_1100mv_100c/clocks.rpt": "3d0178b44a5a879a8e3180936a780e47158ff171e75304e23ee0578b6abb7e88",
+    "timing/7_slow_1100mv_100c/code_buffer_hold.rpt": "2695a5074eec6002d8e74388638dcfd7ba5d300be1e3a75d23d38e9b952ab1bd",
+    "timing/7_slow_1100mv_100c/code_buffer_setup.rpt": "0c3cf336bae867c97884ec116fc418ca6429b55f4cda7a09eaa13458a6cc1268",
+    "timing/7_slow_1100mv_100c/cpu_bridge_hold.rpt": "da600ba25f48ec539605b2201026ade595a858fb95ce54dd4828d0626c3de767",
+    "timing/7_slow_1100mv_100c/cpu_bridge_setup.rpt": "19b2e660cc3ece456a716cb39529ce838a1de12e84231b696407eb79c4206ea3",
+    "timing/7_slow_1100mv_100c/cpu_hold.rpt": "e18bd4c592e3d513cfe16babf377441198415a30c1a4da9bdbbe4e717165317e",
+    "timing/7_slow_1100mv_100c/cpu_setup.rpt": "f6495d8fba61f35af2be0dedad9c6d023e5d6b62adf1d8c7d39b79ebe7d325b6",
+    "timing/7_slow_1100mv_100c/data_buffer_hold.rpt": "e01a091b61d7a6db0174e2119e534032808502f71ea579b395755e4c9e5bd234",
+    "timing/7_slow_1100mv_100c/data_buffer_outputs_hold.rpt": "05638fce52a5458438d9223d676001814056d432af8fa8e8a7925ef79a6e59c6",
+    "timing/7_slow_1100mv_100c/data_buffer_outputs_setup.rpt": "71c824abbab6ab89712533f6ad62879f24084b2f84bde6f5249460bb38ef79ea",
+    "timing/7_slow_1100mv_100c/data_buffer_setup.rpt": "a37b6607eee3862fe6976b333daa1ba8d4f7f20cdf8d69588431e338a2146513",
+    "timing/7_slow_1100mv_100c/exceptions.rpt": "9b2d16ce28603fc80e8a85ebbc801925d01380c7b1c707a09812ec674e69988f",
+    "timing/7_slow_1100mv_100c/fmax.rpt": "596352aa5a95ed1f5432a06df4a6664129c08f3f3b91a99f8b9d37cd527abe16",
+    "timing/7_slow_1100mv_100c/global_hold.rpt": "332ebf37f60ecbec7e2dea2923f1bb2b04d8fdb0e65a2ec7aa21270b57c4ef2f",
+    "timing/7_slow_1100mv_100c/global_recovery.rpt": "0c0faa18b8e354053ac0f11494f834c7753420a2b46990e828b98a3026d51e25",
+    "timing/7_slow_1100mv_100c/global_removal.rpt": "eac31893c6cd2a015662404d2491f144184d31d4c6ff3c1e850915b71cf929b3",
+    "timing/7_slow_1100mv_100c/global_setup.rpt": "5a6d9e8ed87971742f220eea40716615648689d6dbf57b1d7fb8e01efd96d47c",
+    "timing/7_slow_1100mv_100c/keyboard_hold.rpt": "c4991f6861fc59af053a32e3d13fb420f6bfcbd6731bd6aa538070bc21c36c8e",
+    "timing/7_slow_1100mv_100c/keyboard_setup.rpt": "f954de13b07018e70ae88fcfb1b55359d65ff3129fa1f59890f9f80a3e96fb98",
+    "timing/7_slow_1100mv_100c/memory_port_hold.rpt": "00e414be70e0cfac4d6bc6f71e21bd95c5f99b7e766f0f616d503de61452285b",
+    "timing/7_slow_1100mv_100c/memory_port_setup.rpt": "dcabe9153b5aabd48e4321c468754140e09c7c4943a29f5431403171cdf88ac2",
+    "timing/7_slow_1100mv_100c/prebios_stage2_hold.rpt": "577cfb9679ff5adf90d20fa6ce04811c0827c9c586ee657b633451a2bcca4a33",
+    "timing/7_slow_1100mv_100c/prebios_stage2_setup.rpt": "04d53c90b53c249d0ef77ac114936460f414efbc640765617de243b3c6c4a852",
+    "timing/7_slow_1100mv_100c/sdram_input_hold.rpt": "aeac82317583872c59680606a292fcc77f1d33cb309e085cbcbe9c03e8652798",
+    "timing/7_slow_1100mv_100c/sdram_input_setup.rpt": "9bac79d788d056bdcc2f676a4fe8b9039b710d83d24041a4529967cc7ad91569",
+    "timing/7_slow_1100mv_100c/sdram_output_hold.rpt": "a5d5e5c51873e42c3fb1117a3ccd71b38af25c1de37e6de26735fa0e6389e576",
+    "timing/7_slow_1100mv_100c/sdram_output_setup.rpt": "bfae1d976a5d1922dd86266185a73f760ee45cc01b5acea4aa3a3c3c1e063ed0",
+    "timing/7_slow_1100mv_100c/sdram_owner_hold.rpt": "cddd6d89c15af3d50a5aa8a7ede64258ef11fa5fb63a10848be253c9a96230ba",
+    "timing/7_slow_1100mv_100c/sdram_owner_internal_hold.rpt": "81e760bf92258bce67067c8e91b6bc0d5b1c3f15de1a4aed699bf5ae58bb6c67",
+    "timing/7_slow_1100mv_100c/sdram_owner_internal_setup.rpt": "a5264c4f067ef99033bdf44db680de416f91a7fa14c25df20f4de6dd38e5d935",
+    "timing/7_slow_1100mv_100c/sdram_owner_setup.rpt": "fb9aa0f4bf6d97f7a6b95cf47ac2c1484de204313a155c6a26406835f42d1049",
+    "timing/7_slow_1100mv_100c/unconstrained.rpt": "30f62230a2999533e4924546b49fe52bcc7977722ce58ac054ac2754664060f9",
+    "timing/7_slow_1100mv_100c/video_hold.rpt": "66785f35efb1c78a23a170e1921666239cbd3e1b3aa6b8d8fdb0345730718854",
+    "timing/7_slow_1100mv_100c/video_setup.rpt": "791c191181e156dcff2419047ff355a0a66cf92b5766c7e2088db9a06952eaf3",
+    "timing/collections.txt": "add484c70b40d748c02cad898a436ab71305a98f6e85f6c9cb3e82dc96ab6661",
+    "timing/MIN_fast_1100mv_-40c/bridge_cpu_hold.rpt": "538113a68620c20ed9483c70183789f699d1174d80b5f7d8f660ba2c7550c4ad",
+    "timing/MIN_fast_1100mv_-40c/bridge_cpu_setup.rpt": "e126cea863de5afbd1adbbbb316a6e71a354df9dd6f253a6f0d4180426836d38",
+    "timing/MIN_fast_1100mv_-40c/check_timing.rpt": "aae309114f35e49388861bfeb924d2b4c8fa23626f467db5f1dce517ccfa3b7e",
+    "timing/MIN_fast_1100mv_-40c/clk50_incoming_hold.rpt": "1e3e99e042bc55346ba4f2f950e683878fb2190db042bdc417b157e872fbdf87",
+    "timing/MIN_fast_1100mv_-40c/clk50_incoming_setup.rpt": "0e64ab071815b8c15b84773b2f95be7b60c6e665b296c0e64d134db6fb79b2d7",
+    "timing/MIN_fast_1100mv_-40c/clk50_internal_hold.rpt": "c8463c100de2024291699a55ecacfc9662b25d153d866789623575dc336dc69f",
+    "timing/MIN_fast_1100mv_-40c/clk50_internal_setup.rpt": "5e38efb36399f7c3856b7d9db57984bc30a62273227bcd4fa727a5b3115ae07e",
+    "timing/MIN_fast_1100mv_-40c/clocks.rpt": "3d0178b44a5a879a8e3180936a780e47158ff171e75304e23ee0578b6abb7e88",
+    "timing/MIN_fast_1100mv_-40c/code_buffer_hold.rpt": "dcc2ef90eee8672d598f0bb673574763cd6626c6ae34aa365a99db4e0d9d949b",
+    "timing/MIN_fast_1100mv_-40c/code_buffer_setup.rpt": "1cf7d3d5ed2b77acfe568c21ad0110e9db8d5e4b01de97516e39d049cb4f77d9",
+    "timing/MIN_fast_1100mv_-40c/cpu_bridge_hold.rpt": "2c69d66c1fef15a4bbe0606291099f61e790b0321df5a06e1e43dc4b7625365c",
+    "timing/MIN_fast_1100mv_-40c/cpu_bridge_setup.rpt": "6b5ffda4dfb047b5c5475ca3c16e2191fba75b29d8984184d19e307c16e5e01f",
+    "timing/MIN_fast_1100mv_-40c/cpu_hold.rpt": "705ed65c0092b44ba8059760540476e059e07a595278ab0b2db203574985cc21",
+    "timing/MIN_fast_1100mv_-40c/cpu_setup.rpt": "470db1258e14c18c85aeb52abfcdde87e52760ae50ddb3da1127b8a292f4797d",
+    "timing/MIN_fast_1100mv_-40c/data_buffer_hold.rpt": "94a5a6e50b85c7afea90d85b976244a6af939ee01b0a4b67ece30b8335ba53ab",
+    "timing/MIN_fast_1100mv_-40c/data_buffer_outputs_hold.rpt": "2882ff59aedeecae01e094d2fe17bb065f8fc4943d63de38decb4347de57d6fb",
+    "timing/MIN_fast_1100mv_-40c/data_buffer_outputs_setup.rpt": "225e630d4b8a32f40d171856cf330d588b29d5933c3cb242177574963d1c5681",
+    "timing/MIN_fast_1100mv_-40c/data_buffer_setup.rpt": "58438665e299c19c96a434559b32fc792ac6fc3dc2673195707670acf0e956cc",
+    "timing/MIN_fast_1100mv_-40c/exceptions.rpt": "820bced9ba8edf043a918d8ba2fa745615d873f66df815ffc310da68c6d2b1aa",
+    "timing/MIN_fast_1100mv_-40c/fmax.rpt": "031603345a8d5a551b2aa5995a650317cf27e7c1f0f31eb3a69422fc1b55a210",
+    "timing/MIN_fast_1100mv_-40c/global_hold.rpt": "a871b0b1d812f687b454da2ac135c99d74e050d9947455ebc6777ff022f8ab25",
+    "timing/MIN_fast_1100mv_-40c/global_recovery.rpt": "4d645bffd1100a9212e1c400f0c3253220a63fef12791ca58598fc272b620cc7",
+    "timing/MIN_fast_1100mv_-40c/global_removal.rpt": "b874d1140bca40221733711fd566499909edeed1a1f175e585c37602bbffad1e",
+    "timing/MIN_fast_1100mv_-40c/global_setup.rpt": "ba04dc44d61a0487a100a6a7f304d1c85e292caf4a7fd32d69135bca65d7c202",
+    "timing/MIN_fast_1100mv_-40c/keyboard_hold.rpt": "7d0bbd729c1eb8e3b1eb28e46f7c473df8dc052b7cde8c9fcd3226867ee8bba9",
+    "timing/MIN_fast_1100mv_-40c/keyboard_setup.rpt": "7c59a38407d97b1ecd5ba95ccf8d6e27fb1d5b794035b72157c21030eac2051d",
+    "timing/MIN_fast_1100mv_-40c/memory_port_hold.rpt": "44d03874ef7c5a6c28763b1dafce513eeeb56f0efdb07bebb41ec8dba823df77",
+    "timing/MIN_fast_1100mv_-40c/memory_port_setup.rpt": "7131e13aca8f2f8b1b7ceb4ade8e9c52bc92b940e088a777c143b9d3836b72e8",
+    "timing/MIN_fast_1100mv_-40c/prebios_stage2_hold.rpt": "42975aab0e5059e9433757f5d04b2a985bd48d6e25420484b492c5212ee018dd",
+    "timing/MIN_fast_1100mv_-40c/prebios_stage2_setup.rpt": "caba31493c1c67471e1028fbdaaf43ee2b36d337a09bcb43688fe244812db9f9",
+    "timing/MIN_fast_1100mv_-40c/sdram_input_hold.rpt": "190ff4aed6817400c777d868a04b99d1eb934b6ca05d4513335387355bd224b1",
+    "timing/MIN_fast_1100mv_-40c/sdram_input_setup.rpt": "4e85275470e11e42d0acea4a05e909c49ff8abe8512e6c5f4430a6fffbb0f731",
+    "timing/MIN_fast_1100mv_-40c/sdram_output_hold.rpt": "2c5971297dc9d2d9ee8437270315fb72ff39b5db28662b732470f02be0c75455",
+    "timing/MIN_fast_1100mv_-40c/sdram_output_setup.rpt": "da1a0533dffdcd721e82c0c2442caa291ea8132ecf172826ce8233f706b4d03b",
+    "timing/MIN_fast_1100mv_-40c/sdram_owner_hold.rpt": "89326f11780b8d03bf1ba86e61500a5586d38618a5c6085c40ad296a5b20fc59",
+    "timing/MIN_fast_1100mv_-40c/sdram_owner_internal_hold.rpt": "92f8578cba5e3560436f1e629fcec357c625d7c9a1a8983753bbe1415dcf1c75",
+    "timing/MIN_fast_1100mv_-40c/sdram_owner_internal_setup.rpt": "7cb4faaae72ae4c5990cd0a4908da094c4c1176b5c61a5af2e48694933b1da93",
+    "timing/MIN_fast_1100mv_-40c/sdram_owner_setup.rpt": "3b9ac27d8754fde82f0f4eb60cf9f3125c5495de4a7f8723ce9efa5e92805210",
+    "timing/MIN_fast_1100mv_-40c/unconstrained.rpt": "30f62230a2999533e4924546b49fe52bcc7977722ce58ac054ac2754664060f9",
+    "timing/MIN_fast_1100mv_-40c/video_hold.rpt": "72850ce9de03ad7c71b8da7772995283b2d6f710fdb50a6976a5acf081df82c1",
+    "timing/MIN_fast_1100mv_-40c/video_setup.rpt": "64002269d19013511ba3e2970a8fcc1a9e1fcbea6adf7c87aaef1ed6ca972dcd",
+    "timing/MIN_fast_1100mv_100c/bridge_cpu_hold.rpt": "4ef6828ef93a05b1303b69aa5b631a6bce603e3cd443491be0252b7aa3965133",
+    "timing/MIN_fast_1100mv_100c/bridge_cpu_setup.rpt": "c279cc8a72c41b5113b16a129d7ac21f51e0dcd341b50662874fdeccd2efd95a",
+    "timing/MIN_fast_1100mv_100c/check_timing.rpt": "aae309114f35e49388861bfeb924d2b4c8fa23626f467db5f1dce517ccfa3b7e",
+    "timing/MIN_fast_1100mv_100c/clk50_incoming_hold.rpt": "f2ffec98d66e64117cf2449b58d1b24202debe010f2b98b9e4d5f1db7fe719d5",
+    "timing/MIN_fast_1100mv_100c/clk50_incoming_setup.rpt": "a6718d947b7c27242d4252eb7351734533ba982a427d816ee6490e84ba644225",
+    "timing/MIN_fast_1100mv_100c/clk50_internal_hold.rpt": "758ef1c05fce51acd9da9f598d8b20f15974a271c46ff63c154a6f386acf7bcd",
+    "timing/MIN_fast_1100mv_100c/clk50_internal_setup.rpt": "46d5a647434d1a782cec992fa489426821b0c296f22c1bd9863d327e94a5a8ad",
+    "timing/MIN_fast_1100mv_100c/clocks.rpt": "3d0178b44a5a879a8e3180936a780e47158ff171e75304e23ee0578b6abb7e88",
+    "timing/MIN_fast_1100mv_100c/code_buffer_hold.rpt": "d1e1063b56c5631e271446788a14c74fc7031f298485bf38b435923eccd35574",
+    "timing/MIN_fast_1100mv_100c/code_buffer_setup.rpt": "76fedd593e08343a8eae5a4f8aae45cac6dbe4b4c096230f49be55ff45faa9bc",
+    "timing/MIN_fast_1100mv_100c/cpu_bridge_hold.rpt": "00e1f13d75191c43fcb51cd7891dcad9684f9fca8dbd02665a1b0d0440c8b8fc",
+    "timing/MIN_fast_1100mv_100c/cpu_bridge_setup.rpt": "25a647c275df7dbc82923656909bf22c8e3cbc724d618b6ed188810decab47d5",
+    "timing/MIN_fast_1100mv_100c/cpu_hold.rpt": "f414cac630189a486d6468f02996636b79eed5dc738b2e857cf096d34790db7a",
+    "timing/MIN_fast_1100mv_100c/cpu_setup.rpt": "43b83971718197c8287fdab499f0d5757c7265ec2d49d4582e4a83812ccafd9a",
+    "timing/MIN_fast_1100mv_100c/data_buffer_hold.rpt": "718c2c0b807d19d88493590ced269cdad2942baaf0dc40200a40d9b4013df4b0",
+    "timing/MIN_fast_1100mv_100c/data_buffer_outputs_hold.rpt": "87b8f07d5915d69979bc632f584ed606c5f3ca3dd9c2afe6b375c42dd799349b",
+    "timing/MIN_fast_1100mv_100c/data_buffer_outputs_setup.rpt": "3ed689b35f73376aee3220cb74408fc6f1209c52bb219f90b67cb18b448cb32d",
+    "timing/MIN_fast_1100mv_100c/data_buffer_setup.rpt": "df3090b3d2c7b896f7d0cb8d4530f189afded83219e0d6b878e975f07b26e78d",
+    "timing/MIN_fast_1100mv_100c/exceptions.rpt": "f7156635bf9017ed60191bdcad4e761711e9f4bb3e944d4ab2107fbf24e77a31",
+    "timing/MIN_fast_1100mv_100c/fmax.rpt": "4274884418687d60a9f502fdb54f82c7cd658e34b9541502470c274dfeec501b",
+    "timing/MIN_fast_1100mv_100c/global_hold.rpt": "3316e18e063b3c9b9bcc3e7411f9bb72666cf56c3adf109718c3fda098da3945",
+    "timing/MIN_fast_1100mv_100c/global_recovery.rpt": "761e7beec4eadc1e9547ba215773d776f4e39cfd4328184313eb328401069cc3",
+    "timing/MIN_fast_1100mv_100c/global_removal.rpt": "8151073910970f399408e28ffd5d1b10005a7f076c3b9a9413c53b191595e462",
+    "timing/MIN_fast_1100mv_100c/global_setup.rpt": "95b23b2c5cdf4df7f259c9445726198dc214a4f90c9088108bd1c03d10ef228d",
+    "timing/MIN_fast_1100mv_100c/keyboard_hold.rpt": "f940b4162f83a1b9322672a8ee48fbc805b362b79f5ad9ab0b3062552819972e",
+    "timing/MIN_fast_1100mv_100c/keyboard_setup.rpt": "7ab74f62486ebac1f2a7ee9433ea603f8dc3dae2be35a52ce10be6080c41bf34",
+    "timing/MIN_fast_1100mv_100c/memory_port_hold.rpt": "7c37059c63396b5985a2bc45e1ae2b17218fe1a5a0ea4d2ea822f40823646b93",
+    "timing/MIN_fast_1100mv_100c/memory_port_setup.rpt": "e9c3ca5d6788f47cad845ef58523a8bab951af75299167fcc6cf0cb33568eaaf",
+    "timing/MIN_fast_1100mv_100c/prebios_stage2_hold.rpt": "d3c61846af3777112363f4d7ae486a467acf88a5b94ad9e9cbf5ed28ec363810",
+    "timing/MIN_fast_1100mv_100c/prebios_stage2_setup.rpt": "cc2c622ce7ff3e125d884cffa1d96287a580ea453b66c51f1f64d34d088534d6",
+    "timing/MIN_fast_1100mv_100c/sdram_input_hold.rpt": "dc8278b7ec54cddd5ef02109e34fe8b7e37f3c1ee4b638f054c660592911d8d1",
+    "timing/MIN_fast_1100mv_100c/sdram_input_setup.rpt": "5514d95280581b257f43668b82e4d6eb4d4b73beb8aa193542ac5802fa443b1c",
+    "timing/MIN_fast_1100mv_100c/sdram_output_hold.rpt": "835ae3a5e7a93c34f604d71cead1011b15b205dac4a21b1c46dacbb5b271491d",
+    "timing/MIN_fast_1100mv_100c/sdram_output_setup.rpt": "04ac488645da4b1dd43cf1aa6e30b716badf6a6ebb8a1bc9eb1172cbb4bc4917",
+    "timing/MIN_fast_1100mv_100c/sdram_owner_hold.rpt": "9599c8f935de371e535ca2a4606aedfebeaaa3338c1883a1da37ef0883a8a38b",
+    "timing/MIN_fast_1100mv_100c/sdram_owner_internal_hold.rpt": "4c1d53ce100efc6194ffc7ec672d8b15a11e78e1a7a5c8c9640d806e1362f8c2",
+    "timing/MIN_fast_1100mv_100c/sdram_owner_internal_setup.rpt": "16bd158137ddff22500a2d64e62f6cb89db90a48c1b860a965cd0128c23ea389",
+    "timing/MIN_fast_1100mv_100c/sdram_owner_setup.rpt": "d2799d4ff791bd375638b74af13f4ee1ce2da604ac06b5f714bd70ebb82ac2be",
+    "timing/MIN_fast_1100mv_100c/unconstrained.rpt": "30f62230a2999533e4924546b49fe52bcc7977722ce58ac054ac2754664060f9",
+    "timing/MIN_fast_1100mv_100c/video_hold.rpt": "1de6aad9f5939f7a9ff102d2c6e170d81ac538d8e00ca4cc2ecd618152bc3dfa",
+    "timing/MIN_fast_1100mv_100c/video_setup.rpt": "8a425c88d8e33663a6c30a5ee8a6261d5d851bc5f867634c6ea411cccd9cea88",
+    "timing/path_counts.txt": "7a6c4071af698a3ee34bd0e0ff7c4b1ef18e19867aa59ff4bcb388e4a7861ca8"
+  }
+}

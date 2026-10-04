@@ -188,3 +188,8 @@ with ideal RAM, then with the actual bridge/code buffer. Record instruction
 metadata/deadline, raw retirement, permitted retirement, implementation
 extension, processor boundaries and CODE acceptance/READY/refill to distinguish
 functional lateness from fetch/admission phasing.
+
+This local R0 anomaly coexists with the higher mixed-workload CHECKNUM scores:
+20 to 25 MHz rises from 4,361 to 5,023 Dhrystones (**+15.18%**) and from 84.1K
+to 91.9K Whetstones (**+9.27%**). The aggregate gain does not exclude a
+penalty for the particular repeated R0 instruction sequence.

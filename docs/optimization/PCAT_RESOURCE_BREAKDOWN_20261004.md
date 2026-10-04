@@ -112,4 +112,3 @@ these video memories use 330/416 M10Ks (79.33% of used blocks), whereas CPU
 microcode uses 1/416 (0.24%). Main system RAM lives in external SDRAM.
 
 Evidence: [resource analysis](../evidence/pcat-resources-20261004/README.md).
-

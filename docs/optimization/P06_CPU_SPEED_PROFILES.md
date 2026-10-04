@@ -13,7 +13,10 @@ El primer hito es definir y medir la referencia antes de modificar RTL/OSD:
 [contrato de referencia y la atribución de rendimiento](P12_REAL_CHECKNUM_MEMORY_ATTRIBUTION_20261002.md).
 La parte nativa de 86Box está completada en
 [los resultados P06-M1](P06_NATIVE_REFERENCE_RESULTS_20261003.md); las mediciones
-físicas a 6/12 MHz permanecen `NOT_MEASURED` y el alcance histórico de M1 sigue abierto.
+físicas del colaborador a 6/12 MHz ya están
+[recibidas y validadas como datos RAW](P06_PHYSICAL_REFERENCE_RESULTS_20261004.md).
+El temporizador y las frecuencias físicas siguen sin calibración independiente;
+el alcance histórico de M1 continúa abierto.
 
 Ya están completadas la [extracción Intel de los kernels](P06_INTEL_TIMING_REFERENCE_20261003.md)
 y la [especificación del piloto de 6 MHz](P06_TIMING_CONTRACT_20261003.md), con
@@ -312,8 +315,9 @@ P06-M1 ya dispone del programa DOS canónico
 y de [resultados aceptados del 286 ORIGINAL nativo de 86Box](P06_NATIVE_REFERENCE_RESULTS_20261003.md)
 a 6 MHz y en su entrada `12`/12,5 MHz: host RC0, guest RC0 y validación estricta
 de 42 muestras y seis resúmenes por perfil. Este paso previo al colaborador está
-completado. Las mediciones físicas a 6 y 12 MHz en el mismo PC siguen
-`NOT_MEASURED`; el temporizador mantiene `NOT_CALIBRATED`. La aceptación RAW del
+completado. Las cuatro capturas físicas a 6 y 12 MHz nominales en el mismo PC
+ya pasan la validación de 168 muestras y sus resúmenes; el temporizador mantiene
+`NOT_CALIBRATED`. La aceptación RAW del
 programa no acepta temporización histórica de SPK286 ni cierra M1 completo.
 
 El primer perfil candidato será **6 MHz**, empezando por casos dirigidos de
@@ -388,3 +392,27 @@ and zero register bits, excluding full FPGA cost. Serialized dependencies
 make the aggregate seven/eleven-clock minimum nonbinding in the fastest
 observed cases; exact Intel issue phases and write-buffer EU overlap remain
 open. Production config, source selection and selected RBF are unchanged.
+
+## 2026-10-04 physical anchors and profile approximation
+
+The [physical reference analysis](P06_PHYSICAL_REFERENCE_RESULTS_20261004.md)
+retains all four collaborator CSVs, independent 6/12 hardware-selector labels
+and 168 validated fixed-work samples. The program argument changes metadata,
+not workload. These are provisional behavioral anchors; board identity,
+executable identity on the physical machine and actual clocks remain unverified.
+
+Additional native visible-zero controls at 6/12.5 MHz pass host and guest
+checks. Automatic config zero differs from visible-zero config one. At 12.5,
+the latter changes memory/prefetch service from three to two cycles and R0
+from 1,017 to 643 ticks. Against visible-zero native and illustrative frequency
+normalization, physical12 is approximately +5.4% elapsed for R0, +17.1% for B0
+and +46.9% for M0. The automatic comparisons remain archived unchanged.
+
+User direction: use Intel, native 86Box and the physical6/12 anchors to make
+the best coherent approximation for every historical profile. Calibrate
+execution, CODE prefetch/branches and DATA/board READY separately; one global
+benchmark multiplier cannot explain these different sensitivities. Use the
+same causal model at 8/10/12.5/16/20/25 MHz and explicitly identify those
+unmeasured predictions. Interpolation/extrapolation of aggregate kernel times
+alone does not define instruction timing. MAX remains dependency-driven.
+No CPU RTL, public profile, OSD, clock or RBF adjustment is made by this analysis.

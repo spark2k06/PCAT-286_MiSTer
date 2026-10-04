@@ -567,5 +567,40 @@ Product decision, 2026-10-04: one public selector MAX / 6 / 8 / 10 / 12.5 /
 16 / 20 / 25 MHz. MAX preserves accelerated execution; named MHz profiles apply
 historical CPU/board timing. No independent public T-states setting is planned.
 Versioned profiles carry their wait policy, while test tools retain 0/1/2
-variants. The physical pair remains NOT_MEASURED and can refine the initial
-86Box-based calibration later without blocking development now.
+variants. The physical pair was initially NOT_MEASURED; the subsequent
+2026-10-04 evidence and its calibration implications are recorded below.
+
+### Physical observations and native zero-wait follow-up (2026-10-04)
+
+The [P06 physical reference analysis](P06_PHYSICAL_REFERENCE_RESULTS_20261004.md)
+now retains four collaborator captures, 168 validated samples and the six
+previous native controls, augmented with visible-zero native6/native12.5.
+The first filename number is the reported hardware speed selector and the
+second the DOS argument. The argument only labels metadata; all runs execute
+the same fixed 256-iteration kernels. Physical mode-3 PIT decrements are
+converted to input ticks before comparison with native mode-2 observations.
+
+Both new native controls verify the original dispatcher, actual clock, config
+one, two prefetch/read/write service cycles, disabled caches and successful
+guest/host completion. Config zero remains Automatic. At 12.5 MHz it selects
+three service cycles; R0 is 1,017 ticks there versus 643 with visible zero waits.
+The initial large register discrepancy is therefore strongly sensitive to
+the native memory/prefetch policy and cannot be attributed to EU timing alone.
+
+Physical12 compared with visible-zero native12.5 and illustrative equal-cycle
+frequency normalization gives approximately +5.4% elapsed for registers,
++17.1% for branches and +46.9% for aligned RAM. Physical6 is much closer for
+RAM. The physical RAM workload scales only about 1.37 times between nominal
+selectors6/12, unlike the nearly twofold register/branch improvement. These
+observations motivate separating CODE/prefetch, DATA/board READY, ISA/PIT and
+refresh costs. They do not identify a unique memory-wait setting or prove
+which physical component causes the difference.
+
+User direction is to make the best coherent approximation across all public
+historical speeds using Intel, native 86Box and these provisional physical
+anchors. Preserve intrinsic instruction timings and genuine dependencies;
+select a causal board policy rather than a global score correction. Predict
+8/10/12.5/16/20/25 MHz with that same model and label unmeasured estimates.
+MAX retains dependency-driven accelerated execution. Actual physical clocks,
+board/BIOS identity and executable hash remain unverified; NOT_CALIBRATED
+still applies. No immediate RTL, clock, fit or RBF change is included here.

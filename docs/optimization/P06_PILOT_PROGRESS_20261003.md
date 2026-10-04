@@ -373,3 +373,25 @@ reset can leave a partial word. Historical HOLD, consecutive WRITE/following
 READ, write-buffer overlap, branches/events, decoded lookahead, DOS wrapper
 and complete public speeds remain separate gates. Production config,
 source selection and selected RBF are unchanged. No total regression was run.
+
+## 2026-10-04: physical reference received and native visible-zero controls
+
+The [physical analysis](P06_PHYSICAL_REFERENCE_RESULTS_20261004.md) validates
+four collaborator CSVs: 168 samples with independent hardware-selector and
+program-argument labels. The argument is metadata-only. Physical PIT mode 3
+uses half the raw counter decrement; native controls use mode 2. Timer/clock
+calibration and board identity remain separate from raw-data acceptance.
+
+Two additional native controls with visible zero waits pass at 6/12.5 MHz,
+config one, two prefetch/read/write service cycles, disabled caches and host/
+guest exit zero. At 6 MHz they reproduce the automatic control within one
+tick. At 12.5 MHz, R0 changes from 1,017 automatic ticks to 643, demonstrating
+the large contribution of that native memory/prefetch selection. Against this
+zero-wait control with illustrative frequency normalization, physical12 has
+approximately +5.4/+17.1/+46.9% elapsed differences for R0/B0/M0 respectively.
+
+The agreed next calibration basis is one causal CPU/prefetch/board model
+anchored to physical6/12 and Intel/native references, then estimated at the
+remaining historical speeds. No global multiplier or unique physical wait
+count is inferred from three aggregate kernels. MAX stays separate; no
+production RTL, selector, clock or RBF changes accompany this evidence.

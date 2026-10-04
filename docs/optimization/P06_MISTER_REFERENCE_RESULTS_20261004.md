@@ -193,3 +193,15 @@ This local R0 anomaly coexists with the higher mixed-workload CHECKNUM scores:
 20 to 25 MHz rises from 4,361 to 5,023 Dhrystones (**+15.18%**) and from 84.1K
 to 91.9K Whetstones (**+9.27%**). The aggregate gain does not exclude a
 penalty for the particular repeated R0 instruction sequence.
+
+## Directed trace completed
+
+The [R0 phase diagnosis](P06_R0_PHASE_DIAGNOSIS_20261004.md) now reproduces
+the inversion on the unchanged production CPU and PCAT memory chain:
+11,530 versus 12,300 fabric clocks for 256 iterations (+6.68% at 25 MHz).
+Immediate RAM does not reproduce it. The warm composed trace isolates code
+hits with zero physical SDRAM reads, HOLD or AT refresh grants, and identifies
+fetch turnaround interacting with the historical bridge admission window.
+This closes the pending trace task; a general fetch optimization and an
+explicit historical Ts epoch contract remain implementation work. No CPU
+timing table, MAX, config or RBF is changed by this diagnosis.

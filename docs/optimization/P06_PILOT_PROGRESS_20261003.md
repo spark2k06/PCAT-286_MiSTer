@@ -159,10 +159,15 @@ and bus too; prior frozen receipts remain unchanged.
 
 ## Next stages
 
-The [M3 full CPU register probe](P06_CORE_REGISTER_PILOT_20261004.md) now
+The [M3 full CPU register pilot](P06_CORE_REGISTER_PILOT_20261004.md) now
 records real dispatch, byte consumption, retained operands, architectural
-writes and retirement. Its 208 cases pass in both simulators. M3a is
-observation; the temporal CPU connection is the following milestone.
+writes and retirement. M3a observes 208 cases. M3b connects the real CPU's
+retained register paths to 6 MHz virtual start/commit in a private source
+selection: all 208 cases meet 2/3-clock minima, with late dependencies,
+cancellation, scope stops and consecutive instructions tested separately.
+MAX per-edge traces remain identical to production. Generic control cost is
+22 bits / 284 cells; MAX control disappears. BIU/IU timing and physical
+calibration are still open, including the measured dispatch gap in P06-IU01.
 
 - Map the qualified forms to actual decode/start/issue/commit milestones,
   reuse existing retention and validate fetch/redirect/ownership/events.

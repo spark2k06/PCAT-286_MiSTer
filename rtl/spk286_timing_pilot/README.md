@@ -45,3 +45,23 @@ The coupled stage mocks a functional caller, issues data at instruction start,
 and uses an abstract backend. That issue milestone is an unvalidated fixture
 assumption, not an Intel-qualified phase. It does not execute SPK286 or DOS.
 Its generic synthesis measures the named duration component, not a full CPU.
+
+## Private full-CPU register connection (M3)
+
+`p06_register_connection.svh` is inserted by the hash-guarded private builder
+into one selected copy of the existing CPU sources under an ignored build
+directory. It gates actual retained register execution/commit and publishes
+the saved instruction IP while active; it does not add another result buffer.
+The production QIP does not include it. Use:
+
+```sh
+python3 scripts/run_p06_timed_register.py --output build/p06-register-repeat
+```
+
+The full CPU register subset passes 2/3-clock minima at virtual 6 MHz, late
+dependencies, lifecycle and scope stops in both simulators. MAX traces remain
+identical. The exact connection's cost fixture maps to 22 register bits /
+284 generic cells, or zero in MAX, not an FPGA resource/timing estimate.
+The repeated ADD stream exposes an additional dispatch clock in P06-IU01.
+See the [M3 report](../../docs/optimization/P06_CORE_REGISTER_PILOT_20261004.md)
+for evidence and remaining historical BIU/IU/event/physical acceptance.

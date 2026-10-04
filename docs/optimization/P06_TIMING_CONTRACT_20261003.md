@@ -1,12 +1,14 @@
 # P06/P12: fixed-50 MHz timing contract and 6 MHz pilot
 
 Date: 2026-10-03. Status: **design contract and directed acceptance plan**.
-Historical CPU integration is `NOT_IMPLEMENTED`; physical 6/12 MHz is
+Production historical CPU integration is `NOT_IMPLEMENTED`; the
+[private M3 register connection](P06_CORE_REGISTER_PILOT_20261004.md) now passes
+full CPU directed acceptance for its qualified subset. Physical 6/12 MHz is
 `NOT_MEASURED`. References and their limitations are in the
 [Intel extraction](P06_INTEL_TIMING_REFERENCE_20261003.md).
 This advances the reference/design portion of
 [P06-M1](P06_TIMING_REFERENCE_PLAN_20261003.md); it does not close physical M1.
-Unwired component implementation and its directed evidence are tracked in
+Component implementation and private CPU directed evidence are tracked in
 [the pilot progress](P06_PILOT_PROGRESS_20261003.md).
 
 ## 1. Product and pilot boundary

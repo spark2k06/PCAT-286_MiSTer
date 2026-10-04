@@ -1,6 +1,6 @@
 # P06 — Perfiles de CPU 6–25 MHz y MAX
 
-Estado: especificación futura, actualizada el 2026-10-03. Base: implementación
+Estado: especificación futura, actualizada el 2026-10-04. Base: implementación
 única tras la limpieza P20, con CPU/puente/SDRAM sobre el reloj común de 50 MHz;
 P21 mantiene pendiente la aceptación del cierre de tiempos. No hay perfiles
 históricos implementados ni precisión temporal validada. Aplican los
@@ -20,12 +20,15 @@ captura/publicación de respuestas, unidades temporales, pruebas dirigidas y
 base de recursos del fit seleccionado. Se han identificado diferencias entre
 las tablas Intel y los handlers nativos de 86Box; sus medidas se conservan como
 contraste. Ya hay componentes provisionales de reloj, bus retenido y primeras
-duraciones con pruebas dirigidas. Falta conectarlos y validar el piloto en la
-CPU completa, completar los hitos internos y obtener la referencia física.
+duraciones con pruebas dirigidas. El [piloto M3 de registro](P06_CORE_REGISTER_PILOT_20261004.md)
+ya conecta arranque y compromiso temporal a una CPU completa privada, con
+mínimos de 2/3 relojes, equivalencia MAX y cancelaciones validados. Quedan el
+bus/fetch histórico, los hitos restantes y la referencia física.
 
 El desarrollo provisional de componentes temporales y sus pruebas dirigidas
 se registra en [el progreso del piloto](P06_PILOT_PROGRESS_20261003.md).
-Todavía no hay un perfil histórico conectado a la CPU completa ni al RBF.
+La conexión privada cubre únicamente instrucciones de registro calificadas;
+todavía no hay un perfil histórico completo integrado al RBF.
 
 ## 1. Objetivo y alcance de precisión
 

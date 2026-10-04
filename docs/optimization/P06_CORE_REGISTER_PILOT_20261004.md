@@ -59,3 +59,98 @@ The pilot will validate instruction minima and commit ordering. Historical
 Ts/Tc fetch publication, decoded-instruction lookahead (P06-IU01), complete
 event timing, memory/branch forms and the complete T286REF wrapper remain
 later gates. No production speed profile or new RBF is implied by M3a.
+
+## M3b: private connection validated
+
+`scripts/build_p06_register_cpu.py` checks the frozen production CPU hashes
+and applies exact, single-match hooks to **one selected CPU source list** in
+an ignored build directory. There is no committed functional CPU clone.
+The existing decoder/microcode/datapath still own instruction semantics.
+The production QIP, vendored CPU, 86Box integration and RBF remain unchanged.
+Reproduce the directed acceptance under WSL with:
+
+```sh
+python3 scripts/run_p06_timed_register.py --output build/p06-register-fresh
+```
+
+The private parameter `P06_REGISTER_PILOT` defaults to MAX bypass. In the
+pilot, opcode admission occurs at a 6 MHz virtual boundary. The retained
+executor `register_pending_q` is exposed independently of execution enables:
+it is set only after accepted register ModRM or the final immediate byte.
+Gate actual executor progress and micro-operation completion while that
+record waits for its 2/3-clock deadline. The real ALU, original completion
+checks and existing GPR/FLAGS write paths execute at the permitted commit.
+No second result slot, functional engine, queue or clock domain is added.
+
+The published `debug_ip` holds the event unit's saved start IP while the
+timed instruction is active, then publishes the final byte cursor with
+GPR/FLAGS/retirement. All internal cursor consumers, including event context,
+retain the original byte cursor semantics. Redirect/reset cancels both the
+retained functional candidate and temporal ownership.
+
+Scope tags classify already available opcode bytes only for temporal
+qualification. 81/83 ADD and XOR share the three-clock cost class; the existing
+functional decode chooses the actual ALU operation. Register ModRM and group
+0/6 are checked before consumption. Other opcodes, byte forms, prefixes,
+memory operands, groups, PM and event entry stop with an explicit development
+diagnostic. They do not receive a zero-cost historical fallback.
+
+### Directed acceptance
+
+| Evidence | Result |
+| --- | --- |
+| 208 ordinary cases in the full CPU | Exactly 2 clocks for register/register and 3 for register/immediate; correct GPR/defined FLAGS/IP |
+| 13 deliberately slow dependency cases | 6 still fit because their bytes are present at dispatch; 7 immediate cases extend by 9/10 clocks until the real bytes arrive |
+| 65 lifecycle cases | Pause, malformed controller transaction, redirect, reset and pending NMI retain/cancel state correctly |
+| 7 scope stops | Unknown opcode, prefix, byte form, memory ModRM, non-ADD/XOR groups and forced PM stop before architectural writes |
+| Four consecutive ADD AX,BX | Correct dependent results and flags; each instruction's minimum is 2 clocks; one additional dispatch clock between instructions is exposed |
+| Original MAX versus hooked MAX | Identical per-edge and final-state traces for all 208 cases |
+| Existing MAX banks using the hooked CPU | Register execution 78 cases; immediate execution 184 cases; timing-policy equivalence 63 checks |
+| Timing-gate bypass mutation | Rejected before the first premature write, even though the functional result would be correct |
+| Lint and microcode freshness | Strict full CPU `-Wall` in MAX/pilot, and current microcode, pass |
+
+Icarus and Verilator traces match in every pilot scenario. The normal pilot
+run records 1,175 physical bus completions outside CPU boundaries: READY
+capture/fetch service remain on fabric edges rather than being clock-divided.
+Deliberately late dependencies are **implementation extensions**, not board
+wait corrections. No physical-board policy is inferred from the test READY
+pulses. Event tests demonstrate pending NMI and the completed saved IP,
+then stop before untimed event entry; they do not certify interrupt latency.
+The PM test forces PE as a qualification fixture, not a timed LMSW execution.
+
+The additional dispatch clock in the repeated ADD stream is a real coverage
+gap. The current decoder has no three-entry decoded-instruction queue and
+does not admit the next instruction on the retirement edge. This belongs to
+**P06-IU01**; M3b proves isolated instruction minima and commit ordering,
+not Intel steady-state stream throughput.
+
+### Cost and limits
+
+The exact connection included by `p06_register_policy_cost` maps in generic
+Yosys synthesis to **22 register bits / 284 generic cells**, including the
+clock generator and three diagnostic reason bits. MAX maps to **zero bits /
+zero cells** for this control fixture. Full CPU MAX elaboration also prunes
+the entire temporal generate branch. This is not whole-CPU synthesis or an
+ALM/placement/STA estimate; the fixture exposes normalized dependency/control
+inputs and preserves diagnostic outputs. Adoption still requires actual
+FPGA resource/timing measurements.
+
+Additional nominal profiles share this execution/timing logic. The planned
+upper named profile is **25 MHz**, followed by **MAX** for the current
+dependency-driven maximum throughput. A common denominator of 50 can emit
+the required 2x phase events from the existing 50 MHz fabric using a slightly
+wider accumulator and speed selector. That is a small incremental logic
+proposal, not a measured ALM cost. No new PLL/domain is needed. Faster profiles
+still require directed deadline checks: selector reuse cannot prove their
+functional/backend work fits the shorter virtual periods.
+
+Frozen evidence:
+[`timed receipt`](../evidence/p06-core-register-20261004/timed/receipt.json),
+[`audit`](../evidence/p06-core-register-20261004/audit.py).
+The audit verifies all frozen text/netlist artifacts, reconstructs the private
+CPU from unchanged production sources and checks actual minima/MAX equality.
+
+M3b is complete for this private register subset. Historical BIU/fetch Ts/Tc,
+IU lookahead, branches/memory, complete event/PM coverage, the DOS timer/setup/
+return wrapper, physical collaborator calibration and full FPGA cost/STA
+remain open. No long global regression or Quartus fit was run for this milestone.

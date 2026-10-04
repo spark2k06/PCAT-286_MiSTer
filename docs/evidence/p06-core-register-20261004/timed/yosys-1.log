@@ -1,0 +1,866 @@
+
+-- Executing script file `/mnt/d/GitHub/PCAT-286_MiSTer/build/p06-timed-register-final-20261004/generic-1.ys' --
+
+1. Executing Verilog-2005 frontend: /mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_clock.sv
+Parsing SystemVerilog input from `/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_clock.sv' to AST representation.
+Generating RTLIL representation for module `\p06_clock'.
+Successfully finished Verilog frontend.
+
+2. Executing Verilog-2005 frontend: /mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_instruction_duration.sv
+Parsing SystemVerilog input from `/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_instruction_duration.sv' to AST representation.
+Generating RTLIL representation for module `\p06_instruction_duration'.
+Successfully finished Verilog frontend.
+
+3. Executing Verilog-2005 frontend: /mnt/d/GitHub/PCAT-286_MiSTer/sim/spk286_timing_pilot/p06_register_policy_cost.sv
+Parsing SystemVerilog input from `/mnt/d/GitHub/PCAT-286_MiSTer/sim/spk286_timing_pilot/p06_register_policy_cost.sv' to AST representation.
+Generating RTLIL representation for module `\p06_register_policy_cost'.
+Successfully finished Verilog frontend.
+Parameter \P06_REGISTER_PILOT = 1
+
+4. Executing AST frontend in derive mode using pre-parsed AST for module `\p06_register_policy_cost'.
+Parameter \P06_REGISTER_PILOT = 1
+Generating RTLIL representation for module `$paramod\p06_register_policy_cost\P06_REGISTER_PILOT=32'00000000000000000000000000000001'.
+
+5. Executing SYNTH pass.
+
+5.1. Executing HIERARCHY pass (managing design hierarchy).
+
+5.1.1. Analyzing design hierarchy..
+Top module:  \p06_register_policy_cost
+Used module:     \p06_clock
+Used module:     \p06_instruction_duration
+
+5.1.2. Analyzing design hierarchy..
+Top module:  \p06_register_policy_cost
+Used module:     \p06_clock
+Used module:     \p06_instruction_duration
+Removed 0 unused modules.
+
+5.2. Executing PROC pass (convert processes to netlists).
+
+5.2.1. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Cleaned up 0 empty switches.
+
+5.2.2. Executing PROC_RMDEAD pass (remove dead branches from decision trees).
+Marked 1 switch rules as full_case in process $proc$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_register_connection.svh:0$155 in module p06_register_policy_cost.
+Marked 4 switch rules as full_case in process $proc$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_register_connection.svh:64$191 in module p06_register_policy_cost.
+Marked 1 switch rules as full_case in process $proc$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_instruction_duration.sv:102$96 in module p06_instruction_duration.
+Marked 3 switch rules as full_case in process $proc$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_instruction_duration.sv:0$49 in module p06_instruction_duration.
+Marked 1 switch rules as full_case in process $proc$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_clock.sv:25$6 in module p06_clock.
+Removed a total of 0 dead cases.
+
+5.2.3. Executing PROC_PRUNE pass (remove redundant assignments in processes).
+Removed 1 redundant assignment.
+Promoted 11 assignments to connections.
+
+5.2.4. Executing PROC_INIT pass (extract init attributes).
+
+5.2.5. Executing PROC_ARST pass (detect async resets in processes).
+
+5.2.6. Executing PROC_ROM pass (convert switches to ROMs).
+Converted 0 switches.
+<suppressed ~19 debug messages>
+
+5.2.7. Executing PROC_MUX pass (convert decision trees to multiplexers).
+Creating decoders for process `\p06_register_policy_cost.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_register_connection.svh:0$155'.
+     1/2: $1\p06_register.form[3:0]
+     2/2: $1\p06_register.opcode_known[0:0]
+Creating decoders for process `\p06_register_policy_cost.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_register_connection.svh:64$191'.
+     1/2: $0\p06_register.scope_reason[2:0]
+     2/2: $0\p06_register.scope_error[0:0]
+Creating decoders for process `\p06_instruction_duration.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_instruction_duration.sv:102$96'.
+     1/5: $0\historical.budget_q[7:0]
+     2/5: $0\historical.elapsed_q[7:0]
+     3/5: $0\historical.permits_wait_q[0:0]
+     4/5: $0\historical.active_q[0:0]
+     5/5: $0\timing_error[0:0]
+Creating decoders for process `\p06_instruction_duration.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_instruction_duration.sv:0$49'.
+     1/8: $1\minimum_clocks[5:0]
+     2/8: $1\historical.alignment_clocks[5:0]
+     3/8: $1\historical.base_clocks[5:0]
+     4/8: $1\historical.requires_target_length[0:0]
+     5/8: $1\historical.branch_form[0:0]
+     6/8: $1\historical.permits_read_wait[0:0]
+     7/8: $1\historical.memory_form[0:0]
+     8/8: $1\historical.row_known[0:0]
+Creating decoders for process `\p06_clock.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_clock.sv:25$6'.
+     1/2: $0\historical.phase_accumulator_q[4:0]
+     2/2: $0\historical.phase_parity_q[0:0]
+
+5.2.8. Executing PROC_DLATCH pass (convert process syncs to latches).
+No latch inferred for signal `\p06_register_policy_cost.\p06_register.opcode_known' from process `\p06_register_policy_cost.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_register_connection.svh:0$155'.
+No latch inferred for signal `\p06_register_policy_cost.\p06_register.form' from process `\p06_register_policy_cost.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_register_connection.svh:0$155'.
+No latch inferred for signal `\p06_instruction_duration.\metadata_qualified' from process `\p06_instruction_duration.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_instruction_duration.sv:0$49'.
+No latch inferred for signal `\p06_instruction_duration.\minimum_clocks' from process `\p06_instruction_duration.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_instruction_duration.sv:0$49'.
+No latch inferred for signal `\p06_instruction_duration.\historical.row_known' from process `\p06_instruction_duration.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_instruction_duration.sv:0$49'.
+No latch inferred for signal `\p06_instruction_duration.\historical.memory_form' from process `\p06_instruction_duration.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_instruction_duration.sv:0$49'.
+No latch inferred for signal `\p06_instruction_duration.\historical.permits_read_wait' from process `\p06_instruction_duration.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_instruction_duration.sv:0$49'.
+No latch inferred for signal `\p06_instruction_duration.\historical.branch_form' from process `\p06_instruction_duration.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_instruction_duration.sv:0$49'.
+No latch inferred for signal `\p06_instruction_duration.\historical.requires_target_length' from process `\p06_instruction_duration.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_instruction_duration.sv:0$49'.
+No latch inferred for signal `\p06_instruction_duration.\historical.base_clocks' from process `\p06_instruction_duration.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_instruction_duration.sv:0$49'.
+No latch inferred for signal `\p06_instruction_duration.\historical.alignment_clocks' from process `\p06_instruction_duration.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_instruction_duration.sv:0$49'.
+
+5.2.9. Executing PROC_DFF pass (convert process syncs to FFs).
+Creating register for signal `\p06_register_policy_cost.\p06_register.scope_error' using process `\p06_register_policy_cost.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_register_connection.svh:64$191'.
+  created $dff cell `$procdff$351' with positive edge clock.
+Creating register for signal `\p06_register_policy_cost.\p06_register.scope_reason' using process `\p06_register_policy_cost.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_register_connection.svh:64$191'.
+  created $dff cell `$procdff$352' with positive edge clock.
+Creating register for signal `\p06_instruction_duration.\timing_error' using process `\p06_instruction_duration.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_instruction_duration.sv:102$96'.
+  created $dff cell `$procdff$353' with positive edge clock.
+Creating register for signal `\p06_instruction_duration.\historical.active_q' using process `\p06_instruction_duration.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_instruction_duration.sv:102$96'.
+  created $dff cell `$procdff$354' with positive edge clock.
+Creating register for signal `\p06_instruction_duration.\historical.permits_wait_q' using process `\p06_instruction_duration.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_instruction_duration.sv:102$96'.
+  created $dff cell `$procdff$355' with positive edge clock.
+Creating register for signal `\p06_instruction_duration.\historical.elapsed_q' using process `\p06_instruction_duration.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_instruction_duration.sv:102$96'.
+  created $dff cell `$procdff$356' with positive edge clock.
+Creating register for signal `\p06_instruction_duration.\historical.budget_q' using process `\p06_instruction_duration.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_instruction_duration.sv:102$96'.
+  created $dff cell `$procdff$357' with positive edge clock.
+Creating register for signal `\p06_clock.\historical.phase_accumulator_q' using process `\p06_clock.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_clock.sv:25$6'.
+  created $dff cell `$procdff$358' with positive edge clock.
+Creating register for signal `\p06_clock.\historical.phase_parity_q' using process `\p06_clock.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_clock.sv:25$6'.
+  created $dff cell `$procdff$359' with positive edge clock.
+
+5.2.10. Executing PROC_MEMWR pass (convert process memory writes to cells).
+
+5.2.11. Executing PROC_CLEAN pass (remove empty switches from decision trees).
+Found and cleaned up 1 empty switch in `\p06_register_policy_cost.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_register_connection.svh:0$155'.
+Removing empty process `p06_register_policy_cost.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_register_connection.svh:0$155'.
+Found and cleaned up 6 empty switches in `\p06_register_policy_cost.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_register_connection.svh:64$191'.
+Removing empty process `p06_register_policy_cost.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_register_connection.svh:64$191'.
+Found and cleaned up 7 empty switches in `\p06_instruction_duration.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_instruction_duration.sv:102$96'.
+Removing empty process `p06_instruction_duration.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_instruction_duration.sv:102$96'.
+Found and cleaned up 3 empty switches in `\p06_instruction_duration.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_instruction_duration.sv:0$49'.
+Removing empty process `p06_instruction_duration.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_instruction_duration.sv:0$49'.
+Found and cleaned up 2 empty switches in `\p06_clock.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_clock.sv:25$6'.
+Removing empty process `p06_clock.$proc$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_clock.sv:25$6'.
+Cleaned up 19 empty switches.
+
+5.2.12. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_register_policy_cost.
+<suppressed ~1 debug messages>
+Optimizing module p06_instruction_duration.
+<suppressed ~3 debug messages>
+Optimizing module p06_clock.
+
+5.3. Executing FLATTEN pass (flatten design).
+Deleting now unused module p06_instruction_duration.
+Deleting now unused module p06_clock.
+<suppressed ~2 debug messages>
+
+5.4. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_register_policy_cost.
+<suppressed ~33 debug messages>
+
+5.5. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_register_policy_cost..
+Removed 34 unused cells and 166 unused wires.
+<suppressed ~46 debug messages>
+
+5.6. Executing CHECK pass (checking for obvious problems).
+Checking module p06_register_policy_cost...
+Found and reported 0 problems.
+
+5.7. Executing OPT pass (performing simple optimizations).
+
+5.7.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_register_policy_cost.
+<suppressed ~5 debug messages>
+
+5.7.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\p06_register_policy_cost'.
+<suppressed ~117 debug messages>
+Removed a total of 39 cells.
+
+5.7.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \p06_register_policy_cost..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~15 debug messages>
+
+5.7.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \p06_register_policy_cost.
+    New ctrl vector for $pmux cell $flatten\p06_register.duration_policy.$procmux$300: { $flatten\p06_register.duration_policy.$procmux$308_CTRL $flatten\p06_register.duration_policy.$procmux$304_CMP $flatten\p06_register.duration_policy.$procmux$303_CMP $auto$opt_reduce.cc:134:opt_pmux$363 $auto$opt_reduce.cc:134:opt_pmux$361 }
+    New ctrl vector for $pmux cell $flatten\p06_register.duration_policy.$procmux$314: $flatten\p06_register.duration_policy.$procmux$305_CMP
+    New ctrl vector for $pmux cell $flatten\p06_register.duration_policy.$procmux$321: $auto$opt_reduce.cc:134:opt_pmux$365
+    New ctrl vector for $pmux cell $flatten\p06_register.duration_policy.$procmux$334: $auto$opt_reduce.cc:134:opt_pmux$367
+    New ctrl vector for $pmux cell $procmux$214: $auto$opt_reduce.cc:134:opt_pmux$369
+    New input vector for $reduce_or cell $auto$opt_reduce.cc:128:opt_pmux$360: { $flatten\p06_register.duration_policy.$procmux$301_CMP $flatten\p06_register.duration_policy.$procmux$305_CMP }
+    New input vector for $reduce_or cell $auto$opt_reduce.cc:128:opt_pmux$362: { $flatten\p06_register.duration_policy.$procmux$302_CMP $flatten\p06_register.duration_policy.$procmux$306_CMP $flatten\p06_register.duration_policy.$procmux$307_CMP }
+    New input vector for $reduce_or cell $auto$opt_reduce.cc:128:opt_pmux$366: { $flatten\p06_register.duration_policy.$procmux$301_CMP $flatten\p06_register.duration_policy.$procmux$302_CMP $flatten\p06_register.duration_policy.$procmux$303_CMP $flatten\p06_register.duration_policy.$procmux$304_CMP $flatten\p06_register.duration_policy.$procmux$305_CMP $flatten\p06_register.duration_policy.$procmux$306_CMP $flatten\p06_register.duration_policy.$procmux$307_CMP $flatten\p06_register.duration_policy.$procmux$308_CMP }
+    New input vector for $reduce_or cell $auto$opt_reduce.cc:128:opt_pmux$368: { $procmux$209_CMP $procmux$210_CMP $procmux$211_CMP $procmux$212_CMP $procmux$219_CMP }
+  Optimizing cells in module \p06_register_policy_cost.
+Performed a total of 9 changes.
+
+5.7.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\p06_register_policy_cost'.
+Removed a total of 0 cells.
+
+5.7.6. Executing OPT_DFF pass (perform DFF optimizations).
+
+5.7.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_register_policy_cost..
+Removed 3 unused cells and 38 unused wires.
+<suppressed ~4 debug messages>
+
+5.7.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_register_policy_cost.
+
+5.7.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+5.7.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \p06_register_policy_cost..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~15 debug messages>
+
+5.7.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \p06_register_policy_cost.
+Performed a total of 0 changes.
+
+5.7.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\p06_register_policy_cost'.
+Removed a total of 0 cells.
+
+5.7.13. Executing OPT_DFF pass (perform DFF optimizations).
+
+5.7.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_register_policy_cost..
+
+5.7.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_register_policy_cost.
+
+5.7.16. Finished OPT passes. (There is nothing left to do.)
+
+5.8. Executing FSM pass (extract and optimize FSM).
+
+5.8.1. Executing FSM_DETECT pass (finding FSMs in design).
+Not marking p06_register_policy_cost.p06_register.duration_policy.historical.budget_q as FSM state register:
+    Users of register don't seem to benefit from recoding.
+Not marking p06_register_policy_cost.p06_register.scope_reason as FSM state register:
+    Register is connected to module port.
+    Users of register don't seem to benefit from recoding.
+
+5.8.2. Executing FSM_EXTRACT pass (extracting FSM from design).
+
+5.8.3. Executing FSM_OPT pass (simple optimizations of FSMs).
+
+5.8.4. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_register_policy_cost..
+
+5.8.5. Executing FSM_OPT pass (simple optimizations of FSMs).
+
+5.8.6. Executing FSM_RECODE pass (re-assigning FSM state encoding).
+
+5.8.7. Executing FSM_INFO pass (dumping all available information on FSM cells).
+
+5.8.8. Executing FSM_MAP pass (mapping FSMs to basic logic).
+
+5.9. Executing OPT pass (performing simple optimizations).
+
+5.9.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_register_policy_cost.
+
+5.9.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\p06_register_policy_cost'.
+Removed a total of 0 cells.
+
+5.9.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \p06_register_policy_cost..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~15 debug messages>
+
+5.9.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \p06_register_policy_cost.
+Performed a total of 0 changes.
+
+5.9.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\p06_register_policy_cost'.
+Removed a total of 0 cells.
+
+5.9.6. Executing OPT_DFF pass (perform DFF optimizations).
+Adding SRST signal on $procdff$352 ($dff) from module p06_register_policy_cost (D = $procmux$231_Y, Q = \p06_register.scope_reason, rval = 3'000).
+Adding EN signal on $auto$ff.cc:266:slice$370 ($sdff) from module p06_register_policy_cost (D = $procmux$229_Y, Q = \p06_register.scope_reason).
+Adding SRST signal on $procdff$351 ($dff) from module p06_register_policy_cost (D = $procmux$247_Y, Q = \p06_register.scope_error, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$376 ($sdff) from module p06_register_policy_cost (D = $procmux$245_Y, Q = \p06_register.scope_error).
+Adding SRST signal on $flatten\p06_register.duration_policy.$procdff$357 ($dff) from module p06_register_policy_cost (D = $flatten\p06_register.duration_policy.$procmux$258_Y [5:0], Q = \p06_register.duration_policy.historical.budget_q [5:0], rval = 6'000000).
+Adding SRST signal on $flatten\p06_register.duration_policy.$procdff$357 ($dff) from module p06_register_policy_cost (D = $flatten\p06_register.duration_policy.$procmux$256_Y [7:6], Q = \p06_register.duration_policy.historical.budget_q [7:6], rval = 2'00).
+Adding EN signal on $auto$ff.cc:266:slice$383 ($sdff) from module p06_register_policy_cost (D = 2'00, Q = \p06_register.duration_policy.historical.budget_q [7:6]).
+Adding EN signal on $auto$ff.cc:266:slice$382 ($sdff) from module p06_register_policy_cost (D = $flatten\p06_register.duration_policy.$procmux$258_Y [5:0], Q = \p06_register.duration_policy.historical.budget_q [5:0]).
+Adding SRST signal on $flatten\p06_register.duration_policy.$procdff$356 ($dff) from module p06_register_policy_cost (D = $flatten\p06_register.duration_policy.$procmux$263_Y, Q = \p06_register.duration_policy.historical.elapsed_q, rval = 8'00000000).
+Adding EN signal on $auto$ff.cc:266:slice$390 ($sdff) from module p06_register_policy_cost (D = \p06_register.duration_policy.historical.next_elapsed [7:0], Q = \p06_register.duration_policy.historical.elapsed_q).
+Adding SRST signal on $flatten\p06_register.duration_policy.$procdff$354 ($dff) from module p06_register_policy_cost (D = $flatten\p06_register.duration_policy.$procmux$283_Y, Q = \p06_register.duration_policy.historical.active_q, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$394 ($sdff) from module p06_register_policy_cost (D = $flatten\p06_register.duration_policy.$procmux$283_Y, Q = \p06_register.duration_policy.historical.active_q).
+Adding EN signal on $flatten\p06_register.duration_policy.$procdff$353 ($dff) from module p06_register_policy_cost (D = 1'0, Q = \p06_register.duration_policy.timing_error).
+Adding SRST signal on $flatten\p06_register.clock_policy.$procdff$359 ($dff) from module p06_register_policy_cost (D = $flatten\p06_register.clock_policy.$procmux$346_Y, Q = \p06_register.clock_policy.historical.phase_parity_q, rval = 1'0).
+Adding EN signal on $auto$ff.cc:266:slice$399 ($sdff) from module p06_register_policy_cost (D = $flatten\p06_register.clock_policy.$logic_not$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_clock.sv:32$9_Y, Q = \p06_register.clock_policy.historical.phase_parity_q).
+Adding SRST signal on $flatten\p06_register.clock_policy.$procdff$358 ($dff) from module p06_register_policy_cost (D = $flatten\p06_register.clock_policy.$ternary$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_clock.sv:30$8_Y, Q = \p06_register.clock_policy.historical.phase_accumulator_q, rval = 5'00000).
+Setting constant 0-bit at position 0 on $auto$ff.cc:266:slice$398 ($dffe) from module p06_register_policy_cost.
+Setting constant 0-bit at position 0 on $auto$ff.cc:266:slice$386 ($sdffe) from module p06_register_policy_cost.
+Setting constant 0-bit at position 1 on $auto$ff.cc:266:slice$386 ($sdffe) from module p06_register_policy_cost.
+
+5.9.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_register_policy_cost..
+Removed 15 unused cells and 15 unused wires.
+<suppressed ~16 debug messages>
+
+5.9.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_register_policy_cost.
+<suppressed ~8 debug messages>
+
+5.9.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+5.9.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \p06_register_policy_cost..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~12 debug messages>
+
+5.9.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \p06_register_policy_cost.
+Performed a total of 0 changes.
+
+5.9.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\p06_register_policy_cost'.
+<suppressed ~6 debug messages>
+Removed a total of 2 cells.
+
+5.9.13. Executing OPT_DFF pass (perform DFF optimizations).
+
+5.9.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_register_policy_cost..
+Removed 0 unused cells and 6 unused wires.
+<suppressed ~1 debug messages>
+
+5.9.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_register_policy_cost.
+
+5.9.16. Rerunning OPT passes. (Maybe there is more to do..)
+
+5.9.17. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \p06_register_policy_cost..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~12 debug messages>
+
+5.9.18. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \p06_register_policy_cost.
+Performed a total of 0 changes.
+
+5.9.19. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\p06_register_policy_cost'.
+Removed a total of 0 cells.
+
+5.9.20. Executing OPT_DFF pass (perform DFF optimizations).
+
+5.9.21. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_register_policy_cost..
+
+5.9.22. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_register_policy_cost.
+
+5.9.23. Finished OPT passes. (There is nothing left to do.)
+
+5.10. Executing WREDUCE pass (reducing word size of cells).
+Removed top 6 bits (of 8) from port B of cell p06_register_policy_cost.$procmux$219_CMP1 ($eq).
+Removed top 7 bits (of 8) from port B of cell p06_register_policy_cost.$procmux$219_CMP0 ($eq).
+Removed top 2 bits (of 8) from port B of cell p06_register_policy_cost.$procmux$212_CMP1 ($eq).
+Removed top 2 bits (of 8) from port B of cell p06_register_policy_cost.$procmux$212_CMP0 ($eq).
+Removed top 2 bits (of 8) from port B of cell p06_register_policy_cost.$procmux$211_CMP1 ($eq).
+Removed top 2 bits (of 8) from port B of cell p06_register_policy_cost.$procmux$211_CMP0 ($eq).
+Removed top 5 bits (of 8) from port B of cell p06_register_policy_cost.$procmux$210_CMP0 ($eq).
+Removed top 1 bits (of 4) from mux cell p06_register_policy_cost.$procmux$208 ($pmux).
+Removed top 2 bits (of 8) from port B of cell p06_register_policy_cost.$procmux$209_CMP0 ($eq).
+Removed top 5 bits (of 8) from port B of cell p06_register_policy_cost.$ne$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_register_connection.svh:35$156 ($ne).
+Removed top 2 bits (of 8) from port B of cell p06_register_policy_cost.$ne$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_register_connection.svh:35$157 ($ne).
+Removed top 1 bits (of 4) from port A of cell p06_register_policy_cost.$flatten\p06_register.duration_policy.$procmux$308_CMP2 ($eq).
+Removed top 2 bits (of 4) from port B of cell p06_register_policy_cost.$flatten\p06_register.duration_policy.$procmux$308_CMP2 ($eq).
+Removed top 1 bits (of 4) from port A of cell p06_register_policy_cost.$flatten\p06_register.duration_policy.$procmux$308_CMP1 ($eq).
+Removed top 3 bits (of 4) from port B of cell p06_register_policy_cost.$flatten\p06_register.duration_policy.$procmux$308_CMP1 ($eq).
+Removed top 1 bits (of 4) from port A of cell p06_register_policy_cost.$flatten\p06_register.duration_policy.$procmux$307_CMP1 ($eq).
+Removed top 1 bits (of 4) from port B of cell p06_register_policy_cost.$flatten\p06_register.duration_policy.$procmux$307_CMP1 ($eq).
+Removed top 1 bits (of 4) from port A of cell p06_register_policy_cost.$flatten\p06_register.duration_policy.$procmux$307_CMP0 ($eq).
+Removed top 2 bits (of 4) from port B of cell p06_register_policy_cost.$flatten\p06_register.duration_policy.$procmux$307_CMP0 ($eq).
+Removed top 1 bits (of 4) from port A of cell p06_register_policy_cost.$flatten\p06_register.duration_policy.$procmux$306_CMP0 ($eq).
+Removed top 1 bits (of 4) from port B of cell p06_register_policy_cost.$flatten\p06_register.duration_policy.$procmux$306_CMP0 ($eq).
+Removed top 1 bits (of 4) from port A of cell p06_register_policy_cost.$flatten\p06_register.duration_policy.$procmux$305_CMP0 ($eq).
+Removed top 1 bits (of 4) from port B of cell p06_register_policy_cost.$flatten\p06_register.duration_policy.$procmux$305_CMP0 ($eq).
+Removed top 1 bits (of 4) from port A of cell p06_register_policy_cost.$flatten\p06_register.duration_policy.$procmux$304_CMP0 ($eq).
+Removed top 1 bits (of 4) from port B of cell p06_register_policy_cost.$flatten\p06_register.duration_policy.$procmux$304_CMP0 ($eq).
+Removed top 1 bits (of 4) from port A of cell p06_register_policy_cost.$flatten\p06_register.duration_policy.$procmux$303_CMP0 ($eq).
+Removed top 1 bits (of 4) from port A of cell p06_register_policy_cost.$flatten\p06_register.duration_policy.$procmux$302_CMP0 ($eq).
+Removed top 3 bits (of 6) from mux cell p06_register_policy_cost.$flatten\p06_register.duration_policy.$procmux$300 ($pmux).
+Removed top 1 bits (of 4) from port A of cell p06_register_policy_cost.$flatten\p06_register.duration_policy.$procmux$301_CMP1 ($eq).
+Removed top 1 bits (of 4) from port A of cell p06_register_policy_cost.$flatten\p06_register.duration_policy.$procmux$301_CMP0 ($eq).
+Removed top 3 bits (of 6) from mux cell p06_register_policy_cost.$flatten\p06_register.duration_policy.$procmux$294 ($mux).
+Removed top 2 bits (of 8) from mux cell p06_register_policy_cost.$flatten\p06_register.duration_policy.$procmux$258 ($mux).
+Removed top 2 bits (of 8) from mux cell p06_register_policy_cost.$flatten\p06_register.duration_policy.$procmux$256 ($mux).
+Removed top 3 bits (of 9) from port B of cell p06_register_policy_cost.$flatten\p06_register.duration_policy.$ge$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_instruction_duration.sv:46$36 ($ge).
+Removed top 1 bits (of 9) from port A of cell p06_register_policy_cost.$flatten\p06_register.duration_policy.$add$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_instruction_duration.sv:40$15 ($add).
+Removed top 8 bits (of 9) from port B of cell p06_register_policy_cost.$flatten\p06_register.duration_policy.$add$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_instruction_duration.sv:40$15 ($add).
+Removed top 1 bits (of 6) from port B of cell p06_register_policy_cost.$flatten\p06_register.clock_policy.$sub$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_clock.sv:31$7 ($sub).
+Removed top 1 bits (of 6) from port Y of cell p06_register_policy_cost.$flatten\p06_register.clock_policy.$sub$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_clock.sv:31$7 ($sub).
+Removed top 1 bits (of 6) from port A of cell p06_register_policy_cost.$flatten\p06_register.clock_policy.$sub$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_clock.sv:31$7 ($sub).
+Removed top 1 bits (of 6) from port B of cell p06_register_policy_cost.$flatten\p06_register.clock_policy.$ge$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_clock.sv:19$2 ($ge).
+Removed top 1 bits (of 6) from port A of cell p06_register_policy_cost.$flatten\p06_register.clock_policy.$add$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_clock.sv:18$1 ($add).
+Removed top 3 bits (of 6) from port B of cell p06_register_policy_cost.$flatten\p06_register.clock_policy.$add$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_clock.sv:18$1 ($add).
+Removed top 1 bits (of 6) from wire p06_register_policy_cost.$flatten\p06_register.clock_policy.$sub$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_clock.sv:31$7_Y.
+Removed top 2 bits (of 8) from wire p06_register_policy_cost.$flatten\p06_register.duration_policy.$procmux$256_Y.
+Removed top 2 bits (of 8) from wire p06_register_policy_cost.$flatten\p06_register.duration_policy.$procmux$258_Y.
+Removed top 1 bits (of 4) from wire p06_register_policy_cost.p06_register.form.
+Removed top 3 bits (of 6) from wire p06_register_policy_cost.p06_register.minimum_clocks.
+Removed top 2 bits (of 8) from wire p06_register_policy_cost.p06_register.scheduled.
+
+5.11. Executing PEEPOPT pass (run peephole optimizers).
+
+5.12. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_register_policy_cost..
+Removed 0 unused cells and 6 unused wires.
+<suppressed ~1 debug messages>
+
+5.13. Executing ALUMACC pass (create $alu and $macc cells).
+Extracting $alu and $macc cells in module p06_register_policy_cost:
+  creating $macc model for $flatten\p06_register.clock_policy.$add$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_clock.sv:18$1 ($add).
+  creating $macc model for $flatten\p06_register.clock_policy.$sub$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_clock.sv:31$7 ($sub).
+  creating $macc model for $flatten\p06_register.duration_policy.$add$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_instruction_duration.sv:40$15 ($add).
+  creating $alu model for $macc $flatten\p06_register.duration_policy.$add$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_instruction_duration.sv:40$15.
+  creating $alu model for $macc $flatten\p06_register.clock_policy.$sub$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_clock.sv:31$7.
+  creating $alu model for $macc $flatten\p06_register.clock_policy.$add$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_clock.sv:18$1.
+  creating $alu model for $flatten\p06_register.clock_policy.$ge$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_clock.sv:19$2 ($ge): new $alu
+  creating $alu model for $flatten\p06_register.duration_policy.$ge$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_instruction_duration.sv:46$36 ($ge): new $alu
+  creating $alu cell for $flatten\p06_register.duration_policy.$ge$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_instruction_duration.sv:46$36: $auto$alumacc.cc:485:replace_alu$410
+  creating $alu cell for $flatten\p06_register.clock_policy.$ge$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_clock.sv:19$2: $auto$alumacc.cc:485:replace_alu$419
+  creating $alu cell for $flatten\p06_register.clock_policy.$add$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_clock.sv:18$1: $auto$alumacc.cc:485:replace_alu$428
+  creating $alu cell for $flatten\p06_register.clock_policy.$sub$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_clock.sv:31$7: $auto$alumacc.cc:485:replace_alu$431
+  creating $alu cell for $flatten\p06_register.duration_policy.$add$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_instruction_duration.sv:40$15: $auto$alumacc.cc:485:replace_alu$434
+  created 5 $alu and 0 $macc cells.
+
+5.14. Executing SHARE pass (SAT-based resource sharing).
+
+5.15. Executing OPT pass (performing simple optimizations).
+
+5.15.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_register_policy_cost.
+<suppressed ~5 debug messages>
+
+5.15.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\p06_register_policy_cost'.
+Removed a total of 0 cells.
+
+5.15.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \p06_register_policy_cost..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+    dead port 3/6 on $pmux $flatten\p06_register.duration_policy.$procmux$300.
+Removed 1 multiplexer ports.
+<suppressed ~12 debug messages>
+
+5.15.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \p06_register_policy_cost.
+    New input vector for $reduce_or cell $auto$opt_reduce.cc:128:opt_pmux$366: { $flatten\p06_register.duration_policy.$procmux$304_CMP $flatten\p06_register.duration_policy.$procmux$305_CMP $flatten\p06_register.duration_policy.$procmux$306_CMP $flatten\p06_register.duration_policy.$procmux$307_CMP $flatten\p06_register.duration_policy.$procmux$308_CMP }
+    New input vector for $reduce_or cell $auto$opt_reduce.cc:128:opt_pmux$362: { $flatten\p06_register.duration_policy.$procmux$306_CMP $flatten\p06_register.duration_policy.$procmux$307_CMP }
+  Optimizing cells in module \p06_register_policy_cost.
+Performed a total of 2 changes.
+
+5.15.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\p06_register_policy_cost'.
+Removed a total of 0 cells.
+
+5.15.6. Executing OPT_DFF pass (perform DFF optimizations).
+
+5.15.7. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_register_policy_cost..
+Removed 0 unused cells and 6 unused wires.
+<suppressed ~1 debug messages>
+
+5.15.8. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_register_policy_cost.
+
+5.15.9. Rerunning OPT passes. (Maybe there is more to do..)
+
+5.15.10. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \p06_register_policy_cost..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~12 debug messages>
+
+5.15.11. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \p06_register_policy_cost.
+Performed a total of 0 changes.
+
+5.15.12. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\p06_register_policy_cost'.
+Removed a total of 0 cells.
+
+5.15.13. Executing OPT_DFF pass (perform DFF optimizations).
+
+5.15.14. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_register_policy_cost..
+
+5.15.15. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_register_policy_cost.
+
+5.15.16. Finished OPT passes. (There is nothing left to do.)
+
+5.16. Executing MEMORY pass.
+
+5.16.1. Executing OPT_MEM pass (optimize memories).
+Performed a total of 0 transformations.
+
+5.16.2. Executing OPT_MEM_PRIORITY pass (removing unnecessary memory write priority relations).
+Performed a total of 0 transformations.
+
+5.16.3. Executing OPT_MEM_FEEDBACK pass (finding memory read-to-write feedback paths).
+
+5.16.4. Executing MEMORY_BMUX2ROM pass (converting muxes to ROMs).
+
+5.16.5. Executing MEMORY_DFF pass (merging $dff cells to $memrd).
+
+5.16.6. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_register_policy_cost..
+
+5.16.7. Executing MEMORY_SHARE pass (consolidating $memrd/$memwr cells).
+
+5.16.8. Executing OPT_MEM_WIDEN pass (optimize memories where all ports are wide).
+Performed a total of 0 transformations.
+
+5.16.9. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_register_policy_cost..
+
+5.16.10. Executing MEMORY_COLLECT pass (generating $mem cells).
+
+5.17. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_register_policy_cost..
+
+5.18. Executing OPT pass (performing simple optimizations).
+
+5.18.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_register_policy_cost.
+<suppressed ~17 debug messages>
+
+5.18.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\p06_register_policy_cost'.
+Removed a total of 0 cells.
+
+5.18.3. Executing OPT_DFF pass (perform DFF optimizations).
+Adding EN signal on $auto$ff.cc:266:slice$401 ($sdff) from module p06_register_policy_cost (D = $flatten\p06_register.clock_policy.$ternary$/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_clock.sv:30$8_Y [0], Q = \p06_register.clock_policy.historical.phase_accumulator_q [0]).
+
+5.18.4. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_register_policy_cost..
+Removed 1 unused cells and 14 unused wires.
+<suppressed ~2 debug messages>
+
+5.18.5. Rerunning OPT passes. (Removed registers in this run.)
+
+5.18.6. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_register_policy_cost.
+<suppressed ~1 debug messages>
+
+5.18.7. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\p06_register_policy_cost'.
+Removed a total of 0 cells.
+
+5.18.8. Executing OPT_DFF pass (perform DFF optimizations).
+
+5.18.9. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_register_policy_cost..
+Removed 0 unused cells and 1 unused wires.
+<suppressed ~1 debug messages>
+
+5.18.10. Finished fast OPT passes.
+
+5.19. Executing MEMORY_MAP pass (converting memories to logic and flip-flops).
+
+5.20. Executing OPT pass (performing simple optimizations).
+
+5.20.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_register_policy_cost.
+
+5.20.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\p06_register_policy_cost'.
+Removed a total of 0 cells.
+
+5.20.3. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \p06_register_policy_cost..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~6 debug messages>
+
+5.20.4. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \p06_register_policy_cost.
+    Consolidated identical input bits for $mux cell $flatten\p06_register.duration_policy.$procmux$258:
+      Old ports: A=6'000000, B={ 3'000 \p06_register.minimum_clocks }, Y=$auto$wreduce.cc:461:run$404 [5:0]
+      New ports: A=3'000, B=\p06_register.minimum_clocks, Y=$auto$wreduce.cc:461:run$404 [2:0]
+      New connections: $auto$wreduce.cc:461:run$404 [5:3] = 3'000
+    Consolidated identical input bits for $mux cell $procmux$223:
+      Old ports: A=3'001, B=3'010, Y=$procmux$223_Y
+      New ports: A=2'01, B=2'10, Y=$procmux$223_Y [1:0]
+      New connections: $procmux$223_Y [2] = 1'0
+  Optimizing cells in module \p06_register_policy_cost.
+Performed a total of 2 changes.
+
+5.20.5. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\p06_register_policy_cost'.
+Removed a total of 0 cells.
+
+5.20.6. Executing OPT_SHARE pass.
+
+5.20.7. Executing OPT_DFF pass (perform DFF optimizations).
+
+5.20.8. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_register_policy_cost..
+
+5.20.9. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_register_policy_cost.
+
+5.20.10. Rerunning OPT passes. (Maybe there is more to do..)
+
+5.20.11. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \p06_register_policy_cost..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~6 debug messages>
+
+5.20.12. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \p06_register_policy_cost.
+Performed a total of 0 changes.
+
+5.20.13. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\p06_register_policy_cost'.
+Removed a total of 0 cells.
+
+5.20.14. Executing OPT_SHARE pass.
+
+5.20.15. Executing OPT_DFF pass (perform DFF optimizations).
+Setting constant 0-bit at position 3 on $auto$ff.cc:266:slice$387 ($sdffe) from module p06_register_policy_cost.
+Setting constant 0-bit at position 4 on $auto$ff.cc:266:slice$387 ($sdffe) from module p06_register_policy_cost.
+Setting constant 0-bit at position 5 on $auto$ff.cc:266:slice$387 ($sdffe) from module p06_register_policy_cost.
+
+5.20.16. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_register_policy_cost..
+
+5.20.17. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_register_policy_cost.
+
+5.20.18. Rerunning OPT passes. (Maybe there is more to do..)
+
+5.20.19. Executing OPT_MUXTREE pass (detect dead branches in mux trees).
+Running muxtree optimizer on module \p06_register_policy_cost..
+  Creating internal representation of mux trees.
+  Evaluating internal representation of mux trees.
+  Analyzing evaluation results.
+Removed 0 multiplexer ports.
+<suppressed ~6 debug messages>
+
+5.20.20. Executing OPT_REDUCE pass (consolidate $*mux and $reduce_* inputs).
+  Optimizing cells in module \p06_register_policy_cost.
+Performed a total of 0 changes.
+
+5.20.21. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\p06_register_policy_cost'.
+Removed a total of 0 cells.
+
+5.20.22. Executing OPT_SHARE pass.
+
+5.20.23. Executing OPT_DFF pass (perform DFF optimizations).
+
+5.20.24. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_register_policy_cost..
+
+5.20.25. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_register_policy_cost.
+
+5.20.26. Finished OPT passes. (There is nothing left to do.)
+
+5.21. Executing TECHMAP pass (map to technology primitives).
+
+5.21.1. Executing Verilog-2005 frontend: /usr/bin/../share/yosys/techmap.v
+Parsing Verilog input from `/usr/bin/../share/yosys/techmap.v' to AST representation.
+Generating RTLIL representation for module `\_90_simplemap_bool_ops'.
+Generating RTLIL representation for module `\_90_simplemap_reduce_ops'.
+Generating RTLIL representation for module `\_90_simplemap_logic_ops'.
+Generating RTLIL representation for module `\_90_simplemap_compare_ops'.
+Generating RTLIL representation for module `\_90_simplemap_various'.
+Generating RTLIL representation for module `\_90_simplemap_registers'.
+Generating RTLIL representation for module `\_90_shift_ops_shr_shl_sshl_sshr'.
+Generating RTLIL representation for module `\_90_shift_shiftx'.
+Generating RTLIL representation for module `\_90_fa'.
+Generating RTLIL representation for module `\_90_lcu'.
+Generating RTLIL representation for module `\_90_alu'.
+Generating RTLIL representation for module `\_90_macc'.
+Generating RTLIL representation for module `\_90_alumacc'.
+Generating RTLIL representation for module `\$__div_mod_u'.
+Generating RTLIL representation for module `\$__div_mod_trunc'.
+Generating RTLIL representation for module `\_90_div'.
+Generating RTLIL representation for module `\_90_mod'.
+Generating RTLIL representation for module `\$__div_mod_floor'.
+Generating RTLIL representation for module `\_90_divfloor'.
+Generating RTLIL representation for module `\_90_modfloor'.
+Generating RTLIL representation for module `\_90_pow'.
+Generating RTLIL representation for module `\_90_pmux'.
+Generating RTLIL representation for module `\_90_demux'.
+Generating RTLIL representation for module `\_90_lut'.
+Successfully finished Verilog frontend.
+
+5.21.2. Continuing TECHMAP pass.
+Using extmapper simplemap for cells of type $mux.
+Using extmapper simplemap for cells of type $eq.
+Using extmapper simplemap for cells of type $reduce_or.
+Using extmapper simplemap for cells of type $not.
+Using template $paramod$d31bf4d7d72e59528d18fbd4f322e9d608532043\_90_pmux for cells of type $pmux.
+Using extmapper simplemap for cells of type $ne.
+Using extmapper simplemap for cells of type $logic_and.
+Using extmapper simplemap for cells of type $logic_not.
+Using extmapper simplemap for cells of type $logic_or.
+Using extmapper simplemap for cells of type $reduce_bool.
+Using extmapper simplemap for cells of type $sdffe.
+Using template $paramod$8ffc13f158d9c4b92f6c17114e5b147ae5ead21a\_90_alu for cells of type $alu.
+Using extmapper simplemap for cells of type $reduce_and.
+Using extmapper simplemap for cells of type $sdff.
+Using template $paramod$0ae6dcbc606d0267ec97d3ccf20343286af3366c\_90_alu for cells of type $alu.
+Using template $paramod$83dd457849c736323edf2edb15923eb27f99c683\_90_alu for cells of type $alu.
+Using template $paramod$a2af9b43308e3114c3b5dd3f4dc3329b2387395d\_90_alu for cells of type $alu.
+Using template $paramod$b18e16801adf491a64caa0542270798e5d4ac6b6\_90_alu for cells of type $alu.
+Using extmapper simplemap for cells of type $and.
+Using extmapper simplemap for cells of type $pos.
+Using template $paramod\_90_lcu\WIDTH=32'00000000000000000000000000001001 for cells of type $lcu.
+Using extmapper simplemap for cells of type $xor.
+Using template $paramod\_90_lcu\WIDTH=32'00000000000000000000000000000101 for cells of type $lcu.
+Using extmapper simplemap for cells of type $or.
+No more expansions possible.
+<suppressed ~697 debug messages>
+
+5.22. Executing OPT pass (performing simple optimizations).
+
+5.22.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_register_policy_cost.
+<suppressed ~358 debug messages>
+
+5.22.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\p06_register_policy_cost'.
+<suppressed ~372 debug messages>
+Removed a total of 124 cells.
+
+5.22.3. Executing OPT_DFF pass (perform DFF optimizations).
+
+5.22.4. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_register_policy_cost..
+Removed 24 unused cells and 360 unused wires.
+<suppressed ~25 debug messages>
+
+5.22.5. Finished fast OPT passes.
+
+5.23. Executing ABC pass (technology mapping using ABC).
+
+5.23.1. Extracting gate netlist of module `\p06_register_policy_cost' to `<abc-temp-dir>/input.blif'..
+Extracted 356 gates and 444 wires to a netlist network with 85 inputs and 47 outputs.
+
+5.23.1.1. Executing ABC.
+Running ABC command: "<yosys-exe-dir>/yosys-abc" -s -f <abc-temp-dir>/abc.script 2>&1
+ABC: ABC command line: "source <abc-temp-dir>/abc.script".
+ABC: 
+ABC: + read_blif <abc-temp-dir>/input.blif 
+ABC: + read_library <abc-temp-dir>/stdcells.genlib 
+ABC: Entered genlib library with 13 gates from file "<abc-temp-dir>/stdcells.genlib".
+ABC: + strash 
+ABC: + dretime 
+ABC: + map 
+ABC: + write_blif <abc-temp-dir>/output.blif 
+
+5.23.1.2. Re-integrating ABC results.
+ABC RESULTS:              XNOR cells:        2
+ABC RESULTS:              NAND cells:       18
+ABC RESULTS:               AND cells:        9
+ABC RESULTS:               NOT cells:       11
+ABC RESULTS:             ORNOT cells:       19
+ABC RESULTS:               XOR cells:       15
+ABC RESULTS:               NOR cells:       22
+ABC RESULTS:                OR cells:       72
+ABC RESULTS:            ANDNOT cells:       78
+ABC RESULTS:               MUX cells:       21
+ABC RESULTS:        internal signals:      312
+ABC RESULTS:           input signals:       85
+ABC RESULTS:          output signals:       47
+Removing temp directory.
+
+5.24. Executing OPT pass (performing simple optimizations).
+
+5.24.1. Executing OPT_EXPR pass (perform const folding).
+Optimizing module p06_register_policy_cost.
+<suppressed ~2 debug messages>
+
+5.24.2. Executing OPT_MERGE pass (detect identical cells).
+Finding identical cells in module `\p06_register_policy_cost'.
+<suppressed ~12 debug messages>
+Removed a total of 4 cells.
+
+5.24.3. Executing OPT_DFF pass (perform DFF optimizations).
+
+5.24.4. Executing OPT_CLEAN pass (remove unused cells and wires).
+Finding unused cells or wires in module \p06_register_policy_cost..
+Removed 1 unused cells and 347 unused wires.
+<suppressed ~30 debug messages>
+
+5.24.5. Finished fast OPT passes.
+
+5.25. Executing HIERARCHY pass (managing design hierarchy).
+
+5.25.1. Analyzing design hierarchy..
+Top module:  \p06_register_policy_cost
+
+5.25.2. Analyzing design hierarchy..
+Top module:  \p06_register_policy_cost
+Removed 0 unused modules.
+
+5.26. Printing statistics.
+
+=== p06_register_policy_cost ===
+
+   Number of wires:                312
+   Number of wire bits:            499
+   Number of public wires:          78
+   Number of public wire bits:     265
+   Number of memories:               0
+   Number of memory bits:            0
+   Number of processes:              0
+   Number of cells:                284
+     $_ANDNOT_                      74
+     $_AND_                          9
+     $_MUX_                         21
+     $_NAND_                        18
+     $_NOR_                         22
+     $_NOT_                         10
+     $_ORNOT_                       19
+     $_OR_                          72
+     $_SDFFE_PP0N_                   2
+     $_SDFFE_PP0P_                  16
+     $_SDFF_PP0_                     4
+     $_XNOR_                         2
+     $_XOR_                         15
+
+5.27. Executing CHECK pass (checking for obvious problems).
+Checking module p06_register_policy_cost...
+Found and reported 0 problems.
+
+6. Executing JSON backend.
+
+End of script. Logfile hash: 2a9bd82eb7, CPU: user 0.35s system 0.01s, MEM: 47.01 MB peak
+Yosys 0.33 (git sha1 2584903a060)
+Time spent: 27% 24x opt_expr (0 sec), 15% 22x opt_clean (0 sec), ...

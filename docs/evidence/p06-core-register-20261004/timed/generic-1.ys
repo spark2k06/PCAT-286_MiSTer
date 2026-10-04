@@ -1,0 +1,4 @@
+read_verilog -sv -I/mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot /mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_clock.sv /mnt/d/GitHub/PCAT-286_MiSTer/rtl/spk286_timing_pilot/p06_instruction_duration.sv /mnt/d/GitHub/PCAT-286_MiSTer/sim/spk286_timing_pilot/p06_register_policy_cost.sv
+chparam -set P06_REGISTER_PILOT 1 p06_register_policy_cost
+synth -top p06_register_policy_cost -flatten
+write_json /mnt/d/GitHub/PCAT-286_MiSTer/build/p06-timed-register-final-20261004/generic-1.json

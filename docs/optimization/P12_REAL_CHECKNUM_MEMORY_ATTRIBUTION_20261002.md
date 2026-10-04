@@ -550,3 +550,11 @@ from bus dependencies instead of adding every bus clock to the table budget.
 It executes no real x86/DOS benchmark and makes no new performance attribution
 or historical accuracy claim. Full issue/commit, prefetch/decoded lookahead,
 write-buffer and board/physical coverage remain acceptance gates.
+
+Update 2026-10-04: [M3](P06_CORE_REGISTER_PILOT_20261004.md) executes the real
+full CPU in a private register pilot and validates temporal start/commit for
+208 ordinary cases at 6 MHz, with additional late dependencies and lifecycle
+tests. It exposes one extra dispatch clock in a repeated ADD stream as
+P06-IU01 coverage. This is not a DOS benchmark or a measured share of MAX's
+remaining performance gap. Production MAX traces stay identical; historical
+BIU/fetch, full instruction/event coverage and physical calibration stay open.

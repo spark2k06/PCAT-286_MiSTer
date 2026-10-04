@@ -174,7 +174,11 @@ The evidence is preserved in
 `docs/evidence/at-floppy-write-fix-20261004`. The tests model physical SDRAM
 and the host image peer; they do not run DOS COPY, MiSTer Main, an SD-card
 filesystem or physical image remounting. Hardware COPY/remount confirmation
-remains the final check of the user's complete scenario.
+was the remaining check of the user's complete scenario. On 2026-10-04 the
+user confirmed correct floppy operation with the new
+[RBF](AT_FLOPPY_RBF_20261004.md). The reported corruption correction is
+therefore accepted in hardware; individual write-protection combinations
+remain covered by the directed simulation matrix.
 
 ## Follow-up static audit
 

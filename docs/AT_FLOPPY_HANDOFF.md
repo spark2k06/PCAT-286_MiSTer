@@ -170,3 +170,11 @@ Las pruebas y sus límites se detallan en
 También pasan los bancos dirigidos de DMA y Sound Blaster y el diagnóstico
 de integración en los ocho perfiles. Queda por confirmar COPY, desmontaje y
 remontaje de una imagen desechable en MiSTer con el RBF nuevo.
+
+## 2026-10-04 confirmación de la corrección en MiSTer
+
+El usuario confirma el correcto funcionamiento de la disquetera con el
+[RBF de escritura DMA y protección](AT_FLOPPY_RBF_20261004.md), y solicita
+continuar la investigación independiente del perfil de 25 MHz. La corrección
+del fallo comunicado queda aceptada en hardware. No se han comunicado
+resultados separados para todas las combinaciones de protección de escritura.

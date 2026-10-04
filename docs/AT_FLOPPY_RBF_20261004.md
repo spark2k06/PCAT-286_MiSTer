@@ -81,5 +81,13 @@ On MiSTer, use a disposable copy of an image containing existing files:
 
 The complete source identities, directed-receipt bindings, resource report,
 compiled ROM and raw TimeQuest reports are archived in
-`docs/evidence/at-floppy-rbf-20261004`. Hardware confirmation remains pending.
+`docs/evidence/at-floppy-rbf-20261004`.
 The compile and TimeQuest containers completed and were removed automatically.
+
+### MiSTer confirmation, 2026-10-04
+
+The user confirmed correct floppy operation with this RBF and authorized
+continuing the separate 25 MHz investigation. This accepts the reported
+floppy correction in hardware. The confirmation does not specify each
+write-protection combination; their coverage remains the directed simulation
+matrix described above. Physical setup timing remains open.

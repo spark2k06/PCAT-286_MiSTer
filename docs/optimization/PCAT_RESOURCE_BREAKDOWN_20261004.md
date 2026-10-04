@@ -112,3 +112,60 @@ these video memories use 330/416 M10Ks (79.33% of used blocks), whereas CPU
 microcode uses 1/416 (0.24%). Main system RAM lives in external SDRAM.
 
 Evidence: [resource analysis](../evidence/pcat-resources-20261004/README.md).
+
+## MiSTer scaler versus the complete HDMI/VGA group
+
+The group above includes the Avalon Scaler (`ascal`, TEMLIB), output geometry
+and CDC, HDMI PLL control, synchronization, scanlines/shadowmask and VGA/YC
+output. It is not the scaler's standalone resource attribution.
+
+| Subset | ALMs needed | ALMs placed | Registers | M10K | DSP |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `ascal`, including its descendants | 2,028.5 | 3,009.6 | 4,697 | 42 | 23 |
+| Remaining members of HDMI/VGA group | 1,974.5 | 2,884.8 | 4,669 | 1 | 2 |
+| Complete HDMI/VGA group | 4,003.0 | 5,894.4 | 9,366 | 43 | 25 |
+
+`ascal` receives the core's RGB/sync/active-area stream, resizes and frames it
+for the selected HDMI timing and crosses input/output clocks through an
+external framebuffer. Nearest/polyphase and buffering selection remain
+variable in this core. VGA can select native or scaled output. The scaler's
+3,009.6 placed ALMs are 8.43% of the placed design / 7.18% of device capacity.
+This is separate from the emulated EGA/VGA+ adapter.
+
+References: [scaler source](../../sys/ascal.vhd),
+[instantiation and output routing](../../sys/sys_top.v),
+[inclusive scaler hierarchy](../evidence/pcat-resources-20261004/hierarchy.rpt).
+
+## Dedicated 350-line to 240p/480i TV conversion
+
+The native 350-line EGA conversion has its own capture/readout path. The
+current identifiable attribution is a subset of the core framebuffer/output
+group; it must not be added to that group again.
+
+| TV conversion member | ALMs placed | Registers | M10K | DSP |
+| --- | ---: | ---: | ---: | ---: |
+| `ega_fb_capture` | 203.8 | 285 | 4 | 0 |
+| `ega_fb_readout` | 329.3 | 313 | 6 | 0 |
+| `ega_ddr_arbiter` | 53.7 | 63 | 0 | 0 |
+| CRT350 configuration CDC and source selector | 11.0 | 29 | 0 | 0 |
+| Identifiable TV conversion total | 597.8 | 690 | 10 | 0 |
+
+This is 1.67% of placed design ALMs / 1.43% of device capacity (497.0 ALMs
+needed). Both 240p and 480i share this pipeline and memory. Full frames reside
+in external DDR; the ten M10Ks are capture FIFO and readout line buffers,
+81,920 useful bits. The reserved three DDR frame slots total 6 MiB. Conversion
+is enabled only for the core's qualifying 350-line raster; 200-line modes use
+their native path.
+
+These numbers describe **present attributed occupancy**, not an isolated
+historical development delta or guaranteed savings on removal. No comparable
+pre/post fit with only TV support changed was identified. The imported source
+already contains both modes; the 2026-09-25 fit reports compare CDC/HDMI changes
+with TV support present in both. Shared native-TV timing/OSD glue inside other
+entities is not separately attributable here. The complete 717.9-ALM core
+video-output group also includes mixer, monochrome and shared options.
+
+References: [conversion selection](../../PCAT-286.sv),
+[capture and DDR reservation](../../rtl/video/ega_fb_capture.v),
+[240p/480i readout](../../rtl/video/ega_fb_readout.v),
+[frozen hierarchy](../evidence/pcat-resources-20261004/hierarchy.rpt).

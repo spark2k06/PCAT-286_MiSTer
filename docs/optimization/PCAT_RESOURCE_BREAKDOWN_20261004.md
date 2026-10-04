@@ -169,3 +169,39 @@ References: [conversion selection](../../PCAT-286.sv),
 [capture and DDR reservation](../../rtl/video/ega_fb_capture.v),
 [240p/480i readout](../../rtl/video/ega_fb_readout.v),
 [frozen hierarchy](../evidence/pcat-resources-20261004/hierarchy.rpt).
+
+## Configurable fallback if a future fit cannot place the design
+
+User decision, 2026-10-04: prioritize a working design. If a future fit fails
+for resources, first disable an existing optional function **only through
+`config.tcl`**, retaining its RTL and reactivation path. Optimize that function
+later. This is a fallback policy, not a configuration change made here.
+
+The present configuration enables SB, OPL2, C/MS, Tandy audio and MIDI; boot
+splash is already omitted. Among the directly identified optional sound
+engines, OPL2 has the largest ALM/register footprint:
+
+| Existing config option | Engine placed ALMs | Registers | M10K | DSP |
+| --- | ---: | ---: | ---: | ---: |
+| `ENABLE_OPL2=1` | 1,149.8 | 2,026 | 3 | 1 |
+| `ENABLE_CMS=1`, both SAA1099 chips | 826.8 | 807 | 0 | 4 |
+| `ENABLE_SB=1`, Sound Blaster DSP/PCM | 586.9 | 582 | 0 | 1 |
+| `ENABLE_TANDY_AUDIO=1` | 153.7 | 184 | 0 | 0 |
+
+`ENABLE_OPL2=0` selects the existing `GEN_NO_OPL2` branch. It removes AdLib/FM,
+including FM used by Sound Blaster; SB's digital PCM remains enabled. OPL2's
+placed footprint is 3.22% of the placed design / 2.74% of FPGA capacity.
+C/MS is the largest of these options by DSP count instead. Shared decode,
+clocking and mixing contributions are outside the engine rows; the exact net
+resource/timing gain still requires a new fit with that option changed.
+
+MIDI combines serial/MPU-401, MT32-Pi and shared routing, so its isolated
+option delta is not measured by these engine rows. The framework also has
+`MISTER_DEBUG_NOHDMI` and video-filter/YC switches, but they are not among the
+options currently exposed in this project's `config.tcl`. Do not substitute
+an HDMI feature reduction for the present sound fallback without an explicit
+decision about output requirements.
+
+References: [current options](../../config.tcl),
+[conditional sound instances](../../rtl/spk286_integration/spk286_at_sound.sv),
+[frozen engine hierarchy](../evidence/pcat-resources-20261004/hierarchy.rpt).

@@ -55,7 +55,7 @@ def main():
     flat=flat.replace('import spk286_microcode_pkg::*;',constants)
     policy=out/'policy-constants-expanded.sv';policy.write_text(flat,newline='\n')
     selection=CONNECTION[CONNECTION.index('    wire profile_delivery_metadata'):CONNECTION.index('    // Odd corrections')]
-    original_sum=CONNECTION[CONNECTION.index('    always_comb begin\n        profile_metadata_sum'):CONNECTION.index('    assign profile_preserve_cancel')]
+    original_sum=CONNECTION[CONNECTION.index('    assign profile_metadata_clocks'):CONNECTION.index('    assign profile_preserve_cancel')]
     selection=selection.replace('spk286_microcode_pkg::','')
     context='''module context_miter (
     input event_dispatch, event_active, event_software, micro_active, profile_body_active,

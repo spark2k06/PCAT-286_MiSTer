@@ -400,13 +400,11 @@ module spk286_profiled (
     logic [2:0] profile_ea_clocks;
     logic profile_metadata_read_wait;
     logic profile_alignment_event, profile_start_interval, profile_start_body;
-    logic [11:0] profile_metadata_sum;
     logic [9:0] profile_metadata_clocks;
     logic profile_execution_metadata_valid, profile_execution_metadata_read_wait;
     logic [9:0] profile_execution_base, profile_execution_repeat_setup;
     logic [9:0] profile_execution_repeat_iteration, profile_execution_metadata_clocks;
     logic [2:0] profile_execution_ea;
-    logic [11:0] profile_execution_metadata_sum;
     logic profile_instruction_metadata_valid, profile_instruction_metadata_read_wait;
     logic profile_event_metadata_valid, profile_event_metadata_read_wait;
     logic [9:0] profile_event_base;
@@ -523,6 +521,28 @@ module spk286_profiled (
                               queue_consume_data != 8'hF0;
     wire profile_modrm_current = operand_context_valid && micro_active && !event_active;
 
+    // Prefix correction is a nonnegative addend. For REP, the table already
+    // includes one prefix: subtract it from the small prefix count before
+    // adding the budget, not after a chain of wide carry-propagating sums.
+    function automatic logic [9:0] profile_metadata_budget(
+        input logic [9:0] base, setup_clocks, iteration_clocks,
+        input logic [2:0] ea,
+        input logic repeated, nonempty, delivery,
+        input logic [3:0] prefixes
+    );
+        logic [3:0] remaining_prefixes;
+        logic [11:0] first, second, prefix_clocks, sum_bits, carry_bits, full_sum;
+        remaining_prefixes = prefixes == 0 ? 4'd0 : prefixes - 4'd1;
+        first = {2'd0, repeated ? setup_clocks : base};
+        second = repeated ? (nonempty ? {2'd0, iteration_clocks} : 12'd0) : {9'd0, ea};
+        prefix_clocks = repeated ? {7'd0, remaining_prefixes, 1'b0} :
+                        delivery ? 12'd0 : {7'd0, prefixes, 1'b0};
+        sum_bits = first ^ second ^ prefix_clocks;
+        carry_bits = (first & second) | (first & prefix_clocks) | (second & prefix_clocks);
+        full_sum = sum_bits + (carry_bits << 1);
+        profile_metadata_budget = |full_sum[11:10] ? 10'd1023 : full_sum[9:0];
+    endfunction
+
     spk286_instruction_timing profile_metadata (
         .opcode(profile_metadata_opcode),
         .extended_opcode(profile_delivery_metadata ? 1'b0 : extended_opcode_active),
@@ -603,21 +623,10 @@ module spk286_profiled (
         profile_event_metadata_valid : profile_instruction_metadata_valid;
     assign profile_execution_metadata_read_wait = profile_delivery_metadata ?
         profile_event_metadata_read_wait : profile_instruction_metadata_read_wait;
-    always_comb begin
-        profile_execution_metadata_sum = {2'd0, profile_execution_base} + {9'd0, profile_execution_ea};
-        if (profile_execution_repeated) begin
-            profile_execution_metadata_sum = {2'd0, profile_execution_repeat_setup} +
-                (profile_repeat_nonempty_q ? {2'd0, profile_execution_repeat_iteration} : 12'd0);
-            if (profile_prefix_count_q != 0)
-                profile_execution_metadata_sum = profile_execution_metadata_sum +
-                    {7'd0, profile_prefix_count_q, 1'b0} - 12'd2;
-        end else begin
-            profile_execution_metadata_sum = profile_execution_metadata_sum +
-                {7'd0, profile_prefix_count_q, 1'b0};
-        end
-        profile_execution_metadata_clocks = profile_delivery_metadata ? profile_event_base :
-            profile_execution_metadata_sum > 12'd1023 ? 10'd1023 : profile_execution_metadata_sum[9:0];
-    end
+    assign profile_execution_metadata_clocks = profile_delivery_metadata ? profile_event_base :
+        profile_metadata_budget(profile_execution_base, profile_execution_repeat_setup,
+            profile_execution_repeat_iteration, profile_execution_ea, profile_execution_repeated,
+            profile_repeat_nonempty_q, 1'b0, profile_prefix_count_q);
 
     // Odd corrections belong to each real original word reference, before the
     // BIU decomposes it into lanes. RMW therefore obtains READ +2 and WRITE +2.
@@ -626,24 +635,11 @@ module spk286_profiled (
     assign profile_metadata_estimated = profile_family_estimated || profile_target_fault_estimated ||
         (!profile_delivery_metadata && profile_prefix_count_q != 0 &&
          (!profile_repeated_string || profile_prefix_count_q > 1));
-    always_comb begin
-        profile_metadata_sum = {2'd0, profile_base_clocks} + {9'd0, profile_ea_clocks};
-        if (profile_repeated_string) begin
-            profile_metadata_sum = {2'd0, profile_repeat_setup} +
-                ((profile_candidate_body ? register_state[16 +: 16] != 0 : profile_repeat_nonempty_q) ?
-                 {2'd0, profile_repeat_iteration} : 12'd0);
-            // Setup already includes one REP prefix. Any remaining counted
-            // override/repeated prefix uses the estimated native fallback.
-            if (profile_prefix_count_q != 0)
-                profile_metadata_sum = profile_metadata_sum +
-                    {7'd0, profile_prefix_count_q, 1'b0} - 12'd2;
-        end else if (!profile_delivery_metadata) begin
-            // Provisional native fallback; LOCK and 0F are not charged again.
-            profile_metadata_sum = profile_metadata_sum + {7'd0, profile_prefix_count_q, 1'b0};
-        end
-        profile_metadata_clocks = profile_metadata_sum > 12'd1023 ?
-                                  10'd1023 : profile_metadata_sum[9:0];
-    end
+    assign profile_metadata_clocks = profile_metadata_budget(profile_base_clocks,
+        profile_repeat_setup, profile_repeat_iteration, profile_ea_clocks,
+        profile_repeated_string,
+        profile_candidate_body ? register_state[16 +: 16] != 0 : profile_repeat_nonempty_q,
+        profile_delivery_metadata, profile_prefix_count_q);
     assign profile_preserve_cancel = !restart && event_cancel && event_active && event_software;
     assign profile_start_interval =
         ((!context_active && (prefix_accept || opcode_start)) ||

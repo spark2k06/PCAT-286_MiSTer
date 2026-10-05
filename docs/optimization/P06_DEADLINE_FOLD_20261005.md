@@ -176,3 +176,24 @@ The RBF is announced at assembler completion, before the final STA pass.
 The next trial changes only placement seed 1 to 2 in another frozen copy of
 these same inputs. No functional change or new full regression is needed
 for that controlled physical experiment. All features remain enabled.
+
+### Prepared scaler fallback — private proof only
+
+The actual `sys/ascal.vhd` OSWEEP process has been extracted and checked with
+the candidate horizontal predicate `o_htotal>0 AND o_hcpt<o_htotal-1`.
+The operand type is VHDL `natural range 0..4095`; intermediate expressions
+are integers, so this preserves `4095+1=4096` and `0-1=-1` semantics.
+No production source is changed by preparing this option.
+
+Native GHDL checks all 16,777,216 counter/total pairs and 40,000 complete
+process transitions against an independent edge oracle. GHDL-synthesized
+actual processes also pass an arbitrary-state/context one-step Yosys
+equivalence proof for all 22 retained state fields. A wrong off-by-one
+predicate is rejected by native and formal checks. The final native log
+has no warnings. This is an OSWEEP proof, not whole-scaler regression or a
+claim that a future placement improves timing.
+
+[The private proof and source bindings](../evidence/p06-scaler-compare-proof-20261005/receipt.json)
+are archived and read back before its 4 MB of owned temporaries are deleted.
+It is available if the unchanged-RTL placement retry still needs an HDMI
+logic correction.

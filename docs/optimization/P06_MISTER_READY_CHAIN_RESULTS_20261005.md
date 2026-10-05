@@ -107,6 +107,17 @@ taken-target/prefetch and bridge admission epoch contracts separately; select
 board READ waits only from an identified causal model. No global benchmark
 multiplier or workload-specific instruction exception follows from these CSVs.
 
+Subsequent source-bound checks now provide the
+[6 MHz M0 causal diagnosis](P06_M0_PHASE_DIAGNOSIS_20261005.md), the
+[Intel branch/target and bus-epoch audit](P06_HISTORICAL_TIMING_AUDIT_20261005.md),
+and [all fourteen native reference controls](P06_NATIVE_ALL_PROFILES_20261005.md).
+The composed PCAT fixture reproduces the 6 MHz memory penalty; its bounded
+8 MHz phase controls do not reproduce that hardware observation. Taken
+branch target-length timing is a demonstrated gap that needs a general
+handoff protocol, while R0 and LOOP minima remain supported by Intel.
+These findings do not justify changing the nominal frequency generator or
+selecting a universal motherboard READ-wait count.
+
 The existing physical 50 MHz fit still fails setup, worst -15.190 ns with minimum
 hold +0.058 ns. Hardware fixed-work acceptance does not close that separate gate.
 This archive runs data analysis only; no new CPU regression or fit is claimed.

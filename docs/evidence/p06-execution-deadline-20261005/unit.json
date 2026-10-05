@@ -1,0 +1,105 @@
+{
+  "status": "PASS",
+  "scope": "source retained target-length controller/scheduler units",
+  "checks": {
+    "spk286_instruction_schedule_tb": {
+      "status": "PASS",
+      "marker": "PROFILE_SCHEDULE_PASS checks54"
+    },
+    "spk286_target_handoff_tb": {
+      "status": "PASS",
+      "marker": "TARGET_HANDOFF_PASS checks=398"
+    },
+    "spk286_target_replay_tb": {
+      "status": "PASS",
+      "marker": "TARGET_REPLAY_PASS checks=246"
+    }
+  },
+  "source_sha256": {
+    "rtl/spk286_timing/spk286_instruction_schedule.sv": "318015e3e2b1a6db4d928a129a977386e79931b42de785772bc042b8d48ada08",
+    "rtl/spk286_timing/spk286_target_handoff.sv": "7f8057eee52bd8c55eb3063c6284232245570ee41d47b232c1e9cb3510004e18",
+    "rtl/spk286_timing/spk286_target_replay.sv": "0d10e75f1f692566879edb6aa652f97baffabdc467403f7b5a866ed32e892564",
+    "sim/spk286_timing/spk286_instruction_schedule_tb.sv": "408de1a79a86813487d363f1d3710273ed6e5952f2e59b42dd8ceab96a130a73",
+    "sim/spk286_timing/spk286_target_handoff_tb.sv": "7c07cc4d2dba600ed6440a7e73a49263ae765cd6a8c35c25fec40f8198471de9",
+    "sim/spk286_timing/spk286_target_replay_tb.sv": "949c7a9349cb25828eed3559fd6c5956295fe0326eed5ec9fda9f29ae9baa723",
+    "scripts/test_spk286_target_handoff.py": "106859385a5dde8f05ae4b52e18b4551ea7d9f420d8af77e9e5850e8b406727a"
+  },
+  "isolated_cost": {
+    "handoff": {
+      "generic_cells": 50,
+      "register_bits": 7,
+      "memories": 0,
+      "scope": "isolated generic logic; not fitted FPGA ALMs"
+    },
+    "schedule": {
+      "generic_cells": 525,
+      "register_bits": 37,
+      "memories": 0,
+      "scope": "isolated generic logic; not fitted FPGA ALMs"
+    },
+    "schedule_before": {
+      "generic_cells": 383,
+      "register_bits": 37,
+      "memories": 0,
+      "scope": "isolated generic logic; not fitted FPGA ALMs"
+    },
+    "schedule_baseline_sha256": "40cf0ccb6742cc6f24809cbe3fb4323c228296a3971452f9a773087fb2790c93"
+  },
+  "negative": {
+    "missing-source-length": {
+      "returncode": 1,
+      "marker": "HANDOFF_ORACLE_FAILED"
+    },
+    "premature-source-publication": {
+      "returncode": 1,
+      "marker": "HANDOFF_ORACLE_FAILED"
+    },
+    "fixed-target-penalty": {
+      "returncode": 1,
+      "marker": "HANDOFF_ORACLE_FAILED"
+    },
+    "max-pending-leak": {
+      "returncode": 1,
+      "marker": "HANDOFF_ORACLE_FAILED"
+    },
+    "saturated-total-overflow": {
+      "returncode": 1,
+      "marker": "SCHEDULE_ORACLE_FAILED"
+    }
+  },
+  "excluded": [
+    "whole CPU event/fault/queue acceptance",
+    "FPGA fitted cost/timing"
+  ],
+  "artifacts_sha256": {
+    "baseline-cost/spk286_instruction_schedule-yosys.log": "5f4351555c387fe76dfdfc40e1c37b1e96c819a7996c3c6fee37a2b94def32f2",
+    "negative-fixed-target-penalty/build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "negative-fixed-target-penalty/run.log": "b2aaa34c7d1179fe3a9be562dddc904daab10772ad336e63232184bac37d71c4",
+    "negative-max-pending-leak/build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "negative-max-pending-leak/run.log": "24a3d3a651400cc2bfed138f6a3a3f44cb8ef567e79758ccc170c3b5664b8f64",
+    "negative-missing-source-length/build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "negative-missing-source-length/run.log": "9c98d4b8fc22537309efcfc187de5ba0b277fce122eaf875800add55420076ca",
+    "negative-premature-source-publication/build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "negative-premature-source-publication/run.log": "48863b0b10547e90a024c02616be7fa8b2e12ad21dfbb8925d1a94b9ebfdce2c",
+    "negative-saturated-total-overflow/build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "negative-saturated-total-overflow/run.log": "2ac53a62025e387e058bba2ff0a8a3ec7efc5a311ea82f4b099b4d583f56f920",
+    "spk286_instruction_schedule-yosys.log": "2630e6d455f1dc53a69efc470a6860fec6f7b3a1943c700e24e064a6c0077d0a",
+    "spk286_instruction_schedule_tb/iverilog-build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "spk286_instruction_schedule_tb/iverilog-run.log": "272ed2662d74cca4685c0558806b8b61c4fff3ae9d96ee553df95c1213a7fecc",
+    "spk286_instruction_schedule_tb/spk286_instruction_schedule-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "spk286_instruction_schedule_tb/verilator-build.log": "9699040a7043ac560eac12492877d4461243bb9057bce6a54f180d71e38cb0b0",
+    "spk286_instruction_schedule_tb/verilator-run.log": "96ab9ad1ed5eaf8eaec5b1945857d907b7021897af6f8be51950c3b27edb373d",
+    "spk286_target_handoff-yosys.log": "8429136d9e90ea641ed36c3ee1b9600cf36a30400efc7cabde2e7aeaf30e1162",
+    "spk286_target_handoff_tb/iverilog-build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "spk286_target_handoff_tb/iverilog-run.log": "5a41446c7e711c176c7bfe1e99e7b307d422d52f111b9dd2b9ffc882ea113ba8",
+    "spk286_target_handoff_tb/spk286_instruction_schedule-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "spk286_target_handoff_tb/spk286_target_handoff-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "spk286_target_handoff_tb/verilator-build.log": "2846676c74a18b56ce1ffd52df61b3887721eebfaadbcebbd8b3404bbeffbc0b",
+    "spk286_target_handoff_tb/verilator-run.log": "7678c3ef4aaea3f88f6d2314de1a9157444eb7dbbcfd856902c875aab60b3451",
+    "spk286_target_replay_tb/iverilog-build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "spk286_target_replay_tb/iverilog-run.log": "50aad0c1b02e77eea95143de4d6f75b5495237e3a455742fa63315d66854c87d",
+    "spk286_target_replay_tb/spk286_target_replay-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "spk286_target_replay_tb/verilator-build.log": "6a60f24dd42fc136bfa87e5d41d42728448a70dabc9bedbc2ee1ddde32ccab76",
+    "spk286_target_replay_tb/verilator-run.log": "015df813213ea0e9b0d9589d6d66f9bbf8e9c809efeb82020fa81fa422cda14d"
+  }
+}

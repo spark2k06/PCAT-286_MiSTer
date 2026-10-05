@@ -17,7 +17,9 @@ module spk286_target_handoff_tb;
     wire implementation_extension;
     integer checks=0, publications=0;
     spk286_target_handoff handoff(.*);
-    spk286_instruction_schedule schedule(.*);
+    spk286_instruction_schedule schedule(.execution_metadata_valid(metadata_valid),
+        .execution_metadata_clocks(metadata_clocks),
+        .execution_read_wait_event(read_wait_event), .*);
     assign source_retire=retire_fire;
 
     task automatic check(input logic condition,input string label);

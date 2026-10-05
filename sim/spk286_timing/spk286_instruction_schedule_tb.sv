@@ -13,7 +13,9 @@ module spk286_instruction_schedule_tb;
     wire [9:0] elapsed_clocks, scheduled_clocks;
     wire implementation_extension;
     integer checks=0;
-    spk286_instruction_schedule dut(.*);
+    spk286_instruction_schedule dut(.execution_metadata_valid(metadata_valid),
+        .execution_metadata_clocks(metadata_clocks),
+        .execution_read_wait_event(read_wait_event), .*);
 
     task automatic check(input logic condition, input string label);
         begin

@@ -51,7 +51,8 @@ def synthesize(out, top, inputs):
 def negatives(out):
     checks = [
         ("missing-source-length", SCHEDULE,
-         " + {8'd0, target_length_clocks}", ""),
+         "execution_total = {1'b0, execution_base} + {2'd0, extra_q} + {8'd0, target_length_clocks};",
+         "execution_total = {1'b0, execution_base} + {2'd0, extra_q};"),
         ("premature-source-publication", SCHEDULE,
          "metadata_available && target_length_ready &&", "metadata_available &&"),
         ("fixed-target-penalty", HANDOFF,
@@ -60,14 +61,14 @@ def negatives(out):
         ("max-pending-leak", HANDOFF,
          "assign pending = historical_enable && pending_q;", "assign pending = pending_q;"),
         ("saturated-total-overflow", SCHEDULE,
-         "logic [11:0] total;", "logic [10:0] total;"),
+         "logic [11:0]", "logic [10:0]"),
     ]
     results = {}
     for label, source, before, after in checks:
         directory = out / f"negative-{label}"
         directory.mkdir()
         original = source.read_text()
-        assert original.count(before) == 1, label
+        assert original.count(before) == (2 if label == "saturated-total-overflow" else 1), label
         mutated = directory / source.name
         mutated.write_text(original.replace(before, after), newline="\n")
         rtl = [mutated if item == source else item for item in [SCHEDULE, HANDOFF]]

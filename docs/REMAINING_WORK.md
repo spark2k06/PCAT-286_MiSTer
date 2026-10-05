@@ -20,13 +20,15 @@ A deferred item stays deferred regardless of its priority.
 | **P05/P21 — physical setup/hold closure** | P0, in progress | Complete the current deadline/buffer/palette fit and select the measured candidate. Obtain positive setup/hold margins and check recovery/removal and constraint coverage at all four corners. Preserve the common physical 50 MHz CPU/bridge/SDRAM clock, behavior and enabled features. Bind reports, sources and RBF/SOF identities. |
 | **HW01 — new timing candidate on MiSTer** | P1, when the user has board access | Confirm that the selected physical candidate preserves the accepted boot, applications and profile behavior. Bind observations to its RBF and configuration; this does not reopen the OSD/profile implementation. |
 | **QA01 — full current-source regression** | P1, **USER_DEFERRED** | Resume only when the user requests it, against frozen current sources and the actual registered banks. Keep CPU, machine and tooling outcomes distinct; bounded checks are not a complete-regression PASS. |
-| **RES01 — fitted resource comparison** | P1, with the current fit | Record placed/equivalent ALMs, registers, RAM/M10K, DSP and PLL totals, plus CPU attribution where available, against the preceding bound fit. Distinguish generic cell estimates from Cyclone V resources. |
 
-The preceding live-speed fit is the comparison baseline, not the result of
-the fit in progress: setup −6.051 ns; original-SDC hold +0.015 ns; hold with
-the additional 0.500 ns palette route requirement −0.065 ns; 37,054 placed
-ALMs / 41,910 (88.4%). The new result must retain the constraints rather than
-replace a failing requirement with a sign-off claim.
+The completed deadline-fold seed-1 fit improves global setup from −6.051 to
+−0.288 ns, with worst CPU setup −0.054 ns. Original-SDC hold is +0.043 ns;
+hold under the retained additional 0.500 ns palette route requirement is
+−0.047 ns. The measured resource comparison is complete: 36,913 placed ALMs
+/ 41,910 (88.1%), 141 fewer than the live-speed baseline, with unchanged RAM,
+DSP and PLL totals. A separate frozen seed-2 placement trial is in progress.
+Closure must retain the constraints rather than replace a failing requirement
+with a sign-off claim.
 
 If placement fails for resources, the user-approved first fallback is to
 disable OPL2 **only in config.tcl**, preserving its RTL and reactivation path.

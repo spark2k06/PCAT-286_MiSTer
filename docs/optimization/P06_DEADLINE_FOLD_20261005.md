@@ -1,6 +1,6 @@
 # P06 — Fused deadline arithmetic, idle memory payload and palette hold
 
-Status: **FORMAL_AND_DIRECTED_PASS; FIT_NOT_RUN**.
+Status: **FORMAL_AND_DIRECTED_PASS; FIT_COMPLETE_TIMING_OPEN**.
 Full regression remains **USER_DEFERRED**. No hardware result is claimed.
 
 ## Starting point
@@ -99,3 +99,77 @@ are not Cyclone V ALMs. A positive margin claim requires the actual fitted
 setup/hold/recovery/removal results; formal equivalence alone does not prove
 timing closure. Compiler and simulation temporaries are cleaned only after
 sealed evidence is read back, preserving the RBF and reports.
+
+## Completed all-features fit — seed 1
+
+The frozen `f2ea538` snapshot contains 1,390 files. Quartus 17.0 completes
+compilation in 28m57s. The measured result keeps the same RTL, configuration,
+clock relationships, seed and SDC as the preceding live-speed fit, apart from
+the four verified logic changes above and the existing BUILD_DATE preflow.
+
+| Timing corner | Global setup (ns) | Global hold (ns) | Recovery (ns) | Removal (ns) |
+| --- | ---: | ---: | ---: | ---: |
+| Slow 1100 mV, 100 C | -0.096 | +0.162 | +3.025 | +0.582 |
+| Slow 1100 mV, -40 C | -0.288 | +0.043 | +3.205 | +0.445 |
+| Fast 1100 mV, 100 C | +2.078 | +0.048 | +4.737 | +0.361 |
+| Fast 1100 mV, -40 C | +2.431 | -0.047 | +4.973 | +0.223 |
+
+Global setup improves from -6.051 to -0.288 ns. The worst CPU setup is now
+-0.054 ns at 100 C, with -0.033 ns at -40 C. The former scheduler/descriptor
+critical cone is removed; the remaining CPU paths cross prefetch/operand
+and event stack-range qualification. CPU hold is positive, minimum +0.121 ns.
+
+All four corners now have positive setup for the bridge (+1.595 ns minimum),
+memory port (+2.530), code buffer (+0.243), data buffer (+1.355), data output
+cone (+3.799) and SDRAM owner (+1.361). SDRAM pin budgets retain positive
+setup/input +5.189 ns, setup/output +4.601 ns, and positive hold.
+These scoped figures are minimum margins across the four corners.
+
+The global setup path is now the inherited HDMI scaler's horizontal
+terminal decision to vertical counters, at its unchanged 148.5 MHz clock:
+`o_hcpt[6] -> o_hcpt+1<o_htotal -> o_vcpt[5]`, four logic levels.
+The remaining negative hold is six reported blue-palette MLAB address
+endpoints under the additional 0.500 ns route requirement. The XOR encoder
+is physically present and all six 256x6 software memories still use MLAB.
+No register, memory conversion or cycle was added to the palette.
+
+An independent four-corner STA with the original SDC verifies eleven fitted
+artifacts, including the RBF/SOF, unchanged. Its worst global hold is
++0.043 ns. The extra route requirement stays active for the candidate;
+its -0.047 ns failure remains open. This is not complete timing closure.
+Constraint coverage matches the preceding fit: inherited platform issue
+counts are unchanged, with 25 partial min/max assignments under the guard
+and 24 under the original SDC. Fitter-time palette selectors cover 8
+sources/288 endpoints; mapped duplicates and MLAB address-bit expansion
+produce 11 sources/1,440 endpoints, still covered by the same selectors.
+
+| Resource | Live-speed baseline | Deadline-fold seed 1 | Change |
+| --- | ---: | ---: | ---: |
+| Physical placed ALMs | 37,054 (88.4%) | 36,913 (88.1%) | -141 |
+| Equivalent ALMs | 31,895 | 31,602 | -293 |
+| Fitted registers | 38,207 | 38,384 | +177 |
+| Logical block-memory bits | 3,301,019 | 3,301,019 | 0 |
+| M10K blocks | 416 | 416 | 0 |
+| DSP blocks | 39 | 39 | 0 |
+| PLLs | 3 | 3 | 0 |
+
+The register difference is fitter duplication; the design implementation
+register count remains 35,404. The inclusive CPU hierarchy accounts for
+8,311.5 placed ALMs, 5,613 registers and one 9,216-bit M10K. Hierarchical
+fractional ALM attribution is not a separate device allocation.
+
+Evidence: [source-bound fit, reports and original-SDC audit](../evidence/p06-deadline-fold-fit-20261005/result.json).
+Every functional receipt is bound to the frozen source inputs. Two historic
+mutation files listed by the broad elaboration inventory are explicitly
+archived as uncompiled inventory; they are absent from the elaboration
+command and Quartus QIPs. BUILD_DATE is the only controlled nonfunctional
+source difference from the elaboration receipt.
+
+RBF: `build/p06-deadline-fold-allfeatures-20261005-v1/work/output_files/PCAT-286.rbf`,
+4,141,940 bytes, SHA-256
+`5b809465da95d32150a858bf04db6abc52da630b459307d453df556c91973296`.
+The RBF is announced at assembler completion, before the final STA pass.
+
+The next trial changes only placement seed 1 to 2 in another frozen copy of
+these same inputs. No functional change or new full regression is needed
+for that controlled physical experiment. All features remain enabled.

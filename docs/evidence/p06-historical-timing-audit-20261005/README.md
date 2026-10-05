@@ -12,14 +12,14 @@ hashes bind the packet to the repository state recorded there; the builder and
 bench are included in the packet. `verification.json` records a separate
 review of all member hashes, source hashes, paired traces and run clock counts.
 
-Validate the packet from any working directory without extraction or simulation:
+Validate the packet from the repository root without extraction or simulation:
 
 ```sh
 python3 docs/evidence/p06-historical-timing-audit-20261005/verify_archive.py
 ```
 
-Run the command from the repository root. Rebuilding requires Icarus and
-Verilator under WSL and the bound source state. To restore the disposable
+Rebuilding requires Icarus and Verilator under WSL and the bound source state.
+To restore the disposable
 fixture from the repository root:
 
 ```sh

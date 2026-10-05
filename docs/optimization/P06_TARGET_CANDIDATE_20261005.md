@@ -99,9 +99,15 @@ SHA-256:
 `88f1075046876d13acafde4834a6ed2a0b385e7ec1de51a3d5646342dc1140b1`
 
 Size: 4,113,440 bytes. Compile: 35 min 23 s; detailed STA: 3 min 25 s.
-This is a newly generated hardware-test candidate, not a timing-closed release
-or a MiSTer-tested result. Hardware measurements should confirm MAX preservation
-and the new B0 intervals before further calibration.
+At delivery this was a newly generated hardware-test candidate, with MAX
+preservation and the new B0 intervals still awaiting MiSTer measurements.
+It is not a timing-closed release.
+
+Subsequent [MiSTer measurements](P06_MISTER_TARGET_HANDOFF_RESULTS_20261005.md)
+now pass that directed hardware gate: all eight fixed-work captures validate,
+profile ordering and MAX are preserved, and the historical B0 body approaches
+the intended 23-clock minimum. They do not close this fit's setup failure or
+the remaining historical calibration work.
 
 ## Evidence and cleanup
 

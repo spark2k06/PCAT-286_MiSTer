@@ -439,3 +439,15 @@ policy. Keep Intel minima and unchanged benchmark bytes; neither a global
 multiplier nor MHz detection alone establishes the intended AT timing model.
 The analysis changes evidence/documentation only and does not close P06/P12
 calibration or the candidate's physical setup failure.
+
+## 2026-10-05 target-handoff hardware measurements
+
+The [eight-profile follow-up](P06_MISTER_TARGET_HANDOFF_RESULTS_20261005.md)
+validates 336 samples and 48 summaries on the user-identified first
+target-handoff RBF. MAX remains 6906 / 121.6K, and its three fixed-work gross
+medians are unchanged. Every adjacent historical profile remains faster.
+The added target-length allowance increases B0 gross by about 14.4% at 6..20
+MHz and 10.1% at 25, with approximately 23 nominal clocks per body through
+20 MHz. R0/M0 gross remain within 0.6% of the preceding capture. This closes
+the targeted hardware measurement gate, not general historical calibration.
+Resume physical setup/hold work without a benchmark multiplier or MHz retune.

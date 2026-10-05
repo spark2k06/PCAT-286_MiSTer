@@ -349,6 +349,13 @@ failing candidate. The two stale fixed-CPU verification adapters have been
 [repaired and checked independently](../evidence/verification-adapters-fixed-source-20261005/README.md),
 preserving their original references and directed expected values.
 
+This non-closing fit is not eligible for the authorized full regression.
+After committed archive readback and independent review, 331,261,570 bytes
+of its owned compiler database and source copies are removed. The archive
+retains all 2,062 effective sources; RBF/SOF, output reports and both STA
+inventories remain available. Its `--rm` containers have already exited.
+The later positive candidate will be frozen separately for the regression.
+
 RBF: `build/p06-null-segment-allfeatures-20261005-v1/work/output_files/PCAT-286.rbf`,
 4,114,900 bytes, SHA-256
 `083c91a21a1d21ef9cf1be61aebd1c8a5ebeca0ebc873415271635b6bfd415bd`.

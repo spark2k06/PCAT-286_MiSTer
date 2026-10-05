@@ -15,6 +15,12 @@ $taskReceiptPath = [IO.Path]::GetFullPath((Join-Path $taskWorkspace $Receipt))
 if (-not $taskReceiptPath.StartsWith($taskWorkspace + [IO.Path]::DirectorySeparatorChar, [StringComparison]::OrdinalIgnoreCase)) {
     throw 'Receipt must remain inside this workspace'
 }
+if (Test-Path -LiteralPath $taskReceiptPath) {
+    throw 'Preserve the existing receipt; pass a fresh -Receipt path'
+}
+if (-not (Test-Path -LiteralPath (Split-Path -Parent $taskReceiptPath) -PathType Container)) {
+    throw 'Create the receipt parent directory before cleanup'
+}
 if ((Get-Item -LiteralPath $taskBuildRoot).Attributes -band [IO.FileAttributes]::ReparsePoint) {
     throw 'Build root is a reparse point'
 }
@@ -60,6 +66,9 @@ $taskRecord = [ordered]@{
     free_before = $taskFreeBefore
     preserved = 'Every corresponding source header, all non-PCH artifacts and all files modified on/after cutoff'
 }
+# Record the complete validated plan before mutation; a failed deletion still
+# leaves evidence identifying every candidate and its preserved source header.
+$taskRecord | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $taskReceiptPath -Encoding utf8
 if ($Apply) {
     # All targets were validated before the first mutation. Recheck each file
     # for replacement or concurrent writes immediately before deleting it.

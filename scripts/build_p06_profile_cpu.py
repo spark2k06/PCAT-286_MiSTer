@@ -24,9 +24,10 @@ ORIGINALS = {
 # explicit production inputs implement separately verified corrections;
 # do not replace hashes inside the frozen evidence to admit them.
 FUNCTIONAL_UPDATES = {
-    # Exact null-segment commit specialization; arbitrary raw/timed cone
-    # equivalence is recorded separately from the frozen pilot receipt.
-    "vendor/spk286/rtl/spk286_micro_executor.sv": "325f51e6a91ae9c309786c17da8c22aa3264b3084314008b43b7cc41fd44f6db",
+    # Null-segment specialization and stack DATA selection. The latter proves
+    # consumed addresses/faults and operand next state; idle payloads differ.
+    # Their separate evidence does not replace the frozen pilot receipt.
+    "vendor/spk286/rtl/spk286_micro_executor.sv": "8d41e0187bef3081728780e4683c9e312b1f4beb1f3c40a6244d465c32799710",
     # A completed legal ten-byte instruction is not a demand for byte eleven.
     "vendor/spk286/rtl/spk286.sv": "fe945327191099b0c1580eae0819a451cd797b8b0cf3f78166e4b5eefd159b26",
     "vendor/spk286/rtl/spk286_fetch.sv": "1da4efb3273c690d97acba5f8646a3e40b9588b957e00dfc7d4aa40c66b6af3c",

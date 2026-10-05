@@ -6,13 +6,17 @@ root=$(cd "$(dirname "$0")/.." && pwd)
 build_dir=$(realpath -m "${1:-$root/build/at-stack-offset-arithmetic}")
 [[ $# -le 1 && ! -e "$build_dir" ]]
 mkdir -p "$build_dir"
-python3 "$root/scripts/test_stack_offset_contract.py" --output "$build_dir/current-formal"
+# Current data payloads may differ while idle. Prove the actual consumed
+# interface separately, retaining the original flat checker/evidence and its
+# historical producer replay; do not reinterpret its idle difference as PASS.
+python3 "$root/scripts/test_stack_offset_consumed_contract.py" --output "$build_dir/current-formal"
 source "$root/scripts/at_performance_flags.sh"
 cd "$root/vendor/spk286"
 source scripts/rtl_sources.sh
 sha256sum "${rtl_sources[@]}" "$root/config.tcl" \
     "$root/scripts/test_at_stack_offset_arithmetic.sh" \
     "$root/scripts/test_stack_offset_contract.py" \
+    "$root/scripts/test_stack_offset_consumed_contract.py" \
     rtl/timed/spk286_profiled_micro_executor.sv \
     sim/unit/spk286_signals.svh sim/unit/spk286_call_stack_precheck_tb.sv \
     sim/unit/spk286_protected_event_outer_tb.sv sim/unit/spk286_call_gate_accessed_tb.sv \
@@ -47,17 +51,17 @@ import hashlib,json,sys
 from pathlib import Path
 root=Path(sys.argv[1]); out=Path(sys.argv[2])
 proof=json.loads((out/'current-formal/receipt.json').read_text())
-assert proof['status']=='CURRENT_STACK_OFFSET_CONTRACT_EQUIVALENCE_PASS'
+assert proof['status']=='CURRENT_STACK_OFFSET_CONSUMED_CONTRACT_EQUIVALENCE_PASS'
 for name,digest in proof['sources_sha256'].items():
     assert hashlib.sha256((root/name).read_bytes()).hexdigest()==digest, ('Proof input changed',name)
 receipt={'status':'AT_STACK_OFFSET_ARITHMETIC_DIRECTED_PASS',
     'formal_receipt_sha256':hashlib.sha256((out/'current-formal/receipt.json').read_bytes()).hexdigest(),
-    'scope':'Fresh original-contract raw/timed offset SAT proof plus strict CPU lint and unchanged three affected banks in Icarus/Verilator; base and pcat labels both use the fixed active implementation, not CPU options off',
+    'scope':'Current raw/timed consumed-address/fault/operand next-state SAT proof, historical flat producer replay unchanged and current flat-idle DIFFERS preserved, plus strict CPU lint and unchanged three affected banks in Icarus/Verilator; base and pcat labels both use the fixed active implementation, not CPU options off',
     'cases':12,'expected_results_unchanged':True,
     'sources_manifest_sha256':hashlib.sha256((out/'sources.sha256').read_bytes()).hexdigest(),
     'artifacts_sha256':{p.relative_to(out).as_posix():hashlib.sha256(p.read_bytes()).hexdigest()
                       for p in out.rglob('*') if p.is_file() and p.suffix in ('.log','.txt','.json','.sha256')}}
 (out/'receipt.json').write_text(json.dumps(receipt,indent=2)+'\n')
-print('PROVEN_VENDOR_STACK_OFFSET_SOURCE_PASS current_raw_timed_cones=1')
+print('PROVEN_VENDOR_STACK_OFFSET_CONSUMED_SOURCE_PASS current_raw_timed_cones=1 historical_flat=preserved current_idle_flat=DIFFERS')
 PY
 echo AT_STACK_OFFSET_ARITHMETIC_DIRECTED_PASS

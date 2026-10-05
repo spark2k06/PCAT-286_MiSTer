@@ -32,8 +32,8 @@ FUNCTIONAL_UPDATES = {
     "microcode/generated/spk286_microcode_sync_rom.sv": "31841a56d61b32aaf92c91afbc0258d67ce90a3c67788dc06092c8d845ec1894",
     "rtl/spk286_decoder.sv": "d38849308e58512e02f7766a0aa4d513a73771915901e7dd8b44eb457f1606bb",
     "rtl/spk286_control_decode.sv": "026d3217f5290f2b3b7f14da66a660ff0e65372b6dbb11c7db6f1ae2c56b352b",
-    # Proved stack/frame arithmetic, then null-segment commit specialization.
-    "rtl/spk286_micro_executor.sv": "325f51e6a91ae9c309786c17da8c22aa3264b3084314008b43b7cc41fd44f6db",
+    # Proved stack/frame arithmetic, null commit and consumed stack DATA selectors.
+    "rtl/spk286_micro_executor.sv": "8d41e0187bef3081728780e4683c9e312b1f4beb1f3c40a6244d465c32799710",
 }
 SELECTED_CONTRACT = "tools/profile_cpu_selected_20261005.json"
 

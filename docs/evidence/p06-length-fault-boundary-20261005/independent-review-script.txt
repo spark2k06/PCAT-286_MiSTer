@@ -1,0 +1,155 @@
+import collections
+import gzip
+import hashlib
+import json
+from pathlib import Path, PurePosixPath
+import subprocess
+import tarfile
+
+ROOT = Path(__file__).resolve().parents[2]
+def sha(data): return hashlib.sha256(data).hexdigest()
+def save(path, value): path.write_text(json.dumps(value, indent=2) + '\n')
+def packet(key):
+    folder = ROOT / 'docs/evidence' / key
+    manifest = json.loads((folder / 'manifest.json').read_text())
+    meta = manifest['archive'] if isinstance(manifest['archive'], dict) else {
+        'path': manifest['archive'], 'bytes': manifest['bytes'], 'sha256': manifest['sha256']}
+    raw = (folder / meta['path']).read_bytes()
+    assert len(raw) == meta['bytes'] and sha(raw) == meta['sha256']
+    with tarfile.open(folder / meta['path']) as archive:
+        members = archive.getmembers()
+        assert len({item.name for item in members}) == len(members)
+        for item in members:
+            name = PurePosixPath(item.name)
+            assert not name.is_absolute() and '..' not in name.parts and item.isfile()
+        content = {item.name: archive.extractfile(item).read() for item in members}
+    return folder, manifest, meta, content
+
+folder, manifest, meta, content = packet('p06-encoding-preview-20261005')
+assert set(content) == set(manifest['members'])
+for name, description in manifest['members'].items():
+    assert len(content[name]) == description['bytes'] and sha(content[name]) == description['sha256']
+receipt = json.loads(content['accepted/receipt.json'])
+assert receipt['status'] == 'PASS'
+for source, description in receipt['source_manifest'].items():
+    if source.startswith('baseline:'):
+        original = source.split(':', 1)[1]
+        data = subprocess.check_output(['git', 'show', receipt['baseline'] + ':' + original], cwd=ROOT)
+        basename = 'spk286_control_decode_baseline.sv' if original.endswith('control_decode.sv') else 'spk286_decoder_baseline.sv'
+        module = Path(original).stem
+        renamed = data.replace(('module ' + module + ' (').encode(),
+                               ('module ' + module + '_baseline (').encode())
+        assert content['accepted/sources/' + basename] == renamed
+    else:
+        data = content['accepted/sources/' + source]
+    assert len(data) == description['bytes'] and sha(data) == description['sha256']
+for result in receipt['results']:
+    assert result['pass'] in content[f"accepted/{result['label']}-{result['simulator']}-run.log"].decode()
+costs = {}
+for label, name in [('preview', 'cost-preview'), ('preview_and_replay', 'cost-historical'), ('max_disabled', 'cost-max-disabled')]:
+    netlist = json.loads(content['accepted/' + name + '.json'])
+    assert len(netlist['modules']) == 1
+    cells = next(iter(netlist['modules'].values()))['cells']
+    types = dict(collections.Counter(cell['type'] for cell in cells.values()))
+    bits = sum(len(cell['connections']['Q']) for cell in cells.values() if 'DFF' in cell['type'])
+    actual = {'cell_types': types, 'generic_cells': len(cells), 'register_bits': bits}
+    assert actual == receipt['generic_synthesis'][label]
+    costs[label] = actual
+save(folder / 'independent-review.json', {
+    'status': 'INDEPENDENT_PACKET_REVIEW_PASS', 'archive_sha256': meta['sha256'],
+    'members_verified': len(content), 'all_member_hashes_verified': True,
+    'baseline_decoder_and_control_equal_git_commit_after_exact_module_rename': receipt['baseline'],
+    'all_compiled_source_bindings_verified': True,
+    'preview_checks_per_simulator': 3110, 'default_mode_comparisons_per_simulator': 49152,
+    'runtime_markers_verified': True, 'generic_netlist_counts_recomputed': costs,
+    'protocol_review': ['Start/cancel resets without consuming a byte.',
+        'Terminal completion remains latched; root independently qualifies the redirect epoch.',
+        'Ten-byte completion terminates on byte ten; unavailable/overlength preview never consumes byte eleven.',
+        'Canonical syntax metadata remains separate from architectural execution and successor faults.'],
+    'limits': ['Read-only independent review; no additional runtime was launched.',
+        'Syntax classification does not certify architectural validity.',
+        'Generic cells are not fitted Cyclone V ALMs; constant MAX-disabled wrapper is not dynamic whole-core cost.']})
+
+key = 'p06-target-handoff-integration-20261005'
+folder, manifest, meta, content = packet(key)
+prefix = key + '/'
+inner = json.loads(content[prefix + 'manifest.json'])
+assert len(content) == manifest['members']
+assert set(content) == {prefix + name for name in inner['members']} | {prefix + 'manifest.json'}
+for name, description in inner['members'].items():
+    data = content[prefix + name]
+    assert len(data) == description['bytes'] and sha(data) == description['sha256']
+receipt = json.loads(content[prefix + 'receipt.json'])
+assert receipt == json.loads((folder / 'receipt.json').read_text())
+assert receipt['status'] == 'PASS' and receipt['source_changes'] == []
+for source, digest in receipt['sources_sha256'].items():
+    assert sha(content[prefix + 'source/' + source]) == digest
+for source, digest in receipt['generated_sha256'].items():
+    assert sha(content[prefix + 'generated/' + source]) == digest
+generation = json.loads(content[prefix + 'generated/generation.json'])
+for source, digest in generation['sources_sha256'].items():
+    assert sha(content[prefix + 'source/' + source]) == digest
+assert generation['generated_sha256'] == receipt['generated_sha256']
+fields = {
+    'RESULT': ('results', ['id','profile','kind','length','odd','stall','clocks','budget'], 0),
+    'EVENT_RESULT': ('event_results', ['id','profile','probe','phase','vector','clocks','frame_ip'], 1),
+    'PROTECTED_RESULT': ('protected_results', ['id','profile','variant','source_retired','frame_ip','error_code'], 2),
+    'CANCEL_RESULT': ('cancel_results', ['id','profile','reset','source_retired','ax','dx'], 2),
+    'HOLD_RESULT': ('hold_results', ['id','profile','source_retired','target_retired'], 0)}
+counts = {}
+for run in receipt['results']:
+    is_golden = 'kind' in run
+    log_name = 'golden.log' if is_golden else ('candidate' if run['simulator'] == 'iverilog' else 'verilator') + '-' + str(run['profile']) + '.log'
+    log = content[prefix + log_name].decode()
+    assert 'P06_TARGET_HANDOFF_INTEGRATION_PASS' in log
+    rows = {item[0]: [] for item in fields.values()}
+    for line in log.splitlines():
+        values = line.split(',')
+        if values[0] not in fields: continue
+        dest, names, hexadecimal = fields[values[0]]
+        values = values[1:]
+        parsed = [int(value, 16 if hexadecimal and index >= len(values)-hexadecimal else 10) for index,value in enumerate(values)]
+        rows[dest].append(dict(zip(names, parsed, strict=True)))
+    for name in rows: assert rows[name] == run[name], (log_name, name, rows[name][:2], run[name][:2])
+    if is_golden: continue
+    item = counts.setdefault(run['simulator'], collections.Counter())
+    item['profiles'] += 1
+    for source, dest in [('results','normal'),('event_results','events'),('protected_results','protected'),('cancel_results','cancel'),('hold_results','hold')]:
+        item[dest] += len(rows[source]); item['total'] += len(rows[source])
+for simulator in counts:
+    assert dict(counts[simulator]) == manifest['counts'][simulator]
+for profile in range(8):
+    a = next(run for run in receipt['results'] if run['profile']==profile and run['simulator']=='iverilog')
+    b = next(run for run in receipt['results'] if run['profile']==profile and run['simulator']=='verilator')
+    for name in [item[0] for item in fields.values()]: assert a[name] == b[name]
+candidate = gzip.decompress(content[prefix + 'max-candidate.csv.gz'])
+golden = gzip.decompress(content[prefix + 'max-golden.csv.gz'])
+assert candidate == golden
+maximum = next(run for run in receipt['results'] if run['simulator']=='iverilog' and run['profile']==0)
+assert maximum['trace']['sha256'] == sha(candidate)
+assert maximum['trace']['bytes'] == len(candidate) and maximum['trace']['rows'] == len(candidate.splitlines())
+save(folder / 'independent-review.json', {
+    'status': 'INDEPENDENT_PACKET_REVIEW_PASS', 'archive_sha256': meta['sha256'],
+    'members_verified': len(content), 'all_member_hashes_verified': True,
+    'source_and_generated_bindings_verified': True, 'generation_receipt_bindings_verified': True,
+    'runtime_metrics_reparsed_and_equal': True, 'counts': {k:dict(v) for k,v in counts.items()},
+    'max_recorded_raw_stream_equal_without_normalization': True,
+    'max_recorded_raw_sha256': sha(candidate), 'max_recorded_rows': len(candidate.splitlines()),
+    'protocol_review': ['Successful semantic redirect precedes RAW completion; target readiness uses retained state.',
+        'Preview begins only after RAW completion; real architectural consumption is blocked while source is retained.',
+        'Preview consumes real prefetch bytes into ten-byte replay; events use public source retirement before successor dispatch.',
+        'Stream restart cancels preview/replay; source cancellation clears retained target dependency.',
+        'Protected successor faults remain gated until the source boundary; estimated unavailable length does not inject a source fault.',
+        'MAX bypass leaves the recorded functional stream unchanged.'],
+    'limits': ['Read-only independent review; frozen runtime replay was performed separately by the author.',
+        'Recorded MAX equivalence covers the captured fields, not every possible debug port or program.',
+        '777 directed cases per simulator do not constitute the deferred complete regression or fitted timing closure.']})
+
+raw_folder = ROOT / 'docs/evidence/p06-length-fault-boundary-20261005'
+review = json.loads((raw_folder / 'independent-source-review.json').read_text())
+runtime = json.loads((ROOT / 'build/p06-raw10-review-20261005/run/verification.json').read_text())
+assert runtime['status'] == 'PASS'
+review.update(status='INDEPENDENT_SOURCE_AND_FROZEN_RUNTIME_REVIEW_PASS', runtime_reproduction_pending=False,
+              runtime_reproduction=runtime)
+save(raw_folder / 'independent-source-review.json', review)
+print('FINAL_PACKETS_INDEPENDENT_REVIEW_PASS encoding=54 integration=81 raw_runtime=PASS')

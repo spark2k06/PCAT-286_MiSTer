@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 """Generate the single selected production timing variant from frozen SPK286.
 
-The functional engine and private pilot ancestors are never edited. This first
-general profile uses explicit Intel/native instruction metadata, retained bus
-dependencies and deferred interval retirement. It is provisional instruction/
-logical-bus timing, not a native-pin or exact internal-EU schedule claim.
+Private pilot ancestors remain frozen. Named functional corrections and shared
+syntax metadata are pinned independently below. The general profile uses
+Intel/native metadata, retained bus dependencies and deferred retirement. It
+is provisional instruction/logical-bus timing, not an exact internal-EU or
+native-pin schedule claim.
 """
 import argparse
 import hashlib
@@ -19,11 +20,20 @@ ORIGINALS = {
 }
 
 # The private P06 pilot receipt remains a historical baseline. These two
-# explicit production inputs implement the separately verified READY chaining
-# milestone; do not replace hashes inside the frozen evidence to admit them.
+# explicit production inputs implement separately verified corrections;
+# do not replace hashes inside the frozen evidence to admit them.
 FUNCTIONAL_UPDATES = {
-    "vendor/spk286/rtl/spk286.sv": ORIGINALS["vendor/spk286/rtl/spk286.sv"],
+    # A completed legal ten-byte instruction is not a demand for byte eleven.
+    "vendor/spk286/rtl/spk286.sv": "fe945327191099b0c1580eae0819a451cd797b8b0cf3f78166e4b5eefd159b26",
     "vendor/spk286/rtl/spk286_fetch.sv": "1da4efb3273c690d97acba5f8646a3e40b9588b957e00dfc7d4aa40c66b6af3c",
+    # Canonical encoding metadata adds no functional words or decoder map.
+    "vendor/spk286/microcode/generated/spk286_microcode_pkg.sv": "202236c1ec93016bfb17d8a918b61de8af805dabb4ccb55c9cc1ec54875e3e10",
+    "vendor/spk286/microcode/generated/spk286_microcode_rom.sv": "8861eb3eefeecc72a0e6383cf95d961c0d0cb27f76595bcb5ecc3d2ae711f519",
+    "vendor/spk286/microcode/generated/spk286_microcode_sync_rom.sv": "31841a56d61b32aaf92c91afbc0258d67ce90a3c67788dc06092c8d845ec1894",
+    # Default functional entries remain identical; syntax mode resolves the
+    # generated acquisition shape at those same canonical decoder leaves.
+    "vendor/spk286/rtl/spk286_decoder.sv": "d38849308e58512e02f7766a0aa4d513a73771915901e7dd8b44eb457f1606bb",
+    "vendor/spk286/rtl/spk286_control_decode.sv": "026d3217f5290f2b3b7f14da66a660ff0e65372b6dbb11c7db6f1ae2c56b352b",
 }
 
 
@@ -70,6 +80,86 @@ CONNECTION = r'''
     logic profile_implementation_extension;
     /* verilator lint_on UNUSEDSIGNAL */
 
+    logic profile_requires_target_length;
+    logic profile_native_queue_valid, profile_native_queue_ready;
+    logic [7:0] profile_native_queue_data;
+    logic profile_target_pending, profile_target_preview_enable;
+    logic profile_target_preview_start, profile_target_started_q;
+    logic profile_target_preview_active, profile_target_byte_ready;
+    logic profile_target_complete, profile_target_valid_length;
+    /* verilator lint_off UNUSEDSIGNAL */
+    logic profile_target_invalid, profile_target_unsupported;
+    logic profile_target_overlength, profile_target_fetch_fault;
+    /* verilator lint_on UNUSEDSIGNAL */
+    logic profile_target_abort_fetch, profile_target_length_ready;
+    logic [3:0] profile_target_length, profile_target_length_clocks;
+    logic profile_target_replay_valid;
+    logic [7:0] profile_target_replay_data;
+    /* verilator lint_off UNUSEDSIGNAL */
+    logic [3:0] profile_target_replay_count;
+    logic profile_target_fault_estimated;
+    /* verilator lint_on UNUSEDSIGNAL */
+
+    // A real redirect qualifies the source form. Preview starts only after
+    // functional END, when no late source operand can consume target bytes.
+    assign profile_target_preview_start = historical_enable && raw_retired &&
+        profile_target_pending && !event_active && !profile_target_started_q;
+    assign profile_target_preview_active = profile_target_started_q &&
+        profile_target_preview_enable && !micro_active;
+    assign profile_target_abort_fetch = !profile_native_queue_valid &&
+        !fetch_response_valid && !fetch_bus_valid &&
+        (fetch_blocked || protected_fetch_invalid);
+    always_ff @(posedge clk) begin
+        if (reset || !historical_enable || stream_restart || profile_start_interval ||
+            profile_retire_fire)
+            profile_target_started_q <= 1'b0;
+        else if (profile_target_preview_start)
+            profile_target_started_q <= 1'b1;
+    end
+
+    spk286_target_handoff profile_target_handoff (
+        .clk(clk), .reset(reset), .historical_enable(historical_enable),
+        .cancel(semantic_cancel || loadall_commit_valid ||
+                (internal_redirect && (!profile_requires_target_length || event_active))),
+        .start_interval(profile_start_interval), .source_retire(profile_retire_fire),
+        .requires_target_length(profile_requires_target_length && !event_active),
+        .redirect_event(internal_redirect),
+        .preview_complete(profile_target_complete && profile_target_started_q),
+        .preview_fault(!profile_target_valid_length), .preview_length(profile_target_length),
+        .pending(profile_target_pending), .preview_enable(profile_target_preview_enable),
+        .target_length_ready(profile_target_length_ready),
+        .target_length_clocks(profile_target_length_clocks),
+        .target_fault_estimated(profile_target_fault_estimated)
+    );
+    spk286_encoding_preview profile_target_preview (
+        .clk(clk), .reset(reset), .cancel(!historical_enable || stream_restart),
+        .start(profile_target_preview_start), .enable(profile_target_preview_active),
+        .byte_valid(profile_native_queue_valid), .byte_data(profile_native_queue_data),
+        .abort_fetch(profile_target_abort_fetch), .byte_ready(profile_target_byte_ready),
+        .complete(profile_target_complete), .valid_length(profile_target_valid_length),
+        .invalid_opcode(profile_target_invalid), .unsupported(profile_target_unsupported),
+        .overlength(profile_target_overlength), .fetch_fault(profile_target_fetch_fault),
+        .length(profile_target_length)
+    );
+    spk286_target_replay profile_target_replay (
+        .clk(clk), .reset(reset), .cancel(!historical_enable || stream_restart),
+        .start(profile_target_preview_start),
+        .capture(profile_native_queue_valid && profile_target_byte_ready),
+        .capture_data(profile_native_queue_data),
+        .consume(!profile_target_pending && queue_consume_valid && queue_consume_ready &&
+                 profile_target_replay_valid),
+        .valid(profile_target_replay_valid), .data(profile_target_replay_data),
+        .count(profile_target_replay_count)
+    );
+    // Only replay uses the existing architectural queue handshake. Native
+    // prefetch keeps its six-byte reservation and accepted-response ownership.
+    assign queue_consume_valid = profile_target_pending ? 1'b0 :
+        profile_target_replay_valid ? 1'b1 : profile_native_queue_valid;
+    assign queue_consume_data = profile_target_replay_valid ?
+        profile_target_replay_data : profile_native_queue_data;
+    assign profile_native_queue_ready = profile_target_pending ? profile_target_byte_ready :
+        (!profile_target_replay_valid && queue_consume_ready);
+
     wire profile_delivery_metadata = event_dispatch || (event_active && !event_software);
     // Candidate metadata must not depend on opcode_start/event_request: the
     // retirement deadline itself participates in event/head arbitration.
@@ -105,6 +195,7 @@ CONNECTION = r'''
         .estimated(profile_family_estimated),
         .requires_modrm(profile_requires_modrm), .requires_outcome(profile_requires_outcome),
         .requires_count(profile_requires_count), .base_clocks(profile_base_clocks),
+        .requires_target_length(profile_requires_target_length),
         .repeat_setup_clocks(profile_repeat_setup),
         .repeat_iteration_clocks(profile_repeat_iteration),
         .permits_read_wait(profile_metadata_read_wait), .ea_clocks(profile_ea_clocks)
@@ -114,7 +205,7 @@ CONNECTION = r'''
     // BIU decomposes it into lanes. RMW therefore obtains READ +2 and WRITE +2.
     assign profile_alignment_event = historical_enable &&
         memory_request && memory_request_ready && !memory_byte && memory_address[0];
-    assign profile_metadata_estimated = profile_family_estimated ||
+    assign profile_metadata_estimated = profile_family_estimated || profile_target_fault_estimated ||
         (!profile_delivery_metadata && profile_prefix_count_q != 0 &&
          (!profile_repeated_string || profile_prefix_count_q > 1));
     always_comb begin
@@ -169,6 +260,8 @@ CONNECTION = r'''
         .metadata_valid(profile_metadata_valid),
         .metadata_freeze(raw_retired || (software_taken && event_request)),
         .metadata_clocks(profile_metadata_clocks),
+        .target_length_ready(profile_target_length_ready),
+        .target_length_clocks(profile_target_length_clocks),
         .read_wait_event(timing_read_wait_event && profile_metadata_read_wait),
         .alignment_event(profile_alignment_event), .functional_retired(raw_retired),
         .repeat_checkpoint(profile_repeat_checkpoint), .repeat_next_clocks(profile_repeat_iteration),
@@ -223,7 +316,7 @@ CONNECTION = r'''
 def build(out):
     out = Path(out)
     for name, expected in ORIGINALS.items():
-        if sha(ROOT / name) != expected:
+        if sha(ROOT / name) != FUNCTIONAL_UPDATES.get(name, expected):
             raise ValueError(f"Frozen production source changed: {name}")
     # Unchanged pilot dependencies retain their frozen hashes. Production
     # updates are named and pinned independently, leaving old receipts intact.
@@ -238,6 +331,11 @@ def build(out):
         "    input  logic         historical_enable, cpu_boundary, timing_read_wait_event,")
     top = replace_once(top, "    // A CS reload requires", CONNECTION + "\n    // A CS reload requires")
     top = replace_once(top, ".start_ready(decode_ready),", ".start_ready(profile_decode_ready),")
+    top = replace_once(top,
+        ".consume_valid(queue_consume_valid), .consume_data(queue_consume_data),\n"
+        "        .consume_ready(queue_consume_ready), .count(queue_count)",
+        ".consume_valid(profile_native_queue_valid), .consume_data(profile_native_queue_data),\n"
+        "        .consume_ready(profile_native_queue_ready), .count(queue_count)")
     top = replace_once(top, ".operation_valid(operation_valid), .active(micro_active),",
         ".operation_valid(profile_raw_operation_valid), .active(micro_active),")
     top = replace_once(top, ".complete(raw_retired || event_completed),",
@@ -287,10 +385,15 @@ def build(out):
                  if name.startswith("vendor/spk286/")},
         **ORIGINALS, **FUNCTIONAL_UPDATES, "scripts/build_p06_profile_cpu.py": sha(Path(__file__)),
         "rtl/spk286_timing/spk286_instruction_schedule.sv": sha(ROOT / "rtl/spk286_timing/spk286_instruction_schedule.sv"),
+        "rtl/spk286_timing/spk286_target_handoff.sv": sha(ROOT / "rtl/spk286_timing/spk286_target_handoff.sv"),
+        "rtl/spk286_timing/spk286_target_replay.sv": sha(ROOT / "rtl/spk286_timing/spk286_target_replay.sv"),
+        "vendor/spk286/rtl/spk286_encoding_preview.sv": sha(ROOT / "vendor/spk286/rtl/spk286_encoding_preview.sv"),
+        "vendor/spk286/tools/microcode/compile_microcode.py": sha(ROOT / "vendor/spk286/tools/microcode/compile_microcode.py"),
+        "vendor/spk286/microcode/generated/spk286_microcode_validation.json": sha(ROOT / "vendor/spk286/microcode/generated/spk286_microcode_validation.json"),
         "rtl/spk286_timing/spk286_instruction_timing.sv": sha(ROOT / "rtl/spk286_timing/spk286_instruction_timing.sv")}
     manifest = {"status": "PROFILED_CPU_GENERATED_NOT_ACCEPTED", "sources_sha256": sources,
         "generated_sha256": {name: sha(path) for name, path in selected.items()},
-        "scope": "Single selected functional core with reserved READY chaining; provisional instruction intervals and logical bus supplied by integration; private pilot evidence unchanged"}
+        "scope": "Single selected functional core with reserved READY chaining and historical source-retirement target encoding handoff; provisional instruction intervals and logical bus supplied by integration; private pilot evidence unchanged"}
     (out / "generation.json").write_text(json.dumps(manifest, indent=2) + "\n", newline="\n")
     return selected
 

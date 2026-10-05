@@ -447,6 +447,8 @@ def main():
     extras = [ROOT / "scripts/build_p06_profile_cpu.py",
               ROOT / "rtl/spk286_timing/spk286_instruction_schedule.sv",
               ROOT / "rtl/spk286_timing/spk286_instruction_timing.sv",
+              ROOT / "rtl/spk286_timing/spk286_target_handoff.sv",
+              ROOT / "rtl/spk286_timing/spk286_target_replay.sv",
               ROOT / "rtl/spk286_integration/spk286_at_cpu_profile.sv",
               CPU / "sim/unit/spk286_signals.svh", Path(__file__).resolve()]
     inputs = original + extras + [CPU / f"sim/unit/spk286_{name}_tb.sv" for name in units]
@@ -454,7 +456,7 @@ def main():
     generated = build(out / "generated")
     generated_hashes = {path.name: sha(path) for path in generated.values()}
     selected = [path for path in original if path.name not in {"spk286.sv", "spk286_events.sv"}]
-    selected += list(generated.values()) + extras[1:4]
+    selected += list(generated.values()) + extras[1:6]
     fixtures = {name: fixture(out, name) for name in units}
     if args.prepare_only:
         (out / "prepared.json").write_text(json.dumps({"status": "PREPARED_NOT_TESTED",

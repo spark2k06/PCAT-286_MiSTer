@@ -5,6 +5,9 @@
 // The selected hardware has one profiled CPU; MAX bypasses its schedule.
 `include "rtl/spk286_timing/spk286_instruction_timing.sv"
 `include "rtl/spk286_timing/spk286_instruction_schedule.sv"
+`include "rtl/spk286_timing/spk286_target_handoff.sv"
+`include "rtl/spk286_timing/spk286_target_replay.sv"
+`include "vendor/spk286/rtl/spk286_encoding_preview.sv"
 `include "vendor/spk286/rtl/timed/spk286_profiled_events.sv"
 `include "vendor/spk286/rtl/timed/spk286_profiled.sv"
 

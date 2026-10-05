@@ -10,6 +10,8 @@ module spk286_instruction_schedule (
     input logic start_interval, start_body,
     input logic metadata_valid, metadata_freeze,
     input logic [9:0] metadata_clocks,
+    input logic target_length_ready,
+    input logic [3:0] target_length_clocks,
     input logic read_wait_event, alignment_event,
     input logic functional_retired,
     input logic repeat_checkpoint,
@@ -21,7 +23,8 @@ module spk286_instruction_schedule (
 );
     logic active_q, body_q, pending_q, qualified_q, frozen_q, admission_window_q;
     logic [9:0] elapsed_q, base_q, extra_q;
-    logic [10:0] elapsed_next, effective_base, extra_next, total;
+    logic [10:0] elapsed_next, effective_base, extra_next;
+    logic [11:0] total;
     logic metadata_available;
 
     always_comb begin
@@ -37,8 +40,11 @@ module spk286_instruction_schedule (
         // Current bus admissions may depend on an EU checkpoint permit. They
         // update the retained budget at this edge, never feed that permit
         // combinationally. Every reference precedes its functional retirement.
-        total = effective_base + {1'b0, extra_q};
-        if (total > 11'd1023) total = 11'd1023;
+        // The source's base freezes at functional END. Its independently
+        // qualified target encoding may arrive later, so this allowance must
+        // never be frozen with the earlier base or charged to the successor.
+        total = {1'b0, effective_base} + {2'd0, extra_q} + {8'd0, target_length_clocks};
+        if (total > 12'd1023) total = 12'd1023;
         metadata_available = qualified_q || (!frozen_q && metadata_valid);
     end
     assign active = historical_enable && active_q;
@@ -48,7 +54,8 @@ module spk286_instruction_schedule (
                          ((cpu_boundary || admission_window_q) &&
                           (!active_q || !body_q) && !pending_q);
     assign deadline_ready = !historical_enable ||
-                            (active_q && body_q && metadata_available && elapsed_next >= total);
+                            (active_q && body_q && metadata_available && target_length_ready &&
+                             {1'b0, elapsed_next} >= total);
     assign retire_fire = !historical_enable ? functional_retired :
                          !reset && !cancel && cpu_boundary && deadline_ready &&
                          (pending_q || functional_retired);

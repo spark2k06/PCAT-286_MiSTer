@@ -64,5 +64,17 @@ memory, DSP or clock hardware are requested by the implementation.
 The [sealed packet](../evidence/p06-execution-deadline-20261005/manifest.json)
 retains exact tested sources, fixtures, logs, proof scripts, counterexamples,
 receipts and baseline comparisons. Simulator objects are excluded and removed
-after byte verification. A fresh all-features 50 MHz fit is the next gate.
+after byte verification. Verified implementation commit: `99c4934`.
+
+A fresh all-features 50 MHz compile started at 2026-10-05 10:56:40 UTC in
+`build/p06-execution-deadline-allfeatures-20261005-v1`, from 1,375 frozen input
+files. It remains pending; no physical setup improvement or FPGA cost is claimed
+yet. Adlib/OPL2 stays enabled. Four-corner detailed timing follows the fit.
 The previous RBF remains the hardware/profile measurement reference.
+
+After checking the sealed packet against every archived byte and confirming
+the directed processes had completed, five owned test directories and the
+collector were removed: 1,300,998,280 logical bytes. The active fit workspace and
+earlier RBFs were retained. The packet directory contains the cleanup receipt;
+the fit's databases will be cleaned after its effective sources and results
+have been preserved.

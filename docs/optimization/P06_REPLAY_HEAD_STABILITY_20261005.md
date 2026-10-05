@@ -53,6 +53,16 @@ tested sources, unchanged benches, exact baseline comparison, proof scripts,
 negative controls and simulator logs. Compiler objects and executables are not
 archived.
 
-Next: a fresh all-features fit at the existing physical 50 MHz, followed by
-four-corner setup/hold reporting and resource comparison. This change is not yet
-claimed to improve fitted timing or qualify hardware stability.
+Verified implementation commit: `c90f7b5`. A fresh all-features fit started at
+2026-10-05 07:50:06 UTC under
+`build/p06-replay-head-allfeatures-20261005-v1`, at the existing physical 50 MHz.
+Four-corner setup/hold reporting and resource comparison follow compilation.
+This change is not yet claimed to improve fitted timing or qualify hardware
+stability.
+
+After archive byte verification and confirmation that simulator processes had
+finished, the four owned proof/integration work directories and temporary
+collector were removed: 609,533,055 logical bytes. The active frozen fit and
+earlier measurement RBF were retained. The cleanup receipt is in the packet's
+directory; the ongoing fit databases will be removed only after its results
+and effective inputs have been preserved.

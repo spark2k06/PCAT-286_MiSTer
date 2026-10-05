@@ -66,8 +66,8 @@ All features, including Adlib/OPL2, remain enabled.
 | Worst global recovery | +1.680 ns | +1.981 ns | +0.301 ns |
 | Worst global removal | +0.198 ns | +0.160 ns | −0.038 ns |
 | Equivalent ALMs | 31,018 | 31,108 | +90 |
-| Placed ALMs | 36,489 | 36,489 | 0 |
-| Placed device occupancy | 87.065% | 87.065% | 0 |
+| Physical ALMs used in final placement | 36,490 | 36,490 | 0 |
+| Physical placed device occupancy | 87.068% | 87.068% | 0 |
 | Total registers | 38,024 | 38,127 | +103 |
 | Block memory bits | 3,301,099 | 3,301,019 | −80 |
 | M10K | 417 | 416 | −1 |
@@ -78,6 +78,11 @@ The inclusive CPU hierarchy changes from 7,385.8 to 7,357.3 equivalent ALMs,
 8,177.8 to 8,156.3 placed ALMs, and 5,417 to 5,492 registers. Whole-design
 packing and sharing change beyond this hierarchy; these are measured fitted
 attributions, not additive standalone module costs.
+
+Correction recorded during the next fit review: both original Fitter reports
+give a whole-device final-placement count of 36,490. The earlier table used
+36,489.0 from hierarchy attribution. The physical totals above now consistently
+use the global Fitter count; the original sealed evidence remains unchanged.
 
 The worst path now starts at the ordinary prefetch queue's `head_q[2]` and
 ends at the microsequencer's `micro_entry[1]`, with 31 logic levels and 35.332 ns

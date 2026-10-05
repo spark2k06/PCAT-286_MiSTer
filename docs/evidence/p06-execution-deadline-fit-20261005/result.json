@@ -1,0 +1,149 @@
+{
+  "status": "COMPILE_COMPLETE_TIMING_OPEN",
+  "baseline": "build/p06-replay-head-allfeatures-20261005-v1",
+  "candidate": "build/p06-execution-deadline-allfeatures-20261005-v1",
+  "resource_baseline": {
+    "equivalent_alms": 31108,
+    "placed_alms": 36490,
+    "hierarchy_placed_alm_attribution": 36489.0,
+    "placed_percent_device": 87.06752565020281,
+    "registers": 38127,
+    "memory_bits": 3301019,
+    "m10k": 416.0,
+    "dsp": 39.0,
+    "pll": 3,
+    "cpu": {
+      "alm_needed": 7357.3,
+      "alm_placed": 8156.3,
+      "registers": 5492.0,
+      "memory_bits": 9216.0,
+      "m10k": 1.0
+    }
+  },
+  "resource_candidate": {
+    "equivalent_alms": 31600,
+    "placed_alms": 36866,
+    "hierarchy_placed_alm_attribution": 36865.5,
+    "placed_percent_device": 87.96468623240277,
+    "registers": 38166,
+    "memory_bits": 3301019,
+    "m10k": 416.0,
+    "dsp": 39.0,
+    "pll": 3,
+    "cpu": {
+      "alm_needed": 7670.1,
+      "alm_placed": 8475.4,
+      "registers": 5519.0,
+      "memory_bits": 9216.0,
+      "m10k": 1.0
+    }
+  },
+  "margins_baseline_ns": {
+    "setup": [
+      -16.044,
+      "7_slow_1100mv_-40c"
+    ],
+    "hold": [
+      0.055,
+      "7_slow_1100mv_-40c"
+    ],
+    "recovery": [
+      1.981,
+      "7_slow_1100mv_100c"
+    ],
+    "removal": [
+      0.16,
+      "MIN_fast_1100mv_-40c"
+    ]
+  },
+  "margins_candidate_ns": {
+    "setup": [
+      -10.992,
+      "7_slow_1100mv_-40c"
+    ],
+    "hold": [
+      -0.11,
+      "7_slow_1100mv_-40c"
+    ],
+    "recovery": [
+      2.429,
+      "7_slow_1100mv_100c"
+    ],
+    "removal": [
+      0.187,
+      "MIN_fast_1100mv_-40c"
+    ]
+  },
+  "setup_improvement_ns": 5.052,
+  "worst_cpu_path": {
+    "corner": "7_slow_1100mv_-40c",
+    "path": {
+      "slack_ns": -10.658,
+      "from": "emu_at:emu|spk286_at_machine:u_at_machine|spk286_machine_cpu:u_cpu|spk286_profiled:cpu|spk286_operand:operand|blocked",
+      "to": "emu_at:emu|spk286_at_machine:u_at_machine|spk286_machine_cpu:u_cpu|spk286_profiled:cpu|spk286_registers:registers|gpr_q[63]",
+      "launch_clock": "FPGA_CLK2_50",
+      "latch_clock": "FPGA_CLK2_50",
+      "relationship_ns": 20.0,
+      "clock_skew_ns": -0.512,
+      "data_delay_ns": 29.966
+    },
+    "logic_levels": 28
+  },
+  "rbf": {
+    "path": "build/p06-execution-deadline-allfeatures-20261005-v1/work/output_files/PCAT-286.rbf",
+    "bytes": 4105836,
+    "sha256": "4c02e8dac4b7026ae938bdf8c70637f2aaf80cc99545a3fc1dd8e081fae2bddd"
+  },
+  "sources": {
+    "count": 1375,
+    "controlled_generated": [
+      {
+        "path": "build_id.v",
+        "before_sha256": "92194b42e011765f82d684c65b168e8a17d9df0916b4b5b7c429a1970259f3a7",
+        "after_sha256": "ab6f6e17454d678dfff7f5cd8f753698aa3f5842ba310c324a316a2f1dbeff06",
+        "rule": "Standard sys/build_id.tcl compile preflow regenerates only BUILD_DATE"
+      }
+    ],
+    "baseline_snapshot_deltas": {
+      "rtl/spk286_timing/spk286_instruction_schedule.sv": {
+        "before": "40cf0ccb6742cc6f24809cbe3fb4323c228296a3971452f9a773087fb2790c93",
+        "after": "318015e3e2b1a6db4d928a129a977386e79931b42de785772bc042b8d48ada08"
+      },
+      "scripts/build_p06_profile_cpu.py": {
+        "before": "2323c8cccd14cec35ebf4dca698a27f6c15dba9bce238dcd0d39f4f1110a288f",
+        "after": "63dfe7bf2abf2306d3990354f59787622b676d63af520633a25ce73630ff4803"
+      },
+      "scripts/test_p06_execution_deadline_equivalence.py": {
+        "before": null,
+        "after": "219ff7b9faa5518d069001a61d44c224a64396fe3af8bf0cefb4a4540c43e728"
+      },
+      "scripts/test_spk286_target_handoff.py": {
+        "before": "a74a54a5563300a143457df027c45ae0cc78fd346f744d36b035f2e6b1201581",
+        "after": "106859385a5dde8f05ae4b52e18b4551ea7d9f420d8af77e9e5850e8b406727a"
+      },
+      "sim/spk286_timing/spk286_instruction_schedule_tb.sv": {
+        "before": "fb51f6411d65213309ba3ae4d2e8f4aeab0958644d8f2c9dc85647ecc84444ec",
+        "after": "408de1a79a86813487d363f1d3710273ed6e5952f2e59b42dd8ceab96a130a73"
+      },
+      "sim/spk286_timing/spk286_target_handoff_tb.sv": {
+        "before": "8ba9c71c16e776e4d0eae269c6ecfbd098e1ce0e67faeab9fc3506cbd964d1a2",
+        "after": "7c07cc4d2dba600ed6440a7e73a49263ae765cd6a8c35c25fec40f8198471de9"
+      },
+      "vendor/spk286/rtl/timed/generation.json": {
+        "before": "9c42b9bf410459cfab6ece0b76597dd019a97c1befac25442bf9a58a9ba30041",
+        "after": "7b7ebb84f296ee570c6d8ffb8a19a421eac250aa251a3f81f2d15ac2f4a5848f"
+      },
+      "vendor/spk286/rtl/timed/spk286_profiled.sv": {
+        "before": "a73f221664509d4c489fee4e685f5fa78fe3e547bb875644e02eeaca89666694",
+        "after": "795a9d7248f1f61d1b0998e84cbedb4c5c3f2d6f038775fc660c82052ef2c812"
+      }
+    },
+    "directed_cpu_source_binding": "All integration proof and generated CPU/event input hashes matched fitted sources",
+    "constraint_configuration_binding": "Every baseline SDC, QSF, QIP, QPF and TCL source hash unchanged"
+  },
+  "timing_scope": "Four-corner constrained paths; bounded top-N per selector, inherited platform limitations retained",
+  "hardware": "NOT_RUN",
+  "full_regression": "USER_DEFERRED",
+  "compile_duration": "00:28:05",
+  "detailed_sta_duration": "00:03:35"
+}

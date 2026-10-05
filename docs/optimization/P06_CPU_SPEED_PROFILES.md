@@ -1,9 +1,11 @@
 # P06 — Perfiles de CPU 6–25 MHz y MAX
 
 Status, 2026-10-05: [main-menu selection and safe live changes](P06_LIVE_SPEED_20261005.md)
-pass directed dual-simulator qualification. A new physical fit and MiSTer
-validation are pending. The dated reset-applied candidates below remain
-historical evidence; physical setup closure is still open.
+pass directed dual-simulator qualification. The all-features RBF is available;
+its four-corner fit gives setup -6.051 ns and original-SDC hold +0.015 ns,
+with the additional palette route requirement still missing by 0.065 ns.
+MiSTer live-switch validation is pending. The dated reset-applied candidates
+below remain historical evidence; physical setup closure is still open.
 
 Previous status, 2026-10-04: the first general reset-applied OSD candidate is synthesized
 and passes directed validation; its physical setup does not close. See

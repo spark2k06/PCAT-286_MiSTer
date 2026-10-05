@@ -3010,7 +3010,7 @@ BEGIN
 
 			IF o_ce='1' THEN
 				-- Output pixels count
-				IF o_hcpt+1<o_htotal THEN
+				IF o_htotal>0 AND o_hcpt<o_htotal-1 THEN
 					o_hcpt<=(o_hcpt+1) MOD 4096;
 				ELSE
 					o_hcpt<=0;

@@ -173,9 +173,42 @@ RBF: `build/p06-deadline-fold-allfeatures-20261005-v1/work/output_files/PCAT-286
 `5b809465da95d32150a858bf04db6abc52da630b459307d453df556c91973296`.
 The RBF is announced at assembler completion, before the final STA pass.
 
-The next trial changes only placement seed 1 to 2 in another frozen copy of
-these same inputs. No functional change or new full regression is needed
-for that controlled physical experiment. All features remain enabled.
+## Completed placement retry — seed 2
+
+The second frozen fit changes only QSF `SEED 1` to `SEED 2`; all 1,390
+inputs are checked, with the controlled BUILD_DATE preflow retained.
+Compilation takes 28m39s. The additional 0.500 ns palette minimum-route
+requirement remains active and hold is now positive at every corner.
+
+| Timing corner | Global setup (ns) | Global hold (ns) | Recovery (ns) | Removal (ns) |
+| --- | ---: | ---: | ---: | ---: |
+| Slow 1100 mV, 100 C | -0.312 | +0.189 | +3.110 | +0.498 |
+| Slow 1100 mV, -40 C | -0.248 | +0.073 | +3.304 | +0.462 |
+| Fast 1100 mV, 100 C | +2.286 | +0.133 | +4.648 | +0.301 |
+| Fast 1100 mV, -40 C | +2.626 | +0.034 | +4.978 | +0.228 |
+
+The remaining hot setup path is CPU prefetch/service permission through
+the descriptor selector and pre-fault qualification to SP. The cold CPU
+setup margin is -0.106 ns through protected return stack-range logic;
+the cold global path remains the HDMI horizontal-to-vertical decision.
+CPU hold is +0.121 ns minimum. Bridge, buffers and SDRAM retain positive
+scoped margins. The same fitted artifacts checked with the original SDC
+have minimum hold +0.073 ns. Neither constraint set closes setup yet.
+
+Placed ALMs are 36,854 / 41,910 (87.94%); equivalent ALMs 31,633;
+registers 38,333. RAM, M10K, DSP and PLL totals match seed 1. The inclusive
+CPU accounts for 8,295.1 placed ALMs and 5,606 registers. Constraint coverage
+and the mapped palette scope remain unchanged.
+
+[The sealed seed-2 fit evidence](../evidence/p06-deadline-fold-seed2-fit-20261005/result.json)
+binds all verified sources, four-corner reports and original-SDC audit.
+After archive readback, 321,128,264 bytes of owned source copies and compiler
+databases are removed; RBF/SOF and reports remain available.
+
+RBF: `build/p06-deadline-fold-seed2-allfeatures-20261005-v1/work/output_files/PCAT-286.rbf`,
+4,146,272 bytes, SHA-256
+`05aa2f73c75c3b36dfb2d0fba579f5afe82a77d0036cd800f66ec6580d5d9492`.
+It was announced at assembler availability before the final custom STA.
 
 ### Prepared scaler fallback — private proof only
 
@@ -197,3 +230,32 @@ claim that a future placement improves timing.
 are archived and read back before its 4 MB of owned temporaries are deleted.
 It is available if the unchanged-RTL placement retry still needs an HDMI
 logic correction.
+
+### Applied scaler terminal correction
+
+The seed-2 retry leaves the HDMI setup path open. The proved predicate is
+therefore applied as the sole change in `sys/ascal.vhd`. Its reusable
+checker is `scripts/test_ascal_terminal_equivalence.py`.
+The installed source passes the exhaustive 16,777,216-pair predicate check,
+40,000 complete OSWEEP transitions and arbitrary-state/context actual-process
+equivalence. An off-by-one mutant fails both native and formal checks.
+Full-file GHDL analysis passes VHDL-93 and VHDL-2008 for both versions.
+Ten inherited declaration-hiding warnings per analysis are compared by
+exact source anchor and normalized diagnostic; no new warning is accepted.
+Extracted native and synthesis checks are warning-free.
+
+[Applied source-bound evidence](../evidence/p06-scaler-terminal-applied-20261005/receipt.json)
+includes the complete files, helper and diagnostic trials. The candidate
+file SHA-256 is `412aa4c447e9b6389600dabb0072ffdc5bffdd14a310962e2dc5ebff01be5186`;
+reversing the sole predicate reconstructs the original file byte for byte.
+Archive readback precedes deletion of 23,841,296 bytes of owned temporaries.
+No register, cycle or clock changes. FPGA timing benefit is not yet measured.
+
+### Rejected descriptor comparator rewrite
+
+A private exact-equivalence experiment replaces descriptor-end comparison
+with split index/low-bit comparison. Every selector output is equivalent,
+but generic mapped comparator depth increases from 9 to 12 despite two fewer
+gates. It is not applied; production selector RTL remains unchanged.
+[The rejected experiment](../evidence/p06-selector-entry-bound-proof-20261005/mapping-comparison.json)
+is preserved to avoid repeating it. Generic depths are not Cyclone V timing.

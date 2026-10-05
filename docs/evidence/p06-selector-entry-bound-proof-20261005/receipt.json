@@ -1,0 +1,33 @@
+{
+  "status": "SELECTOR_ENTRY_BOUND_ALL_OUTPUTS_EQUIVALENCE_PASS",
+  "scope": "Actual selector module, all 9 public outputs, every 16-bit selector/limit and 24-bit table base; no assumptions or state",
+  "source_sha256": "cd003eaccbb361fece41fa4fff352015d4d2e2723ed7656bfdf4457b40af4c33",
+  "helper_sha256": "34764d1150daf1993aabefdf9f95487527aef8be50cd00f03dcdd1265430a795",
+  "original_assignment": "descriptor_limit_valid = descriptor_end <= {5'b0, table_limit};",
+  "replacement_assignment": "descriptor_limit_valid = (selector[15:3] < table_limit[15:3]) ||\n                                 ((selector[15:3] == table_limit[15:3]) && (&table_limit[2:0]));",
+  "proofs": [
+    {
+      "name": "all-outputs",
+      "negative_control": false
+    },
+    {
+      "name": "unsafe-low-limit-bits",
+      "negative_control": true
+    },
+    {
+      "name": "unsafe-entry-equality",
+      "negative_control": true
+    }
+  ],
+  "artifacts_sha256": {
+    "all-outputs.log": "95d4ca5a364cddae8b39edda54a2f817ac5fd0364cff01fa55c440bfdc1b4058",
+    "all-outputs.sv": "391f7f2b7ca15f38019aa202f59e3401f09ee2d51c50bb232fc576d2f507dcb2",
+    "candidate.sv": "391f7f2b7ca15f38019aa202f59e3401f09ee2d51c50bb232fc576d2f507dcb2",
+    "miter.sv": "24db0ea02a839a65e145daba7d2f77981330c16506916d7c58949075519e66c7",
+    "reference.sv": "a494c7dfa23e388832b2ff6c25dbacf8cc977a1fe544691f663051af1aa0e27c",
+    "unsafe-entry-equality.log": "b88196b314a9a50b030ce6a81f990478c98bd58efe1fbc43804650a4ee92acfe",
+    "unsafe-entry-equality.sv": "24c5e40f8b08d5fbfcb0bd31640ab2dbe8bd89155877300402e0788e4650216c",
+    "unsafe-low-limit-bits.log": "d3fe49cba435323c27e00704b37cb4466930184b2273f563535e3040125a9254",
+    "unsafe-low-limit-bits.sv": "139d91cf0297cbce8479cafc1aaddff1ae82e61ab502376c6125bb70f605a14d"
+  }
+}

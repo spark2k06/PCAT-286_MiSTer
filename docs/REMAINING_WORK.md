@@ -26,7 +26,11 @@ The completed deadline-fold seed-1 fit improves global setup from −6.051 to
 hold under the retained additional 0.500 ns palette route requirement is
 −0.047 ns. The measured resource comparison is complete: 36,913 placed ALMs
 / 41,910 (88.1%), 141 fewer than the live-speed baseline, with unchanged RAM,
-DSP and PLL totals. A separate frozen seed-2 placement trial is in progress.
+DSP and PLL totals. The completed frozen seed-2 placement retry has positive
+hold (+0.034 ns minimum under the additional guard), but setup remains
+-0.312 ns. It uses 36,854 placed ALMs (87.94%). The next logic candidate
+applies the formally equivalent scaler terminal predicate and investigates
+the remaining CPU descriptor/service path; its physical result is pending.
 Closure must retain the constraints rather than replace a failing requirement
 with a sign-off claim.
 

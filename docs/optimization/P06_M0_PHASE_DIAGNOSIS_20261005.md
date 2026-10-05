@@ -216,5 +216,10 @@ ideal/PCAT and 18.707/35.162 seconds previous ideal/PCAT. Individual runs take
 0.167–2.824 seconds. Natural epoch builds take 30.825/21.262 seconds;
 NOP-prelude builds take 22.908/19.672 seconds. All simulations run in WSL
 Ubuntu 24.04 with bounded process-group timeouts. Temporary build trees,
-uncompressed traces, duplicated snapshots and owned `/tmp` compilation
-directories are removed after the compact packet is reviewed.
+uncompressed traces and duplicated snapshots were removed after independent
+review: 587,452,135 bytes in the exact owned build subtree and 26,708 bytes
+in its Python cache. The five recorded owned `/tmp` roots were already
+absent. The [cleanup receipt](../evidence/p06-m0-diagnosis-20261005/cleanup-receipt.json)
+records path boundaries, reparse/process checks and preservation of the user
+landmark script. The [independent review](../evidence/p06-m0-diagnosis-20261005/independent-review.json)
+passes the raw packet, all accepted runs and portable restoration contracts.

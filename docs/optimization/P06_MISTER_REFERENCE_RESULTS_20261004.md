@@ -211,3 +211,12 @@ reduces the reproduced 25 MHz R0 count from 12,300 to 9,734 physical clocks,
 with unchanged workload and nominal timing policy. This removes the simulated
 20/25 MHz inversion; a new MiSTer CSV is required to confirm it in hardware.
 The separate Ts epoch contract and broader historical calibration remain open.
+
+## All-profile READY-chain hardware follow-up
+
+The [2026-10-05 follow-up](P06_MISTER_READY_CHAIN_RESULTS_20261005.md) validates
+all336 new raw samples for the corrected candidate. R0 at25MHz is now253ticks
+against300at20MHz; every gross case improves between adjacent profiles.
+This confirms the local inversion correction. M0 at6/8MHz takes6.05%/2.67%
+more elapsed time than these original captures; its cause remains directed
+diagnostic work, separate from historical timing calibration and fixed50STA.

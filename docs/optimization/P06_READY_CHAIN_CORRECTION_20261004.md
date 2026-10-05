@@ -234,3 +234,9 @@ The first target is the gross R0 median, previously 298 ticks at 20 MHz and
 CHECKNUM at 20/25/MAX is complementary mixed-workload evidence, not a substitute
 for the local R0 check. No new DOS executable is required. This candidate also
 retains the hardware-confirmed floppy fix and existing write protection.
+
+The [all-profile hardware follow-up](P06_MISTER_READY_CHAIN_RESULTS_20261005.md)
+now validates336 new MiSTer samples with strict adjacent-profile ordering.
+It confirms the25MHz R0 correction and preserves MAX CHECKNUM. The recorded
+6/8MHz M0 penalties remain investigation items; no calibrated board wait or
+pin-exact historical timing is inferred from those aggregate measurements.

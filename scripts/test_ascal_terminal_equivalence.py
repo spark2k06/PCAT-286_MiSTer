@@ -16,6 +16,8 @@ ROOT = Path(__file__).resolve().parents[1]
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("--output", type=Path, default=Path("build/ascal-terminal-equivalence"),
                     help="fresh output directory inside this repository's build directory")
+parser.add_argument("--hacc-proof-receipt", type=Path,
+                    help="source-bound hacc PASS receipt; required for the installed hacc reorder")
 args = parser.parse_args()
 OUT = (ROOT / args.output).resolve() if not args.output.is_absolute() else args.output.resolve()
 assert OUT.is_relative_to((ROOT / "build").resolve()), "output must stay inside the repository build directory"
@@ -25,6 +27,11 @@ SOURCE = ROOT / "sys/ascal.vhd"
 DEPENDENCY = ROOT / "sys/at_cdc_snapshot.vhd"
 IMAGE = "ghdl/ghdl:ubuntu22-llvm-11"
 PRIVATE_PROOF_REFERENCE_SHA256 = "966157e71f22a94123597188cbba91e28943c71368670d0a13a5bd8b0baf61e4"
+HACC_REFERENCE_SOURCE_SHA256 = "412aa4c447e9b6389600dabb0072ffdc5bffdd14a310962e2dc5ebff01be5186"
+HACC_CANDIDATE_SOURCE_SHA256 = "8a8382913f007cf7405aad235d6df9558ec14fc493251e31783ddb00031fd687"
+HACC_PROOF_HELPER_SHA256 = "214ba1367775b2aa67a90ebf81740b41e54cc48a8d0acf535bef50daab24700b"
+HACC_REFERENCE_ASSIGNMENT = "o_hacc_next<=(dif_v + 2*o_ihsize + (4*OHRESH)) MOD (4*OHRESH);"
+HACC_CANDIDATE_ASSIGNMENT = "o_hacc_next<=(o_hacc_next + 2*o_ihsize - 2*o_hsize + (8*OHRESH)) MOD (4*OHRESH);"
 EXPECTED_HIDE_DIAGNOSTICS = [
     (446, 55, 'declaration of "freeze" hides port "freeze"'),
     (600, 97, 'declaration of "format" hides port "format"'),
@@ -58,6 +65,63 @@ image_id = subprocess.check_output(
     ["docker", "image", "inspect", "--format={{.Id}}", IMAGE], text=True).strip()
 assert re.fullmatch(r"sha256:[0-9a-f]{64}", image_id), "installed GHDL image identity unavailable"
 candidate_bytes = SOURCE.read_bytes()
+assert source_sha in (HACC_REFERENCE_SOURCE_SHA256, HACC_CANDIDATE_SOURCE_SHA256), "unreviewed full-file scaler source"
+hacc_installed = "reference" if source_sha == HACC_REFERENCE_SOURCE_SHA256 else "candidate"
+if hacc_installed == "reference":
+    assert candidate_bytes.count(HACC_REFERENCE_ASSIGNMENT.encode()) == 1
+    assert HACC_CANDIDATE_ASSIGNMENT.encode() not in candidate_bytes
+    hacc_reference_bytes = candidate_bytes
+    hacc_candidate_bytes = candidate_bytes.replace(HACC_REFERENCE_ASSIGNMENT.encode(), HACC_CANDIDATE_ASSIGNMENT.encode())
+else:
+    assert candidate_bytes.count(HACC_CANDIDATE_ASSIGNMENT.encode()) == 1
+    assert HACC_REFERENCE_ASSIGNMENT.encode() not in candidate_bytes
+    hacc_candidate_bytes = candidate_bytes
+    hacc_reference_bytes = candidate_bytes.replace(HACC_CANDIDATE_ASSIGNMENT.encode(), HACC_REFERENCE_ASSIGNMENT.encode())
+assert hashlib.sha256(hacc_reference_bytes).hexdigest() == HACC_REFERENCE_SOURCE_SHA256
+assert hashlib.sha256(hacc_candidate_bytes).hexdigest() == HACC_CANDIDATE_SOURCE_SHA256
+assert hacc_reference_bytes.replace(HACC_REFERENCE_ASSIGNMENT.encode(), HACC_CANDIDATE_ASSIGNMENT.encode()) == hacc_candidate_bytes
+hacc_binding = {"installed_variant": hacc_installed,
+                "reference_source_sha256": HACC_REFERENCE_SOURCE_SHA256,
+                "candidate_source_sha256": HACC_CANDIDATE_SOURCE_SHA256,
+                "proof_required": hacc_installed == "candidate"}
+hacc_receipt_path = None
+if args.hacc_proof_receipt is not None:
+    hacc_receipt_path = ((ROOT / args.hacc_proof_receipt).resolve() if not args.hacc_proof_receipt.is_absolute()
+                         else args.hacc_proof_receipt.resolve())
+    assert any(hacc_receipt_path.is_relative_to((ROOT / directory).resolve())
+               for directory in ("build", "docs/evidence")), "hacc receipt must be owned repository evidence"
+    hacc_receipt_sha = sha(hacc_receipt_path)
+    hacc_proof = json.loads(hacc_receipt_path.read_text())
+    assert hacc_proof["status"] == "PASS"
+    assert hacc_proof["helper_sha256"] == HACC_PROOF_HELPER_SHA256
+    assert sha(ROOT / "scripts/test_ascal_hacc_equivalence.py") == HACC_PROOF_HELPER_SHA256
+    assert hacc_proof["reference_sha256"] == HACC_REFERENCE_SOURCE_SHA256
+    assert hacc_proof["candidate_sha256"] == HACC_CANDIDATE_SOURCE_SHA256
+    assert hacc_proof["installed_source_sha256"] in (HACC_REFERENCE_SOURCE_SHA256, HACC_CANDIDATE_SOURCE_SHA256)
+    assert hacc_proof["dependency_sha256"] == dependency_sha and hacc_proof["ghdl_image"] == image_id
+    assert hacc_proof["outputs_proved"] == ["dif_v", "o_hacc", "o_hacc_next", "hcarry_v"]
+    assert hacc_proof["ohresh_values"] == [1024, 2048, 4096]
+    assert hacc_proof["positive_miters"] == 3 and hacc_proof["rejected_mutants"] == 9
+    assert hacc_proof["native_boundary_random_cases"] == 135168
+    assert hacc_proof["added_state"] == 0 and hacc_proof["added_cycles"] == 0
+    assert hacc_proof["new_extracted_native_formal_warnings"] == 0
+    for standard in ("93", "08"):
+        analysis = hacc_proof["full_file_analysis"][standard]
+        assert analysis["reference"] == analysis["candidate"] == "PASS"
+        assert analysis["inherited_Whide_count_per_file"] == 10 and analysis["new_warnings"] == 0
+        assert analysis["normalized_diagnostics_equal"] is True
+    for relative, expected_sha in hacc_proof["artifacts"].items():
+        artifact = (hacc_receipt_path.parent / relative).resolve()
+        assert artifact.is_relative_to(hacc_receipt_path.parent), "unsafe hacc artifact path"
+        assert artifact.is_file() and sha(artifact) == expected_sha, ("hacc artifact mismatch", relative)
+    assert (hacc_receipt_path.parent / "full_reference.vhd").read_bytes() == hacc_reference_bytes
+    assert (hacc_receipt_path.parent / "full_candidate.vhd").read_bytes() == hacc_candidate_bytes
+    hacc_binding.update(proof_receipt=str(hacc_receipt_path.relative_to(ROOT)),
+                        proof_receipt_sha256=hacc_receipt_sha,
+                        proof_helper_sha256=HACC_PROOF_HELPER_SHA256,
+                        all_proof_artifacts_verified=True)
+else:
+    assert hacc_installed == "reference", "installed hacc reorder requires --hacc-proof-receipt"
 source = SOURCE.read_text()
 processes = re.findall(r"\bOSWEEP:PROCESS\(o_clk\) IS.*?END PROCESS OSWEEP;", source, re.S)
 assert len(processes) == 1
@@ -71,6 +135,15 @@ assert candidate_bytes.count(replacement.encode()) == 1 and candidate_bytes.coun
 reference_bytes = candidate_bytes.replace(replacement.encode(), needle.encode())
 assert reference_bytes.replace(needle.encode(), replacement.encode()) == candidate_bytes
 reference_sha = hashlib.sha256(reference_bytes).hexdigest()
+# Keep the pinned historical file unchanged. Only this independently proved
+# one-assignment hacc update may be reversed for the historical full-file guard.
+# The files analyzed below and the OSWEEP bodies remain the actual current pair.
+historical_reference_bytes = reference_bytes
+if hacc_installed == "candidate":
+    assert historical_reference_bytes.count(HACC_CANDIDATE_ASSIGNMENT.encode()) == 1
+    historical_reference_bytes = historical_reference_bytes.replace(HACC_CANDIDATE_ASSIGNMENT.encode(), HACC_REFERENCE_ASSIGNMENT.encode())
+historical_reference_sha = hashlib.sha256(historical_reference_bytes).hexdigest()
+assert historical_reference_sha == PRIVATE_PROOF_REFERENCE_SHA256, "unreviewed changes outside the two exact proven rewrites"
 (OUT / "full_candidate.vhd").write_bytes(candidate_bytes)
 (OUT / "full_reference.vhd").write_bytes(reference_bytes)
 mutant = reference.replace(needle, "IF o_hcpt<o_htotal THEN")
@@ -320,13 +393,19 @@ for name in ("sweep_miter", "sweep_mutant_miter"):
 assert sha(SOURCE)==source_sha, "production source changed during proof"
 assert sha(DEPENDENCY)==dependency_sha, "VHDL dependency changed during proof"
 assert sha(__file__)==helper_sha, "proof helper changed during proof"
+if hacc_receipt_path is not None:
+    assert sha(hacc_receipt_path)==hacc_receipt_sha, "hacc proof receipt changed during terminal proof"
+    assert sha(ROOT / "scripts/test_ascal_hacc_equivalence.py")==HACC_PROOF_HELPER_SHA256
 receipt={"schema":1,"status":"OSWEEP_TERMINAL_COMPARE_EQUIVALENCE_PASS",
          "production_unchanged_during_proof":True,
          "sources_sha256":{"sys/ascal.vhd":source_sha,"sys/at_cdc_snapshot.vhd":dependency_sha,
                             "scripts/test_ascal_terminal_equivalence.py":helper_sha},
          "reconstructed_reference_sha256":reference_sha,
          "private_proof_reference_sha256":PRIVATE_PROOF_REFERENCE_SHA256,
-         "reference_matches_private_proof":reference_sha==PRIVATE_PROOF_REFERENCE_SHA256,
+         "reference_matches_private_proof":historical_reference_sha==PRIVATE_PROOF_REFERENCE_SHA256,
+         "historical_reference_after_exact_hacc_undo_sha256":historical_reference_sha,
+         "historical_reference_normalization":"reverse independently source-bound hacc assignment only" if hacc_installed=="candidate" else "none",
+         "hacc_source_binding":hacc_binding,
          "ghdl_image_id":image_id,
          "full_scaler_vhdl_analysis":full_analysis,
          "extracted_process_native_and_synthesis_warnings":0,

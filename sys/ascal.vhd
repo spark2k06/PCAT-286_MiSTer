@@ -2443,7 +2443,7 @@ BEGIN
 							hcarry_v:=false;
 						ELSE
 							o_hacc<=dif_v;
-							o_hacc_next<=(dif_v + 2*o_ihsize + (4*OHRESH)) MOD (4*OHRESH);
+							o_hacc_next<=(o_hacc_next + 2*o_ihsize - 2*o_hsize + (8*OHRESH)) MOD (4*OHRESH);
 							hcarry_v:=true;
 						END IF;
 						o_dcpt_inc <= '1';

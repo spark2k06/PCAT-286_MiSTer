@@ -300,3 +300,56 @@ is sealed before compiler/simulation temporaries are removed. The next frozen
 all-features fit uses these two applied logic changes and seed 2. Physical
 closure is still pending; complete regression starts after positive setup
 and hold at all four corners, against the selected candidate.
+
+### Completed null-segment / scaler-terminal fit
+
+The frozen all-features seed-2 candidate at `3d1fd8d4c5433c8f4194c6b13b300362e24d4e68`
+finishes compilation in 29 min 40 s. Its 2,062 actual source inputs and the
+1,241-file canonical vendor import at `3001de76` are bound before and after
+compilation. The later standalone generator maintenance at `c9239dc3` is
+not a source change to this fit. The generated build date is the only
+declared preflow source transition. All features and physical clocks remain
+identical to the preceding seed-2 fit.
+
+| Corner | Global setup ns | Global hold ns | CPU setup ns | Recovery ns | Removal ns |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Slow 100 C | -0.337 | +0.248 | -0.337 | +3.032 | +0.477 |
+| Slow -40 C | -0.197 | +0.036 | +0.026 | +3.219 | +0.396 |
+| Fast 100 C | +2.422 | +0.119 | +9.270 | +4.548 | +0.279 |
+| Fast -40 C | +2.724 | +0.050 | +10.895 | +4.909 | +0.198 |
+
+Hold is positive at all four corners with the retained 0.500 ns palette route
+requirement. Setup remains open. A separate four-corner audit overlays only
+the original SDC on the same fitted database; all eleven bound fitted/RBF/SOF
+artifacts are unchanged. It confirms the same setup failures. No constraint
+is relaxed to declare closure.
+
+The old null-descriptor and horizontal-terminal routes no longer lead the
+reported paths. The hot CPU path now crosses replay selection, service start,
+the stack offset selector, a protected range comparison and SP writeback:
+16 logic levels, 19.623 ns data delay (12.911 ns interconnect). A separate
+prefetch-to-synchronous-microcode-address path reaches -0.213 ns. Cold HDMI
+now crosses `o_hsize` through two arithmetic chains to `o_hacc_next`, three
+reported logic levels and 6.566 ns data delay. These actual remaining paths
+guide the next private experiments; a proof alone is not a measured timing
+improvement.
+
+Placement uses 36,896 / 41,910 ALMs (88.04%), equivalent ALMs 31,609,
+38,374 registers, 3,301,019 RAM bits, 416 M10K blocks, 39 DSP blocks and
+three PLLs. Relative to the preceding seed-2 fit, placed ALMs rise by 42
+and equivalent ALMs fall by 24; physical register duplication accounts for
+the changed register total, without additional RTL state. The inclusive CPU
+uses 8,191.4 placed ALMs and 5,606 registers, down 103.7 placed ALMs.
+
+[Sealed fit, sources, reports and original-SDC evidence](../evidence/p06-null-segment-fit-20261005/result.json)
+retains exact inputs, actual microcode RAM contents, proof references and
+readback-verified reports. The full regression is explicitly authorized after
+positive setup and hold at all four corners, and has not started on this
+failing candidate. The two stale fixed-CPU verification adapters have been
+[repaired and checked independently](../evidence/verification-adapters-fixed-source-20261005/README.md),
+preserving their original references and directed expected values.
+
+RBF: `build/p06-null-segment-allfeatures-20261005-v1/work/output_files/PCAT-286.rbf`,
+4,114,900 bytes, SHA-256
+`083c91a21a1d21ef9cf1be61aebd1c8a5ebeca0ebc873415271635b6bfd415bd`.
+It was announced at assembler availability before the custom STA completed.

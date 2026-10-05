@@ -28,9 +28,12 @@ hold under the retained additional 0.500 ns palette route requirement is
 / 41,910 (88.1%), 141 fewer than the live-speed baseline, with unchanged RAM,
 DSP and PLL totals. The completed frozen seed-2 placement retry has positive
 hold (+0.034 ns minimum under the additional guard), but setup remains
--0.312 ns. It uses 36,854 placed ALMs (87.94%). The next logic candidate
-applies the formally equivalent scaler terminal predicate and investigates
-the remaining CPU descriptor/service path; its physical result is pending.
+-0.312 ns. It uses 36,854 placed ALMs (87.94%). The completed null-segment /
+scaler-terminal candidate retains positive hold (+0.036 ns minimum), but
+setup remains -0.337 ns in the CPU and -0.197 ns in HDMI. It uses 36,896
+placed ALMs (88.04%). The next experiments target the actual remaining
+stack-offset/range route and horizontal-accumulator arithmetic. The complete
+regression waits for positive setup and hold at all four corners.
 Closure must retain the constraints rather than replace a failing requirement
 with a sign-off claim.
 

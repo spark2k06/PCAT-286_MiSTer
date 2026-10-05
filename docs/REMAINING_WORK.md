@@ -17,23 +17,21 @@ A deferred item stays deferred regardless of its priority.
 
 | Story | Priority / status | Acceptance condition |
 | --- | --- | --- |
-| **P05/P21 — physical setup/hold closure** | P0, in progress | Complete the current deadline/buffer/palette fit and select the measured candidate. Obtain positive setup/hold margins and check recovery/removal and constraint coverage at all four corners. Preserve the common physical 50 MHz CPU/bridge/SDRAM clock, behavior and enabled features. Bind reports, sources and RBF/SOF identities. |
+| **P05/P21 — remaining HDMI setup closure** | P0, **PAUSED_AFTER_CURRENT_FIT** | The common 50 MHz CPU/bridge/SDRAM paths now close setup and hold. On resumption, address only the measured cold HDMI scaler path at -0.063 ns; retain positive hold, recovery/removal and constraint coverage at all four corners. Preserve behavior, clocks and enabled features; bind reports, sources and RBF/SOF identities. |
 | **HW01 — new timing candidate on MiSTer** | P1, when the user has board access | Confirm that the selected physical candidate preserves the accepted boot, applications and profile behavior. Bind observations to its RBF and configuration; this does not reopen the OSD/profile implementation. |
-| **QA01 — full current-source regression** | P1, **AUTHORIZED_AFTER_TIMING_CLOSURE** | The user authorized the complete regression once setup and hold close. Run against the same frozen candidate sources and actual registered banks, with performance options active. Keep CPU, machine and tooling outcomes distinct; bounded checks are not a complete-regression PASS. |
+| **QA01 — full current-source regression** | P1, **PAUSED_BY_LATEST_USER_INSTRUCTION** | The earlier authorization after global timing closure is retained for future resumption. The newer instruction pauses after the current result; no full regression is run now. On resumption, use the same frozen candidate sources and actual registered banks, with performance options active. Keep CPU, machine and tooling outcomes distinct; bounded checks are not a complete-regression PASS. |
 
-The completed deadline-fold seed-1 fit improves global setup from −6.051 to
-−0.288 ns, with worst CPU setup −0.054 ns. Original-SDC hold is +0.043 ns;
-hold under the retained additional 0.500 ns palette route requirement is
-−0.047 ns. The measured resource comparison is complete: 36,913 placed ALMs
-/ 41,910 (88.1%), 141 fewer than the live-speed baseline, with unchanged RAM,
-DSP and PLL totals. The completed frozen seed-2 placement retry has positive
-hold (+0.034 ns minimum under the additional guard), but setup remains
--0.312 ns. It uses 36,854 placed ALMs (87.94%). The completed null-segment /
-scaler-terminal candidate retains positive hold (+0.036 ns minimum), but
-setup remains -0.337 ns in the CPU and -0.197 ns in HDMI. It uses 36,896
-placed ALMs (88.04%). The next experiments target the actual remaining
-stack-offset/range route and horizontal-accumulator arithmetic. The complete
-regression waits for positive setup and hold at all four corners.
+The selected stack DATA / scaler HACC candidate is the best equivalent fit
+with positive hold. CPU setup/hold minima are **+0.486 / +0.120 ns**; the
+entire common 50 MHz domain, including incoming paths, has **+0.164 /
++0.110 ns**. Recovery/removal minima are **+1.710 / +0.197 ns**. Global hold
+is positive at all four corners, with a minimum of **+0.027 ns**. The sole
+remaining negative setup is cold HDMI `ascal|o_ihsize[3]` to
+`ascal|o_hacc_next[12]`, **-0.063 ns**. Placed ALMs are **36,701 / 41,910
+(87.57%)**, 195 fewer than the null-segment parent, with unchanged RAM,
+DSP and PLL totals. All features remain enabled. Complete source-bound
+evidence and the best RBF are retained; the latest requested pause applies
+to further fits and full regression.
 Closure must retain the constraints rather than replace a failing requirement
 with a sign-off claim.
 
@@ -41,7 +39,8 @@ If placement fails for resources, the user-approved first fallback is to
 disable OPL2 **only in config.tcl**, preserving its RTL and reactivation path.
 This is a contingency; the current candidate retains all enabled features.
 
-Sources: [verified physical candidate](../docs/optimization/P06_DEADLINE_FOLD_20261005.md),
+Sources: [selected physical candidate](../docs/optimization/P06_STACK_DATA_HACC_20261005.md),
+[preceding deadline-fold candidate](../docs/optimization/P06_DEADLINE_FOLD_20261005.md),
 [preceding fit](../docs/optimization/P06_LIVE_SPEED_20261005.md),
 [bounded CPU checks and deferral](../docs/optimization/P06_CPU_FOCUSED_VALIDATION_20261005.md),
 [resource attribution/fallback](../docs/optimization/PCAT_RESOURCE_BREAKDOWN_20261004.md).
@@ -154,4 +153,5 @@ tasks. See [the retained performance proposals](../docs/optimization/P18_P19_COM
 Initial I/A milestones and BIOS_BACKLOG retain their historical scope; old
 “not started”, XT-profile or “no board boot” statements are not current blockers.
 Update this list with the fit outcome and subsequent actual evidence or user
-decisions. The full regression remains deferred until the user requests it.
+decisions. Current work and full regression remain paused until the user
+resumes them.

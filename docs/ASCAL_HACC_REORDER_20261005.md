@@ -100,7 +100,14 @@ The **+92 generic gates** are accepted for a measured fit because the rewritten
 path is the current scaler bottleneck. These are not Cyclone V ALM counts or
 physical delay measurements. The input-size path becomes deeper, so the next
 Quartus fit must check all paths, corners, setup, hold and actual resources.
-No timing-closure claim is made here.
+No timing-closure claim follows from generic mapping.
+
+The subsequent [joint CPU/HACC fit](optimization/P06_STACK_DATA_HACC_20261005.md)
+has global setup -0.063 ns and global hold +0.027 ns at their worst corners.
+The remaining setup path is now `o_ihsize[3]` to `o_hacc_next[12]` at the cold
+slow corner. CPU and the common 50 MHz domain close. Actual joint placed
+ALMs decrease from 36,896 to 36,701, with unchanged RAM/DSP/PLL totals; this
+joint delta does not isolate the scaler cost. Work is paused after this result.
 
 Explicit wide/low common sums mapped identically to the selected rewrite;
 an experimental carry-save form required 340 generic gates. These screens

@@ -11,6 +11,7 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
+from p06_repeat_local import generate as generate_local_repeat_executor
 
 ROOT = Path(__file__).resolve().parents[1]
 ORIGINALS = {
@@ -419,6 +420,12 @@ def build(out):
     top = replace_once(top, "    input  logic         reset,", "    input  logic         reset,\n"
         "    input  logic         historical_enable, cpu_boundary, timing_read_wait_event,")
     top = replace_once(top, "    // A CS reload requires", CONNECTION + "\n    // A CS reload requires")
+    top = replace_once(top, "    spk286_micro_executor #(",
+        "    spk286_profiled_micro_executor #(")
+    top = replace_once(top,
+        ".operation_valid(operation_valid), .operation(micro_word), .operation_done(executor_done),",
+        ".operation_valid(operation_valid), .implementation_operation_valid(profile_raw_operation_valid),\n"
+        "        .operation(micro_word), .operation_done(executor_done),")
     top = replace_once(top, ".start_ready(decode_ready),", ".start_ready(profile_decode_ready),")
     top = replace_once(top,
         ".consume_valid(queue_consume_valid), .consume_data(queue_consume_data),\n"
@@ -460,9 +467,13 @@ def build(out):
         "                      !event_active && !cancel_operation;")
     events = replace_once(events, "            end else if (boundary) begin",
         "            end else if (boundary && async_boundary_enable) begin")
+    local_executor, local_contract = generate_local_repeat_executor(
+        (ROOT / 'vendor/spk286/rtl/spk286_micro_executor.sv').read_text(),
+        (ROOT / 'vendor/spk286/microcode/generated/spk286_microcode_pkg.sv').read_text())
     generated = {
         "spk286_profiled.sv": ("SPK286_PROFILED_SV", top),
         "spk286_profiled_events.sv": ("SPK286_PROFILED_EVENTS_SV", events),
+        "spk286_profiled_micro_executor.sv": ("SPK286_PROFILED_MICRO_EXECUTOR_SV", local_executor),
     }
     selected = {}
     for name, (guard, body) in generated.items():
@@ -479,11 +490,13 @@ def build(out):
         "vendor/spk286/rtl/spk286_encoding_preview.sv": sha(ROOT / "vendor/spk286/rtl/spk286_encoding_preview.sv"),
         "vendor/spk286/tools/microcode/compile_microcode.py": sha(ROOT / "vendor/spk286/tools/microcode/compile_microcode.py"),
         "vendor/spk286/microcode/generated/spk286_microcode_validation.json": sha(ROOT / "vendor/spk286/microcode/generated/spk286_microcode_validation.json"),
-        "rtl/spk286_timing/spk286_instruction_timing.sv": sha(ROOT / "rtl/spk286_timing/spk286_instruction_timing.sv")}
+        "rtl/spk286_timing/spk286_instruction_timing.sv": sha(ROOT / "rtl/spk286_timing/spk286_instruction_timing.sv"),
+        "scripts/p06_repeat_local.py": sha(ROOT / "scripts/p06_repeat_local.py")}
     manifest = {"status": "PROFILED_CPU_GENERATED_NOT_ACCEPTED", "sources_sha256": sources,
         "generated_sha256": {name: sha(path) for name, path in selected.items()},
         "scope": "Single selected functional core with reserved READY chaining and historical source-retirement target encoding handoff; provisional instruction intervals and logical bus supplied by integration; private pilot evidence unchanged"}
     (out / "generation.json").write_text(json.dumps(manifest, indent=2) + "\n", newline="\n")
+    (out / "repeat-local-contract.json").write_text(json.dumps(local_contract, indent=2) + "\n", newline="\n")
     return selected
 
 

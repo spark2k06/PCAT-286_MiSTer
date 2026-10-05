@@ -9,6 +9,7 @@
 `include "rtl/spk286_timing/spk286_target_replay.sv"
 `include "vendor/spk286/rtl/spk286_encoding_preview.sv"
 `include "vendor/spk286/rtl/timed/spk286_profiled_events.sv"
+`include "vendor/spk286/rtl/timed/spk286_profiled_micro_executor.sv"
 `include "vendor/spk286/rtl/timed/spk286_profiled.sv"
 
 module spk286_machine_cpu (

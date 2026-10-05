@@ -1244,12 +1244,13 @@ module spk286_profiled (
     // Remove that redundant late qualification from descriptor/event responses.
     assign executor_operand_done = (protected_descriptor_access || protected_tss_access || protected_event_access) ?
                                    unlimited_memory_done : operand_done;
-    spk286_micro_executor #(
+    spk286_profiled_micro_executor #(
         .USE_PARALLEL_SYSTEM_LIMIT(1'b1)
     ) micro_executor (
         .parallel_system_limit_fault(parallel_system_cache_fault),
         .clk(clk), .reset(reset), .cancel(semantic_cancel), .start(service_start),
-        .operation_valid(operation_valid), .operation(micro_word), .operation_done(executor_done), .operation_retire(operation_retire), .dispatch_request(dispatch_request),
+        .operation_valid(operation_valid), .implementation_operation_valid(profile_raw_operation_valid),
+        .operation(micro_word), .operation_done(executor_done), .operation_retire(operation_retire), .dispatch_request(dispatch_request),
         .segment_pop_opcode(opcode_q == 8'h07 || opcode_q == 8'h17 || opcode_q == 8'h1F),
         .byte_valid(queue_consume_valid && !length_fault), .byte_data(queue_consume_data), .byte_ready(executor_byte_ready),
         .decode_operand(operand_decode_enable), .decode_done(operand_decode_done), .decode_modrm_valid(operand_context_valid),

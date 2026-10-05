@@ -79,8 +79,14 @@ CONNECTION = r'''
     logic [9:0] profile_execution_repeat_iteration, profile_execution_metadata_clocks;
     logic [2:0] profile_execution_ea;
     logic [11:0] profile_execution_metadata_sum;
+    logic profile_instruction_metadata_valid, profile_instruction_metadata_read_wait;
+    logic profile_event_metadata_valid, profile_event_metadata_read_wait;
+    logic [9:0] profile_event_base;
     /* verilator lint_off UNUSEDSIGNAL */
     logic [4:0] profile_execution_unused;
+    logic [4:0] profile_event_unused;
+    logic [9:0] profile_event_repeat_setup, profile_event_repeat_iteration;
+    logic [2:0] profile_event_ea;
     /* verilator lint_on UNUSEDSIGNAL */
     /* verilator lint_off UNUSEDSIGNAL */
     logic profile_requires_modrm, profile_requires_outcome, profile_requires_count;
@@ -214,11 +220,11 @@ CONNECTION = r'''
     // metadata, but its decoder must not feed through the deadline to EU
     // exception/head arbitration. Both lanes agree whenever body_active is
     // true; no architectural or virtual-clock boundary is added.
-    wire [7:0] profile_execution_opcode = profile_delivery_metadata ? 8'd0 : opcode_q;
-    wire [spk286_microcode_pkg::MC_ADDR_WIDTH-1:0] profile_execution_entry =
-        profile_delivery_metadata ? (protected_msw[0] ?
-            spk286_microcode_pkg::MC_ENTRY_EVENT_ENTRY_PROTECTED :
-            spk286_microcode_pkg::MC_ENTRY_EVENT_ENTRY) : micro_entry;
+    // Classify retained instruction and delivery contexts in parallel. The
+    // live dispatch permission selects their completed budgets below; it does
+    // not traverse the instruction decoder or prefix arithmetic.
+    wire [7:0] profile_execution_opcode = opcode_q;
+    wire [spk286_microcode_pkg::MC_ADDR_WIDTH-1:0] profile_execution_entry = micro_entry;
     wire profile_execution_string = !extended_opcode_active &&
         ((profile_execution_opcode >= 8'hA4 && profile_execution_opcode <= 8'hA7) ||
          (profile_execution_opcode >= 8'hAA && profile_execution_opcode <= 8'hAF) ||
@@ -226,14 +232,14 @@ CONNECTION = r'''
     wire profile_execution_repeated = profile_execution_string && repeat_kind != 0;
     spk286_instruction_timing profile_execution_metadata (
         .opcode(profile_execution_opcode),
-        .extended_opcode(profile_delivery_metadata ? 1'b0 : extended_opcode_active),
+        .extended_opcode(extended_opcode_active),
         .micro_entry(profile_execution_entry),
         .modrm_valid(profile_modrm_current), .modrm_mode(operand_mode),
         .modrm_reg(operand_reg), .modrm_rm(operand_rm),
         .protected_mode(protected_msw[0]), .CPL(current_cpl), .operand_odd(1'b0),
         .branch_known(profile_branch_known_q), .branch_taken(profile_branch_taken_q),
         .count_known(profile_count_known_q), .count(profile_count_q),
-        .repeat_kind(repeat_kind), .qualified(profile_execution_metadata_valid),
+        .repeat_kind(repeat_kind), .qualified(profile_instruction_metadata_valid),
         .estimated(profile_execution_unused[0]),
         .requires_modrm(profile_execution_unused[1]),
         .requires_outcome(profile_execution_unused[2]),
@@ -242,9 +248,33 @@ CONNECTION = r'''
         .base_clocks(profile_execution_base),
         .repeat_setup_clocks(profile_execution_repeat_setup),
         .repeat_iteration_clocks(profile_execution_repeat_iteration),
-        .permits_read_wait(profile_execution_metadata_read_wait),
+        .permits_read_wait(profile_instruction_metadata_read_wait),
         .ea_clocks(profile_execution_ea)
     );
+    // Reuse the authoritative policy table rather than duplicate event timing
+    // constants. Constant event entries fold to the small delivery lane.
+    spk286_instruction_timing profile_event_metadata (
+        .opcode(8'd0), .extended_opcode(1'b0),
+        .micro_entry(protected_msw[0] ?
+            spk286_microcode_pkg::MC_ENTRY_EVENT_ENTRY_PROTECTED :
+            spk286_microcode_pkg::MC_ENTRY_EVENT_ENTRY),
+        .modrm_valid(profile_modrm_current), .modrm_mode(operand_mode),
+        .modrm_reg(operand_reg), .modrm_rm(operand_rm),
+        .protected_mode(protected_msw[0]), .CPL(current_cpl), .operand_odd(1'b0),
+        .branch_known(profile_branch_known_q), .branch_taken(profile_branch_taken_q),
+        .count_known(profile_count_known_q), .count(profile_count_q),
+        .repeat_kind(repeat_kind), .qualified(profile_event_metadata_valid),
+        .estimated(profile_event_unused[0]), .requires_modrm(profile_event_unused[1]),
+        .requires_outcome(profile_event_unused[2]), .requires_count(profile_event_unused[3]),
+        .requires_target_length(profile_event_unused[4]), .base_clocks(profile_event_base),
+        .repeat_setup_clocks(profile_event_repeat_setup),
+        .repeat_iteration_clocks(profile_event_repeat_iteration),
+        .permits_read_wait(profile_event_metadata_read_wait), .ea_clocks(profile_event_ea)
+    );
+    assign profile_execution_metadata_valid = profile_delivery_metadata ?
+        profile_event_metadata_valid : profile_instruction_metadata_valid;
+    assign profile_execution_metadata_read_wait = profile_delivery_metadata ?
+        profile_event_metadata_read_wait : profile_instruction_metadata_read_wait;
     always_comb begin
         profile_execution_metadata_sum = {2'd0, profile_execution_base} + {9'd0, profile_execution_ea};
         if (profile_execution_repeated) begin
@@ -253,12 +283,12 @@ CONNECTION = r'''
             if (profile_prefix_count_q != 0)
                 profile_execution_metadata_sum = profile_execution_metadata_sum +
                     {7'd0, profile_prefix_count_q, 1'b0} - 12'd2;
-        end else if (!profile_delivery_metadata) begin
+        end else begin
             profile_execution_metadata_sum = profile_execution_metadata_sum +
                 {7'd0, profile_prefix_count_q, 1'b0};
         end
-        profile_execution_metadata_clocks = profile_execution_metadata_sum > 12'd1023 ?
-            10'd1023 : profile_execution_metadata_sum[9:0];
+        profile_execution_metadata_clocks = profile_delivery_metadata ? profile_event_base :
+            profile_execution_metadata_sum > 12'd1023 ? 10'd1023 : profile_execution_metadata_sum[9:0];
     end
 
     // Odd corrections belong to each real original word reference, before the

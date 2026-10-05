@@ -83,6 +83,11 @@ def main():
     logic [2:0] profile_execution_ea;
     logic [11:0] profile_execution_metadata_sum;
     logic [4:0] profile_execution_unused;
+    logic profile_instruction_metadata_valid, profile_instruction_metadata_read_wait;
+    logic profile_event_metadata_valid, profile_event_metadata_read_wait;
+    logic [9:0] profile_event_base, profile_event_repeat_setup, profile_event_repeat_iteration;
+    logic [4:0] profile_event_unused;
+    logic [2:0] profile_event_ea;
 '''+constants+'\n'+selection+original_sum+'''
     always @* if (profile_body_active) begin
         assert(profile_execution_metadata_valid == profile_metadata_valid);
@@ -98,9 +103,9 @@ endmodule
     log=run(['yosys','-Q','-s',script],out/'context.log')
     assert 'SAT proof finished - no model found: SUCCESS!' in log
     mutant=out/'context-mutant.sv'
-    assert context.count("profile_execution_opcode = profile_delivery_metadata ? 8'd0 : opcode_q;")==1
-    mutant.write_text(context.replace("profile_execution_opcode = profile_delivery_metadata ? 8'd0 : opcode_q;",
-        "profile_execution_opcode = profile_delivery_metadata ? 8'd0 : queue_consume_data;"),newline='\n')
+    assert context.count("profile_execution_opcode = opcode_q;")==1
+    mutant.write_text(context.replace("profile_execution_opcode = opcode_q;",
+        "profile_execution_opcode = queue_consume_data;"),newline='\n')
     script_mutant=out/'context-mutant.ys'
     script_mutant.write_text(script.read_text().replace(str(wrapper),str(mutant)),newline='\n')
     run(['yosys','-Q','-s',script_mutant],out/'context-mutant.log',reject=True)

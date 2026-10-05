@@ -80,6 +80,7 @@ def main():
     logic profile_execution_metadata_valid, profile_execution_metadata_read_wait;
     logic [9:0] profile_execution_base, profile_execution_repeat_setup;
     logic [9:0] profile_execution_repeat_iteration, profile_execution_metadata_clocks;
+    logic [23:0] profile_execution_metadata_carry_save;
     logic [2:0] profile_execution_ea;
     logic [11:0] profile_execution_metadata_sum;
     logic [4:0] profile_execution_unused;
@@ -134,7 +135,7 @@ endmodule
     input functional_retired, repeat_checkpoint,
     input [9:0] repeat_next_clocks
 );
-'''+wires+'\nspk286_instruction_schedule a('+outputs('a')+',.*);\n'
+'''+wires+'\nspk286_instruction_schedule a('+outputs('a')+',.execution_metadata_sum_bits(12\'d0),.execution_metadata_carry_bits(12\'d0),.*);\n'
         +'reference_schedule b('+outputs('b')+',.*);\n'
         +'''always @* begin
     if (a_body_active) begin

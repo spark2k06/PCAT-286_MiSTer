@@ -22,7 +22,7 @@ frecuencia física no se fija como requisito ni se promete una puntuación final
 | P03 | [Buffer de lectura SDRAM](P03_AT_SDRAM_READ_BUFFER.md) | Memoria PCAT | Amortizar activación y precarga mediante lecturas de varias palabras |
 | P04 | [Perfilado y optimización de ejecución](P04_SPK286_EXECUTION_PROFILING.md) | Verificación y CPU | Separar costes de memoria/ejecución y elegir cambios medidos |
 | P05 | [Cierre de timing FPGA](P05_AT_FPGA_TIMING_CLOSURE.md) | Integración, CPU y constraints | Cumplir los tiempos del diseño físico a la frecuencia declarada |
-| P06 | [Perfiles de velocidad de CPU](P06_CPU_SPEED_PROFILES.md) | Política CPU e integración OSD | MAX / 6–25 MHz: [main-menu selection and live changes](P06_LIVE_SPEED_20261005.md) pass directed dual-simulator checks; all-features RBF available, setup -6.051 ns, original-SDC hold +0.015 ns; additional palette route requirement misses by 0.065 ns; MiSTer validation, physical setup closure and complete EU/pin timing remain open |
+| P06 | [Perfiles de velocidad de CPU](P06_CPU_SPEED_PROFILES.md) | Política CPU e integración OSD | First P06/P12 functional version accepted: MAX / 6–25 MHz, integrated waits, main-menu selection and safe live changes; exact EU/native pin timing remains future precision work. Physical 50 MHz setup/hold closure continues separately with the [verified deadline/buffer/palette candidate](P06_DEADLINE_FOLD_20261005.md); full regression is user-deferred |
 | P07 | [Camino EGA byte-preservado](P07_EGA_BYTE_PRESERVING_PATH.md) | Vídeo y frontend VRAM | Reducir latencia interna sólo cuando sea seguro, sin convertir EGA en un dispositivo de 16 bits |
 
 P01–P04 corresponden a las cuatro mejoras iniciales. P03 tiene ya una primera

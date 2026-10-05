@@ -251,7 +251,7 @@ module spk286_profiled_micro_executor #(parameter bit USE_PARALLEL_SYSTEM_LIMIT 
     // Keep a tentative SP until protected returns or POP Sreg validate all
     // descriptors. A fault must leave the original SS:SP restartable.
     assign begin_return_cursor = protected_msw[0] && (check_pop2 ||
-                                 (allowed && operation == spk286_microcode_pkg::MC_TASK_RETURN && !architectural_flags[14]) ||
+                                 (implementation_allowed && operation == spk286_microcode_pkg::MC_TASK_RETURN && !architectural_flags[14]) ||
                                  (segment_pop_opcode && pop_operation && !stack_cursor_valid_q));
     assign return_stack_pointer = protected_return_cursor_q ? stack_cursor_q : stack_pointer;
     assign add_allocation_arch = add_allocation_sp && !protected_return_cursor_q;
@@ -598,7 +598,7 @@ module spk286_profiled_micro_executor #(parameter bit USE_PARALLEL_SYSTEM_LIMIT 
                                       !event_gate_candidate_valid_q;
     assign call_gate_validation_operation = implementation_allowed && operation == spk286_microcode_pkg::MC_VALIDATE_CALL_GATE && protected_msw[0];
     assign call_gate_cs_validation_operation = jmp_gate_cs_validation_operation ||
-                                               (allowed && operation == spk286_microcode_pkg::MC_VALIDATE_CALL_CS &&
+                                               (implementation_allowed && operation == spk286_microcode_pkg::MC_VALIDATE_CALL_CS &&
                                                 protected_msw[0] && call_gate_candidate_valid_q);
     assign call_stack_validation_operation = implementation_allowed && operation == spk286_microcode_pkg::MC_VALIDATE_CALL_STACK;
     assign call_ss_validation_operation = implementation_allowed && operation == spk286_microcode_pkg::MC_VALIDATE_CALL_SS && protected_msw[0];
@@ -1511,7 +1511,7 @@ module spk286_profiled_micro_executor #(parameter bit USE_PARALLEL_SYSTEM_LIMIT 
     assign commit_result = implementation_allowed && result_operation && temporary_valid_q[2] && !result_disposed_q;
     assign discard_result = commit_result && !allow_result_write;
     assign result_to_dst = commit_result && allow_result_write && (operation == spk286_microcode_pkg::MC_WRITE_RESULT_DST || operation == spk286_microcode_pkg::MC_WRITE_RESULT_DST8);
-    assign operand_request = descriptor_active_q || event_gate_active_q || call_tss_active_q || system_operand_request || io_transfer || string_request || vector_request || stack_request || check_operand || (arpl_operation && arpl_adjust) || (allowed &&
+    assign operand_request = descriptor_active_q || event_gate_active_q || call_tss_active_q || system_operand_request || io_transfer || string_request || vector_request || stack_request || check_operand || (arpl_operation && arpl_adjust) || (implementation_allowed &&
                              (write_reg_tmp1 || operation == spk286_microcode_pkg::MC_READ_REG16 || operation == spk286_microcode_pkg::MC_READ_RM16 || operation == spk286_microcode_pkg::MC_READ_REG8 || operation == spk286_microcode_pkg::MC_READ_RM8 || read_tmp1 ||
                               ((operation == spk286_microcode_pkg::MC_WRITE_REG16 || operation == spk286_microcode_pkg::MC_WRITE_RM16 || operation == spk286_microcode_pkg::MC_WRITE_REG8 || operation == spk286_microcode_pkg::MC_WRITE_RM8) && temporary_valid_q[0]) ||
                               (commit_result && allow_result_write && operation != spk286_microcode_pkg::MC_WRITE_RESULT_DST && operation != spk286_microcode_pkg::MC_WRITE_RESULT_DST8)));
@@ -1555,7 +1555,7 @@ module spk286_profiled_micro_executor #(parameter bit USE_PARALLEL_SYSTEM_LIMIT 
                              task_event_switch_skip ||
                              task_return_noop || task_return_commit_done || task_return_skip) ||
                              (arpl_check_operation && protected_msw[0]) || arpl_fault || arpl_commit || clts_commit || clts_fault ||
-                            (allowed && (operation == spk286_microcode_pkg::MC_VALIDATE_CS || operation == spk286_microcode_pkg::MC_VALIDATE_CALL_GATE ||
+                            (implementation_allowed && (operation == spk286_microcode_pkg::MC_VALIDATE_CS || operation == spk286_microcode_pkg::MC_VALIDATE_CALL_GATE ||
                                          operation == spk286_microcode_pkg::MC_VALIDATE_CALL_CS || operation == spk286_microcode_pkg::MC_VALIDATE_CALL_SS || operation == spk286_microcode_pkg::MC_VALIDATE_IRET_CS ||
                                          operation == spk286_microcode_pkg::MC_VALIDATE_IRET_SS) && !protected_msw[0]) ||
                             (iret_outer_frame_operation && (!iret_outer_required || (iret_outer_phase_q == 2'd1 && operand_done))) ||

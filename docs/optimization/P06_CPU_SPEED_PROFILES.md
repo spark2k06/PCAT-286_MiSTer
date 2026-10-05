@@ -1,5 +1,15 @@
 # P06 — Perfiles de CPU 6–25 MHz y MAX
 
+Functional acceptance, 2026-10-05: the user accepts closure of the first
+P06/P12 product version: MAX / 6 / 8 / 10 / 12.5 / 16 / 20 / 25 MHz,
+integrated profile waits, main-menu selection and safe live changes without
+reset. The preceding directed MiSTer measurements and dual-simulator
+qualification remain the evidence for their declared scopes. Exact internal
+EU/native pin timing and further physical-board calibration remain future
+precision work; this functional acceptance does not certify them. The full
+regression remains user-deferred. Physical 50 MHz setup/hold closure continues
+separately, with the verified [deadline/buffer/palette candidate](P06_DEADLINE_FOLD_20261005.md).
+
 Status, 2026-10-05: [main-menu selection and safe live changes](P06_LIVE_SPEED_20261005.md)
 pass directed dual-simulator qualification. The all-features RBF is available;
 its four-corner fit gives setup -6.051 ns and original-SDC hold +0.015 ns,

@@ -2,6 +2,13 @@
 
 Date: 2026-10-02. PERF01 attribution milestone.
 
+2026-10-05 product follow-up: the user accepts the first P06/P12 functional
+speed-profile version, with integrated waits and main-menu live selection.
+See [the current P06 acceptance scope](P06_CPU_SPEED_PROFILES.md). This closes
+that product milestone, while finer historical calibration remains future
+work and physical 50 MHz setup/hold closure continues separately. The dated
+PERF01 attribution measurements below retain their original limited scope.
+
 Running the unchanged CHECKNUM with production PCAT memory READY timing gives
 **4804 Dhrystones / 88.6K Whetstones**, versus **7709 / 133.3K** with immediate
 READY on the same SPK286 at actual 50 MHz. The reduced memory path reproduces

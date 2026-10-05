@@ -46,6 +46,38 @@ Unsupported opcodes latch a development-only indication and remain unconsumed.
 setup controls. There is no ALU, prefix execution, exception delivery,
 descriptor loader or protected-mode activation.
 
+## Protected-Mode PM0 foundation
+
+The PM0 foundation is documented in [PROTECTED_MODE_PM0.md](PROTECTED_MODE_PM0.md).
+`spk286_selector`, `spk286_descriptor` and `spk286_protected_state` implement
+selector decomposition, typed 80286 descriptor candidates, table-limit
+arithmetic and protected-state commit storage. PM1a/PM1b/PM1c/PM1d/PM1e/PM1f/PM1g now connect the live
+decoder/microcode/BIU path for `SGDT`, `SIDT`, `LGDT`, `LIDT`, `SMSW`, `LMSW`,
+`SLDT`, `STR`, `LLDT`, `LTR`, `VERR`, `VERW`, `LAR`, `LSL`, `ARPL` and `CLTS`.
+The bounded PM1 contract is recorded in
+[PROTECTED_MODE_PM1.md](PROTECTED_MODE_PM1.md).
+
+The first PM2 slice connects protected `MOV Sreg,r/m16` reloads for DS, ES and
+SS to the descriptor service. GDT and LDT selectors are range-checked before
+the ordered descriptor reads; null DS/ES loads, descriptor privilege/type
+rules, present faults and the descriptor accessed-bit write are handled before
+one atomic hidden-cache commit. While PE is set, the selected protected cache
+supplies the logical-to-physical base/limit/access translation, and a complete
+word access is rejected before the BIU request when its type or limit is
+invalid. The follow-on PM2b slice adds protected CS validation for the
+existing direct far-transfer protocols, including candidate cache latching,
+conforming/non-conforming privilege checks, accessed-bit writeback and atomic
+CS/IP/prefetch redirect commit. PM3a–PM3d
+add bounded protected event gates, external events, error frames and outer
+IRET; PM3e adds outer-level event entry through TSS-selected stacks, and PM2e
+extends the data, event, call-gate and outer-return paths with expand-down
+limits. Task gates, task switching and the remaining full-fault policy remain
+deferred. See
+[PROTECTED_MODE_PM2.md](PROTECTED_MODE_PM2.md),
+[PROTECTED_MODE_PM2B.md](PROTECTED_MODE_PM2B.md) and
+[PROTECTED_MODE_PM3E.md](PROTECTED_MODE_PM3E.md),
+[PROTECTED_MODE_PM2E.md](PROTECTED_MODE_PM2E.md).
+
 ### ModR/M and logical operands
 
 `DECODE_MODRM` enables `spk286_operand_decode`. It acquires the ModR/M byte
@@ -125,6 +157,8 @@ not historical clocks. A future timing policy must coordinate functional
 acceptance and advancement, retaining completed responses while delayed and
 preventing repeated side effects. It must continue honoring READY, queue and
 operand dependencies. No timing modes, counters, padding or idle micro-ops exist.
+The deferred instruction/BIU/pin timing work is tracked separately in the
+[Phase 9 timing-fidelity plan](PHASE9_TIMING_FIDELITY.md).
 
 The generated four-bit control and source maps are described in
 [../microcode/README.md](../microcode/README.md). Numeric `debug_micro_pc`,

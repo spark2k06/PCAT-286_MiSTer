@@ -2,8 +2,9 @@
 
 Date: 2026-09-10
 
-Status: focused implementation validation passed; independent commit-isolation,
-unchanged BIOS retest and downstream transfer remain open.
+Status: focused validation, commit-isolation review, unchanged-BIOS boundary
+smoke and downstream transfer passed; the user-owned Quartus/RBF hardware
+checkpoint remains pending.
 
 ## Scope and contract
 
@@ -40,13 +41,21 @@ MSW/TS exception support.
 | `python3 -m unittest discover -s tests -p 'test_microcode*.py' -v` | PASS, `88 tests` |
 | `python3 -m tools.microcode.audit_microcode --output build/microcode-audit` | `MICROCODE AUDIT PASS` |
 | `python3 -m tools.microcode.compile_microcode --check` | `MICROCODE CHECK PASS: 101 entries, 614 words` |
+| `make phase8-audit` | `PHASE8_AUDIT PASS: 2 rejected RTL mutants; 3 pristine controls; production bytes unchanged` |
 
 The 24 directed cases are three forms for each opcode in `D8`–`DF`; `DB` is
 therefore covered explicitly as the reported downstream trigger.
 
 ## Isolation requirement
 
-The final review must run this manifest from the 8B-only commit with 8A
-reverted, then run the 8A manifest from the complementary isolated commit.
+The isolated review was completed from the 8B-only snapshot with 8A reverted.
+The complementary 8A-only review was also completed. The verified CPU payload
+was transferred to `PCAT-286_MiSTer` at commit
+`b6c3035e716fcd640523c7189480e59941067472`; see
+[the downstream transfer record](PHASE8_DOWNSTREAM_TRANSFER_20260910.md).
+The Phase 8 mutation audit was then transferred in follow-up commit
+`af74c70108db8ede90a62a4f6bcff6d8da86057d`.
+The unchanged `xtsergey_mod.rom` boundary smoke reached the reset vector and
+128 accepted beats; this is not a full BIOS boot or a physical-board result.
 The existing invalid-instruction policy remains unchanged outside the admitted
 ESC range.

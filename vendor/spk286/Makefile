@@ -1,6 +1,6 @@
 SHELL := /usr/bin/env bash
 
-.PHONY: help env bootstrap lint verilator test unit regression iverilog waveform data-smoke state-smoke synth-check quartus-info verify-failure singlestep-fetch singlestep-smoke singlestep-mov singlestep-audit clean microcode microcode-check microcode-test microcode-audit mcl86-fetch mcl86-check mcl86-test phase2.80-check
+.PHONY: help env bootstrap lint verilator test unit regression iverilog waveform timing-trace timing-calibration data-smoke state-smoke synth-check quartus-info verify-failure singlestep-fetch singlestep-smoke singlestep-mov singlestep-audit clean microcode microcode-check microcode-test microcode-audit mcl86-fetch mcl86-check mcl86-test phase2.80-check
 
 help:
 	@echo "SPK286 development targets:"
@@ -21,6 +21,8 @@ help:
 	@echo "  make unit         run directed RTL tests in both simulators"
 	@echo "  make regression   run test plus Yosys synthesis sanity check"
 	@echo "  make waveform     run Verilator smoke with a VCD trace"
+	@echo "  make timing-trace capture and validate a versioned Phase 9A timing trace"
+	@echo "  make timing-calibration capture the Phase 9B instruction calibration suite"
 	@echo "  make data-smoke   validate the JSON/MOO data loader"
 	@echo "  make state-smoke  initialize RTL and verify first fetch from JSON state"
 	@echo "  make singlestep-fetch acquire the pinned external 80286 MOO working set"
@@ -30,6 +32,7 @@ help:
 	@echo "  make phase5-check run all inherited and stack/control-flow release gates"
 	@echo "  make phase6-check run the complete event release gate in a fresh build directory"
 	@echo "  make phase6-exec-check run all executable checks with explicit provisional evidence status"
+	@echo "  make phase8-check run the ordered Phase 8 development gate with logs"
 	@echo "  make singlestep-phase6 run all 474049 admitted Phase 6 hardware cases"
 	@echo "  make event-audit reject isolated event/arbitration/INTA RTL mutations"
 	@echo "  make stack-control-audit reject twelve isolated stack/control RTL mutants"
@@ -97,6 +100,12 @@ regression:
 
 waveform:
 	./scripts/test_verilator.sh --trace
+
+timing-trace:
+	python3 -m tools.capture_timing_trace
+
+timing-calibration:
+	python3 -m tools.capture_timing_calibration --simulator both
 
 data-smoke:
 	python3 tools/run_tests.py --smoke
@@ -184,12 +193,15 @@ singlestep-events-smoke: verilator
 singlestep-phase6: verilator
 	python3 -m tools.run_singlestep --phase6 --full
 
-.PHONY: phase7-check phase7-byte-prefix-check phase8-audit
+.PHONY: phase7-check phase7-byte-prefix-check phase8-audit phase8-check
 phase7-byte-prefix-check:
 	bash scripts/validate_phase7_byte_prefix.sh
 
 phase8-audit:
 	python3 -m tools.audit_phase8
+
+phase8-check:
+	bash scripts/validate_phase8.sh
 
 # Full scope cannot pass by running only the byte/prefix increment.
 phase7-check:

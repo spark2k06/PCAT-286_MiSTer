@@ -3,16 +3,6 @@
 SPK286 is an open-source, synthesizable SystemVerilog project targeting an
 Intel 80286-compatible FPGA soft-core.
 
-This vendored PCAT copy includes the downstream
-[SALC D6 compatibility extension](docs/PCAT_SALC_COMPATIBILITY.md), needed by
-AT XTIDE Universal BIOS after disk detection. Historical phase manifests
-below retain their original scope.
-
-The downstream copy also integrates the upstream 80286 `0F 05` LOADALL
-functional slice, including atomic register/cache loading and tests. See the
-[HIMEM integration record](../../docs/AT_HIMEM_LOADALL.md) for provenance,
-microcode numbering and the remaining hardware-validation boundary.
-
 SPK286 is a **CPU-only project**. Its scope ends at the processor boundary:
 architectural execution, microcode, prefetch, segmentation/protection,
 exceptions, the Bus Interface Unit (BIU), timing policy, and the native external
@@ -45,12 +35,52 @@ SPK286
 
 ## Current status
 
-Phase 7 strings/REP and scalar/string I/O are now integrated with the delivered
-arithmetic baseline, covering all 307 required opcode files. The current
-functional validation/review/delivery is in progress under
-[D-037](docs/PHASE7_FUNCTIONAL_POLICY.md). Five explicit evidence notes remain
-open and nonblocking for functional acceptance. Historical phase narratives
-below are superseded for current scope; they preserve their original results.
+The current pending-only work register is [Remaining work](docs/REMAINING_WORK.md).
+It consolidates the still-open CPU stories and evidence gates; dated phase
+reports below retain their original acceptance scopes.
+
+**Phase 7 milestones 1–9 are delivered and functionally/development ready**
+under [D-037](docs/PHASE7_FUNCTIONAL_POLICY.md), with independent functional
+approval for the executed sources and policy. Fresh integrated validation covers
+all 307 required opcode files: **1,386,996 evaluable passes and one NOT EVALUABLE
+E7 capture**, with no executable failures or unexpected omissions.
+
+The five named evidence notes remain open and nonblocking; historical 80286
+timing is not certified. Phase 8 can start from this accepted functional baseline;
+it was not implemented here. The current Phase 8 scope (D-038) adds two
+independent CPU-only workstreams: reproduce/fix the BIU HOLD/HLDA race against
+implicit LOCK during memory `XCHG`, and diagnose/fix deterministic no-deadlock
+handling of coprocessor ESC opcodes `D8–DF` (including `DB`) through the decoder
+and project-owned microcode. The existing PCXT/PCAT BIOS is to be retested
+unchanged after the ESC fix; BIOS adaptation is not Phase 8 work unless an
+independent firmware defect remains. See the [Phase 8 preparation](docs/PHASE8_PREPARATION.md),
+[D-038](docs/DECISIONS.md#d-038--phase-8-biu-race-and-esc-decoder-scope-2026-09-10),
+[D-039](docs/DECISIONS.md#d-039--phase-8-downstream-transfer-and-user-hardware-checkpoint-2026-09-10),
+the [delivery and validation record](docs/PHASE7_FUNCTIONAL_CLOSURE_20260909.md),
+[independent review](docs/PHASE7_FUNCTIONAL_REVIEW_20260909.md) and
+[recovery guide](docs/PHASE7_FUNCTIONAL_RECOVERY.md). Historical narratives below
+preserve their original evidence and are superseded for current Phase 7 status.
+
+After 8A and 8B pass and are independently reviewed in SPK286, their portable
+CPU changes are transferred to `PCAT-286_MiSTer` and committed there. The user
+then owns Quartus synthesis and the physical RBF test. An explicit user OK closes
+the Phase 8 hardware checkpoint; no BIOS adaptation is required after that OK.
+
+The independent CPU now matches the established PCAT functional baseline,
+including fetch chaining, parallel bounds, synchronous microcode and real-mode
+IP wrap. See the [CPU synchronization record](docs/PCAT_CPU_BASELINE_SYNC_20261004.md).
+
+A provisional CPU-only instruction interval variant, `spk286_profiled`, is
+available with a reproducible builder, explicit instruction metadata and retained
+retirement deadlines. Its host supplies virtual CPU boundaries and the bus timing
+contract; no AT chipset, MiSTer clocks or OSD are included. See the
+[profile timing contract](docs/PROFILE_TIMING_CONTRACT.md) for the interface
+and limits, and the [directed acceptance record](docs/PROFILE_TIMING_ACCEPTANCE_20261004.md).
+
+**Phase 9 — historical 80286 timing and bus fidelity** remains incomplete and is
+not release-approved. The provisional interval model and established performance
+implementation do not close the gap to a validated instruction-, BIU- and
+pin/cycle-level timing model. See the [Phase 9 timing fidelity plan](docs/PHASE9_TIMING_FIDELITY.md).
 
 Completed and verified:
 
@@ -297,7 +327,18 @@ Read these first:
   microsequencer/tooling specification.
 - `SPK286_TIMING_MODEL.md` — Accurate/Fast/Max timing architecture and the rule
   separating functional semantics from historical timing.
+- `docs/PHASE9_TIMING_FIDELITY.md` — planned work for instruction, BIU,
+  prefetch and native 80286 timing validation.
 - `SPK286_REALMODE_MVP.md` — functional Real Mode milestone.
+- `SPK286_PROTECTED_MODE.md` — 80286 Protected-Mode architecture and
+  implementation contract.
+- `docs/MILESTONE_7_LOADALL.md` — 80286 LOADALL/unreal-mode milestone, current
+  implementation slice, evidence policy, implementation gates, and acceptance
+  criteria.
+- `docs/LOADALL_EVIDENCE.md` — LOADALL source provenance, image layout,
+  implementation contract, validation receipt, and remaining evidence gaps.
+- `SPK286_PROTECTED_MODE_IMPLEMENTATION_PROMPT.md` — ready-to-use prompt for a
+  new implementation session.
 - `SPK286_ENVIRONMENT.md` — development/toolchain environment.
 - `docs/DECISIONS.md` — engineering decisions.
 - `docs/SINGLESTEP_INTEGRATION.md` — external hardware-vector runner.

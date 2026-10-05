@@ -2023,25 +2023,40 @@ See PHASE7_REP_EVENT_EVIDENCE.md and PHASE7_IO_CAPTURE_REVIEW.md for evidence
 limitations. Complete Phase 7 remains incomplete; this directory is not a
 verified Git delivery.
 
-## PCAT register execution extension — format 22 (2026-09-22)
+## Milestone 7 LOADALL extension - format 21
 
-Controls 173..180 add the byte/word and both-direction variants of
-`DECODE_ALU_*` and `DECODE_MOV_*`. Register-direct ModR/M captures both
-operands together, then executes and retires with an atomic architectural
-commit. Memory operands continue through the original microcode body. The
-compiler requires that body to match the optimized direction and width.
+The active LOADALL slice raises the generated image to microcode format 21 and
+adds control 171, `LOADALL`, at eight bits per control word. Its source entry is
+intentionally only `LOADALL` followed by `END`; the dedicated RTL service owns
+the 51-word physical acquisition, staging, protected-mode checks and atomic
+architectural commit. The generic microsequencer waits on the service
+completion and does not acquire the image itself.
 
-This downstream image preserves `CARRY_FILL8=171` and `LOADALL=172`; their
-upstream numbering differs. Always regenerate package and ROM together with
-this compiler. Exactly eight existing ROM words change; all 122 entries,
-labels, branch targets and the 723-word layout remain fixed. The independent
-contract is `tests/fixtures/microcode_register_execution.json`.
+The generated candidate currently contains 121 entries and 719 words with ten
+address bits and eight control bits. This format extension does not introduce
+386 operand/address-size prefixes or 32-bit state. See
+[`docs/LOADALL_EVIDENCE.md`](docs/LOADALL_EVIDENCE.md) for the image layout and
+the evidence boundary.
 
-The sequencer accepts `operation_retire` only alongside `operation_done`.
-Capture and execution are useful work, not historical timing states. The
-two-clock execution interval excludes opcode dispatch, retirement boundaries
-and instruction-byte starvation. See the downstream integration receipt in
-`docs/optimization/REGISTER_EXECUTION_50MHZ.md` at the PCAT repository root.
+## Register execution extension — format 22
+
+Controls 173..180 add `DECODE_ALU_RM16_REG16`, `DECODE_ALU_REG16_RM16`,
+`DECODE_ALU_RM8_REG8`, `DECODE_ALU_REG8_RM8`, `DECODE_MOV_RM16_REG16`,
+`DECODE_MOV_REG16_RM16`, `DECODE_MOV_RM8_REG8` and `DECODE_MOV_REG8_RM8`.
+Each acquires the same ModR/M context as `DECODE_MODRM`. For register-direct
+operands it captures both GPR values and retires after the execution/commit
+step. For memory it completes decode and continues the explicit source body.
+The compiler only admits the corresponding complete ALU or MOV fallback, so
+the two paths cannot disagree on width, direction or architectural commits.
+
+The sequencer's `operation_retire` is a functional terminal qualifier, accepted
+only together with `operation_done` while execution is enabled. It does not
+insert or specify historical timing. Architectural write and retirement share
+one edge, so no standalone `END` is executed on the register path. Cancellation
+and pause retain their existing precedence. The active image remains 122
+entries and 723 words, with ten address bits and eight control bits.
+
+See [the implementation and validation receipt](docs/REGISTER_EXECUTION_OPTIMIZATION.md).
 
 ## Immediate execution extension — format 23
 
@@ -2070,4 +2085,4 @@ branch targets and the 723-word layout remain fixed; address/control widths
 remain ten/eight bits. The frozen format-22 contract remains independently
 executable, and a separate format-23 fixture specifies the literal delta.
 
-See [the immediate execution receipt](../../docs/optimization/IMMEDIATE_EXECUTION_50MHZ.md).
+See [the immediate execution receipt](docs/IMMEDIATE_EXECUTION_OPTIMIZATION.md).

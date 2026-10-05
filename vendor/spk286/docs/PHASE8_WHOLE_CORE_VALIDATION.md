@@ -24,4 +24,31 @@ The existing suite remains the functional proof for the previously delivered
 CPU behaviors. The Phase 8 additions are deliberately narrow: they add the
 HOLD/LOCK race and the deterministic ESC profile without moving PCAT machine
 logic into SPK286. The full dual-simulator `make unit`, Yosys sanity check and
-repository `make regression` all passed before downstream transfer.
+repository `make regression` all passed before downstream transfer. The
+downstream CPU snapshot was then validated with the focused consumer benches,
+microcode audit/compile checks, and consumer-side Yosys synthesis sanity; see
+[the downstream transfer record](PHASE8_DOWNSTREAM_TRANSFER_20260910.md).
+The Phase 8-specific mutation audit also passed in SPK286 and PCAT with two
+rejected RTL mutants and three pristine controls.
+
+## Ordered Phase 8 gate
+
+The reproducible ordered gate was run on 2026-09-10 from a fresh build
+directory with:
+
+```text
+make phase8-check
+```
+
+It completed all stages successfully: focused 8A BIU/HOLD/LOCK, CPU XCHG,
+focused 8B ESC, decoder, microcode tests, microcode audit, Verilator lint,
+dual-simulator whole-core unit validation, mutation audit, Yosys synthesis
+sanity and the complete repository regression. The gate ended with:
+
+```text
+PHASE8_CHECK PASS: focused, microcode, lint, whole-core, mutation, synthesis and regression stages passed
+```
+
+Per-stage logs are retained under `build/phase8-complete/logs/`, and the gate
+requires that directory to be absent before each fresh run. The gate itself is
+recorded in commit `e36f8f6`.

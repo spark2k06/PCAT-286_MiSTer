@@ -37,17 +37,19 @@ def main():
     def add(name,value,mode=0o644):
         assert name not in payload and name.casefold() not in {n.casefold() for n in payload}
         payload[name]=(value,mode)
-    # Git archive supplies canonical blob bytes and recorded executable modes,
-    # independently of Windows checkout conversions and DrvFS mode reporting.
-    archive_bytes=subprocess.check_output(['git','archive','--format=tar','HEAD'],cwd=ROOT)
-    with tarfile.open(fileobj=io.BytesIO(archive_bytes)) as source:
-        for item in source:
-            if item.isdir():continue
-            assert item.isfile(), 'Nonregular tracked source'
-            data=source.extractfile(item).read()
-            mode=0o755 if item.mode&0o111 else 0o644
-            add('source/'+item.name,data,mode)
-            source_manifest[item.name]=hashlib.sha256(data).hexdigest();modes[item.name]=mode
+    # Read Git blobs directly.  `git archive` applies checkout attributes and
+    # can transform an unlisted text extension (for example `.asm`) to CRLF,
+    # which would no longer match the executed input manifest.
+    tracked=subprocess.check_output(['git','ls-files','-z'],cwd=ROOT).split(b'\0')
+    for raw_name in tracked:
+        if not raw_name:continue
+        name=raw_name.decode()
+        data=subprocess.check_output(['git','cat-file','blob','HEAD:'+name],cwd=ROOT)
+        tree_line=subprocess.check_output(['git','ls-tree','HEAD','--',name],cwd=ROOT,text=True)
+        mode=int(tree_line.split(None,1)[0],8)
+        mode=0o755 if mode&0o111 else 0o644
+        add('source/'+name,data,mode)
+        source_manifest[name]=hashlib.sha256(data).hexdigest();modes[name]=mode
     for kind,source_name in (('executable-inputs.json','inputs.json'),('policy-inputs.json','policy-inputs.json')):
         inputs=json.loads((build/source_name).read_text())
         assert all(source_manifest.get(name)==digest for name,digest in inputs.items()), 'Canonical Git input mismatch'

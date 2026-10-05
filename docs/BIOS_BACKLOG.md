@@ -1,5 +1,10 @@
 # Production BIOS backlog
 
+Historical initial XT-profile contingency, not the active PCAT backlog.
+Current open stories are recorded in [Remaining work](REMAINING_WORK.md).
+User-confirmed MRBIOS reboot and DOS/Windows/OS2 operation supersede the
+initial no-boot observation below; B0-B2 are not scheduled firmware work.
+
 Production BIOS adaptation is outside the I0-I6 core delivery. No BIOS source
 or binary was changed, and B0-B2 were not started.
 

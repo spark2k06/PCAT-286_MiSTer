@@ -1,4 +1,23 @@
 > Historical prototype record. The four failures and tentative format 14 below
+
+Current functional delivery (2026-09-09, D-037): **Phase 7 milestones 1–9
+are integrated, executable-validated and independently approved for functional
+development.** All 307 required files are covered: 1,386,996 evaluable records
+passed, exactly one E7 capture is NOT EVALUABLE, and there are no unexpected
+omissions or executable failures. The three inherited Phase 6 notes and the two
+named Phase 7 notes remain open and nonblocking; historical timing is not
+certified. Phase 8 may start from this accepted functional baseline; no Phase 8
+implementation is included. E7 issue publication remains pending by user request.
+See the [functional closure record](PHASE7_FUNCTIONAL_CLOSURE_20260909.md),
+[new independent approval](PHASE7_FUNCTIONAL_REVIEW_20260909.md) and
+[functional recovery guide](PHASE7_FUNCTIONAL_RECOVERY.md).
+
+## Preserved historical record — superseded for current status
+
+The text below retains its original dates, counts and conclusions. Its earlier
+REP/E7 blocking criteria are superseded by D-037 and the functional delivery
+above; historical validation and withheld-approval decisions are not rewritten.
+
 > describe the preserved frame-based candidate. See PHASE7_ARITHMETIC.md and
 > PHASE7_IDIV_COMPATIBILITY.md for the corrected candidate and current status.
 

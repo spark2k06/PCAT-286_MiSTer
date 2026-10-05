@@ -4,6 +4,28 @@ This repository is an integration work tree. It retains the selected PCXT
 machine source hierarchy and vendors a complete, pinned SPK286 indexed tree.
 Normal builds do not read either source checkout.
 
+## Current SPK286 synchronization
+
+The current portable CPU mirror is recorded independently in
+`docs/imports/current-spk286.json`, with its upstream commit, canonical Git
+blob/SHA256 identities and retained consumer files. The original import
+manifests below remain historical records.
+
+Synchronize from a clean standalone checkout and verify it with:
+
+```sh
+python3 -B scripts/sync_spk286_vendor.py --source /path/to/SPK286 --sync
+python3 -B scripts/sync_spk286_vendor.py --source /path/to/SPK286 --check
+```
+
+The whole `vendor/spk286/rtl/timed/` directory is the PCAT-generated timing
+overlay. Its source hashes are recorded and it is preserved during mirroring.
+Use the PCAT root generator and qualification tools for this overlay. The
+mirrored standalone generator's default `rtl/timed` output and installed-
+profile checker target the standalone variant and must not overwrite or
+qualify the consumer variant. Other vendor-only paths are retained explicitly
+in the current ledger.
+
 The snapshot sections below describe the original import. Subsequent CPU
 updates include the [2026-09-22 LOADALL integration](AT_HIMEM_LOADALL.md),
 selectively imported from SPK286 `aa922e53a579db17c67aeba37962a3683353813c`.
@@ -61,8 +83,8 @@ python3 scripts/verify_imports.py write \
   --spk-source /mnt/d/GitHub/SPK286
 ```
 
-At any integration commit, verify every unchanged PCXT import and the complete
-unmodified SPK286 vendor snapshot with:
+At the original import commit, verify the then-unmodified source snapshots
+with:
 
 ```sh
 python3 scripts/verify_imports.py verify
@@ -89,7 +111,8 @@ is therefore listed explicitly in `docs/imports/pcxt-modified-files.txt`.
 
 ## Consumer-side SPK286 timing variant
 
-The complete `vendor/spk286/` snapshot remains byte-for-byte unchanged. The
+Historical initial-import variant: the then-complete `vendor/spk286/` snapshot
+remained byte-for-byte unchanged. The
 PCAT-286 QIP substitutes
 `rtl/spk286_integration/spk286_operand_timing.sv` for the vendored
 `spk286_operand.sv`. It factors the `done` expression around the registered

@@ -23,12 +23,20 @@ a cycle-accurate implementation of the physical 80286 pins.
 | `bus_write` | output | Request is a write; zero for code fetch. |
 | `bus_bhe_n` | output | Active-low upper-byte enable. |
 | `bus_status[3:0]` | output | `0xD` CODE, `0x5` MEMR, `0x6` MEMW, `0xF` passive. |
-| `bus_lock` | output | LOCK indication; currently inactive. |
-| `hlda` | output | Bus-arbitration grant; currently inactive. |
+| `bus_lock` | output | LOCK indication for an explicit/implicit locked operation or INTA/frame chain. |
+| `hlda` | output | HOLD grant at a free physical-cycle boundary; no new CPU transaction is exposed while asserted. |
 
 The interface is intentionally small and normalized. A later native wrapper may
 translate it to pin polarity and the complete S0/S1/M/IO/COD/INTA contract.
 The authoritative architectural requirements remain in `SPK286_SPEC.md`.
+
+The debug-only `debug_bus_transaction[3:0]` metadata identifies the protected
+logical activity associated with an active normalized request. It is zero when
+no request is active and uses the following values: `1` descriptor, `2` TSS,
+`3` gate, `4` frame/stack and `5` protected instruction fetch. The metadata is
+held by the same functional request qualifiers while `READY` is low; it is
+diagnostic evidence, not a historical Ts/Tc timing claim and does not alter
+bus ownership or completion.
 
 The first request after reset remains FFFFF0, now formed using the architectural
 CS cache. Address, BHE and CODE status hold while `bus_valid && !ready`, even
@@ -38,17 +46,17 @@ Response data is retained until its consumer accepts it.
 For code fetch, an even word request uses both lanes (A0=0, BHE_n=0); an odd request returns one
 byte from D15:8 (A0=1, BHE_n=0). A final even byte at the cached segment limit
 uses only D7:0 (BHE_n=1). Inactive byte data is discarded. The next request is
-word-aligned after an odd byte. The top-level enables 16-bit IP wrap in real
-mode, so a fetch ending at FFFF can continue at offset 0000. In protected mode
-the cursor retains its 17th overflow bit and blocks rather than silently
-wrapping; both modes still enforce the cached segment limit. The resulting
-fetch fault is delivered through the core's exception path. Data words have a
-separate whole-width limit check.
+word-aligned after an odd byte. No request crosses the cached segment limit;
+the cursor retains exhaustion instead of wrapping. This does not yet generate
+an architectural exception. Data words have a separate whole-width limit check.
 
 On redirect, an outstanding request completes unchanged and its response is
-discarded. The new stream starts afterward. RESET can abort the request.
-There is no Ts/Tc/Ti timing, HOLD arbitration, interrupt acknowledgement or
-cycle-match claim in this contract.
+discarded. The new stream starts afterward. RESET can abort the request. HOLD
+is sampled only at a free boundary and is represented by `hlda`; it cannot
+split a waiting/locked transaction. There is no Ts/Tc/Ti timing or cycle-match
+claim in this contract. No bus-error/abort input is currently exposed by the
+CPU-only boundary, so no bus-error behavior is implied by `ready` or by
+`cancel_data`.
 
 ## Logical data words and arbitration
 
@@ -89,6 +97,8 @@ not split across a wrapped segment offset. Exception delivery is not implemented
 Pausing semantic execution leaves an accepted physical operation running and
 holds its response. Redirect discards responses and drains an accepted complete
 logical word, including remaining write bytes; reset aborts the transaction.
+The remaining native pin-cycle fidelity work is tracked in the planned
+[Phase 9 timing-fidelity plan](PHASE9_TIMING_FIDELITY.md).
 This development cancellation contract cannot roll back external side effects
 and is not a precise exception or interrupt interface.
 

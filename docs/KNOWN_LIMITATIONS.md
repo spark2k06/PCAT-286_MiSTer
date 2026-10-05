@@ -1,5 +1,11 @@
 # Known limitations and pending evidence
 
+Historical record: the dated sections below retain their original test and
+delivery scopes. The active pending-only register is
+[Remaining work](REMAINING_WORK.md). Subsequent user acceptance includes
+Windows 3.1, OS/2, games, floppy writes and the first functional speed-profile
+version; earlier unverified/XT statements below are not current open stories.
+
 ## HIMEM LOADALL integration (2026-09-22)
 
 The reported HIMEM extended-memory-test stop has `OP=05` and `ERR U=1`:

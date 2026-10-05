@@ -138,7 +138,31 @@ SP=0,2,4 are not blanket-rejected for entry. If a frame push cannot be completed
 enter shutdown; do not recurse forever into an impossible exception frame.
 Frame words already written remain observable. NMI or reset can leave shutdown;
 if NMI itself cannot establish a frame, remain shut down until reset (NMI stays
-blocked). No fabricated protected-mode #DF/error-code sequence is introduced.
+blocked). No complete protected-mode #DF escalation sequence is claimed.
+
+### PM3c protected error-code frames
+
+The bounded protected-mode extension classifies the current selector-related
+`#TS/#NP/#SS/#GP` family as carrying one 16-bit error word. Descriptor
+pre-fault and post-fault paths preserve the faulting selector; other protected
+sources currently use zero. The word is pushed after saved IP, so the frame is
+`FLAGS, CS, IP, ERROR` from the entry operation and the handler can consume
+`ERROR` before a same-level `IRET`. Non-error events retain the Real Mode and
+same-level PM3 frame shape without an extra word. Full error-source
+classification and #DF escalation remain deferred.
+
+### PM3d outer-level protected IRET
+
+The bounded PM3d return path extends protected `IRET` for a non-conforming
+return to a less-privileged code segment. It validates the saved `IP/CS`, then
+reads and validates the saved `SP/SS`; the CS and SS hidden caches, `IP`,
+`FLAGS` and `SP` are committed together only after both candidates are valid.
+The saved CS must be present, non-conforming and satisfy `DPL == RPL`; the
+saved SS must be present writable data with `DPL == RPL == target CPL`.
+Accessed-bit writes occur before cache commit. Privilege-changing event entry,
+inter-level/task gates, complete error-source classification and #DF escalation
+are still outside this bounded contract. Same-level call gates are documented
+in `PROTECTED_MODE_PM4A.md`.
 
 PUSHF/POPF and IRET use normalized 286 reserved bits. Real-mode stack restores
 modify application/control bits 0FD5; IOPL/NT retain their stored values. The

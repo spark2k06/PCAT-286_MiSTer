@@ -146,7 +146,8 @@ later work. A 16-bit limit is sufficient for the 286; the Phase 0 handoff's
 **Evidence:** Intel hardware table 3-6, programmer sections 5.1, 6.3/6.4 and
 Appendix C p. C-3; Intel's undated LOADALL note p. 3 describes the cache layout
 and ordinary real-mode reload. These sources justify the representation and
-normal reset-to-real-mode path; LOADALL-altered cache corner cases are deferred.
+normal reset-to-real-mode path. The first LOADALL cache-commit slice is recorded
+in D-041; unresolved silicon-specific corner cases remain deferred.
 
 ## D-009 — Architectural commits and fetch progress are distinct
 
@@ -929,3 +930,114 @@ policy. The source-level terminal microprogram is authoritative and generated
 ROM artifacts are regenerated from it. Primary evidence:
 [Intel iAPX 286 Programmer’s Reference Manual (1985)](https://www.bitsavers.org/components/intel/80286/210498-003_iAPX_286_Programmers_Reference_1985.pdf),
 [Intel iAPX 286 Programmer’s Reference Manual (1983)](https://bitsavers.org/components/intel/80286/210498-001_iAPX_286_Programmers_Reference_1983.pdf).
+
+## D-041 — fixed-image LOADALL slice and evidence boundary (2026-09-16)
+
+The CPU core implements the documented-by-the-Intel-note 80286 `0F 05`
+LOADALL shape as a dedicated microcode token plus a serialized RTL service.
+The service reads 51 little-endian words from physical `000800h`, stages the
+102-byte image, and commits visible registers, system registers, selectors and
+hidden 286 caches atomically on the final response. It remains separate from
+the generic BIU, microsequencer, ordinary segment reload path and protected-mode
+descriptor services. The 80286-width representation is limited to 24-bit
+bases, 16-bit limits and 8-bit access rights.
+
+The decoder maps `0F 05` to this entry and retains `0F 04`, `0F 07`, other `0F`
+holes and 286-invalid `64h`–`67h` as invalid forms. The staged implementation
+locally rejects non-zero CPL in protected mode with `#GP(0)` and rejects a
+protected-mode image that clears PE, preserving atomicity. These checks and
+the post-load hidden-cache access are functional implementation choices until
+direct silicon or a hardware-derived unreal-mode corpus confirms the exact
+corner behavior.
+
+The evidence hierarchy and source hashes are recorded in
+[LOADALL_EVIDENCE.md](LOADALL_EVIDENCE.md). This decision does not implement
+`LOADALLD`, `STOREALL`, ICE/test forms or historical clock timing, and it does
+not treat 86Box agreement as architectural proof.
+
+## D-042 — LOADALL protected event-path coverage (2026-09-16)
+
+The LOADALL fault is delivered through the existing protected event machinery,
+not through a LOADALL-specific exception or frame path. The directed top-level
+test first loads a protected CPL=1 context, executes a second `0F 05`, and
+checks that the normal event flow delivers `#GP(0)` to the IDT handler while
+preserving the faulting `CS:IP` and pushing `FLAGS`, `CS`, `IP` and the zero
+error word in the established 80286 order. The service-level test separately
+covers the CPL=0 success and pre-read privilege rejection cases.
+
+This is functional SPK286 coverage under the existing event implementation; it
+does not claim that the exact frame timing or any partial-state behavior has
+been confirmed on 80286 silicon.
+
+## D-043 — LOADALL lifecycle boundary coverage (2026-09-16)
+
+The LOADALL integration contract now covers the control conditions that are
+representable by the CPU-only interface: finite READY waits, synchronous reset,
+HOLD/HLDA and a synchronous NMI edge during the 51-word acquisition. READY
+waits retain the complete physical request metadata. Reset cancels the partial
+transaction and a later dispatch restarts at physical `000800h`. HOLD is only
+granted at a free boundary and suppresses new CPU bus cycles while `hlda` is
+asserted; it cannot split an image word. NMI is latched but cannot complete an
+event while LOADALL is active, and remains pending after the atomic commit.
+
+No bus-error or bus-abort behavior is claimed here. The current top-level and
+BIU interfaces expose no such input, and `ready`/development cancellation have
+different meanings. Adding a native bus-error condition requires a separate
+bus-interface contract plus Intel/silicon evidence; it is not silently modeled
+as another LOADALL cancellation case.
+
+## D-044 — LOADALL bounded emulator differential (2026-09-16)
+
+The Milestone 7 Gate 5 emulator comparison executes the original `opLOADALL`
+functions from the local 86Box and PCem source revisions in a generated,
+controlled C host. The experiment records the 286 opcode-table classification,
+logical image-read order, visible/common hidden state and the protected-mode
+general-protection callback. It intentionally does not claim full-machine
+timing, bus pins, event sampling or silicon behavior, and it does not copy
+third-party source into SPK286.
+
+Both references agree on the five tested cases: ordinary real mode, reserved
+FLAGS, protected CPL=0, protected CPL=1, and protected CPL=0 with an image that
+clears PE. They also agree that the 286 table maps `0F 05` to `LOADALL` and
+`0F 04`/`0F 07` to `ILLEGAL`. The comparison records two differences from the
+current SPK286 contract rather than adopting the emulator majority: the
+references mask reserved FLAGS bits, while SPK286 currently publishes the image
+word; and the references preserve PE when the image clears it, while SPK286
+rejects that protected image before architectural commit. Intel/physical
+evidence must adjudicate both questions before changing the RTL.
+
+The complete receipt, source hashes and reproduction command are in
+[LOADALL_EMULATOR_DIFFERENTIAL_20260916.md](LOADALL_EMULATOR_DIFFERENTIAL_20260916.md).
+
+## D-045 — Functional register execution before historical timing (2026-09-22)
+
+Prioritize useful work per implementation clock before adding historical
+timing policy. Format 22 permits ALU and MOV register-direct operands to use
+parallel capture followed by a combined architectural commit and retirement.
+The source retains and validates the existing memory fallback. The generic
+microsequencer receives terminal functional completion; it does not gain
+opcode knowledge or instruction-specific delay logic.
+
+This is an execution scheduling optimization. READY, required bytes, pause,
+cancel and event boundaries remain real dependencies in every policy. A
+two-clock execution interval is not a historical two-clock instruction claim:
+the current stream also pays dispatch/retirement and fetch costs. Unoptimized
+instructions and motherboard-side memory scheduling remain separate work.
+
+The implementation, independent A/B measurements and verification receipt are
+in [REGISTER_EXECUTION_OPTIMIZATION.md](REGISTER_EXECUTION_OPTIMIZATION.md).
+
+## D-046 — Share the atomic register stage with immediate operands (2026-09-22)
+
+Extend the dependency-driven execution schedule to ALU/TEST and MOV constants.
+The final accepted immediate byte captures its value and destination; the
+existing execution stage commits GPR/FLAGS and retirement together on the next
+enabled clock. A pending commit cannot consume the next instruction byte.
+ModR/M memory forms retain the old immediate acquisition and complete sequential
+tail, including all protection and bus dependencies.
+
+Format 23 records this choice explicitly with nine controls and exact compiler
+protocol checks. Historical format-22 fixtures remain frozen and executable.
+No historical timing policy, BIU, chipset or downstream integration is added.
+The measurements and verification are in
+[IMMEDIATE_EXECUTION_OPTIMIZATION.md](IMMEDIATE_EXECUTION_OPTIMIZATION.md).

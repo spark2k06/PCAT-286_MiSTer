@@ -16,6 +16,10 @@ and generated microcode, an AT bus, cascaded PIC, DMA/refresh, PIT, 8042,
 RTC/CMOS, floppy/IDE storage and EGA video. See [known limitations](docs/KNOWN_LIMITATIONS.md)
 and the [source provenance](docs/SOURCE_PROVENANCE.md).
 
+Current open stories and acceptance conditions are maintained in
+[Remaining work](docs/REMAINING_WORK.md). CPU-only follow-ups are tracked in
+[SPK286 remaining work](vendor/spk286/docs/REMAINING_WORK.md).
+
 The video path is a full EGA implementation. Earlier releases used the
 [Graphics Gremlin](https://github.com/schlae/graphics-gremlin) CGA and Hercules
 adapters from TubeTimeUS ([@schlae](https://github.com/schlae)); those have been
@@ -32,24 +36,22 @@ For an architectural overview and possible future improvements, see the
 ## Key features
 
 * Complete pinned SPK286 CPU, BIU and generated microcode
+* MAX / 6 / 8 / 10 / 12.5 / 16 / 20 / 25 MHz profiles, selected from the main OSD and applied safely without reset
 * Six-byte prefetch queue and native 24-bit CPU address generation
 * Native AT bus bridge with READY, LOCK, HOLD/HLDA and dual-byte handling
 * Cascaded PIC, DMA/refresh arbitration, PIT, 8042 keyboard and RTC/CMOS
-* Optional compact SPK286 debug overlay with CPU/BIU state, POST value,
-  fault flags and the latest accepted AT transaction; it includes a live
-  snapshot counter and a splash-off blank-raster fallback
 * **EGA video**: sequencer, graphics controller, attribute controller and a four-plane VRAM, around the UM6845R CRTC
 * Dual EGA dot clock, 14.318181 MHz and 16.257 MHz, selected per mode as on real hardware
 * CGA-compatible text and graphics behaviour, provided by the EGA rather than a separate adapter
 * **Direct 15 kHz CRT output**, with the 350-line modes convertible to 480i or 240p from the OSD
-* EGA-compatible text and graphics output; the legacy VGA/TSR path is not part
-  of the single AT profile
+* Partial VGA+ support through the DOS VGATSR, including [Dyna Blaster's unchained 256×232 mode](docs/vga-dyna-blaster.md)
 * 640 KiB conventional memory plus the normalized AT extended-memory window
 * EGA BIOS option ROM support (required — the card is initialised by its own ROM, as on real hardware)
 * IDE/VHD storage support
+* Floppy image read/write support, with OSD write protection for A:, B: or both
 * MiSTer mouse as a Microsoft-compatible serial mouse on COM1 (`3F8h`, IRQ4)
-* Built-in AdLib/OPL2, C/MS and Tandy SN76489 audio, plus the PC speaker
-* EGA graphical boot splash
+* Built-in Sound Blaster Pro, AdLib/OPL2, C/MS, Tandy SN76489, MIDI/MPU-401 and PC speaker support
+* EGA graphical boot splash, configurable at build time
 
 ## Memory map
 
@@ -260,8 +262,7 @@ planar registers and BIOS state, then switches only the display fetch to the
 fixed VGA raster. That renderer honours CRTC Start Address, Offset 20–23
 (40–46 bytes per plane row) and horizontal pel panning, covering common
 320×200 hardware scrolling without replacing the EGA implementation or adding
-a programmable VGA CRTC. See
-[the planar mode 0Dh scope](docs/vga-planar16-mode0d.md).
+a programmable VGA CRTC.
 
 When it sets mode 13h, VGATSR also installs the IBM VGA CRTC baseline that
 unchained software normally modifies. Within the profiles listed above, the
@@ -367,20 +368,23 @@ ownership of memory, I/O, interrupt and refresh arbitration.
 
 ## Known limitations
 
-The exact functional, timing, BIOS and physical-validation boundaries are in
-[`docs/KNOWN_LIMITATIONS.md`](docs/KNOWN_LIMITATIONS.md). In particular, there
-is no historical 80286 MHz/cycle-accuracy claim, no production-BIOS result and
-no physical-board result yet. The per-milestone outcome is recorded in
-[`docs/MILESTONE_STATUS.md`](docs/MILESTONE_STATUS.md).
+The active boundaries and open stories are recorded in
+[Remaining work](docs/REMAINING_WORK.md). The user has confirmed BIOS/DOS,
+Windows 3.1, OS/2 and games on MiSTer, along with the first functional
+speed-profile version. Detailed historical cycle/pin precision and current
+physical timing acceptance have their own evidence gates. Dated initial
+milestones and diagnostic observations remain in
+[known limitations](docs/KNOWN_LIMITATIONS.md) and
+[milestone history](docs/MILESTONE_STATUS.md).
 
 ## Audio
 
-The AT profile exposes the PC speaker from PIT channel 2 together with the
-source profile's AdLib/OPL2, C/MS and Tandy SN76489 devices. Their OSD options
-retain the source status-bit positions: OPL2 at `388h` (or the `228h` FM
-alias), C/MS at `220h`, and Tandy writes at `0C0h-0CFh`. Speaker volume,
-audio boost and stereo mix are also retained. Sound Blaster DSP, DMA, IRQ and
-its OSD selection are intentionally absent.
+The AT profile exposes the PC speaker from PIT channel 2, Sound Blaster Pro,
+AdLib/OPL2, C/MS, Tandy SN76489 and MIDI/MPU-401. Sound Blaster uses DMA1 and
+selectable IRQ5/7. It shares the `220h` block with C/MS, so the OSD selects
+which card occupies that block. OPL2 uses `388h` (or the `228h` FM alias),
+and Tandy writes use `0C0h-0CFh`. Speaker volume, audio boost and stereo mix
+are also available.
 
 ## RTC/CMOS port
 

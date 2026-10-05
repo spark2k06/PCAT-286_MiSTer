@@ -1,0 +1,80 @@
+{
+  "status": "PASS",
+  "scope": "compact instruction minima metadata; provisional profiles",
+  "coverage": {
+    "cases": 43878,
+    "normal_opcodes": 242,
+    "extended_opcodes": 6,
+    "all_modrm_bytes": true,
+    "variable_count_values": 32,
+    "include_guard": true,
+    "named_micro_entries": 123,
+    "internal_dispatch_aliases": 22
+  },
+  "pass": [
+    "SPK286_INSTRUCTION_TIMING_PASS cases=43878",
+    "SPK286_INSTRUCTION_TIMING_PASS cases=43878"
+  ],
+  "source_sha256": {
+    "rtl/timing/spk286_instruction_timing.sv": "41d901063422f6e3532a2fb9653d21a281b0af85d6274334dcca29ec3db4ff02",
+    "sim/unit/spk286_instruction_timing_tb.sv": "9088ecd72e104239dd6f73fd0e1adb7e480f8495d12d56adf572a4ab6af315ef",
+    "microcode/generated/spk286_microcode_pkg.sv": "fedea94b3d1435a77765aa425926ba8efecabdc0806092a7894c6a1b38d85afe",
+    "rtl/spk286_decoder.sv": "6afedc009dabbad5947fe888cafc4c2af09b4cc4a15eed8e8082b529c96516f0",
+    "scripts/test_instruction_timing.py": "67a61a19c9a8bdc689974c5add681f9be5133340754af88d82c1967c5962cdc3"
+  },
+  "negative": {
+    "immediate": {
+      "returncode": 1,
+      "marker": "instruction timing caller oracle failed"
+    },
+    "out": {
+      "returncode": 1,
+      "marker": "instruction timing caller oracle failed"
+    },
+    "odd-double-charge": {
+      "returncode": 1,
+      "marker": "instruction timing caller oracle failed"
+    },
+    "stale-modrm": {
+      "returncode": 1,
+      "marker": "instruction timing caller oracle failed"
+    },
+    "count-truncate": {
+      "returncode": 1,
+      "marker": "instruction timing caller oracle failed"
+    },
+    "silent-default": {
+      "returncode": 1,
+      "marker": "instruction timing caller oracle failed"
+    },
+    "include-guard": {
+      "returncode": 4,
+      "marker": "already been declared"
+    }
+  },
+  "isolated_cost": {
+    "generic_cells": 1073,
+    "register_bits": 0,
+    "memories": 0,
+    "scope": "isolated metadata logic; not FPGA ALMs or whole CPU"
+  },
+  "artifacts_sha256": {
+    "vectors.txt": "54d33a4374834ae9048ce45084f855a701b48e0c2d51f3d2f5bbd0da39040392",
+    "iverilog-trace.csv": "248c3b6f4a038098c72f463162d0abc8ceb98ee50fe65a700dadc2ae674d2b38",
+    "verilator-trace.csv": "248c3b6f4a038098c72f463162d0abc8ceb98ee50fe65a700dadc2ae674d2b38"
+  },
+  "estimated": [
+    "taken control transfer target length",
+    "protected gate/task variants",
+    "external/fault entry",
+    "ESC syntax only",
+    "LOADALL/SALC native fallback",
+    "REP LODS and untabulated REP prefix contexts"
+  ],
+  "corrections_owned_by_controller": [
+    "prefix",
+    "actual odd-word references",
+    "actual extra MEMORY READ waits",
+    "REP window selection"
+  ]
+}

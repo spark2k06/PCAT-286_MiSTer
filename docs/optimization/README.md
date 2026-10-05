@@ -1,5 +1,9 @@
 # Plan de optimización de PCAT-286 AT
 
+Current pending-only project register: [Remaining work](../REMAINING_WORK.md).
+The dated proposal and fit records below retain their individual scope; a
+historical "pending" label does not reopen a subsequently accepted story.
+
 Estado: especificaciones de trabajo; P03 dispone de una implementación
 experimental validada en simulación, todavía no cerrada en timing ni placa.
 Fecha: 2026-09-13. Base funcional: commit `4a05f97`, rama
@@ -20,7 +24,7 @@ frecuencia física no se fija como requisito ni se promete una puntuación final
 | P01 | [Latencia del puente de memoria](P01_AT_MEMORY_BRIDGE_LATENCY.md) | Integración PCAT | Quitar dos estados de espera en accesos de memoria elegibles |
 | P02 | [Encadenamiento del fetch](P02_SPK286_FETCH_PIPELINING.md) | CPU SPK286 | Reducir huecos entre peticiones sin alterar el flujo de instrucciones |
 | P03 | [Buffer de lectura SDRAM](P03_AT_SDRAM_READ_BUFFER.md) | Memoria PCAT | Amortizar activación y precarga mediante lecturas de varias palabras |
-| P04 | [Perfilado y optimización de ejecución](P04_SPK286_EXECUTION_PROFILING.md) | Verificación y CPU | Separar costes de memoria/ejecución y elegir cambios medidos |
+| P04 | Perfilado y optimización de ejecución; measured follow-up in [PERF01 attribution](P12_REAL_CHECKNUM_MEMORY_ATTRIBUTION_20261002.md) | Verificación y CPU | Separar costes de memoria/ejecución y elegir cambios medidos |
 | P05 | [Cierre de timing FPGA](P05_AT_FPGA_TIMING_CLOSURE.md) | Integración, CPU y constraints | Cumplir los tiempos del diseño físico a la frecuencia declarada |
 | P06 | [Perfiles de velocidad de CPU](P06_CPU_SPEED_PROFILES.md) | Política CPU e integración OSD | First P06/P12 functional version accepted: MAX / 6–25 MHz, integrated waits, main-menu selection and safe live changes; exact EU/native pin timing remains future precision work. Physical 50 MHz setup/hold closure continues separately with the [verified deadline/buffer/palette candidate](P06_DEADLINE_FOLD_20261005.md); full regression is user-deferred |
 | P07 | [Camino EGA byte-preservado](P07_EGA_BYTE_PRESERVING_PATH.md) | Vídeo y frontend VRAM | Reducir latencia interna sólo cuando sea seguro, sin convertir EGA en un dispositivo de 16 bits |

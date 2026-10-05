@@ -984,6 +984,12 @@ Recommended order:
 This order intentionally avoids turning cycle accuracy into a blocker for
 functional CPU development.
 
+The work represented by items 4–10 is now tracked as the planned
+[Phase 9 timing-fidelity workstream](docs/PHASE9_TIMING_FIDELITY.md). Until that
+phase is completed, no SPK286 or downstream PC/AT profile may be called
+historically cycle-accurate solely because it boots, passes SingleStep
+architectural checks, or achieves a particular MHz/benchmark result.
+
 ---
 
 ## 32. Current Phase Policy

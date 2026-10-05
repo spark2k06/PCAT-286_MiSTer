@@ -27,6 +27,28 @@ The existing project documents remain the authority for SPK286 scope. Any
 future source reuse needs a new per-file license decision recorded here before
 the code is copied or adapted.
 
+## LOADALL evidence (2026-09-16)
+
+The 80286 LOADALL source provenance, exact image layout, opcode ambiguity,
+86Box comparison and validation boundary are recorded in
+[LOADALL_EVIDENCE.md](LOADALL_EVIDENCE.md). The implementation is an
+independent SPK286 service; no 86Box or other emulator source was copied.
+The pinned SingleStepTests real-mode checkout explicitly excludes `0F 05` and
+reserves the unreal-mode suite for future data, so it is not claimed as direct
+LOADALL evidence.
+
+The local PCem source is also used as a second bounded emulator reference for
+the LOADALL differential. The executed cases, source revisions/hashes and the
+two unresolved differences from the current SPK286 contract are recorded in
+[LOADALL_EMULATOR_DIFFERENTIAL_20260916.md](LOADALL_EMULATOR_DIFFERENTIAL_20260916.md).
+
+## Protected-Mode PM0 evidence (2026-09-11)
+
+- [Intel iAPX 286 Programmer's Reference Manual, 210498-003 (1985)](https://www.bitsavers.org/components/intel/80286/210498-003_iAPX_286_Programmers_Reference_1985.pdf), sections 6.6, 7.1–7.5, 8 and 10, including tables 7-1/7-2 and figures 7-1/7-10: selector fields, 8-byte 286 descriptors, access byte, typed system descriptors, hidden caches, gates and the fixed 16-bit TSS. Consulted as architecture evidence; no source or tables copied.
+- [Intel 80286 and 80287 Programmer's Reference Manual, 210498-005 (1987)](https://bitsavers.trailing-edge.com/components/intel/80286/210498-005_80286_and_80287_Programmers_Reference_Manual_1987.pdf), section 10.4, p. 10-6 (PDF p. 281): reset `MSW=FFF0h`, `IDTR.base=0`, `IDTR.limit=03FFh`; section 10.3 and figures 10-1/10-3: 24-bit table bases and 16-bit limits. This is the PM0 reset policy.
+- [Intel 80286 Hardware Reference Manual, 210760-002 (1987)](https://bitsavers.trailing-edge.com/components/intel/80286/210760-002_80286_Hardware_Reference_Manual_1987.pdf), table 3-6: independently records reset system state and conflicts with the programmer manual on the IDTR limit. PM0 records the discrepancy and does not use IDTR for execution; resolution remains required before PM3.
+- The PM0 RTL and tests are independent project-owned implementations. No external RTL, microcode, descriptor table or reference-core source was copied.
+
 ## Phase 1 evidence
 
 No external RTL or microcode was reused. Intel manuals were downloaded to

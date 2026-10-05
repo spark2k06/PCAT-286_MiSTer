@@ -1114,9 +1114,14 @@ The internal cache representation need not match Intel transistor-level implemen
 
 ## 30. LOADALL / Unreal Mode
 
+The implementation plan, evidence policy and current functional slice for this
+work are tracked in [`docs/MILESTONE_7_LOADALL.md`](docs/MILESTONE_7_LOADALL.md)
+and [`docs/LOADALL_EVIDENCE.md`](docs/LOADALL_EVIDENCE.md).
+
 SingleStepTests explicitly reserves a future `v1_unreal_mode` suite.
 
-SPK286 should therefore design for the undocumented 80286 `LOADALL` behavior even if implementation is deferred.
+SPK286 implements the fixed-image LOADALL slice while retaining an explicit
+evidence gate for undocumented corner cases and historical timing.
 
 Requirements:
 
@@ -1125,7 +1130,8 @@ Requirements:
 - document known/unknown behavior;
 - implement only from reliable hardware research and test evidence.
 
-LOADALL should be a later milestone after normal real mode is stable unless available SingleStep tests make earlier implementation useful.
+The current implementation does not claim 80386 LOADALLD, STOREALL, ICE forms,
+or cycle-accurate behavior; those remain separately scoped.
 
 ---
 
@@ -1680,6 +1686,9 @@ Acceptance:
 ---
 
 ### Milestone 7 — Unreal mode / LOADALL
+
+See [`docs/MILESTONE_7_LOADALL.md`](docs/MILESTONE_7_LOADALL.md) for the staged
+implementation gates and acceptance matrix.
 
 Implement and validate 80286 LOADALL/unreal-mode behavior from trustworthy evidence.
 

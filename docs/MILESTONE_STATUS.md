@@ -1,5 +1,9 @@
 # Integration milestone status
 
+Historical initial-integration record. The current pending-only register is
+[Remaining work](REMAINING_WORK.md); the dated XT/boot acceptance statements
+below preserve their original scope and do not reopen later accepted work.
+
 Recorded on 2026-09-11 for branch `codex/spk286-xt-integration`.
 
 | Milestone | Status | Evidence |

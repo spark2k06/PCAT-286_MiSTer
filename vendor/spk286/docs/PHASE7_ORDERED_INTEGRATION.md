@@ -1,15 +1,22 @@
 # Phase 7 ordered integration
 
-Current D-037 policy (2026-09-09): the corrected strings/REP and scalar/string
-I/O implementation is integrated in ordinary repository sources. All 307
-required files remain in scope. REP initial-zero-count ordering is an open
-engineering policy; exactly one incomplete E7 capture is NOT EVALUABLE, with
-4,999 evaluable E7 records still required. These and the three inherited D-026
-notes are nonblocking for functional/development acceptance. Final executable
-validation, independent functional approval and verified delivery remain required.
-See [the current policy](PHASE7_FUNCTIONAL_POLICY.md). Historical text below
-retains its original dates, counts and conclusions; its incompatible REP/E7
-closure prerequisites are superseded by D-037.
+Current functional delivery (2026-09-09, D-037): **Phase 7 milestones 1–9
+are integrated, executable-validated and independently approved for functional
+development.** All 307 required files are covered: 1,386,996 evaluable records
+passed, exactly one E7 capture is NOT EVALUABLE, and there are no unexpected
+omissions or executable failures. The three inherited Phase 6 notes and the two
+named Phase 7 notes remain open and nonblocking; historical timing is not
+certified. Phase 8 may start from this accepted functional baseline; no Phase 8
+implementation is included. E7 issue publication remains pending by user request.
+See the [functional closure record](PHASE7_FUNCTIONAL_CLOSURE_20260909.md),
+[new independent approval](PHASE7_FUNCTIONAL_REVIEW_20260909.md) and
+[functional recovery guide](PHASE7_FUNCTIONAL_RECOVERY.md).
+
+## Preserved historical record — superseded for current status
+
+The text below retains its original dates, counts and conclusions. Its earlier
+REP/E7 blocking criteria are superseded by D-037 and the functional delivery
+above; historical validation and withheld-approval decisions are not rewritten.
 
 ## Current ordered integration candidate - 2026-09-09
 

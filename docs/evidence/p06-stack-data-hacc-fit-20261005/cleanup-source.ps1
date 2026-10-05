@@ -65,5 +65,6 @@ $taskReceipt = [ordered]@{
     free_after_bytes=$taskDiskAfter
     scope='Only non-output_files entries of this exact completed owned fit work directory; no original user/repository files, other builds or global caches.'
 }
-$taskReceipt | ConvertTo-Json -Depth 8 | Set-Content -LiteralPath (Join-Path $taskEvidenceRoot 'cleanup.json') -Encoding utf8
+$taskJson = $taskReceipt | ConvertTo-Json -Depth 8
+[IO.File]::WriteAllText((Join-Path $taskEvidenceRoot 'cleanup.json'), ($taskJson -replace "\r\n", "`n") + "`n", [Text.UTF8Encoding]::new($false))
 Write-Output ('STACK_DATA_HACC_OWNED_FIT_CLEANED {0} bytes; best RBF retained' -f $taskReceipt.deleted_bytes)

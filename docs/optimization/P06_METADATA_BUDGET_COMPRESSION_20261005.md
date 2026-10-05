@@ -49,3 +49,40 @@ comparisons. Every archived member was verified against its original bytes
 before deleting owned simulator objects. The recorded SDC is the then-current
 0.700 ns palette routing requirement; any subsequent constraint adjustment must
 be explicitly bound and measured by its fit packet.
+
+## Completed physical measurement
+
+All-features seed-1 compile at frozen `fbda3ba` completed in 35:33. The
+[sealed fit packet](../evidence/p06-budget-compressor-fit-20261005/manifest.json)
+binds all 1,377 frozen inputs, the actual compiled M10K image, qualification
+receipts and both complete four-corner STA runs.
+
+| Measurement | Event selection | Budget compressor |
+| --- | ---: | ---: |
+| Global / CPU setup minimum | -6.989 ns | -7.300 ns |
+| Global hold under original SDC | +0.009 ns | +0.082 ns |
+| CPU hold minimum | +0.118 ns | +0.115 ns |
+| Equivalent ALMs | 31,563 | 31,110 |
+| Physical placed ALMs | 36,757 | 36,610 |
+| Registers | 38,218 | 38,204 |
+| M10K / DSP / PLL | 416 / 39 / 3 | 416 / 39 / 3 |
+
+Physical placement is 87.35%, 147 ALMs fewer than the event-selection fit.
+Setup is 0.311 ns worse, so event selection remains the best measured setup
+candidate. The arithmetic version provides a resource reduction and is the
+base for the independently verified REP-permission correction; its own fit
+does not establish timing closure.
+
+The extra 0.500 ns palette route requirement reports -0.055 ns hold slack.
+With the original SDC, the same fitted netlist has positive global hold in
+every corner, minimum +0.082 ns. Recorded fitter files and RBF/SOF were verified
+unchanged across that independent STA check. Recovery/removal minima are
++2.879/+0.218 ns. Original constraints and the added voluntary route guard
+are reported separately; no existing setup, clock or hold requirement was
+waived.
+
+The archive was read back byte for byte before deleting 317,280,461 logical
+bytes of owned compiler temporaries. RBF/SOF and reports remain available.
+Full regression remains **USER_DEFERRED**; hardware is **NOT_RUN**.
+
+RBF: `build/p06-budget-compressor-allfeatures-20261005-v1/work/output_files/PCAT-286.rbf`

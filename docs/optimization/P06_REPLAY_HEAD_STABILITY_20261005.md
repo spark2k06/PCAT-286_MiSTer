@@ -46,7 +46,7 @@ No new instruction behavior was added. The earlier raw CPU/SingleStep evidence
 still applies to the unchanged CPU inputs. The complete compatibility regression
 remains **USER_DEFERRED** as requested; these results are directed qualification.
 
-## Evidence and next gate
+## Evidence and fitted result
 
 The [sealed packet](../evidence/p06-replay-head-20261005/manifest.json) preserves
 tested sources, unchanged benches, exact baseline comparison, proof scripts,
@@ -56,13 +56,66 @@ archived.
 Verified implementation commit: `c90f7b5`. A fresh all-features fit started at
 2026-10-05 07:50:06 UTC under
 `build/p06-replay-head-allfeatures-20261005-v1`, at the existing physical 50 MHz.
-Four-corner setup/hold reporting and resource comparison follow compilation.
-This change is not yet claimed to improve fitted timing or qualify hardware
-stability.
+Compilation completed in 30 min 45 s, followed by 3 min 22 s of detailed STA.
+All features, including Adlib/OPL2, remain enabled.
+
+| Metric | Previous target-handoff fit | Registered-head fit | Delta |
+| --- | ---: | ---: | ---: |
+| Worst global / CPU setup | −19.145 ns | −16.044 ns | +3.101 ns |
+| Worst global hold | +0.002 ns | +0.055 ns | +0.053 ns |
+| Worst global recovery | +1.680 ns | +1.981 ns | +0.301 ns |
+| Worst global removal | +0.198 ns | +0.160 ns | −0.038 ns |
+| Equivalent ALMs | 31,018 | 31,108 | +90 |
+| Placed ALMs | 36,489 | 36,489 | 0 |
+| Placed device occupancy | 87.065% | 87.065% | 0 |
+| Total registers | 38,024 | 38,127 | +103 |
+| Block memory bits | 3,301,099 | 3,301,019 | −80 |
+| M10K | 417 | 416 | −1 |
+| DSP / PLL | 39 / 3 | 39 / 3 | 0 / 0 |
+
+The replay now uses no M10K and stores its bytes in registers, as intended.
+The inclusive CPU hierarchy changes from 7,385.8 to 7,357.3 equivalent ALMs,
+8,177.8 to 8,156.3 placed ALMs, and 5,417 to 5,492 registers. Whole-design
+packing and sharing change beyond this hierarchy; these are measured fitted
+attributions, not additive standalone module costs.
+
+The worst path now starts at the ordinary prefetch queue's `head_q[2]` and
+ends at the microsequencer's `micro_entry[1]`, with 31 logic levels and 35.332 ns
+data delay at the slow −40°C corner. The replay RAM path is no longer the
+reported worst path. Setup remains negative: **this fit does not close at
+50 MHz**. There are also setup violations in CPU integration, memory/cache,
+SDRAM ownership and video paths.
+
+The reported SDRAM input setup/hold minima remain +5.185 / +5.000 ns;
+output setup/hold minima are +4.260 / +0.340 ns. No constraint/configuration,
+PLL or source clock relationship was changed. The four-corner issue counts
+retain the inherited platform limitations, with no reported timing loops or
+latches. Positive constrained hold/recovery/removal does not certify general
+hardware stability.
+
+RBF: `build/p06-replay-head-allfeatures-20261005-v1/work/output_files/PCAT-286.rbf`
+
+SHA-256: `c073f834304a7c16c64c071888ea11e23b7788db80175ce3f27d68e29939dd87`
+
+Size: 4,145,652 bytes. Hardware testing is still pending. Directed cycle and
+functional equivalence provide no expected benchmark change; this is a physical
+timing implementation change. The earlier RBF remains available for consistent
+profile measurements.
+
+The [fit packet](../evidence/p06-replay-head-fit-20261005/manifest.json) retains
+all 1,374 effective frozen source files, original reports, artifact identities
+and comparisons. Every directed CPU/generator proof input matches the fitted
+source. `build_id.v` has the sole declared compile-generated BUILD_DATE update.
+All baseline SDC, QSF, QIP, QPF and TCL hashes remain unchanged. Snapshot deltas
+also retain verification files added before this fit; they are not additional
+production RTL changes.
 
 After archive byte verification and confirmation that simulator processes had
 finished, the four owned proof/integration work directories and temporary
 collector were removed: 609,533,055 logical bytes. The active frozen fit and
 earlier measurement RBF were retained. The cleanup receipt is in the packet's
-directory; the ongoing fit databases will be removed only after its results
-and effective inputs have been preserved.
+directory. After the fit packet's byte verification, the compiler databases,
+duplicate work sources and collector were removed: another 322,675,791 logical
+bytes. RBF/SOF and compact reports remain available, the RBF hash was checked
+again after cleanup, and no Docker container remains active. Free host space
+after cleanup was approximately 25.20 GiB on C: and 150.09 GiB on D:.

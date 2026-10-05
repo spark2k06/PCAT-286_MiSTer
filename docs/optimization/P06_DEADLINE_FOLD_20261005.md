@@ -159,6 +159,9 @@ register count remains 35,404. The inclusive CPU hierarchy accounts for
 fractional ALM attribution is not a separate device allocation.
 
 Evidence: [source-bound fit, reports and original-SDC audit](../evidence/p06-deadline-fold-fit-20261005/result.json).
+The [independent read-only review](../evidence/p06-deadline-fold-review-20261005/review.md)
+records all scoped deltas and the exact remaining paths. It does not infer a
+standalone posted-write WNS from the data-output or SDRAM-owner selectors.
 Every functional receipt is bound to the frozen source inputs. Two historic
 mutation files listed by the broad elaboration inventory are explicitly
 archived as uncompiled inventory; they are absent from the elaboration

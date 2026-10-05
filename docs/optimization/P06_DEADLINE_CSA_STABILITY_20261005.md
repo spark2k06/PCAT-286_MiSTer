@@ -65,3 +65,53 @@ recovery/removal and SDRAM margins. Check that the palette scope binds and that
 minimum-delay routing produces positive hold without worsening a setup path.
 Retain RBF/SOF and reports, seal fitted inputs/results, then remove owned compiler
 databases and simulator objects. Stop only owned discarded Docker jobs.
+
+## Completed fit and independent hold check
+
+The all-features seed-1 compile completed in 31:12; its four-corner detailed
+STA took 5:20. The fit binds all 1,376 frozen inputs at `3cd8501`, the actual
+compiled 1024-word M10K image and the directed qualification sources. The only
+compile-generated source update is BUILD_DATE. The added palette minimum-route
+collection binds 8 sources and 288 endpoints. Other SDC/QSF/QIP/QPF/TCL inputs
+and all functionality settings retain their preceding identities.
+
+| Measurement | Prior execution-deadline fit | CSA fit |
+| --- | ---: | ---: |
+| Global setup minimum | −10.992 ns | −10.412 ns |
+| CPU setup minimum | −10.658 ns | −10.359 ns |
+| Hold under original SDC | −0.110 ns | +0.041 ns |
+| CPU hold minimum | +0.094 ns | +0.121 ns |
+| Equivalent ALMs | 31,600 | 31,234 |
+| Actual physical placed ALMs | 36,866 | 36,638 |
+| Registers | 38,166 | 38,203 |
+| M10K / DSP / PLL | 416 / 39 / 3 | 416 / 39 / 3 |
+
+Physical placement occupies 87.42% of the device, 228 fewer ALMs. Fitted
+register count includes physical optimization; no retained scheduler state
+was added. SDRAM input setup/hold minima are +5.185 / +5.000 ns, and output
+setup/hold minima are +4.312 / +0.098 ns. Recovery/removal are +3.111 / +0.190 ns.
+
+The fitted 0.700 ns extra palette requirement has −0.082 ns hold slack at the
+fast −40 C corner. That path has 0.684 ns data delay and 0.006 ns clock skew;
+it fails the voluntary margin. An independent four-corner STA run overlays
+the exact preceding SDC on the same completed fitted netlist. It reports
+positive real hold in all four corners, with global minimum +0.041 ns.
+RBF/SOF and all recorded fitted artifacts were checked unchanged before and
+after the overlay. No actual hold path was waived or excluded.
+
+For subsequent fits, select a 0.500 ns extra minimum-route requirement. This
+still tightens the original 0 ns clock relationship; it does not change setup,
+clocks or false/multicycle exceptions. Its physical acceptance remains to be
+measured in a fresh fit. The original 0.700 ns result and its failure remain
+recorded. Setup remains open; the next candidates address live event selection
+and metadata arithmetic. There is no whole-design timing closure claim.
+
+The [sealed fit packet](../evidence/p06-deadline-csa-fit-20261005/manifest.json)
+preserves effective source bytes, both complete STA runs, original reports,
+resource/hierarchy accounting, source bindings and launch commands. Owned
+compiler databases and duplicate sources are removed after byte verification;
+RBF/SOF, reports and prior candidates remain available.
+
+RBF: `build/p06-deadline-csa-allfeatures-20261005-v1/work/output_files/PCAT-286.rbf`
+
+Full regression remains **USER_DEFERRED** and hardware testing is **NOT_RUN**.

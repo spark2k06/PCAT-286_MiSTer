@@ -16,7 +16,7 @@ set at_dac_write_address [get_registers -nowarn {
 }]
 post_message "AT SDC DAC minimum route: [get_collection_size $at_dac_write_index] sources, [get_collection_size $at_dac_write_address] endpoints"
 if {[get_collection_size $at_dac_write_index] && [get_collection_size $at_dac_write_address]} {
-    set_min_delay -from $at_dac_write_index -to $at_dac_write_address 0.700
+    set_min_delay -from $at_dac_write_index -to $at_dac_write_address 0.500
 } elseif {[get_collection_size $at_dac_write_index]} {
     error "AT SDC DAC write-address endpoint collection is empty"
 }

@@ -5701,6 +5701,352 @@
       ]
     },
     {
+      "signal": "immediate_fetch",
+      "guard": "allowed && immediate_operation && !register_pending_q &&\n                             (!immediate_rm || decode_modrm_valid)",
+      "original_statement": "    assign immediate_fetch = allowed && immediate_operation && !register_pending_q &&\n                             (!immediate_rm || decode_modrm_valid);",
+      "replacement_statement": "    assign immediate_fetch = implementation_allowed && immediate_operation && !register_pending_q &&\n                             (!immediate_rm || decode_modrm_valid);",
+      "original_model": [
+        "and",
+        [
+          [
+            "permission",
+            "allowed"
+          ],
+          [
+            "rep_zero",
+            "immediate_operation"
+          ],
+          [
+            "not",
+            [
+              "context",
+              "register_pending_q"
+            ]
+          ],
+          [
+            "or",
+            [
+              [
+                "not",
+                [
+                  "context",
+                  "immediate_rm"
+                ]
+              ],
+              [
+                "context",
+                "decode_modrm_valid"
+              ]
+            ]
+          ]
+        ]
+      ],
+      "replacement_model": [
+        "and",
+        [
+          [
+            "permission",
+            "implementation_allowed"
+          ],
+          [
+            "rep_zero",
+            "immediate_operation"
+          ],
+          [
+            "not",
+            [
+              "context",
+              "register_pending_q"
+            ]
+          ],
+          [
+            "or",
+            [
+              [
+                "not",
+                [
+                  "context",
+                  "immediate_rm"
+                ]
+              ],
+              [
+                "context",
+                "decode_modrm_valid"
+              ]
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "signal": "register_capture",
+      "guard": "allowed && register_decode && !decode_modrm_valid &&\n                              decode_byte_ready && byte_valid && byte_data[7:6] == 2'b11",
+      "original_statement": "    assign register_capture = allowed && register_decode && !decode_modrm_valid &&\n                              decode_byte_ready && byte_valid && byte_data[7:6] == 2'b11;",
+      "replacement_statement": "    assign register_capture = implementation_allowed && register_decode && !decode_modrm_valid &&\n                              decode_byte_ready && byte_valid && byte_data[7:6] == 2'b11;",
+      "original_model": [
+        "and",
+        [
+          [
+            "permission",
+            "allowed"
+          ],
+          [
+            "rep_zero",
+            "register_decode"
+          ],
+          [
+            "not",
+            [
+              "context",
+              "decode_modrm_valid"
+            ]
+          ],
+          [
+            "context",
+            "decode_byte_ready"
+          ],
+          [
+            "context",
+            "byte_valid"
+          ],
+          [
+            "context",
+            "byte_data[7:6] == 2'b11"
+          ]
+        ]
+      ],
+      "replacement_model": [
+        "and",
+        [
+          [
+            "permission",
+            "implementation_allowed"
+          ],
+          [
+            "rep_zero",
+            "register_decode"
+          ],
+          [
+            "not",
+            [
+              "context",
+              "decode_modrm_valid"
+            ]
+          ],
+          [
+            "context",
+            "decode_byte_ready"
+          ],
+          [
+            "context",
+            "byte_valid"
+          ],
+          [
+            "context",
+            "byte_data[7:6] == 2'b11"
+          ]
+        ]
+      ]
+    },
+    {
+      "signal": "direct_register_capture",
+      "guard": "allowed && unary_direct && !register_pending_q",
+      "original_statement": "    assign direct_register_capture = allowed && unary_direct && !register_pending_q;",
+      "replacement_statement": "    assign direct_register_capture = implementation_allowed && unary_direct && !register_pending_q;",
+      "original_model": [
+        "and",
+        [
+          [
+            "permission",
+            "allowed"
+          ],
+          [
+            "rep_zero",
+            "unary_direct"
+          ],
+          [
+            "not",
+            [
+              "context",
+              "register_pending_q"
+            ]
+          ]
+        ]
+      ],
+      "replacement_model": [
+        "and",
+        [
+          [
+            "permission",
+            "implementation_allowed"
+          ],
+          [
+            "rep_zero",
+            "unary_direct"
+          ],
+          [
+            "not",
+            [
+              "context",
+              "register_pending_q"
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "signal": "register_complete",
+      "guard": "allowed && register_pending_q &&\n                               ((register_decode && operand_register_direct && decode_done) ||\n                                (immediate_operation && immediate_register) || unary_direct)",
+      "original_statement": "    assign register_complete = allowed && register_pending_q &&\n                               ((register_decode && operand_register_direct && decode_done) ||\n                                (immediate_operation && immediate_register) || unary_direct);",
+      "replacement_statement": "    assign register_complete = implementation_allowed && register_pending_q &&\n                               ((register_decode && operand_register_direct && decode_done) ||\n                                (immediate_operation && immediate_register) || unary_direct);",
+      "original_model": [
+        "and",
+        [
+          [
+            "permission",
+            "allowed"
+          ],
+          [
+            "context",
+            "register_pending_q"
+          ],
+          [
+            "or",
+            [
+              [
+                "and",
+                [
+                  [
+                    "rep_zero",
+                    "register_decode"
+                  ],
+                  [
+                    "context",
+                    "operand_register_direct"
+                  ],
+                  [
+                    "context",
+                    "decode_done"
+                  ]
+                ]
+              ],
+              [
+                "and",
+                [
+                  [
+                    "rep_zero",
+                    "immediate_operation"
+                  ],
+                  [
+                    "or",
+                    [
+                      [
+                        "not",
+                        [
+                          "context",
+                          "immediate_rm"
+                        ]
+                      ],
+                      [
+                        "and",
+                        [
+                          [
+                            "context",
+                            "decode_modrm_valid"
+                          ],
+                          [
+                            "context",
+                            "operand_register_direct"
+                          ]
+                        ]
+                      ]
+                    ]
+                  ]
+                ]
+              ],
+              [
+                "rep_zero",
+                "unary_direct"
+              ]
+            ]
+          ]
+        ]
+      ],
+      "replacement_model": [
+        "and",
+        [
+          [
+            "permission",
+            "implementation_allowed"
+          ],
+          [
+            "context",
+            "register_pending_q"
+          ],
+          [
+            "or",
+            [
+              [
+                "and",
+                [
+                  [
+                    "rep_zero",
+                    "register_decode"
+                  ],
+                  [
+                    "context",
+                    "operand_register_direct"
+                  ],
+                  [
+                    "context",
+                    "decode_done"
+                  ]
+                ]
+              ],
+              [
+                "and",
+                [
+                  [
+                    "rep_zero",
+                    "immediate_operation"
+                  ],
+                  [
+                    "or",
+                    [
+                      [
+                        "not",
+                        [
+                          "context",
+                          "immediate_rm"
+                        ]
+                      ],
+                      [
+                        "and",
+                        [
+                          [
+                            "context",
+                            "decode_modrm_valid"
+                          ],
+                          [
+                            "context",
+                            "operand_register_direct"
+                          ]
+                        ]
+                      ]
+                    ]
+                  ]
+                ]
+              ],
+              [
+                "rep_zero",
+                "unary_direct"
+              ]
+            ]
+          ]
+        ]
+      ]
+    },
+    {
       "signal": "fetch_word",
       "guard": "allowed && (operation == spk286_microcode_pkg::MC_FETCH_IMM16 || fetch_tmp1)",
       "original_statement": "    assign fetch_word = allowed && (operation == spk286_microcode_pkg::MC_FETCH_IMM16 || fetch_tmp1);",
@@ -5918,6 +6264,82 @@
                 "compare",
                 "==",
                 53
+              ]
+            ]
+          ]
+        ]
+      ]
+    },
+    {
+      "signal": "decode_operand",
+      "guard": "allowed && (operation == spk286_microcode_pkg::MC_DECODE_MODRM ||\n                                        (register_decode && !unary_direct))",
+      "original_statement": "    assign decode_operand = allowed && (operation == spk286_microcode_pkg::MC_DECODE_MODRM ||\n                                        (register_decode && !unary_direct));",
+      "replacement_statement": "    assign decode_operand = implementation_allowed && (operation == spk286_microcode_pkg::MC_DECODE_MODRM ||\n                                        (register_decode && !unary_direct));",
+      "original_model": [
+        "and",
+        [
+          [
+            "permission",
+            "allowed"
+          ],
+          [
+            "or",
+            [
+              [
+                "compare",
+                "==",
+                4
+              ],
+              [
+                "and",
+                [
+                  [
+                    "rep_zero",
+                    "register_decode"
+                  ],
+                  [
+                    "not",
+                    [
+                      "rep_zero",
+                      "unary_direct"
+                    ]
+                  ]
+                ]
+              ]
+            ]
+          ]
+        ]
+      ],
+      "replacement_model": [
+        "and",
+        [
+          [
+            "permission",
+            "implementation_allowed"
+          ],
+          [
+            "or",
+            [
+              [
+                "compare",
+                "==",
+                4
+              ],
+              [
+                "and",
+                [
+                  [
+                    "rep_zero",
+                    "register_decode"
+                  ],
+                  [
+                    "not",
+                    [
+                      "rep_zero",
+                      "unary_direct"
+                    ]
+                  ]
+                ]
               ]
             ]
           ]
@@ -6164,5 +6586,13 @@
         ]
       ]
     }
-  ]
+  ],
+  "procedural_rep_zero": {
+    "atoms": [
+      "immediate_operation",
+      "register_decode",
+      "unary_direct"
+    ],
+    "table_sha256": "16b7a8c0052cb112479673a13ef21a16a5294da34eb2a6689cbaaea2a06a244d"
+  }
 }

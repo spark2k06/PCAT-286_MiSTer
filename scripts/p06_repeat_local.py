@@ -6,6 +6,22 @@ arbitrary. All state-only
 qualifiers, subservice enables and REP strobes retain the original permission.
 """
 import re
+import hashlib
+
+
+REP_ZERO_ATOMS = ('immediate_operation', 'register_decode', 'unary_direct')
+# Actual procedural table fragments; formally proved with their original
+# SystemVerilog before qualification. Changes require a new audited contract.
+REP_DECODER_SHA256 = '16b7a8c0052cb112479673a13ef21a16a5294da34eb2a6689cbaaea2a06a244d'
+
+
+def rep_decoder_fragments(source):
+    immediate = source[source.index('    always_comb begin\n        immediate_operation'):
+                       source.index('    // ModR/M and all displacement bytes')]
+    registers = source[source.index('    always_comb begin\n        register_decode'):
+                       source.index('    assign register_a_index')]
+    assert hashlib.sha256((immediate + registers).encode()).hexdigest() == REP_DECODER_SHA256
+    return immediate + registers
 
 
 def split_top(text, operator):
@@ -92,6 +108,8 @@ def boolean_expression(text, aliases, constants, seen=()):
         return ('not', boolean_expression(text[1:], aliases, constants, seen))
     if text in ('allowed', 'implementation_allowed'):
         return ('permission', text)
+    if text in REP_ZERO_ATOMS:
+        return ('rep_zero', text)
     match = re.fullmatch(r'operation\s*(==|!=|<=|>=|<|>)\s*spk286_microcode_pkg::(MC_\w+)', text)
     if match and match[2] in constants:
         return ('compare', match[1], constants[match[2]])
@@ -108,6 +126,8 @@ def possibilities(tree, operation):
     kind = tree[0]
     if kind in ('permission', 'context'):
         return True, True
+    if kind == 'rep_zero':
+        return (False, True) if operation in (121, 128) else (True, True)
     if kind in ('compare', 'constant'):
         value = evaluate(tree, operation) if kind == 'compare' else tree[1]
         return value, not value
@@ -124,6 +144,8 @@ def generate(source, package):
     constants = {name: int(value) for name, value in re.findall(
         r'localparam\s+logic\s+\[MC_WORD_WIDTH-1:0\]\s+(MC_\w+)\s*=\s*8\'d(\d+);', package)}
     repeat_words = [constants[name] for name in ('MC_BRANCH_REPEAT_EMPTY', 'MC_BRANCH_REPEAT_CONTINUE')]
+    assert repeat_words == [121, 128]
+    rep_decoder_fragments(source)
     pattern = re.compile(r'^    assign (\w+)\s*=\s*(.*?);', re.M | re.S)
     assignments = list(pattern.finditer(source))
     aliases = {m[1]: m[2] for m in assignments}
@@ -155,7 +177,7 @@ def generate(source, package):
 
     result = pattern.sub(rewrite, source)
     assert len(changes) >= 50, 'Unexpectedly few opcode-local strobes'
-    assert not any(c['signal'] in ('string_empty', 'string_continue', 'register_complete', 'allowed') for c in changes)
+    assert not any(c['signal'] in ('string_empty', 'string_continue', 'allowed') for c in changes)
     assert result.count('module spk286_micro_executor #(') == 1
     result = result.replace('module spk286_micro_executor #(', 'module spk286_profiled_micro_executor #(', 1)
     assert result.count('    input  logic operation_valid,') == 1
@@ -167,4 +189,5 @@ def generate(source, package):
     assert result.count(allowed) == 1
     result = result.replace(allowed, allowed + '\n    logic implementation_allowed;\n' + local_allowed, 1)
     return result, {'repeat_words': repeat_words, 'constants': constants,
-                    'pure_aliases': pure_aliases, 'changes': changes}
+                    'pure_aliases': pure_aliases, 'changes': changes,
+                    'procedural_rep_zero': {'atoms': REP_ZERO_ATOMS, 'table_sha256': REP_DECODER_SHA256}}

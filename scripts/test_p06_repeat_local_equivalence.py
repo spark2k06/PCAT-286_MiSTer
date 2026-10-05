@@ -7,7 +7,7 @@ from pathlib import Path
 import subprocess
 
 from build_p06_profile_cpu import CONNECTION, build
-from p06_repeat_local import generate
+from p06_repeat_local import generate, rep_decoder_fragments, REP_ZERO_ATOMS
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -55,7 +55,7 @@ def main():
         recovered = recovered.replace(change['replacement_statement'], change['original_statement'], 1)
     assert recovered == source
     assert clone.count('.enable(operation_valid)') == source.count('.enable(operation_valid)') == 3
-    assert source.count('assign register_complete = allowed') == clone.count('assign register_complete = allowed') == 1
+    assert source.count('assign register_complete = allowed') == clone.count('assign register_complete = implementation_allowed') == 1
     words = contract['repeat_words']
     constants = '\n'.join(line.replace('spk286_microcode_pkg::', '') for line in pkg_path.read_text().splitlines() if 'localparam' in line)
     actual = CONNECTION[CONNECTION.index('    assign profile_repeat_more'):CONNECTION.index('    assign operation_valid')]
@@ -73,6 +73,18 @@ def main():
 endmodule
 '''
     prove(out, 'actual-permission', permission)
+    decoder = '''module miter(input [7:0] operation);
+    logic immediate_operation, immediate_alu, immediate_byte, immediate_rm, immediate_word, immediate_signed;
+    logic register_decode, register_alu, register_byte, register_destination_rm, unary_register, unary_direct;
+''' + constants + '\n' + rep_decoder_fragments(source).replace('spk286_microcode_pkg::', '') + '''
+    always @* if(operation==MC_BRANCH_REPEAT_EMPTY || operation==MC_BRANCH_REPEAT_CONTINUE)
+        assert(!immediate_operation && !register_decode && !unary_direct);
+endmodule
+'''
+    prove(out, 'actual-procedural-decoder', decoder)
+    unsafe_decoder = decoder.replace("default: immediate_operation = 1'b0;", "default: immediate_operation = 1'b1;")
+    assert unsafe_decoder != decoder
+    prove(out, 'unsafe-procedural-default', unsafe_decoder, reject=True)
     atoms = {}
 
     def emit(tree):
@@ -83,10 +95,14 @@ endmodule
             return f"(operation {tree[1]} 8'd{tree[2]})"
         if kind == 'constant':
             return "1'b1" if tree[1] else "1'b0"
-        if kind == 'context':
+        if kind in ('context', 'rep_zero'):
             if tree[1] not in atoms:
                 atoms[tree[1]] = len(atoms)
-            return f'context_bits[{atoms[tree[1]]}]'
+            atom = f'context_bits[{atoms[tree[1]]}]'
+            if kind == 'rep_zero':
+                assert tree[1] in REP_ZERO_ATOMS
+                return f"({atom} && operation != 8'd{words[0]} && operation != 8'd{words[1]})"
+            return atom
         if kind == 'not':
             return '!(' + emit(tree[1]) + ')'
         token = ' && ' if kind == 'and' else ' || '
@@ -111,12 +127,13 @@ endmodule
     (out / 'context-atoms.json').write_text(json.dumps(atoms, indent=2) + '\n', newline='\n')
     inputs = [Path(__file__), ROOT/'scripts/p06_repeat_local.py', ROOT/'scripts/build_p06_profile_cpu.py', raw_path, pkg_path]
     receipt = {'status': 'REPEAT_LOCAL_STROBES_EQUIVALENCE_PASS', 'changed_strobes': len(contract['changes']),
-               'scope': 'Actual permit formula proves raw/legacy equality outside two REP words; every changed strobe proved equal with independently arbitrary context atoms and arbitrary retained state predicates; source delta audited byte for byte',
-               'negative_control': 'Unsafe global bypass rejected with counterexample',
-               'unchanged': 'All state update expressions, REP strobes, state-only register completion and three subservice enables',
+               'scope': 'Actual permit formula proves raw/legacy equality outside two REP words; actual procedural decoder separately proves three guard predicates zero in REP words; every changed strobe equal for all other arbitrary context/state; source delta audited byte for byte',
+               'negative_control': 'Unsafe global bypass and incorrect procedural default rejected with counterexamples',
+               'unchanged': 'All state update expressions, REP strobes and three subservice enables',
                'sources_sha256': {p.relative_to(ROOT).as_posix(): sha(p) for p in inputs},
                'generated_sha256': {name: sha(path) for name,path in selected.items()},
                'context_atom_count': len(atoms), 'no_lifecycle_assumptions': True,
+               'procedural_rep_zero': contract['procedural_rep_zero'],
                'contract_sha256': sha(out/'generated/repeat-local-contract.json'),
                'artifacts_sha256': {p.name: sha(p) for p in out.iterdir() if p.is_file()}}
     (out/'receipt.json').write_text(json.dumps(receipt, indent=2)+'\n', newline='\n')

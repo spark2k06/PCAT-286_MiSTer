@@ -62,3 +62,32 @@ all four corners for global/CPU setup and hold, recovery/removal, SDRAM,
 actual physical ALMs and registers. Verify original-SDC hold independently
 on the same completed fitted netlist. No physical timing or ALM improvement
 is claimed until those measurements finish.
+
+## Procedural decoder extension
+
+The actual immediate/register procedural tables additionally prove
+`immediate_operation`, `register_decode` and `unary_direct` false at both
+REP words. The table fragments are pinned by SHA256 and compiled unchanged
+into a separate formal miter. An incorrect default immediate flag is rejected
+with a counterexample. No lifecycle or reachable-state assumption is needed.
+
+This extends localization to five more strobes: immediate fetch, register
+capture, direct register capture, register completion and operand decoding.
+There are now 133 independently proved equal strobes. Register completion
+is qualified through its actual opcode-derived predicates; its expression's
+remaining conditions and all sequential updates stay unchanged.
+
+Strict lint, both scheduler/prefix oracles, all eight full-CPU handoff profiles
+and all three affected lifecycle fixtures pass in both simulators. The entire
+17-entry handoff results and 51-entry lifecycle results match the preceding
+128-strobe candidate exactly, including clocks and complete stream identities.
+The [extension packet](../evidence/p06-repeat-decoder-20261005/manifest.json)
+was read back byte for byte before deleting 842,636,070 logical bytes of owned
+simulator temporaries. Full regression remains **USER_DEFERRED**; no physical
+timing result or hardware validation is claimed for this extension yet.
+
+The intermediate 128-strobe fit was stopped and its owned Docker container
+terminated. The user requested main-menu speed selection and safe live profile
+changes before further timing adjustment. Those functional changes will be
+verified before resuming the consolidated physical fit; the best completed
+setup result remains the event-selection fit at -6.989 ns.

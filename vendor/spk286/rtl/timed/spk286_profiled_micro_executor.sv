@@ -1421,7 +1421,7 @@ module spk286_profiled_micro_executor #(parameter bit USE_PARALLEL_SYSTEM_LIMIT 
     // ModR/M and all displacement bytes have already completed before these
     // controls. Never consume the next opcode while a register commit is pending.
     assign immediate_register = !immediate_rm || (decode_modrm_valid && operand_register_direct);
-    assign immediate_fetch = allowed && immediate_operation && !register_pending_q &&
+    assign immediate_fetch = implementation_allowed && immediate_operation && !register_pending_q &&
                              (!immediate_rm || decode_modrm_valid);
     assign immediate_last = immediate_fetch && byte_valid && (!immediate_word || high_byte_q);
     assign immediate_capture = immediate_last && immediate_register;
@@ -1474,10 +1474,10 @@ module spk286_profiled_micro_executor #(parameter bit USE_PARALLEL_SYSTEM_LIMIT 
         {8'd0, register_state[register_b_index[1:0]*16 + (register_b_index[2] ? 8 : 0) +: 8]} :
         register_state[register_b_index*16 +: 16];
     // Only the accepted ModR/M may capture operands, never displacement bytes.
-    assign register_capture = allowed && register_decode && !decode_modrm_valid &&
+    assign register_capture = implementation_allowed && register_decode && !decode_modrm_valid &&
                               decode_byte_ready && byte_valid && byte_data[7:6] == 2'b11;
-    assign direct_register_capture = allowed && unary_direct && !register_pending_q;
-    assign register_complete = allowed && register_pending_q &&
+    assign direct_register_capture = implementation_allowed && unary_direct && !register_pending_q;
+    assign register_complete = implementation_allowed && register_pending_q &&
                                ((register_decode && operand_register_direct && decode_done) ||
                                 (immediate_operation && immediate_register) || unary_direct);
     assign register_write = register_complete && (!register_alu || result_write_allowed);
@@ -1503,7 +1503,7 @@ module spk286_profiled_micro_executor #(parameter bit USE_PARALLEL_SYSTEM_LIMIT 
     assign fetch_signed_byte = implementation_allowed && (operation == spk286_microcode_pkg::MC_FETCH_IMM8S_TMP1 || operation == spk286_microcode_pkg::MC_FETCH_IMM8S_TMP0);
     assign move_word = implementation_allowed && (operation == spk286_microcode_pkg::MC_MOVE || operation == spk286_microcode_pkg::MC_MOVE8) && temporary_valid_q[0];
     assign read_destination = implementation_allowed && (operation == spk286_microcode_pkg::MC_READ_DST16 || operation == spk286_microcode_pkg::MC_READ_DST8);
-    assign decode_operand = allowed && (operation == spk286_microcode_pkg::MC_DECODE_MODRM ||
+    assign decode_operand = implementation_allowed && (operation == spk286_microcode_pkg::MC_DECODE_MODRM ||
                                         (register_decode && !unary_direct));
     assign read_tmp1 = string_read1 || operation == spk286_microcode_pkg::MC_READ_REG16_TMP1 || operation == spk286_microcode_pkg::MC_READ_RM16_TMP1 || operation == spk286_microcode_pkg::MC_READ_REG8_TMP1 || operation == spk286_microcode_pkg::MC_READ_RM8_TMP1;
     assign result_operation = operation == spk286_microcode_pkg::MC_WRITE_RESULT_REG8 || operation == spk286_microcode_pkg::MC_WRITE_RESULT_RM8 || operation == spk286_microcode_pkg::MC_WRITE_RESULT_REG16 || operation == spk286_microcode_pkg::MC_WRITE_RESULT_RM16 ||

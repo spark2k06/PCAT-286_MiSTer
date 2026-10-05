@@ -1,7 +1,9 @@
 # P06 — Fused deadline arithmetic, idle memory payload and palette hold
 
 Status: **FORMAL_AND_DIRECTED_PASS; FIT_COMPLETE_TIMING_OPEN**.
-Full regression remains **USER_DEFERRED**. No hardware result is claimed.
+Full regression is **AUTHORIZED_AFTER_TIMING_CLOSURE_NOT_RUN** following the
+user's latest instruction. Earlier sealed receipts retain their then-current
+**USER_DEFERRED** disposition. No hardware result is claimed.
 
 ## Starting point
 
@@ -259,3 +261,42 @@ but generic mapped comparator depth increases from 9 to 12 despite two fewer
 gates. It is not applied; production selector RTL remains unchanged.
 [The rejected experiment](../evidence/p06-selector-entry-bound-proof-20261005/mapping-comparison.json)
 is preserved to avoid repeating it. Generic depths are not Cyclone V timing.
+
+### Applied CPU null-segment commit specialization
+
+The hot seed-2 path crosses descriptor selection/pre-fault qualification to
+SP. One assignment now specializes the protected DS/ES null-selector commit:
+`!descriptor_active_q && segment_reload_operation && tmp0_q[15:2] == 14'd0 && segment_index != 2'd2`.
+The existing reload qualifier retains permission, opcode, PE and temporary
+validity. Null fixes TI/index to zero, so the general address-carry and table
+limit checks are redundant for this commit. General descriptor outputs and
+pre-fault consumers remain intact; SS and descriptor-active guards are explicit.
+No register, cycle, microcode word, clock or architectural result changes.
+
+The portable source is committed in SPK286 at `3001de76db5e47612274b3d9473e524dba1654a3`
+and the complete vendor mirror is synchronized to that revision. The PCAT
+generator adds only the named new raw-source hash, preserving the historical
+pilot. Regeneration leaves top/events byte-identical; the timed executor has
+only the same single assignment changed. The repeat-local contract is unchanged.
+
+The installed raw and timed qualifier/selector cones prove all ten observable
+outputs for every binary input and arbitrary retained state, with no protocol
+or reachable-state assumptions. Four faulty guard/slice/opcode variants per
+source are rejected. Independent review binds the exact seed-2 fitted path.
+Generic mapping changes 485 to 446 gates; permission-to-result depth falls
+35 to 6. These figures do not predict Cyclone V ALMs or final slack.
+
+Strict actual-upstream executor lint and full PCAT profiled-CPU lint pass.
+Protected-foundation and segment-lifecycle pass both simulators; lifecycle
+checks 42 cases / 3,677 assertions per simulator. The existing directed
+expand-down bank, including DS/ES null acceptance and SS fault/no-write,
+passes Icarus. Its costly Verilator frontend is stopped with its evidence
+retained; that result and the longer matrix are not represented as PASS.
+Scheduler and full-top prefix oracles also pass both simulators. No test
+expectation is changed.
+
+[Source-bound applied proof, review and directed evidence](../evidence/p06-null-segment-specialization-20261005/receipt.json)
+is sealed before compiler/simulation temporaries are removed. The next frozen
+all-features fit uses these two applied logic changes and seed 2. Physical
+closure is still pending; complete regression starts after positive setup
+and hold at all four corners, against the selected candidate.

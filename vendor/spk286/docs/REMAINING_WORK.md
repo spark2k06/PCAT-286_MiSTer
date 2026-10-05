@@ -132,7 +132,16 @@ to extend it without weakening state comparisons or counted omissions.
 
 ## 4. Validation, standalone packaging and release closure
 
-- **Current complete regression: P1, USER_DEFERRED.** At the next authorized broader
+
+- **Current standalone profile selection refresh: P1.** The generator pins
+  predate the accepted instruction-length and encoding-metadata source
+  updates and the equivalent null-segment specialization. Preserve the
+  historical baseline and READY-chain contracts; publish an explicitly
+  verified current selection, regenerate deterministically and rerun its
+  focused standalone gates. PCAT uses its own current generator/overlay.
+  See [the source-bound CPU change](NULL_SEGMENT_COMMIT_SPECIALIZATION_20261005.md).
+
+- **Current complete regression: P1, AUTHORIZED_AFTER_TIMING_CLOSURE.** After the consumer candidate closes physical timing, run the authorized broader
   checkpoint, run the appropriate current standalone regression with immutable
   inputs, generated microcode/profile consistency, lint, affected banks and
   physical corpus admission. Include MAX versus the accepted original-engine

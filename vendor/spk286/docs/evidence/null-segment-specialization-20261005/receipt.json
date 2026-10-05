@@ -1,0 +1,133 @@
+{
+  "status": "NULL_SEGMENT_COMMIT_SPECIALIZATION_EQUIVALENCE_PASS",
+  "scope": "Actual selected qualifier and selector dependency cones, 10 observable outputs, all input bit patterns, no assumptions or reachable-state restrictions; no new state/cycles",
+  "cpu_root": "/mnt/d/GitHub/SPK286",
+  "embedded_project": false,
+  "timed_required": false,
+  "selected_variants": [
+    "raw"
+  ],
+  "sources_sha256": {
+    "rtl/spk286_micro_executor.sv": "325f51e6a91ae9c309786c17da8c22aa3264b3084314008b43b7cc41fd44f6db",
+    "rtl/spk286_selector.sv": "cd003eaccbb361fece41fa4fff352015d4d2e2723ed7656bfdf4457b40af4c33",
+    "microcode/generated/spk286_microcode_pkg.sv": "202236c1ec93016bfb17d8a918b61de8af805dabb4ccb55c9cc1ec54875e3e10",
+    "scripts/test_null_segment_commit_equivalence.py": "3ed2c59221654b7a802e9e89f4027ab9942b9f2aec49e624d09d4184fccee24e"
+  },
+  "original_assignment": "    assign descriptor_segment_null_commit = descriptor_begin && segment_reload_operation &&\n                                           descriptor_selector_null && !descriptor_pre_fault && segment_index != 2'd2;",
+  "replacement_assignment": "    assign descriptor_segment_null_commit = !descriptor_active_q && segment_reload_operation &&\n                                           tmp0_q[15:2] == 14'd0 && segment_index != 2'd2;",
+  "results": {
+    "raw": {
+      "candidate_installed": true,
+      "reconstructed_reference_sha256": "df68b9fe22d0ce01837b587f0cb187f4c01a23d23f37dada9b562b4ccb24a1bc",
+      "nodes": [
+        "call_gate_cs_validation_operation",
+        "call_gate_validation_operation",
+        "call_ss_validation_operation",
+        "cs_validation_operation",
+        "descriptor_begin",
+        "descriptor_inspect_operation",
+        "descriptor_load_access",
+        "descriptor_load_ldtr",
+        "descriptor_load_limit",
+        "descriptor_load_operation",
+        "descriptor_load_tr",
+        "descriptor_pre_fault",
+        "descriptor_segment_null_commit",
+        "descriptor_selector_value",
+        "descriptor_table_base",
+        "descriptor_table_limit",
+        "descriptor_verify_operation",
+        "descriptor_verify_read",
+        "descriptor_verify_write",
+        "iret_cs_validation_operation",
+        "iret_ss_validation_operation",
+        "jmp_gate_cs_validation_operation",
+        "segment_reload_operation",
+        "system_verify_read",
+        "system_verify_write"
+      ],
+      "arbitrary_inputs": [
+        "allowed",
+        "call_gate_candidate_valid_q",
+        "call_stack_ready_q",
+        "call_stack_ss_q",
+        "descriptor_active_q",
+        "event_gate_candidate_valid_q",
+        "iret_outer_ready_q",
+        "iret_outer_ss_q",
+        "operation",
+        "protected_gdtr_base",
+        "protected_gdtr_limit",
+        "protected_ldtr_base",
+        "protected_ldtr_limit",
+        "protected_ldtr_present",
+        "protected_ldtr_valid",
+        "protected_msw",
+        "segment_index",
+        "task_gate_target_active_q",
+        "task_gate_target_selector_q",
+        "temporary_valid_q",
+        "tmp0_q",
+        "tmp1_q"
+      ],
+      "asserted_outputs": [
+        "descriptor_segment_null_commit",
+        "descriptor_unused_index",
+        "descriptor_selector_ti",
+        "descriptor_unused_rpl",
+        "descriptor_selector_null",
+        "descriptor_unused_end",
+        "descriptor_selector_limit_valid",
+        "descriptor_unused_selector_valid",
+        "descriptor_selector_address",
+        "descriptor_selector_carry"
+      ],
+      "generic_mapping": {
+        "reference": {
+          "gates": 485,
+          "target_depth": 37,
+          "target_depth_from_permission": 35
+        },
+        "candidate": {
+          "gates": 446,
+          "target_depth": 9,
+          "target_depth_from_permission": 6
+        }
+      },
+      "negative_controls": [
+        "missing-ss-null-guard",
+        "wrong-null-selector-slice",
+        "broken-operation-qualifier",
+        "missing-descriptor-active-guard"
+      ]
+    }
+  },
+  "generic_mapping_scope": "Yosys synth/ABC gates and unit gate depths; not Cyclone V placed timing/resource prediction",
+  "artifacts_sha256": {
+    "raw-actual.log": "de8ef7a690a52b6dd0182f2717f7c7c3f0944fedc17b03714adeae3161569265",
+    "raw-actual.sv": "74c0af3b12515543e338a2f1965baf4d44a710615b6c4e621790abe58cfdd288",
+    "raw-actual.ys": "cf244adcff9d43d6ae2f8d2e4ecc1b7164f6206ace67aaa5b5f87baea93ee20a",
+    "raw-broken-operation-qualifier.log": "b9d8a57dcc6a218c218c3008019df7b3752134fc1b714aa2b6cfcb9897739028",
+    "raw-broken-operation-qualifier.sv": "1e325f2933b918aa1f82e73e7bc379e5247def064c4a7b2f577e72693d28609a",
+    "raw-broken-operation-qualifier.ys": "69ac4a6931a359145b0ee96db6a14e9655229ea78647a3483b97b9abc3f1c79e",
+    "raw-candidate-cone.sv": "9c13d1d04f36a10161f146b8607316a1864cc9c82112ee139d54b7efae6730f3",
+    "raw-candidate-mapped.json": "94a3b90025aa5bd3ab61eafebd01e0361af4fa144e33696d2fd406ef238a60e6",
+    "raw-candidate-synth.log": "260cb2f549f75873d37989fed7b9d91b95445c8b88cdeb0f34b27dd53415e4b2",
+    "raw-candidate-synth.ys": "2fc84016288d2152fd624a60da0465aaccf097b8c84a7c9e52465ff188680cdc",
+    "raw-missing-descriptor-active-guard.log": "bbf0ac5cfb52c766542315148e229e5119029404305ee837c01f8c0268110a27",
+    "raw-missing-descriptor-active-guard.sv": "e9001b220cb67e97b9260d467d8723c5b114ec3bc0cf12151943725da6443597",
+    "raw-missing-descriptor-active-guard.ys": "8374d699d5b82953ab4780b1157902bb00d5ca4f2c0149a4aa3642d2d9975304",
+    "raw-missing-ss-null-guard.log": "45031a3418bd4e7b58b82ba7a352eb71323106506a128b0a4ea4eff756d93181",
+    "raw-missing-ss-null-guard.sv": "29cda3ee75b7ef690eb269713aaeeee931580edbbbaacb86a74fef23112849db",
+    "raw-missing-ss-null-guard.ys": "8281cb8349f9ee4d38c0ffeea8f8a84152af66a358c4dd362049853a2617cc26",
+    "raw-reference-cone.sv": "956bb79f74881e0aeefb4f7801994273b3ce9d789ad16c4b1e1896f474cf3338",
+    "raw-reference-mapped.json": "5aee3a63968f7528b03e84428e2d531018d7ea08884326ec1fa72227f591bfcf",
+    "raw-reference-synth.log": "cdc52450aae0711bc9621737816575bb7686f96a1f060e1403426dc60f25bf07",
+    "raw-reference-synth.ys": "71f01e24bd159362862550e6be9238440082cb61e005dd48e912abce20a464e0",
+    "raw-wrong-null-selector-slice.log": "8b5e975973946277d2e785995e096aef6828432f3ae9fec6c0fbcd2269d5a0c7",
+    "raw-wrong-null-selector-slice.sv": "238f797cb62ea9db90d74d06400dfb3782b26a4f33d251faf207658ffe458be1",
+    "raw-wrong-null-selector-slice.ys": "07db823c841dc63ef4dfffcf8ae34e13a68acbff14acdc8758f7007e6bf978a1",
+    "selector.sv": "cd003eaccbb361fece41fa4fff352015d4d2e2723ed7656bfdf4457b40af4c33",
+    "spk286_micro_executor.sv.candidate": "325f51e6a91ae9c309786c17da8c22aa3264b3084314008b43b7cc41fd44f6db"
+  }
+}

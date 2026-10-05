@@ -658,8 +658,8 @@ module spk286_micro_executor #(parameter bit USE_PARALLEL_SYSTEM_LIMIT = 1'b0) (
                                         (descriptor_selector_null || descriptor_selector_carry ||
                                          !descriptor_selector_limit_valid ||
                                          (descriptor_selector_ti && (!protected_ldtr_valid || !protected_ldtr_present)));
-    assign descriptor_segment_null_commit = descriptor_begin && segment_reload_operation &&
-                                           descriptor_selector_null && !descriptor_pre_fault && segment_index != 2'd2;
+    assign descriptor_segment_null_commit = !descriptor_active_q && segment_reload_operation &&
+                                           tmp0_q[15:2] == 14'd0 && segment_index != 2'd2;
     assign descriptor_read_begin = descriptor_begin && !descriptor_pre_fault && !system_privilege_fault && !descriptor_verify_negative && !descriptor_inspect_negative &&
                                    !descriptor_segment_null_commit && !descriptor_selector_null;
     // Only the reserved-form check uses word 3. Reduce both possible words

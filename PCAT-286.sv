@@ -83,6 +83,8 @@ module emu_at
         "S3,VHD,IDE 0-1;",
         "OLM,2nd SD card,Disable,IDE 0-0,IDE 0-1;",
         "-;",
+        "O[77:75],CPU Speed,MAX,6 MHz,8 MHz,10 MHz,12.5 MHz,16 MHz,20 MHz,25 MHz;",
+        "-;",
         "P1,System & BIOS;",
         "P1-;",
 `ifdef SPK286_AT_BOOT_SPLASH
@@ -116,7 +118,6 @@ module emu_at
         "P3,Hardware;",
         "P3-;",
         "P3O[74:72],Installed RAM,4MB,8MB,16MB,1MB,2MB;",
-        "P3O[77:75],CPU Speed,MAX,6 MHz,8 MHz,10 MHz,12.5 MHz,16 MHz,20 MHz,25 MHz;",
         "P3oCD,Monitor,5154/ECD,5153/CGA,5151/MDA;",
         "P3ONO,Joystick 1, Analog, Digital, Disabled;",
         "P3OPQ,Joystick 2, Analog, Digital, Disabled;",

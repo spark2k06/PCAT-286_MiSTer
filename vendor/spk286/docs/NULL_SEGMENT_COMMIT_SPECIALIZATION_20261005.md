@@ -34,8 +34,9 @@ proves its own timed executor; board logic is outside this repository.
 The generic cone maps from 485 to 446 gates and its permission-to-result
 depth falls from 35 to 6. These are generic gates, not FPGA ALMs or timing.
 
-The standalone profile generator's historical selection already predates
-the accepted top-level instruction-length and encoding-metadata updates.
-Its current source pins need a separately verified selection refresh while
-preserving the original baseline/READY-chain contracts. This is recorded in
-the remaining-work register; the PCAT generator uses its own current pins.
+The previously stale standalone selection is refreshed with the dated
+`tools/profile_cpu_selected_20261005.json`, retaining both historical
+contracts unchanged. [Applied maintenance evidence](evidence/profile-selection-refresh-20261005/manifest.json)
+records deterministic generation, installed identity, strict full-CPU lint,
+dual schedule/prefix/metadata oracles, reset/fetch checks and seven rejected
+identity mutants. CPU, timing policy and test expectations are unchanged.

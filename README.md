@@ -111,6 +111,14 @@ C:\UTIL\CTMOUSE\CTMOUSE.EXE /S14 /Y
 The repository keeps both examples as [`hdd/CONFIG.SYS`](hdd/CONFIG.SYS) and
 [`hdd/AUTOEXEC.BAT`](hdd/AUTOEXEC.BAT).
 
+## CPU speed
+
+*CPU Speed* is in the main OSD menu: MAX, 6, 8, 10, 12.5, 16, 20 and 25 MHz.
+Changes apply while the machine runs, after the current instruction and
+pending bus accesses finish. A reset is not required. MAX uses the core's
+available performance; the other profiles apply the provisional historical
+timing policy. The physical CPU, bridge and SDRAM clock stays at 50 MHz.
+
 ## Video
 
 EGA is the active video hardware model, and it is what the machine reports to

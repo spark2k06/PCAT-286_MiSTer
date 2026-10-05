@@ -22,7 +22,7 @@ frecuencia física no se fija como requisito ni se promete una puntuación final
 | P03 | [Buffer de lectura SDRAM](P03_AT_SDRAM_READ_BUFFER.md) | Memoria PCAT | Amortizar activación y precarga mediante lecturas de varias palabras |
 | P04 | [Perfilado y optimización de ejecución](P04_SPK286_EXECUTION_PROFILING.md) | Verificación y CPU | Separar costes de memoria/ejecución y elegir cambios medidos |
 | P05 | [Cierre de timing FPGA](P05_AT_FPGA_TIMING_CLOSURE.md) | Integración, CPU y constraints | Cumplir los tiempos del diseño físico a la frecuencia declarada |
-| P06 | [Perfiles de velocidad de CPU](P06_CPU_SPEED_PROFILES.md) | Política CPU e integración OSD | MAX / 6–25 MHz: [first reset-applied OSD candidate](P06_OSD_CANDIDATE_20261004.md) synthesized, directed validation passes, physical setup fails; historical intervals provisional, physical calibration and complete EU/pin timing remain open |
+| P06 | [Perfiles de velocidad de CPU](P06_CPU_SPEED_PROFILES.md) | Política CPU e integración OSD | MAX / 6–25 MHz: [main-menu selection and live changes](P06_LIVE_SPEED_20261005.md) pass directed dual-simulator checks; new fit and MiSTer validation pending; historical intervals provisional, physical setup closure and complete EU/pin timing remain open |
 | P07 | [Camino EGA byte-preservado](P07_EGA_BYTE_PRESERVING_PATH.md) | Vídeo y frontend VRAM | Reducir latencia interna sólo cuando sea seguro, sin convertir EGA en un dispositivo de 16 bits |
 
 P01–P04 corresponden a las cuatro mejoras iniciales. P03 tiene ya una primera

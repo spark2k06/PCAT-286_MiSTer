@@ -9,6 +9,8 @@ module spk286_profiled (
     input  logic         clk,
     input  logic         reset,
     input  logic         historical_enable, cpu_boundary, timing_read_wait_event,
+    input  logic         profile_change_pending,
+    output logic         profile_change_ready,
     input  logic         ready,
     input  logic [15:0]  data_in,
     input  logic         execute_enable,
@@ -421,6 +423,12 @@ module spk286_profiled (
     /* verilator lint_on UNUSEDSIGNAL */
 
     logic profile_requires_target_length;
+    // Park only between complete instruction/event contexts. Existing BIU
+    // and fetch responses continue draining on the unchanged fabric clock.
+    wire profile_change_hold = (profile_change_pending === 1'b1) &&
+        !micro_active && !context_active && !event_active && !profile_active &&
+        !raw_retired && !event_completed && !profile_target_pending;
+    assign profile_change_ready = profile_change_hold && !bus_valid && !fetch_bus_valid;
     logic profile_native_queue_valid, profile_native_queue_ready;
     logic [7:0] profile_native_queue_data;
     logic profile_target_pending, profile_target_preview_enable;
@@ -482,7 +490,9 @@ module spk286_profiled (
         .length(profile_target_length)
     );
     spk286_target_replay profile_target_replay (
-        .clk(clk), .reset(reset), .cancel(!historical_enable || stream_restart),
+        // A live transition to MAX must retain bytes already removed from
+        // the native queue. They leave through the normal consume handshake.
+        .clk(clk), .reset(reset), .cancel(stream_restart),
         .start(profile_target_preview_start),
         .capture(profile_native_queue_valid && profile_target_byte_ready),
         .capture_data(profile_native_queue_data),
@@ -750,7 +760,7 @@ module spk286_profiled (
     assign service_segment = string_request ? (string_destination ? 2'd0 : (segment_override ? override_segment : 2'd3)) : stack_request ? 2'd2 : (segment_override ? override_segment : operand_segment);
     assign implicit_lock = micro_active && !event_active && operand_context_valid && !operand_register_direct && (opcode_q == 8'h86 || opcode_q == 8'h87);
     assign service_offset = io_transfer ? 16'd0 : address_override && !stack_request && !vector_request ? address_offset : vector_request ? vector_offset : (stack_request ? stack_offset : operand_offset);
-    assign execution_allowed = execute_enable && commit_allowed && !reset && !restart && !operand_blocked && !unsupported_q &&
+    assign execution_allowed = execute_enable && !profile_change_hold && commit_allowed && !reset && !restart && !operand_blocked && !unsupported_q &&
                                !shutdown && (!halted || micro_active);
 
     // Protected-mode segment state is the architectural cache source. During
@@ -914,7 +924,7 @@ module spk286_profiled (
     assign fetch_reserved_bytes = {1'b0, queue_count} +
         (fetch_response_valid ? {3'b000, fetch_response_count} : 5'd0) +
         (fetch_bus_valid ? 5'd2 : 5'd0);
-    assign fetch_request_internal = execute_enable && !event_active && !halted && !shutdown && !unsupported_q && !microcode_fault && !operand_blocked &&
+    assign fetch_request_internal = execute_enable && !profile_change_hold && !event_active && !halted && !shutdown && !unsupported_q && !microcode_fault && !operand_blocked &&
                                     !protected_fetch_invalid && (fetch_reserved_bytes <= 5'd4);
     assign fetch_response_ready = execute_enable ? queue_fill_ready : fetch_ready;
 

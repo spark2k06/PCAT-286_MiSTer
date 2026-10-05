@@ -24,7 +24,7 @@ module spk286_target_handoff_integration_tb;
     logic held_bhe, held_write, held_lock;
 
     spk286_at_cpu_profile profile_clock (
-        .clk(clk), .reset(reset), .requested(selected_profile),
+        .clk(clk), .reset(reset), .apply(1'b0), .requested(selected_profile),
         .active(active_profile), .pending(profile_pending),
         .historical(historical_enable), .phase_enable(phase_enable),
         .phase_two(phase_two), .cpu_boundary(cpu_boundary)
@@ -32,7 +32,8 @@ module spk286_target_handoff_integration_tb;
 `ifdef HANDOFF_GOLDEN_FUNCTIONAL
     spk286 dut (.*);
 `else
-    spk286_profiled dut (.timing_read_wait_event(1'b0), .*);
+    spk286_profiled dut (.timing_read_wait_event(1'b0),
+        .profile_change_pending(1'b0), .profile_change_ready(), .*);
 `endif
 
     task automatic check(input logic condition, input string message);

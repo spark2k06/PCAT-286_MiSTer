@@ -34,7 +34,8 @@ module spk286_length_fault_boundary_tb;
 `ifdef HANDOFF_GOLDEN_FUNCTIONAL
     spk286 dut (.*);
 `else
-    spk286_profiled dut (.timing_read_wait_event(1'b0), .*);
+    spk286_profiled dut (.timing_read_wait_event(1'b0),
+        .profile_change_pending(1'b0), .profile_change_ready(), .*);
 `endif
 
     task automatic check(input logic condition, input string message);

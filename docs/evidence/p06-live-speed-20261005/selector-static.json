@@ -1,0 +1,56 @@
+{
+  "status": "PASS",
+  "scope": "reset-applied selector and rational enables only",
+  "source_sha256": {
+    "rtl/spk286_integration/spk286_at_cpu_profile.sv": "5ec8523c9c82d74184cfb8bf2e902ce7da872f27c3d1a8f6f3c8057af6f82daa",
+    "sim/spk286_integration/spk286_at_cpu_profile_tb.sv": "e8dd7b7d5e71e60b6d00c8ed91c770240d27a5f970be1761b0dfd8b9adf701f2",
+    "scripts/test_spk286_at_cpu_profile.py": "a03fcee269c0a3352c0916bbe75e0359bc6a18f5504d4c691c080314500db752"
+  },
+  "tools": {
+    "iverilog": "Icarus Verilog version 12.0 (stable) ()",
+    "verilator": "Verilator 5.020 2024-01-01 rev (Debian 5.020-1)",
+    "yosys": "Yosys 0.33 (git sha1 2584903a060)"
+  },
+  "pass": "SPK286_AT_CPU_PROFILE_PASS cases=1512 checks=2583001 reset_edges=3092",
+  "cases": 1512,
+  "coverage": {
+    "0": 8,
+    "1": 64,
+    "2": 64,
+    "3": 64,
+    "4": 800,
+    "5": 256,
+    "6": 256
+  },
+  "four_state_cases": 8,
+  "four_state_pass": "SPK286_AT_CPU_PROFILE_FOUR_STATE_PASS cases=8 unknown_encodings=4 omitted=1",
+  "negative": {
+    "wrong-12p5": {
+      "returncode": 1,
+      "marker": "profile rational boundary oracle failed"
+    },
+    "live-selection": {
+      "returncode": 1,
+      "marker": "profile reset-only selection oracle failed"
+    },
+    "reset-phase": {
+      "returncode": 1,
+      "marker": "profile rational boundary oracle failed"
+    },
+    "unknown-selection": {
+      "returncode": 1,
+      "marker": "profile omitted request normalization oracle failed"
+    }
+  },
+  "isolated_cost": {
+    "generic_cells": 118,
+    "register_bits": 10,
+    "scope": "isolated selector/generator; not FPGA ALMs or full CPU"
+  },
+  "artifacts_sha256": {
+    "iverilog-trace.csv": "699c1ac1c4fcd560650bdfc3006ea49430744883e8f2d9fd75dae0f040f14784",
+    "verilator-trace.csv": "699c1ac1c4fcd560650bdfc3006ea49430744883e8f2d9fd75dae0f040f14784",
+    "iverilog-summary.csv": "0a5cc7d756e2a85ff7b0ecfd0d9c1607c78509e3d93ab599d75024a8695b2b76",
+    "verilator-summary.csv": "0a5cc7d756e2a85ff7b0ecfd0d9c1607c78509e3d93ab599d75024a8695b2b76"
+  }
+}

@@ -1,6 +1,11 @@
 # P06 — Perfiles de CPU 6–25 MHz y MAX
 
-Status, 2026-10-04: the first general reset-applied OSD candidate is synthesized
+Status, 2026-10-05: [main-menu selection and safe live changes](P06_LIVE_SPEED_20261005.md)
+pass directed dual-simulator qualification. A new physical fit and MiSTer
+validation are pending. The dated reset-applied candidates below remain
+historical evidence; physical setup closure is still open.
+
+Previous status, 2026-10-04: the first general reset-applied OSD candidate is synthesized
 and passes directed validation; its physical setup does not close. See
 [the public candidate record](P06_OSD_CANDIDATE_20261004.md) and
 [measured fit](P06_OSD_FIT_20261004.md) for

@@ -94,6 +94,12 @@ CONNECTION = r'''
     /* verilator lint_on UNUSEDSIGNAL */
 
     logic profile_requires_target_length;
+    // Park only between complete instruction/event contexts. Existing BIU
+    // and fetch responses continue draining on the unchanged fabric clock.
+    wire profile_change_hold = (profile_change_pending === 1'b1) &&
+        !micro_active && !context_active && !event_active && !profile_active &&
+        !raw_retired && !event_completed && !profile_target_pending;
+    assign profile_change_ready = profile_change_hold && !bus_valid && !fetch_bus_valid;
     logic profile_native_queue_valid, profile_native_queue_ready;
     logic [7:0] profile_native_queue_data;
     logic profile_target_pending, profile_target_preview_enable;
@@ -155,7 +161,9 @@ CONNECTION = r'''
         .length(profile_target_length)
     );
     spk286_target_replay profile_target_replay (
-        .clk(clk), .reset(reset), .cancel(!historical_enable || stream_restart),
+        // A live transition to MAX must retain bytes already removed from
+        // the native queue. They leave through the normal consume handshake.
+        .clk(clk), .reset(reset), .cancel(stream_restart),
         .start(profile_target_preview_start),
         .capture(profile_native_queue_valid && profile_target_byte_ready),
         .capture_data(profile_native_queue_data),
@@ -418,8 +426,14 @@ def build(out):
     top = (ROOT / "vendor/spk286/rtl/spk286.sv").read_text()
     top = replace_once(top, "module spk286 (", "module spk286_profiled (")
     top = replace_once(top, "    input  logic         reset,", "    input  logic         reset,\n"
-        "    input  logic         historical_enable, cpu_boundary, timing_read_wait_event,")
+        "    input  logic         historical_enable, cpu_boundary, timing_read_wait_event,\n"
+        "    input  logic         profile_change_pending,\n"
+        "    output logic         profile_change_ready,")
     top = replace_once(top, "    // A CS reload requires", CONNECTION + "\n    // A CS reload requires")
+    top = replace_once(top, 'assign execution_allowed = execute_enable && commit_allowed',
+                       'assign execution_allowed = execute_enable && !profile_change_hold && commit_allowed')
+    top = replace_once(top, 'assign fetch_request_internal = execute_enable && !event_active',
+                       'assign fetch_request_internal = execute_enable && !profile_change_hold && !event_active')
     top = replace_once(top, "    spk286_micro_executor #(",
         "    spk286_profiled_micro_executor #(")
     top = replace_once(top,

@@ -85,9 +85,10 @@ sum of standalone module costs. The replay's 80 stored bits infer a M10K.
 | SDRAM output setup / hold | +5.002 / +0.108 ns |
 
 Setup remains open and is worse than the prior −15.190 ns baseline. The worst
-path enters the CPU from a data-buffer RAM output and reaches the target replay
-read pointer through 31 logic levels. Positive hold is only the measured margin
-in the reported corners, not a general hardware-stability qualification. No
+path starts at the target replay RAM output and returns to its read pointer
+through 31 logic levels. The detailed hierarchy identifies the replay's own
+80-bit storage, rather than the machine DATA read buffer. Positive hold is only
+the measured margin in the reported corners, not a general hardware-stability qualification. No
 timing constraints were relaxed to obtain a pass. Closing these paths remains
 a separate task.
 

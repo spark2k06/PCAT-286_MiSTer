@@ -1,0 +1,51 @@
+{
+  "status": "PASS",
+  "source_sha256": {
+    "rtl/spk286_timing/spk286_target_replay.sv": "0d10e75f1f692566879edb6aa652f97baffabdc467403f7b5a866ed32e892564",
+    "sim/spk286_timing/spk286_target_replay_tb.sv": "949c7a9349cb25828eed3559fd6c5956295fe0326eed5ec9fda9f29ae9baa723",
+    "scripts/test_spk286_target_replay_equivalence.py": "f3819bbfbbd3a84860980a8af134ef8c816c7602533dbbeb9a010f428bcc9fe9"
+  },
+  "reference_revision": "6307f5b60e9db21b7964946a859cb42746009c95",
+  "reference_sha256": "df3bca94f471863d05cbd505b8b927634d5049b53da1f2092f7e872f8fd02921",
+  "unit_each_simulator": "TARGET_REPLAY_PASS checks=246",
+  "formal": {
+    "status": "INDUCTIVE_EQUIVALENCE_PASS",
+    "inputs": "arbitrary control/data after reset at step 1; initialization zero",
+    "scope": "exact valid/data/count every cycle; unchanged sequential bodies with additional observation ports",
+    "invariant": "equal total writes/read offset and ordered unread bytes; legal pointer bounds"
+  },
+  "negative_controls": [
+    {
+      "mutation": "capture-byte",
+      "status": "REJECTED_WITH_COUNTEREXAMPLE"
+    },
+    {
+      "mutation": "pop-head",
+      "status": "REJECTED_WITH_COUNTEREXAMPLE"
+    }
+  ],
+  "generic_cost": {
+    "reference": {
+      "generic_cells": 243,
+      "register_bits": 92,
+      "scope": "Yosys generic logic, not fitted FPGA ALMs"
+    },
+    "candidate": {
+      "generic_cells": 251,
+      "register_bits": 88,
+      "scope": "Yosys generic logic, not fitted FPGA ALMs"
+    }
+  },
+  "logs_sha256": {
+    "candidate-cost.log": "aa9775fffb442990590f3ee1a7e75b60778dbd0261e7e2c1859818f1fb3f9d12",
+    "equivalence.log": "54cf54c0c3a813f185aad3df2d01a06557822e8883db37015ca9d6d41ea7b3a2",
+    "icarus-build.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "icarus-run.log": "50aad0c1b02e77eea95143de4d6f75b5495237e3a455742fa63315d66854c87d",
+    "lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "mutant-capture-byte.log": "f490d45b8d4988272a735747bff9215cd1394de93c8243df7f90f9e50a25c40c",
+    "mutant-pop-head.log": "4d227f246b4472520e43f763d0d639deb7da33ef55b6f42f0a9f9478aa50c849",
+    "reference-cost.log": "129209e743d684a7a42318ba167017fefe38a4bd95b537ebc81e5a44af335ccb",
+    "verilator-build.log": "5cc4ca125292afa339b46769c0ea87b4d554fa52540ad784c75aa7b886245f66",
+    "verilator-run.log": "015df813213ea0e9b0d9589d6d66f9bbf8e9c809efeb82020fa81fa422cda14d"
+  }
+}

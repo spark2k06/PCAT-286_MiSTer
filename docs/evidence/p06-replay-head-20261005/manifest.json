@@ -1,0 +1,32 @@
+{
+  "status": "SEALED_DIRECTED_EQUIVALENCE_PASS",
+  "scope": "Replay storage equivalence and directed CPU integration; fitted timing pending, full regression user deferred",
+  "formal": {
+    "status": "INDUCTIVE_EQUIVALENCE_PASS",
+    "inputs": "arbitrary control/data after reset at step 1; initialization zero",
+    "scope": "exact valid/data/count every cycle; unchanged sequential bodies with additional observation ports",
+    "invariant": "equal total writes/read offset and ordered unread bytes; legal pointer bounds"
+  },
+  "negative_controls": [
+    {
+      "mutation": "capture-byte",
+      "status": "REJECTED_WITH_COUNTEREXAMPLE"
+    },
+    {
+      "mutation": "pop-head",
+      "status": "REJECTED_WITH_COUNTEREXAMPLE"
+    }
+  ],
+  "archive": "p06-replay-head-20261005.tar.gz",
+  "bytes": 341909,
+  "sha256": "aed7d64ea695fa3cc0beefafd7f078f97b5910af03c1886eedc32910d7903b90",
+  "member_count": 136,
+  "verification": "Every archived member matched its original byte string",
+  "cases_each_simulator": {
+    "iverilog": 777,
+    "verilator": 777
+  },
+  "unit_checks_each_simulator": 246,
+  "max_raw_stream_and_all_directed_clock_metrics": "unchanged",
+  "timeout_record": "proof-v1 records the 60-second bounded SAT timeout; proof-v3 uses proven state invariants and induction"
+}

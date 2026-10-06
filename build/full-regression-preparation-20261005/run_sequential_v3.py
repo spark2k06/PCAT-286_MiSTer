@@ -82,11 +82,19 @@ def inventory(folder):
 def metadata(path, ignored=frozenset()):
     """Cheap change detector between complete SHA-256 source checkpoints."""
     path = Path(path)
-    files = [path] if path.is_file() else sorted(path.rglob('*'))
-    return {p.relative_to(path).as_posix() if path.is_dir() else 'file':
-            (p.stat().st_size, p.stat().st_mtime_ns, p.stat().st_ctime_ns,
-             p.stat().st_mode)
-            for p in files if p.is_file() and not ignored.intersection(p.relative_to(path).parts)}
+    def attrs(p):
+        stat = p.stat()
+        return stat.st_size, stat.st_mtime_ns, stat.st_ctime_ns, stat.st_mode
+    if path.is_file():
+        return {'file': attrs(path)}
+    items = {}
+    for directory, names, files in os.walk(path, topdown=True, followlinks=False):
+        names[:] = sorted(name for name in names if name not in ignored)
+        for name in sorted(files):
+            p = Path(directory) / name
+            if p.is_file():
+                items[p.relative_to(path).as_posix()] = attrs(p)
+    return items
 
 
 def owned(path, top):

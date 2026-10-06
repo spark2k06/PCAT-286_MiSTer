@@ -1,0 +1,5514 @@
+{
+  "schema": 1,
+  "status": "PREPARED_NOT_EXECUTED",
+  "stages": [
+    {
+      "id": "cpu-compile-smoke",
+      "argv": [
+        "bash",
+        "scripts/build_verilator.sh"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-compile-smoke",
+      "timeout_seconds": 3600,
+      "shared_cpu": true,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-microcode-consistency",
+      "argv": [
+        "python3",
+        "-B",
+        "-m",
+        "tools.microcode.compile_microcode",
+        "--check"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-microcode-consistency",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-microcode-audit",
+      "argv": [
+        "python3",
+        "-B",
+        "-m",
+        "tools.microcode.audit_microcode",
+        "--output",
+        "{RUN}/microcode-audit"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-microcode-audit",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-python-all",
+      "argv": [
+        "python3",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "tests",
+        "-p",
+        "test_*.py",
+        "-v"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-python-all",
+      "timeout_seconds": 3600,
+      "shared_cpu": true,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-lint",
+      "argv": [
+        "bash",
+        "scripts/lint.sh"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-lint",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_registers",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_registers"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_registers",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_segments",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_segments"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_segments",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_loadall_service",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_loadall_service"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_loadall_service",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_loadall_protected",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_loadall_protected"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_loadall_protected",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_protected_foundation",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_protected_foundation"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_protected_foundation",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_protected_system",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_protected_system"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_protected_system",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_protected_event_outer",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_protected_event_outer"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_protected_event_outer",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_protected_expand_down",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_protected_expand_down"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_protected_expand_down",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_call_stack_precheck",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_call_stack_precheck"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_call_stack_precheck",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_arpl",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_arpl"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_arpl",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_clts",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_clts"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_clts",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_clts_privilege",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_clts_privilege"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_clts_privilege",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_protected_retf",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_protected_retf"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_protected_retf",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_tss_service",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_tss_service"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_tss_service",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_tss_descriptor_service",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_tss_descriptor_service"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_tss_descriptor_service",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_task_segment_service",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_task_segment_service"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_task_segment_service",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_task_switch_service",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_task_switch_service"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_task_switch_service",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_protected_task",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_protected_task"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_protected_task",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_protected_task_fault",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_protected_task_fault"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_protected_task_fault",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_protected_task_state_fault",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_protected_task_state_fault"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_protected_task_state_fault",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_protected_task_gate",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_protected_task_gate"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_protected_task_gate",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_protected_task_gate_far",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_protected_task_gate_far"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_protected_task_gate_far",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_protected_task_gate_fault",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_protected_task_gate_fault"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_protected_task_gate_fault",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_protected_task_gate_error",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_protected_task_gate_error"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_protected_task_gate_error",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_protected_task_privilege",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_protected_task_privilege"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_protected_task_privilege",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_protected_task_privilege_outer",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_protected_task_privilege_outer"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_protected_task_privilege_outer",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_protected_task_gate_privilege",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_protected_task_gate_privilege"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_protected_task_gate_privilege",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_protected_task_gate_privilege_outer",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_protected_task_gate_privilege_outer"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_protected_task_gate_privilege_outer",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_protected_task_gate_event_privilege_outer",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_protected_task_gate_event_privilege_outer"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_protected_task_gate_event_privilege_outer",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_protected_task_iret",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_protected_task_iret"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_protected_task_iret",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_protected_task_ldt",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_protected_task_ldt"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_protected_task_ldt",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_fetch",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_fetch"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_fetch",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_core",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_core"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_core",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_prefetch_queue",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_prefetch_queue"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_prefetch_queue",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_protected_ltr",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_protected_ltr"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_protected_ltr",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_microsequencer",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_microsequencer"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_microsequencer",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_microcode_rom",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_microcode_rom"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_microcode_rom",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_decoder",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_decoder"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_decoder",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_timing_trace",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_timing_trace"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_timing_trace",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_timing_capture",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_timing_capture"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_timing_capture",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_timing_policy",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_timing_policy"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_timing_policy",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_timing_policy_contract",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_timing_policy_contract"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_timing_policy_contract",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_timing_policy_equivalence",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_timing_policy_equivalence"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_timing_policy_equivalence",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_timing_calibration",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_timing_calibration"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_timing_calibration",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_timing_calibration_extra",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_timing_calibration_extra"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_timing_calibration_extra",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_prefetch_fidelity",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_prefetch_fidelity"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_prefetch_fidelity",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_execution",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_execution"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_execution",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_microcode_execution",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_microcode_execution"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_microcode_execution",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_modrm",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_modrm"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_modrm",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_effective_address",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_effective_address"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_effective_address",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_operand_decode",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_operand_decode"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_operand_decode",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_biu",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_biu"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_biu",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_mov_operands",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_mov_operands"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_mov_operands",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_operand_lifecycle",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_operand_lifecycle"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_operand_lifecycle",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_operand_service",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_operand_service"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_operand_service",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_alu",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_alu"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_alu",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_alu_instructions",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_alu_instructions"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_alu_instructions",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_alu_lifecycle",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_alu_lifecycle"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_alu_lifecycle",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_stack_control",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_stack_control"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_stack_control",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_stack_lifecycle",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_stack_lifecycle"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_stack_lifecycle",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_event_instructions",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_event_instructions"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_event_instructions",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_event_lifecycle",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_event_lifecycle"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_event_lifecycle",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_event_streams",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_event_streams"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_event_streams",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_biu_width_io",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_biu_width_io"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_biu_width_io",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_operand_byte",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_operand_byte"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_operand_byte",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_alu_byte",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_alu_byte"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_alu_byte",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_byte_scalar",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_byte_scalar"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_byte_scalar",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_prefix",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_prefix"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_prefix",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_test_instructions",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_test_instructions"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_test_instructions",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_scalar_direct",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_scalar_direct"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_scalar_direct",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_shift",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_shift"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_shift",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_shift_instructions",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_shift_instructions"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_shift_instructions",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_data_instructions",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_data_instructions"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_data_instructions",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_data_lifecycle",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_data_lifecycle"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_data_lifecycle",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_unary_instructions",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_unary_instructions"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_unary_instructions",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_unary_lifecycle",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_unary_lifecycle"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_unary_lifecycle",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_adjust",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_adjust"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_adjust",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_adjust_instructions",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_adjust_instructions"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_adjust_instructions",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_adjust_lifecycle",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_adjust_lifecycle"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_adjust_lifecycle",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_segment_instructions",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_segment_instructions"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_segment_instructions",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_segment_lifecycle",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_segment_lifecycle"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_segment_lifecycle",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_stack_range",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_stack_range"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_stack_range",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_stack_frame_instructions",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_stack_frame_instructions"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_stack_frame_instructions",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_stack_frame_lifecycle",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_stack_frame_lifecycle"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_stack_frame_lifecycle",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_far_instructions",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_far_instructions"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_far_instructions",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_far_lifecycle",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_far_lifecycle"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_far_lifecycle",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_string_instructions",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_string_instructions"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_string_instructions",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_string_lifecycle",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_string_lifecycle"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_string_lifecycle",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_string_boundaries",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_string_boundaries"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_string_boundaries",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_scalar_io",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_scalar_io"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_scalar_io",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_string_io",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_string_io"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_string_io",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_string_io_lifecycle",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_string_io_lifecycle"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_string_io_lifecycle",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_muldiv",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_muldiv"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_muldiv",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_muldiv_instructions",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_muldiv_instructions"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_muldiv_instructions",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_muldiv_lifecycle",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_muldiv_lifecycle"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_muldiv_lifecycle",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_string_zero_events",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_string_zero_events"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_string_zero_events",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_string_io_zero_events",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_string_io_zero_events"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_string_io_zero_events",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_biu_hold_lock",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_biu_hold_lock"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_biu_hold_lock",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_xchg_hold_lock",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_xchg_hold_lock"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_xchg_hold_lock",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_esc_instructions",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_esc_instructions"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_esc_instructions",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_loadall_integration",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_loadall_integration"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_loadall_integration",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_npx_traps",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_npx_traps"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_npx_traps",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_esc_boundaries",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_esc_boundaries"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_esc_boundaries",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_double_fault_cpu",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_double_fault_cpu"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_double_fault_cpu",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_double_fault_events",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_double_fault_events"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_double_fault_events",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_protected_entry",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_protected_entry"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_protected_entry",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_protected_direct_call",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_protected_direct_call"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_protected_direct_call",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_conforming_data_load",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_conforming_data_load"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_conforming_data_load",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_call_gate_accessed",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_call_gate_accessed"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_call_gate_accessed",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_jmp_call_gate",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_jmp_call_gate"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_jmp_call_gate",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_hlt_privilege",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_hlt_privilege"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_hlt_privilege",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_event_nt",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_event_nt"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_event_nt",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_return_flags",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_return_flags"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_return_flags",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_gate_target_rpl",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_gate_target_rpl"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_gate_target_rpl",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_fault_metadata",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_fault_metadata"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_fault_metadata",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_fault_precedence",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_fault_precedence"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_fault_precedence",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_odd_protected_stack",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_odd_protected_stack"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_odd_protected_stack",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_system_access",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_system_access"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_system_access",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_iopl_access",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_iopl_access"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_iopl_access",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_protected_return_restart",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_protected_return_restart"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_protected_return_restart",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_protected_pop_segment_restart",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_protected_pop_segment_restart"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_protected_pop_segment_restart",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_descriptor_inspection",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_descriptor_inspection"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_descriptor_inspection",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_system_table_range",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_system_table_range"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_system_table_range",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_outer_return_sp",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_outer_return_sp"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_outer_return_sp",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_register_execution",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_register_execution"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_register_execution",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_task_late_publication",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_task_late_publication"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_task_late_publication",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_null_ldtr",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_null_ldtr"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_null_ldtr",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_immediate_execution",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_immediate_execution"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_immediate_execution",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_immediate_throughput",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_immediate_throughput"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_immediate_throughput",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_encoding_preview",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_encoding_preview"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_encoding_preview",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_length_boundary",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_length_boundary"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_length_boundary",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-unit-spk286_event_arbitration",
+      "argv": [
+        "bash",
+        "scripts/test_units.sh",
+        "both",
+        "spk286_event_arbitration"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-unit-spk286_event_arbitration",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-verilator-smoke",
+      "argv": [
+        "bash",
+        "scripts/test_verilator.sh",
+        "--trace"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-verilator-smoke",
+      "timeout_seconds": 3600,
+      "shared_cpu": true,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-iverilog-smoke",
+      "argv": [
+        "bash",
+        "scripts/test_iverilog.sh"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-iverilog-smoke",
+      "timeout_seconds": 3600,
+      "shared_cpu": true,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-state-default",
+      "argv": [
+        "python3",
+        "-B",
+        "-m",
+        "tools.state_vectors"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-state-default",
+      "timeout_seconds": 3600,
+      "shared_cpu": true,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-state-fixtures",
+      "argv": [
+        "python3",
+        "-B",
+        "-m",
+        "tools.state_vectors",
+        "--source",
+        "tests/fixtures/state_vectors.json"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-state-fixtures",
+      "timeout_seconds": 3600,
+      "shared_cpu": true,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-data-loader",
+      "argv": [
+        "python3",
+        "-B",
+        "tools/run_tests.py",
+        "--smoke"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-data-loader",
+      "timeout_seconds": 3600,
+      "shared_cpu": true,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-failure-propagation",
+      "argv": [
+        "bash",
+        "scripts/verify_failure_path.sh"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-failure-propagation",
+      "timeout_seconds": 3600,
+      "shared_cpu": true,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-yosys-synthesis",
+      "argv": [
+        "bash",
+        "scripts/synth_check.sh"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-yosys-synthesis",
+      "timeout_seconds": 3600,
+      "shared_cpu": true,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-mcl86-tests",
+      "argv": [
+        "python3",
+        "-B",
+        "-m",
+        "unittest",
+        "discover",
+        "-s",
+        "research/mcl86/tests",
+        "-v"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-mcl86-tests",
+      "timeout_seconds": 3600,
+      "shared_cpu": true,
+      "required_placeholders": []
+    },
+    {
+      "id": "cpu-mcl86-roundtrip",
+      "argv": [
+        "python3",
+        "-B",
+        "-m",
+        "research.mcl86.mcl86_uccheck",
+        "--directory",
+        "{MCL86}",
+        "--output",
+        "{RUN}/mcl86"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-mcl86-roundtrip",
+      "timeout_seconds": 3600,
+      "shared_cpu": true,
+      "required_placeholders": [
+        "MCL86"
+      ]
+    },
+    {
+      "id": "cpu-sst-smoke-mov",
+      "argv": [
+        "python3",
+        "-B",
+        "-m",
+        "tools.run_singlestep",
+        "--repo",
+        "{CORPUS}",
+        "--executable",
+        "{RUN}/cpu/verilator/obj_dir/spk286_smoke",
+        "--smoke"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-sst-smoke-mov",
+      "timeout_seconds": 3600,
+      "shared_cpu": true,
+      "depends": [
+        "cpu-compile-smoke"
+      ],
+      "required_placeholders": [
+        "CORPUS"
+      ]
+    },
+    {
+      "id": "cpu-sst-smoke-operands",
+      "argv": [
+        "python3",
+        "-B",
+        "-m",
+        "tools.run_singlestep",
+        "--repo",
+        "{CORPUS}",
+        "--executable",
+        "{RUN}/cpu/verilator/obj_dir/spk286_smoke",
+        "--smoke",
+        "--opcode",
+        "89",
+        "--opcode",
+        "8B"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-sst-smoke-operands",
+      "timeout_seconds": 3600,
+      "shared_cpu": true,
+      "depends": [
+        "cpu-compile-smoke"
+      ],
+      "required_placeholders": [
+        "CORPUS"
+      ]
+    },
+    {
+      "id": "cpu-sst-smoke-alu",
+      "argv": [
+        "python3",
+        "-B",
+        "-m",
+        "tools.run_singlestep",
+        "--repo",
+        "{CORPUS}",
+        "--executable",
+        "{RUN}/cpu/verilator/obj_dir/spk286_smoke",
+        "--smoke",
+        "--alu"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-sst-smoke-alu",
+      "timeout_seconds": 3600,
+      "shared_cpu": true,
+      "depends": [
+        "cpu-compile-smoke"
+      ],
+      "required_placeholders": [
+        "CORPUS"
+      ]
+    },
+    {
+      "id": "cpu-sst-smoke-stack-control",
+      "argv": [
+        "python3",
+        "-B",
+        "-m",
+        "tools.run_singlestep",
+        "--repo",
+        "{CORPUS}",
+        "--executable",
+        "{RUN}/cpu/verilator/obj_dir/spk286_smoke",
+        "--smoke",
+        "--stack-control"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-sst-smoke-stack-control",
+      "timeout_seconds": 3600,
+      "shared_cpu": true,
+      "depends": [
+        "cpu-compile-smoke"
+      ],
+      "required_placeholders": [
+        "CORPUS"
+      ]
+    },
+    {
+      "id": "physical-required",
+      "argv": [
+        "python3",
+        "-B",
+        "-m",
+        "tools.run_phase7_physical",
+        "--repo",
+        "{CORPUS}",
+        "--executable",
+        "{RUN}/cpu/verilator/obj_dir/spk286_smoke",
+        "--build-dir",
+        "{RUN}/physical-required"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/physical-required",
+      "timeout_seconds": null,
+      "shared_cpu": true,
+      "depends": [
+        "cpu-compile-smoke"
+      ],
+      "corpus_full": true,
+      "required_placeholders": [
+        "CORPUS"
+      ]
+    },
+    {
+      "id": "physical-identity",
+      "argv": [
+        "python3",
+        "-B",
+        "-m",
+        "tools.phase7_complete_reports",
+        "--repo",
+        "{CORPUS}",
+        "--directory",
+        "{RUN}/physical-required/singlestep",
+        "--output",
+        "{RUN}/physical-identity.json"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/physical-identity",
+      "timeout_seconds": 3600,
+      "depends": [
+        "physical-required"
+      ],
+      "required_placeholders": [
+        "CORPUS"
+      ]
+    },
+    {
+      "id": "physical-D6",
+      "argv": [
+        "python3",
+        "-B",
+        "-m",
+        "tools.run_singlestep",
+        "--repo",
+        "{CORPUS}",
+        "--executable",
+        "{RUN}/cpu/verilator/obj_dir/spk286_smoke",
+        "--build-dir",
+        "{RUN}/physical-D6",
+        "--opcode",
+        "D6",
+        "--full",
+        "--include-prefixes",
+        "--include-exceptions"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/physical-D6",
+      "timeout_seconds": null,
+      "depends": [
+        "cpu-compile-smoke"
+      ],
+      "corpus_full": true,
+      "required_placeholders": [
+        "CORPUS"
+      ]
+    },
+    {
+      "id": "physical-D8",
+      "argv": [
+        "python3",
+        "-B",
+        "-m",
+        "tools.run_singlestep",
+        "--repo",
+        "{CORPUS}",
+        "--executable",
+        "{RUN}/cpu/verilator/obj_dir/spk286_smoke",
+        "--build-dir",
+        "{RUN}/physical-D8",
+        "--opcode",
+        "D8",
+        "--full",
+        "--include-prefixes",
+        "--include-exceptions"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/physical-D8",
+      "timeout_seconds": null,
+      "depends": [
+        "cpu-compile-smoke"
+      ],
+      "corpus_full": true,
+      "required_placeholders": [
+        "CORPUS"
+      ]
+    },
+    {
+      "id": "mutation-phase3_boundaries",
+      "argv": [
+        "python3",
+        "-B",
+        "{FROZEN}/tools/perf01/run_with_host_budget.py",
+        "--seconds",
+        "600",
+        "tools.audit_phase3_boundaries",
+        "--build-dir",
+        "{RUN}/audits/phase3_boundaries"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/mutation-phase3_boundaries",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "mutation-alu",
+      "argv": [
+        "python3",
+        "-B",
+        "{FROZEN}/tools/perf01/run_with_host_budget.py",
+        "--seconds",
+        "600",
+        "tools.audit_alu",
+        "--build-dir",
+        "{RUN}/audits/alu"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/mutation-alu",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "mutation-stack_control",
+      "argv": [
+        "python3",
+        "-B",
+        "{FROZEN}/tools/perf01/run_with_host_budget.py",
+        "--seconds",
+        "600",
+        "tools.audit_stack_control",
+        "--build-dir",
+        "{RUN}/audits/stack_control"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/mutation-stack_control",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "mutation-events",
+      "argv": [
+        "python3",
+        "-B",
+        "{FROZEN}/tools/perf01/run_with_host_budget.py",
+        "--seconds",
+        "600",
+        "tools.audit_events",
+        "--build-dir",
+        "{RUN}/audits/events"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/mutation-events",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "mutation-byte_prefix",
+      "argv": [
+        "python3",
+        "-B",
+        "{FROZEN}/tools/perf01/run_with_host_budget.py",
+        "--seconds",
+        "600",
+        "tools.audit_byte_prefix",
+        "--build-dir",
+        "{RUN}/audits/byte_prefix"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/mutation-byte_prefix",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "mutation-scalar",
+      "argv": [
+        "python3",
+        "-B",
+        "{FROZEN}/tools/perf01/run_with_host_budget.py",
+        "--seconds",
+        "600",
+        "tools.audit_scalar",
+        "--build-dir",
+        "{RUN}/audits/scalar"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/mutation-scalar",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "mutation-shift",
+      "argv": [
+        "python3",
+        "-B",
+        "{FROZEN}/tools/perf01/run_with_host_budget.py",
+        "--seconds",
+        "600",
+        "tools.audit_shift",
+        "--build-dir",
+        "{RUN}/audits/shift"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/mutation-shift",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "mutation-data",
+      "argv": [
+        "python3",
+        "-B",
+        "{FROZEN}/tools/perf01/run_with_host_budget.py",
+        "--seconds",
+        "600",
+        "tools.audit_data",
+        "--build-dir",
+        "{RUN}/audits/data"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/mutation-data",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "mutation-unary",
+      "argv": [
+        "python3",
+        "-B",
+        "{FROZEN}/tools/perf01/run_with_host_budget.py",
+        "--seconds",
+        "600",
+        "tools.audit_unary",
+        "--build-dir",
+        "{RUN}/audits/unary"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/mutation-unary",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "mutation-adjust",
+      "argv": [
+        "python3",
+        "-B",
+        "{FROZEN}/tools/perf01/run_with_host_budget.py",
+        "--seconds",
+        "600",
+        "tools.audit_adjust",
+        "--build-dir",
+        "{RUN}/audits/adjust"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/mutation-adjust",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "mutation-segment",
+      "argv": [
+        "python3",
+        "-B",
+        "{FROZEN}/tools/perf01/run_with_host_budget.py",
+        "--seconds",
+        "600",
+        "tools.audit_segment",
+        "--build-dir",
+        "{RUN}/audits/segment"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/mutation-segment",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "mutation-stack_frame",
+      "argv": [
+        "python3",
+        "-B",
+        "{FROZEN}/tools/perf01/run_with_host_budget.py",
+        "--seconds",
+        "600",
+        "tools.audit_stack_frame",
+        "--build-dir",
+        "{RUN}/audits/stack_frame"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/mutation-stack_frame",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "mutation-far",
+      "argv": [
+        "python3",
+        "-B",
+        "{FROZEN}/tools/perf01/run_with_host_budget.py",
+        "--seconds",
+        "600",
+        "tools.audit_far",
+        "--build-dir",
+        "{RUN}/audits/far"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/mutation-far",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "mutation-strings",
+      "argv": [
+        "python3",
+        "-B",
+        "{FROZEN}/tools/perf01/run_with_host_budget.py",
+        "--seconds",
+        "600",
+        "tools.audit_strings",
+        "--build-dir",
+        "{RUN}/audits/strings"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/mutation-strings",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "mutation-io",
+      "argv": [
+        "python3",
+        "-B",
+        "{FROZEN}/tools/perf01/run_with_host_budget.py",
+        "--seconds",
+        "600",
+        "tools.audit_io",
+        "--build-dir",
+        "{RUN}/audits/io"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/mutation-io",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "mutation-muldiv",
+      "argv": [
+        "python3",
+        "-B",
+        "{FROZEN}/tools/perf01/run_with_host_budget.py",
+        "--seconds",
+        "600",
+        "tools.audit_muldiv",
+        "--build-dir",
+        "{RUN}/audits/muldiv"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/mutation-muldiv",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "mutation-double_fault",
+      "argv": [
+        "python3",
+        "-B",
+        "{FROZEN}/tools/perf01/run_with_host_budget.py",
+        "--seconds",
+        "600",
+        "tools.audit_double_fault",
+        "--output",
+        "{RUN}/audits/double_fault"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/mutation-double_fault",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "mutation-phase8",
+      "argv": [
+        "python3",
+        "-B",
+        "{FROZEN}/tools/perf01/run_with_host_budget.py",
+        "--seconds",
+        "600",
+        "tools.audit_phase8",
+        "--build-dir",
+        "{RUN}/audits/phase8"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/mutation-phase8",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "mutation-task_late",
+      "argv": [
+        "python3",
+        "-B",
+        "{FROZEN}/tools/perf01/run_with_host_budget.py",
+        "--seconds",
+        "600",
+        "tools.audit_task_late",
+        "--output",
+        "{RUN}/audits/task_late"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/mutation-task_late",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "mutation-null_ldtr",
+      "argv": [
+        "python3",
+        "-B",
+        "{FROZEN}/tools/perf01/run_with_host_budget.py",
+        "--seconds",
+        "600",
+        "tools.audit_null_ldtr",
+        "--output",
+        "{RUN}/audits/null_ldtr"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/mutation-null_ldtr",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "audit-muldiv_adapter",
+      "argv": [
+        "python3",
+        "-B",
+        "-m",
+        "tools.audit_muldiv_adapter",
+        "--repo",
+        "{CORPUS}",
+        "--executable",
+        "{RUN}/cpu/verilator/obj_dir/spk286_smoke",
+        "--build-dir",
+        "{RUN}/audits/muldiv_adapter"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/audit-muldiv_adapter",
+      "timeout_seconds": null,
+      "depends": [
+        "cpu-compile-smoke"
+      ],
+      "corpus_full": true,
+      "required_placeholders": [
+        "CORPUS"
+      ]
+    },
+    {
+      "id": "audit-combined_adapter",
+      "argv": [
+        "python3",
+        "-B",
+        "-m",
+        "tools.audit_combined_adapter",
+        "--repo",
+        "{CORPUS}",
+        "--executable",
+        "{RUN}/cpu/verilator/obj_dir/spk286_smoke",
+        "--build-dir",
+        "{RUN}/audits/combined_adapter"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/audit-combined_adapter",
+      "timeout_seconds": null,
+      "depends": [
+        "cpu-compile-smoke"
+      ],
+      "corpus_full": true,
+      "required_placeholders": [
+        "CORPUS"
+      ]
+    },
+    {
+      "id": "audit-singlestep",
+      "argv": [
+        "python3",
+        "-B",
+        "-m",
+        "tools.audit_singlestep",
+        "--repo",
+        "{CORPUS}",
+        "--build-dir",
+        "{RUN}/cpu"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/audit-singlestep",
+      "timeout_seconds": 3600,
+      "shared_cpu": true,
+      "depends": [
+        "cpu-compile-smoke"
+      ],
+      "required_placeholders": [
+        "CORPUS"
+      ]
+    },
+    {
+      "id": "audit-scalar_io",
+      "argv": [
+        "python3",
+        "-B",
+        "-m",
+        "tools.audit_scalar_io",
+        "--repo",
+        "{CORPUS}",
+        "--build-dir",
+        "{RUN}/cpu"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/audit-scalar_io",
+      "timeout_seconds": 3600,
+      "shared_cpu": true,
+      "depends": [
+        "cpu-compile-smoke"
+      ],
+      "required_placeholders": [
+        "CORPUS"
+      ]
+    },
+    {
+      "id": "audit-synthetic-io",
+      "argv": [
+        "python3",
+        "-B",
+        "-m",
+        "tools.phase7_synthetic_io",
+        "--executable",
+        "{RUN}/cpu/verilator/obj_dir/spk286_smoke",
+        "--build-dir",
+        "{RUN}/audits/synthetic-io"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/audit-synthetic-io",
+      "timeout_seconds": 3600,
+      "depends": [
+        "cpu-compile-smoke"
+      ],
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_a1_at_bridge",
+      "argv": [
+        "bash",
+        "scripts/test_a1_at_bridge.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_a1_at_bridge",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_a2_memory_arbiter",
+      "argv": [
+        "bash",
+        "scripts/test_a2_memory_arbiter.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_a2_memory_arbiter",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_a3_interrupts",
+      "argv": [
+        "bash",
+        "scripts/test_a3_interrupts.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_a3_interrupts",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_a4_dma_refresh_pit",
+      "argv": [
+        "bash",
+        "scripts/test_a4_dma_refresh_pit.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_a4_dma_refresh_pit",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_a5_at_devices",
+      "argv": [
+        "bash",
+        "scripts/test_a5_at_devices.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_a5_at_devices",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_bios_first_fetch",
+      "argv": [
+        "bash",
+        "scripts/test_at_bios_first_fetch.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_bios_first_fetch",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_bridge_cancel_pipeline",
+      "argv": [
+        "bash",
+        "scripts/test_at_bridge_cancel_pipeline.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_bridge_cancel_pipeline",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_bridge_response",
+      "argv": [
+        "bash",
+        "scripts/test_at_bridge_response.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_bridge_response",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_bus_latency",
+      "argv": [
+        "bash",
+        "scripts/test_at_bus_latency.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_bus_latency",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_cdc",
+      "argv": [
+        "bash",
+        "scripts/test_at_cdc.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_cdc",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_code_buffer_integration",
+      "argv": [
+        "bash",
+        "scripts/test_at_code_buffer_integration.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_code_buffer_integration",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_code_buffer_production",
+      "argv": [
+        "bash",
+        "scripts/test_at_code_buffer_production.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_code_buffer_production",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_code_buffer_warm_reset",
+      "argv": [
+        "bash",
+        "scripts/test_at_code_buffer_warm_reset.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_code_buffer_warm_reset",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_data_idle",
+      "argv": [
+        "bash",
+        "scripts/test_at_data_idle.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_data_idle",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_dma_registers",
+      "argv": [
+        "bash",
+        "scripts/test_at_dma_registers.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_dma_registers",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_ega_decode",
+      "argv": [
+        "bash",
+        "scripts/test_at_ega_decode.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_ega_decode",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_floppy_write_protect",
+      "argv": [
+        "bash",
+        "scripts/test_at_floppy_write_protect.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_floppy_write_protect",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_frame_shadowmask",
+      "argv": [
+        "bash",
+        "scripts/test_at_frame_shadowmask.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_frame_shadowmask",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_hdmi_vsync",
+      "argv": [
+        "bash",
+        "scripts/test_at_hdmi_vsync.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_hdmi_vsync",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_hps_rom_loader",
+      "argv": [
+        "bash",
+        "scripts/test_at_hps_rom_loader.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_hps_rom_loader",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_immediate_execution",
+      "argv": [
+        "bash",
+        "scripts/test_at_immediate_execution.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_immediate_execution",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_keyboard",
+      "argv": [
+        "bash",
+        "scripts/test_at_keyboard.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_keyboard",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_keyboard_packing",
+      "argv": [
+        "bash",
+        "scripts/test_at_keyboard_packing.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_keyboard_packing",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_landmark_cmos",
+      "argv": [
+        "bash",
+        "scripts/test_at_landmark_cmos.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_landmark_cmos",
+      "timeout_seconds": 3600,
+      "environment": {
+        "AT_SYSTEM_ROM": "{LANDMARK_ORIGINAL}"
+      },
+      "required_placeholders": [
+        "LANDMARK_ORIGINAL"
+      ]
+    },
+    {
+      "id": "root-shell-test_at_landmark_dma",
+      "argv": [
+        "bash",
+        "scripts/test_at_landmark_dma.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_landmark_dma",
+      "timeout_seconds": 3600,
+      "environment": {
+        "AT_SYSTEM_ROM": "{LANDMARK_SKIP_PM}"
+      },
+      "required_placeholders": [
+        "LANDMARK_SKIP_PM"
+      ]
+    },
+    {
+      "id": "root-shell-test_at_landmark_floppy",
+      "argv": [
+        "bash",
+        "scripts/test_at_landmark_floppy.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_landmark_floppy",
+      "timeout_seconds": 3600,
+      "environment": {
+        "AT_SYSTEM_ROM": "{LANDMARK_SKIP_PM}"
+      },
+      "required_placeholders": [
+        "LANDMARK_SKIP_PM"
+      ]
+    },
+    {
+      "id": "root-shell-test_at_landmark_keyboard",
+      "argv": [
+        "bash",
+        "scripts/test_at_landmark_keyboard.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_landmark_keyboard",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_landmark_peripherals",
+      "argv": [
+        "bash",
+        "scripts/test_at_landmark_peripherals.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_landmark_peripherals",
+      "timeout_seconds": 3600,
+      "environment": {
+        "AT_SYSTEM_ROM": "{LANDMARK_SKIP_PM}"
+      },
+      "required_placeholders": [
+        "LANDMARK_SKIP_PM"
+      ]
+    },
+    {
+      "id": "root-shell-test_at_landmark_pm_skip",
+      "argv": [
+        "bash",
+        "scripts/test_at_landmark_pm_skip.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_landmark_pm_skip",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_loadall_cpu",
+      "argv": [
+        "bash",
+        "scripts/test_at_loadall_cpu.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_loadall_cpu",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_loadall_xms",
+      "argv": [
+        "bash",
+        "scripts/test_at_loadall_xms.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_loadall_xms",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_machine_boundary",
+      "argv": [
+        "bash",
+        "scripts/test_at_machine_boundary.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_machine_boundary",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_memory_entry",
+      "argv": [
+        "bash",
+        "scripts/test_at_memory_entry.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_memory_entry",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_memory_perf",
+      "argv": [
+        "bash",
+        "scripts/test_at_memory_perf.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_memory_perf",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_mister_memory_port",
+      "argv": [
+        "bash",
+        "scripts/test_at_mister_memory_port.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_mister_memory_port",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_mister_sdram_owner",
+      "argv": [
+        "bash",
+        "scripts/test_at_mister_sdram_owner.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_mister_sdram_owner",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_mouse",
+      "argv": [
+        "bash",
+        "scripts/test_at_mouse.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_mouse",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_mrbios_restart",
+      "argv": [
+        "bash",
+        "scripts/test_at_mrbios_restart.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_mrbios_restart",
+      "timeout_seconds": 3600,
+      "environment": {
+        "AT_MRBIOS_ROM": "{MRBIOS}"
+      },
+      "required_placeholders": [
+        "MRBIOS"
+      ]
+    },
+    {
+      "id": "root-shell-test_at_multiline_code_buffer",
+      "argv": [
+        "bash",
+        "scripts/test_at_multiline_code_buffer.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_multiline_code_buffer",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_native_output",
+      "argv": [
+        "bash",
+        "scripts/test_at_native_output.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_native_output",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_phoenix_fdc_post",
+      "argv": [
+        "bash",
+        "scripts/test_at_phoenix_fdc_post.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_phoenix_fdc_post",
+      "timeout_seconds": 3600,
+      "environment": {
+        "AT_PHOENIX_ROM": "{PHOENIX}"
+      },
+      "required_placeholders": [
+        "PHOENIX"
+      ]
+    },
+    {
+      "id": "root-shell-test_at_phoenix_pm87",
+      "argv": [
+        "bash",
+        "scripts/test_at_phoenix_pm87.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_phoenix_pm87",
+      "timeout_seconds": 3600,
+      "environment": {
+        "AT_PHOENIX_ROM": "{PHOENIX}"
+      },
+      "required_placeholders": [
+        "PHOENIX"
+      ]
+    },
+    {
+      "id": "root-shell-test_at_pic_init_probe",
+      "argv": [
+        "bash",
+        "scripts/test_at_pic_init_probe.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_pic_init_probe",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_pit_irq0",
+      "argv": [
+        "bash",
+        "scripts/test_at_pit_irq0.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_pit_irq0",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_pit_ports",
+      "argv": [
+        "bash",
+        "scripts/test_at_pit_ports.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_pit_ports",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_profile_bridge",
+      "argv": [
+        "bash",
+        "scripts/test_at_profile_bridge.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_profile_bridge",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_profile_elab",
+      "argv": [
+        "bash",
+        "scripts/test_at_profile_elab.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_profile_elab",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_protected_memory_data",
+      "argv": [
+        "bash",
+        "scripts/test_at_protected_memory_data.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_protected_memory_data",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_ram_read_buffer",
+      "argv": [
+        "bash",
+        "scripts/test_at_ram_read_buffer.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_ram_read_buffer",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_ram_read_buffer_perf",
+      "argv": [
+        "bash",
+        "scripts/test_at_ram_read_buffer_perf.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_ram_read_buffer_perf",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_register_execution",
+      "argv": [
+        "bash",
+        "scripts/test_at_register_execution.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_register_execution",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_rtc_cmos",
+      "argv": [
+        "bash",
+        "scripts/test_at_rtc_cmos.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_rtc_cmos",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_scaler_avalon",
+      "argv": [
+        "bash",
+        "scripts/test_at_scaler_avalon.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_scaler_avalon",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_scaler_config",
+      "argv": [
+        "bash",
+        "scripts/test_at_scaler_config.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_scaler_config",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_sdram_capture",
+      "argv": [
+        "bash",
+        "scripts/test_at_sdram_capture.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_sdram_capture",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_sdram_entry",
+      "argv": [
+        "bash",
+        "scripts/test_at_sdram_entry.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_sdram_entry",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_sdram_phase",
+      "argv": [
+        "bash",
+        "scripts/test_at_sdram_phase.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_sdram_phase",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_sdram_read_buffer",
+      "argv": [
+        "bash",
+        "scripts/test_at_sdram_read_buffer.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_sdram_read_buffer",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_sdram_write_admission",
+      "argv": [
+        "bash",
+        "scripts/test_at_sdram_write_admission.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_sdram_write_admission",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_serial",
+      "argv": [
+        "bash",
+        "scripts/test_at_serial.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_serial",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_soundblaster",
+      "argv": [
+        "bash",
+        "scripts/test_at_soundblaster.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_soundblaster",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_soundblaster_machine",
+      "argv": [
+        "bash",
+        "scripts/test_at_soundblaster_machine.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_soundblaster_machine",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_splash_control",
+      "argv": [
+        "bash",
+        "scripts/test_at_splash_control.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_splash_control",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_stack_offset_arithmetic",
+      "argv": [
+        "bash",
+        "scripts/test_at_stack_offset_arithmetic.sh",
+        "{RUN}/stage-build/test_at_stack_offset_arithmetic"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_stack_offset_arithmetic",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_video_options",
+      "argv": [
+        "bash",
+        "scripts/test_at_video_options.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_video_options",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_video_window",
+      "argv": [
+        "bash",
+        "scripts/test_at_video_window.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_video_window",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_xtide_machine",
+      "argv": [
+        "bash",
+        "scripts/test_at_xtide_machine.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_xtide_machine",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_at_xub_probe",
+      "argv": [
+        "bash",
+        "scripts/test_at_xub_probe.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_at_xub_probe",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_checkit_directed",
+      "argv": [
+        "bash",
+        "scripts/test_checkit_directed.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_checkit_directed",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_checkit_profile",
+      "argv": [
+        "bash",
+        "scripts/test_checkit_profile.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_checkit_profile",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_code_buffer_capacity",
+      "argv": [
+        "bash",
+        "scripts/test_code_buffer_capacity.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_code_buffer_capacity",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_code_buffer_coherence_audit",
+      "argv": [
+        "bash",
+        "scripts/test_code_buffer_coherence_audit.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_code_buffer_coherence_audit",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_debug_overlay",
+      "argv": [
+        "bash",
+        "scripts/test_debug_overlay.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_debug_overlay",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_i1_cpu_package",
+      "argv": [
+        "bash",
+        "scripts/test_i1_cpu_package.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_i1_cpu_package",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "root-shell-test_rtc_bcd_lookup",
+      "argv": [
+        "bash",
+        "scripts/test_rtc_bcd_lookup.sh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/root-shell-test_rtc_bcd_lookup",
+      "timeout_seconds": 3600,
+      "environment": {},
+      "required_placeholders": []
+    },
+    {
+      "id": "test_ascal_hacc_equivalence",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_ascal_hacc_equivalence.py",
+        "--output",
+        "{RUN}/ascal-hacc"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/test_ascal_hacc_equivalence",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "test_spk286_at_cpu_profile",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_spk286_at_cpu_profile.py",
+        "--output",
+        "{RUN}/supplement/test_spk286_at_cpu_profile"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/test_spk286_at_cpu_profile",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "test_spk286_instruction_timing",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_spk286_instruction_timing.py",
+        "--output",
+        "{RUN}/supplement/test_spk286_instruction_timing"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/test_spk286_instruction_timing",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "test_spk286_encoding_preview",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_spk286_encoding_preview.py",
+        "--output",
+        "{RUN}/supplement/test_spk286_encoding_preview"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/test_spk286_encoding_preview",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "test_spk286_target_handoff",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_spk286_target_handoff.py",
+        "--output",
+        "{RUN}/supplement/test_spk286_target_handoff"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/test_spk286_target_handoff",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "test_spk286_target_replay_equivalence",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_spk286_target_replay_equivalence.py",
+        "--output",
+        "{RUN}/supplement/test_spk286_target_replay_equivalence"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/test_spk286_target_replay_equivalence",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "test_p06_length_fault_boundary",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_p06_length_fault_boundary.py",
+        "--output",
+        "{RUN}/supplement/test_p06_length_fault_boundary",
+        "--dual"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/test_p06_length_fault_boundary",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "test_p06_repeat_local_equivalence",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_p06_repeat_local_equivalence.py",
+        "--output",
+        "{RUN}/supplement/test_p06_repeat_local_equivalence"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/test_p06_repeat_local_equivalence",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "test_p06_repeat_branch_equivalence",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_p06_repeat_branch_equivalence.py",
+        "--output",
+        "{RUN}/supplement/test_p06_repeat_branch_equivalence"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/test_p06_repeat_branch_equivalence",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "test_p06_metadata_budget_equivalence",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_p06_metadata_budget_equivalence.py",
+        "--output",
+        "{RUN}/supplement/test_p06_metadata_budget_equivalence"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/test_p06_metadata_budget_equivalence",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "test_p06_deadline_carry_save_equivalence",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_p06_deadline_carry_save_equivalence.py",
+        "--output",
+        "{RUN}/supplement/test_p06_deadline_carry_save_equivalence"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/test_p06_deadline_carry_save_equivalence",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "test_p06_execution_deadline_equivalence",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_p06_execution_deadline_equivalence.py",
+        "--output",
+        "{RUN}/supplement/test_p06_execution_deadline_equivalence"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/test_p06_execution_deadline_equivalence",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "test_null_segment_commit_equivalence",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_null_segment_commit_equivalence.py",
+        "--output",
+        "{RUN}/supplement/test_null_segment_commit_equivalence"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/test_null_segment_commit_equivalence",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "test_ascal_terminal_equivalence",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_ascal_terminal_equivalence.py",
+        "--output",
+        "{RUN}/supplement/test_ascal_terminal_equivalence",
+        "--hacc-proof-receipt",
+        "{RUN}/ascal-hacc/receipt.json"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/test_ascal_terminal_equivalence",
+      "timeout_seconds": 3600,
+      "depends": [
+        "test_ascal_hacc_equivalence"
+      ],
+      "required_placeholders": []
+    },
+    {
+      "id": "test_p06_palette_address_encoding",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_p06_palette_address_encoding.py",
+        "--output",
+        "{RUN}/supplement/test_p06_palette_address_encoding"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/test_p06_palette_address_encoding",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "test_at_speed_profiles",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_at_speed_profiles.py",
+        "--output",
+        "{RUN}/supplement/test_at_speed_profiles"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/test_at_speed_profiles",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "test_at_floppy_write",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_at_floppy_write.py",
+        "--output",
+        "{RUN}/supplement/test_at_floppy_write"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/test_at_floppy_write",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "test_at_floppy_write_protect",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_at_floppy_write_protect.py",
+        "--output",
+        "{RUN}/supplement/test_at_floppy_write_protect"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/test_at_floppy_write_protect",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "test_fetch_turnaround",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_fetch_turnaround.py",
+        "--output",
+        "{RUN}/supplement/test_fetch_turnaround"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/test_fetch_turnaround",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "test_sync_spk286_vendor",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_sync_spk286_vendor.py",
+        "--output",
+        "{RUN}/supplement/test_sync_spk286_vendor"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/test_sync_spk286_vendor",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "test_p05_limit_equivalence",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_p05_limit_equivalence.py",
+        "--output",
+        "{RUN}/supplement/test_p05_limit_equivalence"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/test_p05_limit_equivalence",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "profile-execution",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_p06_profile_compatibility.py",
+        "--output",
+        "{RUN}/profiles/execution",
+        "--profiles",
+        "0,1,2,3,4,5,6,7",
+        "--units",
+        "execution",
+        "--trace-storage",
+        "digest"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/profile-execution",
+      "timeout_seconds": 3600,
+      "keep_metadata": true,
+      "required_placeholders": []
+    },
+    {
+      "id": "profile-microcode_execution",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_p06_profile_compatibility.py",
+        "--output",
+        "{RUN}/profiles/microcode_execution",
+        "--profiles",
+        "0,1,2,3,4,5,6,7",
+        "--units",
+        "microcode_execution",
+        "--trace-storage",
+        "digest"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/profile-microcode_execution",
+      "timeout_seconds": 3600,
+      "keep_metadata": true,
+      "required_placeholders": []
+    },
+    {
+      "id": "profile-alu_lifecycle",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_p06_profile_compatibility.py",
+        "--output",
+        "{RUN}/profiles/alu_lifecycle",
+        "--profiles",
+        "0,1,2,3,4,5,6,7",
+        "--units",
+        "alu_lifecycle",
+        "--trace-storage",
+        "digest"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/profile-alu_lifecycle",
+      "timeout_seconds": 3600,
+      "keep_metadata": true,
+      "required_placeholders": []
+    },
+    {
+      "id": "profile-data_lifecycle",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_p06_profile_compatibility.py",
+        "--output",
+        "{RUN}/profiles/data_lifecycle",
+        "--profiles",
+        "0,1,2,3,4,5,6,7",
+        "--units",
+        "data_lifecycle",
+        "--trace-storage",
+        "digest"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/profile-data_lifecycle",
+      "timeout_seconds": 3600,
+      "keep_metadata": true,
+      "required_placeholders": []
+    },
+    {
+      "id": "profile-unary_lifecycle",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_p06_profile_compatibility.py",
+        "--output",
+        "{RUN}/profiles/unary_lifecycle",
+        "--profiles",
+        "0,1,2,3,4,5,6,7",
+        "--units",
+        "unary_lifecycle",
+        "--trace-storage",
+        "digest"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/profile-unary_lifecycle",
+      "timeout_seconds": 3600,
+      "keep_metadata": true,
+      "required_placeholders": []
+    },
+    {
+      "id": "profile-prefix",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_p06_profile_compatibility.py",
+        "--output",
+        "{RUN}/profiles/prefix",
+        "--profiles",
+        "0,1,2,3,4,5,6,7",
+        "--units",
+        "prefix",
+        "--trace-storage",
+        "digest"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/profile-prefix",
+      "timeout_seconds": 3600,
+      "keep_metadata": true,
+      "required_placeholders": []
+    },
+    {
+      "id": "profile-event_lifecycle",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_p06_profile_compatibility.py",
+        "--output",
+        "{RUN}/profiles/event_lifecycle",
+        "--profiles",
+        "0,1,2,3,4,5,6,7",
+        "--units",
+        "event_lifecycle",
+        "--trace-storage",
+        "digest"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/profile-event_lifecycle",
+      "timeout_seconds": 3600,
+      "keep_metadata": true,
+      "required_placeholders": []
+    },
+    {
+      "id": "profile-string_zero_events",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_p06_profile_compatibility.py",
+        "--output",
+        "{RUN}/profiles/string_zero_events",
+        "--profiles",
+        "0,1,2,3,4,5,6,7",
+        "--units",
+        "string_zero_events",
+        "--trace-storage",
+        "digest"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/profile-string_zero_events",
+      "timeout_seconds": 3600,
+      "keep_metadata": true,
+      "required_placeholders": []
+    },
+    {
+      "id": "profile-string_io_zero_events",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_p06_profile_compatibility.py",
+        "--output",
+        "{RUN}/profiles/string_io_zero_events",
+        "--profiles",
+        "0,1,2,3,4,5,6,7",
+        "--units",
+        "string_io_zero_events",
+        "--trace-storage",
+        "digest"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/profile-string_io_zero_events",
+      "timeout_seconds": 3600,
+      "keep_metadata": true,
+      "required_placeholders": []
+    },
+    {
+      "id": "profile-string_io_lifecycle",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_p06_profile_compatibility.py",
+        "--output",
+        "{RUN}/profiles/string_io_lifecycle",
+        "--profiles",
+        "0,1,2,3,4,5,6,7",
+        "--units",
+        "string_io_lifecycle",
+        "--trace-storage",
+        "digest"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/profile-string_io_lifecycle",
+      "timeout_seconds": 3600,
+      "keep_metadata": true,
+      "required_placeholders": []
+    },
+    {
+      "id": "profile-scalar_io",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_p06_profile_compatibility.py",
+        "--output",
+        "{RUN}/profiles/scalar_io",
+        "--profiles",
+        "0,1,2,3,4,5,6,7",
+        "--units",
+        "scalar_io",
+        "--trace-storage",
+        "digest"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/profile-scalar_io",
+      "timeout_seconds": 3600,
+      "keep_metadata": true,
+      "required_placeholders": []
+    },
+    {
+      "id": "profile-xchg_hold_lock",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_p06_profile_compatibility.py",
+        "--output",
+        "{RUN}/profiles/xchg_hold_lock",
+        "--profiles",
+        "0,1,2,3,4,5,6,7",
+        "--units",
+        "xchg_hold_lock",
+        "--trace-storage",
+        "digest"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/profile-xchg_hold_lock",
+      "timeout_seconds": 3600,
+      "keep_metadata": true,
+      "required_placeholders": []
+    },
+    {
+      "id": "profile-loadall_integration",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_p06_profile_compatibility.py",
+        "--output",
+        "{RUN}/profiles/loadall_integration",
+        "--profiles",
+        "0,1,2,3,4,5,6,7",
+        "--units",
+        "loadall_integration",
+        "--trace-storage",
+        "digest"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/profile-loadall_integration",
+      "timeout_seconds": 3600,
+      "keep_metadata": true,
+      "required_placeholders": []
+    },
+    {
+      "id": "profile-protected_entry",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_p06_profile_compatibility.py",
+        "--output",
+        "{RUN}/profiles/protected_entry",
+        "--profiles",
+        "0,1,2,3,4,5,6,7",
+        "--units",
+        "protected_entry",
+        "--trace-storage",
+        "digest"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/profile-protected_entry",
+      "timeout_seconds": 3600,
+      "keep_metadata": true,
+      "required_placeholders": []
+    },
+    {
+      "id": "profile-protected_system",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_p06_profile_compatibility.py",
+        "--output",
+        "{RUN}/profiles/protected_system",
+        "--profiles",
+        "0,1,2,3,4,5,6,7",
+        "--units",
+        "protected_system",
+        "--trace-storage",
+        "digest"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/profile-protected_system",
+      "timeout_seconds": 3600,
+      "keep_metadata": true,
+      "required_placeholders": []
+    },
+    {
+      "id": "profile-protected_event_outer",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_p06_profile_compatibility.py",
+        "--output",
+        "{RUN}/profiles/protected_event_outer",
+        "--profiles",
+        "0,1,2,3,4,5,6,7",
+        "--units",
+        "protected_event_outer",
+        "--trace-storage",
+        "digest"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/profile-protected_event_outer",
+      "timeout_seconds": 3600,
+      "keep_metadata": true,
+      "required_placeholders": []
+    },
+    {
+      "id": "profile-odd_protected_stack",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_p06_profile_compatibility.py",
+        "--output",
+        "{RUN}/profiles/odd_protected_stack",
+        "--profiles",
+        "0,1,2,3,4,5,6,7",
+        "--units",
+        "odd_protected_stack",
+        "--trace-storage",
+        "digest"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/profile-odd_protected_stack",
+      "timeout_seconds": 3600,
+      "keep_metadata": true,
+      "required_placeholders": []
+    },
+    {
+      "id": "profile-protected_task",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_p06_profile_compatibility.py",
+        "--output",
+        "{RUN}/profiles/protected_task",
+        "--profiles",
+        "0,1,2,3,4,5,6,7",
+        "--units",
+        "protected_task",
+        "--trace-storage",
+        "digest"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/profile-protected_task",
+      "timeout_seconds": 3600,
+      "keep_metadata": true,
+      "required_placeholders": []
+    },
+    {
+      "id": "profile-protected_task_iret",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_p06_profile_compatibility.py",
+        "--output",
+        "{RUN}/profiles/protected_task_iret",
+        "--profiles",
+        "0,1,2,3,4,5,6,7",
+        "--units",
+        "protected_task_iret",
+        "--trace-storage",
+        "digest"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/profile-protected_task_iret",
+      "timeout_seconds": 3600,
+      "keep_metadata": true,
+      "required_placeholders": []
+    },
+    {
+      "id": "profile-protected_task_state_fault",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_p06_profile_compatibility.py",
+        "--output",
+        "{RUN}/profiles/protected_task_state_fault",
+        "--profiles",
+        "0,1,2,3,4,5,6,7",
+        "--units",
+        "protected_task_state_fault",
+        "--trace-storage",
+        "digest"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/profile-protected_task_state_fault",
+      "timeout_seconds": 3600,
+      "keep_metadata": true,
+      "required_placeholders": []
+    },
+    {
+      "id": "profile-protected_task_privilege_outer",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_p06_profile_compatibility.py",
+        "--output",
+        "{RUN}/profiles/protected_task_privilege_outer",
+        "--profiles",
+        "0,1,2,3,4,5,6,7",
+        "--units",
+        "protected_task_privilege_outer",
+        "--trace-storage",
+        "digest"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/profile-protected_task_privilege_outer",
+      "timeout_seconds": 3600,
+      "keep_metadata": true,
+      "required_placeholders": []
+    },
+    {
+      "id": "profile-protected_retf",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_p06_profile_compatibility.py",
+        "--output",
+        "{RUN}/profiles/protected_retf",
+        "--profiles",
+        "0,1,2,3,4,5,6,7",
+        "--units",
+        "protected_retf",
+        "--trace-storage",
+        "digest"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/profile-protected_retf",
+      "timeout_seconds": 3600,
+      "keep_metadata": true,
+      "required_placeholders": []
+    },
+    {
+      "id": "profile-iopl_access",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_p06_profile_compatibility.py",
+        "--output",
+        "{RUN}/profiles/iopl_access",
+        "--profiles",
+        "0,1,2,3,4,5,6,7",
+        "--units",
+        "iopl_access",
+        "--trace-storage",
+        "digest"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/profile-iopl_access",
+      "timeout_seconds": 3600,
+      "keep_metadata": true,
+      "required_placeholders": []
+    },
+    {
+      "id": "profile-stack_frame_lifecycle",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_p06_profile_compatibility.py",
+        "--output",
+        "{RUN}/profiles/stack_frame_lifecycle",
+        "--profiles",
+        "0,1,2,3,4,5,6,7",
+        "--units",
+        "stack_frame_lifecycle",
+        "--trace-storage",
+        "digest"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/profile-stack_frame_lifecycle",
+      "timeout_seconds": 3600,
+      "keep_metadata": true,
+      "required_placeholders": []
+    },
+    {
+      "id": "profile-far_lifecycle",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_p06_profile_compatibility.py",
+        "--output",
+        "{RUN}/profiles/far_lifecycle",
+        "--profiles",
+        "0,1,2,3,4,5,6,7",
+        "--units",
+        "far_lifecycle",
+        "--trace-storage",
+        "digest"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/profile-far_lifecycle",
+      "timeout_seconds": 3600,
+      "keep_metadata": true,
+      "required_placeholders": []
+    },
+    {
+      "id": "profile-muldiv_lifecycle",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_p06_profile_compatibility.py",
+        "--output",
+        "{RUN}/profiles/muldiv_lifecycle",
+        "--profiles",
+        "0,1,2,3,4,5,6,7",
+        "--units",
+        "muldiv_lifecycle",
+        "--trace-storage",
+        "digest"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/profile-muldiv_lifecycle",
+      "timeout_seconds": 3600,
+      "keep_metadata": true,
+      "required_placeholders": []
+    },
+    {
+      "id": "profile-aggregate",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_p06_profile_compatibility.py",
+        "--output",
+        "{RUN}/profile-aggregate",
+        "--aggregate",
+        "{RUN}/profiles/execution",
+        "{RUN}/profiles/microcode_execution",
+        "{RUN}/profiles/alu_lifecycle",
+        "{RUN}/profiles/data_lifecycle",
+        "{RUN}/profiles/unary_lifecycle",
+        "{RUN}/profiles/prefix",
+        "{RUN}/profiles/event_lifecycle",
+        "{RUN}/profiles/string_zero_events",
+        "{RUN}/profiles/string_io_zero_events",
+        "{RUN}/profiles/string_io_lifecycle",
+        "{RUN}/profiles/scalar_io",
+        "{RUN}/profiles/xchg_hold_lock",
+        "{RUN}/profiles/loadall_integration",
+        "{RUN}/profiles/protected_entry",
+        "{RUN}/profiles/protected_system",
+        "{RUN}/profiles/protected_event_outer",
+        "{RUN}/profiles/odd_protected_stack",
+        "{RUN}/profiles/protected_task",
+        "{RUN}/profiles/protected_task_iret",
+        "{RUN}/profiles/protected_task_state_fault",
+        "{RUN}/profiles/protected_task_privilege_outer",
+        "{RUN}/profiles/protected_retf",
+        "{RUN}/profiles/iopl_access",
+        "{RUN}/profiles/stack_frame_lifecycle",
+        "{RUN}/profiles/far_lifecycle",
+        "{RUN}/profiles/muldiv_lifecycle"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/profile-aggregate",
+      "timeout_seconds": 3600,
+      "depends": [
+        "profile-execution",
+        "profile-microcode_execution",
+        "profile-alu_lifecycle",
+        "profile-data_lifecycle",
+        "profile-unary_lifecycle",
+        "profile-prefix",
+        "profile-event_lifecycle",
+        "profile-string_zero_events",
+        "profile-string_io_zero_events",
+        "profile-string_io_lifecycle",
+        "profile-scalar_io",
+        "profile-xchg_hold_lock",
+        "profile-loadall_integration",
+        "profile-protected_entry",
+        "profile-protected_system",
+        "profile-protected_event_outer",
+        "profile-odd_protected_stack",
+        "profile-protected_task",
+        "profile-protected_task_iret",
+        "profile-protected_task_state_fault",
+        "profile-protected_task_privilege_outer",
+        "profile-protected_retf",
+        "profile-iopl_access",
+        "profile-stack_frame_lifecycle",
+        "profile-far_lifecycle",
+        "profile-muldiv_lifecycle"
+      ],
+      "required_placeholders": []
+    },
+    {
+      "id": "live-speed-full",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_p06_live_speed.py",
+        "--output",
+        "{RUN}/live-speed"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/live-speed-full",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "handoff-all-profiles-dual",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_p06_target_handoff_integration.py",
+        "--output",
+        "{RUN}/handoff",
+        "--profiles",
+        "0,1,2,3,4,5,6,7",
+        "--dual"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/handoff-all-profiles-dual",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "memory-perf-comparison-helper",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_compare_at_memory_perf.py"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/memory-perf-comparison-helper",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "buffer-payload-proof",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/prove_at_buffer_payload.py",
+        "{BUFFER_REFERENCE}",
+        "--candidate-root",
+        "{FROZEN}",
+        "--output",
+        "{RUN}/buffer-proof"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/buffer-payload-proof",
+      "timeout_seconds": 3600,
+      "required_placeholders": [
+        "BUFFER_REFERENCE"
+      ]
+    },
+    {
+      "id": "buffer-payload-directed",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_at_buffer_payload.py",
+        "--reference",
+        "{BUFFER_REFERENCE}",
+        "--output",
+        "{RUN}/buffer-directed"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/buffer-payload-directed",
+      "timeout_seconds": 3600,
+      "required_placeholders": [
+        "BUFFER_REFERENCE"
+      ]
+    },
+    {
+      "id": "retained-fdc-proof",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/prove_at_retained_fdc_write.py",
+        "{FDC_REFERENCE}",
+        "--candidate-root",
+        "{FROZEN}",
+        "--output",
+        "{RUN}/fdc-proof"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/retained-fdc-proof",
+      "timeout_seconds": 3600,
+      "required_placeholders": [
+        "FDC_REFERENCE"
+      ]
+    },
+    {
+      "id": "retained-fdc-directed",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_at_retained_fdc.py",
+        "--proof-directory",
+        "{RUN}/fdc-proof",
+        "--output",
+        "{RUN}/fdc-directed"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/retained-fdc-directed",
+      "timeout_seconds": 3600,
+      "depends": [
+        "retained-fdc-proof"
+      ],
+      "required_placeholders": []
+    },
+    {
+      "id": "sdram-official-library",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_at_sdram_clock.py",
+        "{RUN}/sdram-clock",
+        "{QUARTUS_ALTERA_MF_V}"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/sdram-official-library",
+      "timeout_seconds": 3600,
+      "required_placeholders": [
+        "QUARTUS_ALTERA_MF_V"
+      ]
+    },
+    {
+      "id": "cpu-only-published-profile-contract",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/check_p06_profile_cpu.py",
+        "--output",
+        "{FROZEN}/vendor/spk286/build/regression-profile-focused"
+      ],
+      "cwd": "{FROZEN}/vendor/spk286",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/cpu-only-published-profile-contract",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "stack-offset-consumed-contract",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_stack_offset_consumed_contract.py",
+        "--output",
+        "{RUN}/stack-offset-consumed"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/stack-offset-consumed-contract",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "test_check_at_net_delay",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_check_at_net_delay.py"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/test_check_at_net_delay",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "test_summarize_at_50mhz_timing",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_summarize_at_50mhz_timing.py"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/test_summarize_at_50mhz_timing",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "test_at_scaler_luminance",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_at_scaler_luminance.py"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/test_at_scaler_luminance",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "test_xtsergey_at_keyboard",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_xtsergey_at_keyboard.py"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/test_xtsergey_at_keyboard",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "test_at_timing_closure_audit",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_at_timing_closure_audit.py",
+        "{TIMING_NEGATIVE_RUN}",
+        "{RUN}/timing-audit-negatives"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/test_at_timing_closure_audit",
+      "timeout_seconds": 3600,
+      "original_input_required": true,
+      "required_placeholders": [
+        "TIMING_NEGATIVE_RUN"
+      ]
+    },
+    {
+      "id": "test_at_video_register_placement",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_at_video_register_placement.py",
+        "{VIDEO_INVENTORY}",
+        "{RUN}/video-placement-negatives"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/test_at_video_register_placement",
+      "timeout_seconds": 3600,
+      "original_input_required": true,
+      "required_placeholders": [
+        "VIDEO_INVENTORY"
+      ]
+    },
+    {
+      "id": "test_supersoft_landmark_patch",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/test_supersoft_landmark_patch.py",
+        "{LANDMARK_ORIGINAL}",
+        "{LANDMARK_SKIP_PM_V2}"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/test_supersoft_landmark_patch",
+      "timeout_seconds": 3600,
+      "original_input_required": true,
+      "required_placeholders": [
+        "LANDMARK_ORIGINAL",
+        "LANDMARK_SKIP_PM_V2"
+      ]
+    },
+    {
+      "id": "distributed-rom-check",
+      "argv": [
+        "python3",
+        "-B",
+        "scripts/build_event_diag_rom.py",
+        "--check"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/distributed-rom-check",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "pit-refresh-directed",
+      "argv": [
+        "bash",
+        "tools/perf01/test_pit_refresh.sh",
+        "{FROZEN}",
+        "{RUN}/pit-refresh-directed"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/pit-refresh-directed",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "posted-machine",
+      "argv": [
+        "python3",
+        "-B",
+        "tools/perf01/test_posted_machine.py",
+        "{FROZEN}",
+        "{RUN}/posted-machine",
+        "--pit-refresh"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/posted-machine",
+      "timeout_seconds": 3600,
+      "required_placeholders": []
+    },
+    {
+      "id": "distributed-posted-rom",
+      "argv": [
+        "python3",
+        "-B",
+        "tools/perf01/test_distributed_pit_diag.py",
+        "{RUN}/posted-machine"
+      ],
+      "cwd": "{FROZEN}",
+      "mandatory": true,
+      "build": "{RUN}/stage-build/distributed-posted-rom",
+      "timeout_seconds": 3600,
+      "depends": [
+        "posted-machine"
+      ],
+      "required_placeholders": []
+    }
+  ],
+  "input_registry_sha256": {
+    "build/full-regression-preparation-20261005/plan.json": "0400bc7dd51ce653316a4ea5c43735a2adf4844b0f2c35f98012acc9c2716785",
+    "build/full-regression-preparation-20261005/build_stage_manifest_v3.py": "005ad8c2f9ed6f63980850181fa3218309983315e52bd023fff38cd1941bb7f2",
+    "tools/perf01/run_full_regression.py": "a4bfa61f73ba42616b1f76c0cc7a0a57a57962519c52f603f9e3c1b747d958f2",
+    "vendor/spk286/scripts/test_units.sh": "30f6b337db9d3a16b054b67024380f06c121431a13d0f8a7629e3d1932d6420d",
+    "scripts/test_ascal_hacc_equivalence.py": "214ba1367775b2aa67a90ebf81740b41e54cc48a8d0acf535bef50daab24700b",
+    "scripts/test_ascal_terminal_equivalence.py": "ceda77e287bdb8ab959b22b5fe0454ba1404a076dfda151648eb55d8e7984959",
+    "scripts/test_at_buffer_payload.py": "3c93aa2115c6f79fc86594f1e6af06d4d837cec8c9bef0a38b38d9df2c9206f7",
+    "scripts/test_at_floppy_write.py": "4ef10e65971bd381b60e357e55eec88227eefd5521e1d155b2bc716c2ca2cff9",
+    "scripts/test_at_floppy_write_protect.py": "bf69154b0fa773b6fe587406e2dbd5321d8639624fddf1cc14742beddbe83946",
+    "scripts/test_at_retained_fdc.py": "a9876a75feb56a8bcdb881b00978d05ee686993f65d6f21977a01729900b783f",
+    "scripts/test_at_scaler_luminance.py": "0d060da6376b231ca454abe25d738b7ef4210b684fc21b87ef2c882f0d7dfbef",
+    "scripts/test_at_sdram_clock.py": "b06609723facc82ef4396dfa6a818d7c1eb36ee1cc9a869cfcd8911850a33eb2",
+    "scripts/test_at_speed_profiles.py": "9f0ccc6cfe2b124a005213f7e3f1ebe192fb552bef6e8c676ee7dfd57b1b8cae",
+    "scripts/test_at_timing_closure_audit.py": "465fe88e113a1a9acb142afa71ce7d298543cef272f1ca5321fc57b4caf9e652",
+    "scripts/test_at_video_register_placement.py": "4e6e634a2dc13d86bf0c4a36f9ac04b574c56aad1adb77eb9de6d8f4517e931a",
+    "scripts/test_check_at_net_delay.py": "8b79becb5b09a5159f863f2198707c10ce6db5725be98a6bb0705ad2319fe193",
+    "scripts/test_compare_at_memory_perf.py": "b585b892bb37de8507ca9621a4c0bac85b0b9e094898b95eb55a335d8ab51d91",
+    "scripts/test_fetch_turnaround.py": "be11e4d42c2cf6a5ee6c9dfc3c764656d26081b695ba40dd9e193a13b7640dff",
+    "scripts/test_null_segment_commit_equivalence.py": "3ed2c59221654b7a802e9e89f4027ab9942b9f2aec49e624d09d4184fccee24e",
+    "scripts/test_p05_limit_equivalence.py": "5ae382077b876ca261215d30987c1317983a87037c3217979298234d3683c834",
+    "scripts/test_p06_deadline_carry_save_equivalence.py": "e82576d76ddd3db9f9380ae3d3cbf31a419dbe61edd831750b39280b1934d818",
+    "scripts/test_p06_execution_deadline_equivalence.py": "5a7bc9bd64f8f0822ce820eb8a727c8dd6d1f3d35ba58c0b9d830c59a083320a",
+    "scripts/test_p06_length_fault_boundary.py": "f5e89a0db232b89c7f32f3355e59cd4f10952fb8ff71b08a4c7bdef1e74bbd5b",
+    "scripts/test_p06_live_speed.py": "f07ba96ef22c5458e9bc87465614f511b3346882b48e244fc8e2a8d615ca35c2",
+    "scripts/test_p06_metadata_budget_equivalence.py": "d39de9c1f6547709de7297338e97971eaf48cfbfcf192f23640bcd81d3fedc26",
+    "scripts/test_p06_palette_address_encoding.py": "c145bd09686ee0fb27d5ad3b2ddcfa669ff3245983fea303d7c260262f79e857",
+    "scripts/test_p06_profile_compatibility.py": "e60713198c953f9d2ae407fe4719a58e892d2b0f92e658129c77bcfdae90c36b",
+    "scripts/test_p06_repeat_branch_equivalence.py": "24592f16c050293f4dfa35233c971cfcceeddef673fad0572727a486972e5952",
+    "scripts/test_p06_repeat_local_equivalence.py": "364ef0c79314d1c3153311b55be86b0c9e8dbd3b3cbdfe7b38c24c2ac067ca9e",
+    "scripts/test_p06_target_handoff_integration.py": "6a8937a2e9a8c4e6359b2add32dba0d88c1e0cded0bfccf48dee3611fb489a1e",
+    "scripts/test_spk286_at_cpu_profile.py": "a03fcee269c0a3352c0916bbe75e0359bc6a18f5504d4c691c080314500db752",
+    "scripts/test_spk286_encoding_preview.py": "f0f607172fb813337f80bb8c4fcb7aa7523683fe218dff7f9d55edd786a938f0",
+    "scripts/test_spk286_instruction_timing.py": "5a109597d39d482a65712f9c30159a7bb00e58403861bc88e742fe10e3fbe1dd",
+    "scripts/test_spk286_target_handoff.py": "05f8842f79c77e3ac594819d5e74c8463c47ef0573abc86ce461180514534e49",
+    "scripts/test_spk286_target_replay_equivalence.py": "f3819bbfbbd3a84860980a8af134ef8c816c7602533dbbeb9a010f428bcc9fe9",
+    "scripts/test_stack_offset_consumed_contract.py": "e523d7b5ed71ecabbe4d86ec3d3e984fc9871994d6902683e8d123163c7d4d0e",
+    "scripts/test_stack_offset_contract.py": "ea7ab8bd1ab53589e9e2f6b5219b5e9cdac30335fc1ab969595cb0124cfd3e9c",
+    "scripts/test_summarize_at_50mhz_timing.py": "a2863b532a5764ae8eeb79834919944ee1c57885e803ae439931ce3818020a04",
+    "scripts/test_supersoft_landmark_patch.py": "f0b8411926ae8d79247618fa88a92cfcee4b805747d2158cfd6ef0a0535fb13b",
+    "scripts/test_sync_spk286_vendor.py": "2dc54927f69daf6b7e66de41643afd57d0dcb851d38aeb0d56156e27041a3fd5",
+    "scripts/test_xtsergey_at_keyboard.py": "00ce5c1c9500e6f62945fbbae84a209c9157bfc43906e9adff9cb72b3629917d",
+    "scripts/test_a1_at_bridge.sh": "ffda4c311ce2f791a4e1588558623e8b47fe488da145d2f8914fcda77c48a380",
+    "scripts/test_a2_memory_arbiter.sh": "dd828519a17c391db7ba1b485cb34b2746824d1b5133b9186ba9ee9d84cbfb66",
+    "scripts/test_a3_interrupts.sh": "81f69ebb6fbd035df84b5b9b9a5a3c40a8f9a41114fca8712dbae6d1b7412389",
+    "scripts/test_a4_dma_refresh_pit.sh": "0b85e04f0a524cc900612907eb289e3813cba843563607a2cf52f8322a828090",
+    "scripts/test_a5_at_devices.sh": "c78abd9e593b480023b07c8f4b3406115bf1303191549c56f7e65bd5732c7e40",
+    "scripts/test_at_bios_first_fetch.sh": "ecf8d574740e52da08a2f55df6dbbae62fde80e35d1b1f11657447fe396415b0",
+    "scripts/test_at_bridge_cancel_pipeline.sh": "cf87cb8e2819c881d04e7c44fba78049ec0dbc47f34825c4083809d6abdde065",
+    "scripts/test_at_bridge_response.sh": "1e68683bb35184620b1efc0999a46284503cca20ea16faf1cf679c89860ba4fe",
+    "scripts/test_at_bus_latency.sh": "679eef466a795bfee15d9b2149ca677068f442ac7e9a3fc33de3b50b83ca1033",
+    "scripts/test_at_cdc.sh": "2313a6a0d92916d31e48ca2669f3da5d3becc089f8130c801e0eccde07e7077b",
+    "scripts/test_at_code_buffer_equivalence.sh": "d3e4e5b7201eb77a5ef0f0f3e78dd29f8be6edeb9f4d1b00986226d2baf951c1",
+    "scripts/test_at_code_buffer_integration.sh": "777dd07c96f23d65363bcf4bf37bfbb6776e45dfcca59d0ae9a63640cb4df24f",
+    "scripts/test_at_code_buffer_production.sh": "06fa791a09b9eaa034b4a34eab5e0bc8dd3b3239657bff01be90191df5ffb3ea",
+    "scripts/test_at_code_buffer_warm_reset.sh": "42d9131d0efe99b5c7c175644f7972704ce80ec99f725a10d278d0c3679e606e",
+    "scripts/test_at_data_idle.sh": "197cb53075586956a2a6d29e9ae983983928c94b334a603e3bb16cea30d2061e",
+    "scripts/test_at_dma_registers.sh": "cffcdb8a0b4b1f5a97a03be9364d7e00e939015eea09795d98fb02a5f70c85b7",
+    "scripts/test_at_ega_decode.sh": "cb6777b0119addd7377e58b1771f01f5ac62edf32103ad54da3adbf4f1c471c2",
+    "scripts/test_at_floppy_write_protect.sh": "f374d76b8b3a3f5c18778b9d3cea561a96cb9d0a8081527998934d9fbcb88602",
+    "scripts/test_at_frame_shadowmask.sh": "c5d87e91b9752f696f913013c5d62a3b21514ac48fbe8a8fd11c87e7f002cb90",
+    "scripts/test_at_hdmi_vsync.sh": "db5a29e48bd570090ef52100488e28122882cc972b595293f40d46d7f19f2f5f",
+    "scripts/test_at_hps_rom_loader.sh": "d071d18288ac6b75e52a3ccf96dd96f83a6da0bcc6a0fa6eb7914eba451dbd6f",
+    "scripts/test_at_immediate_execution.sh": "7f0fc75103626539fdba746add899c9af7e61a081087b8cb40ac71225a015737",
+    "scripts/test_at_keyboard.sh": "7ddadb61036ea44ce894bcfb62d1e98b9c2ec393f581c8326eed3c54f656aaa1",
+    "scripts/test_at_keyboard_packing.sh": "433f2d2d3b490324fbcf4711f64908d8213a8d5de9a95fec8333bc4781abec6b",
+    "scripts/test_at_landmark_cmos.sh": "3014868bfe4776965f3a83f6ffd57c6877fbe438ddf08bc5974c97ba909b8ff5",
+    "scripts/test_at_landmark_dma.sh": "0fba7826ccc810c5fa151115416d74357c0919f531a1f5e2ff795ea1a6c3d28c",
+    "scripts/test_at_landmark_floppy.sh": "70628d637774083413e6dd74e8ad869718d4d80449a0d94f30acdf6c3ba7fbcb",
+    "scripts/test_at_landmark_keyboard.sh": "49ea592f5bd0e126220508c304a4158ea3faeae7ff45fcded0ba896a32cf3a36",
+    "scripts/test_at_landmark_peripherals.sh": "fac87e71a81fd1f92fd2c171b69333e6ee715e98a277d0ebcecb2f277e397906",
+    "scripts/test_at_landmark_pm_skip.sh": "a8bfadb37e114903bb0392de69aebfc6829fe9e1d4adcd2157a6d06e869b50e5",
+    "scripts/test_at_loadall_cpu.sh": "433838f27b5b1b14e6cd6de9ff7ec04f9ed3ea38d426ab7642543b1d3b380fc0",
+    "scripts/test_at_loadall_xms.sh": "537a9678ec55a5399e4d9023d2e1d6c3b55cbff627af0de4759b546003a0eaf9",
+    "scripts/test_at_machine_boundary.sh": "d0f4b41bbbfd6cff4b696b2b7cdd838558deb3f414febc4a10054c00d2f5ce03",
+    "scripts/test_at_memory_entry.sh": "433c86e3945063b6e6d5b0f0357e80ce168bebc99abd672279a95559a9ccc2a5",
+    "scripts/test_at_memory_perf.sh": "1bb15f6ced8358edec852d7b2d0b3eafd8cc73cfe2747ce399ed90cf821fb418",
+    "scripts/test_at_mister_memory_port.sh": "33fa94ed9726a25444d7c3096796e16da752015562dae75e377a7f1306ee0b90",
+    "scripts/test_at_mister_sdram_owner.sh": "a9c206b2212044e6b5bd5ec865cf21f97a1d82a2ba8030bf3b107e5635bd1f15",
+    "scripts/test_at_mouse.sh": "afd3e2bee3cb792b9d511813205c6176db8dafe1b6cf7f3bfa1a9ac885dd263f",
+    "scripts/test_at_mrbios_restart.sh": "f8533020e6f110a23438fd43028f528370dc97fe741a7fa9675e120d3989e9b2",
+    "scripts/test_at_multiline_code_buffer.sh": "5145cd07959eaf224985010fa39ad84972293499acde82c8b2c949cca187e93a",
+    "scripts/test_at_native_output.sh": "82dfdce17d9575cbba38556e081df8436f6293c03c37ed5636e81182c3a6ebb4",
+    "scripts/test_at_phoenix_fdc_post.sh": "e99e52191ff7d39d0e2e5ab41cdfcdc530cb4717056bf807fd95bd47bc787f31",
+    "scripts/test_at_phoenix_pm87.sh": "f2a140a2c9e9f0ec688dd41c014875f81d124551aaa1cde012e7e5a38964a042",
+    "scripts/test_at_pic_init_probe.sh": "95d34d9e75ff67187065d0c32a9ae031bd18e8833fdf44144cffcca9123b2af4",
+    "scripts/test_at_pit_irq0.sh": "31063261f832799ed51eae76c1d8404db222c9fa1360553417ac1bac8b512dff",
+    "scripts/test_at_pit_ports.sh": "5beba713fa9c7bb45cdfa910931e7d8f96d4cffbfcb6a80b8857e17ed02784ad",
+    "scripts/test_at_profile_bridge.sh": "0975d70d419a9ea5c013e24e8ae03bac08a001b933b34e8ef38822fcc7fb55e6",
+    "scripts/test_at_profile_elab.sh": "3a26100443aa43051eef987e71dcd6f43fe6578d9c5e0f2e57ebd31da2c02c64",
+    "scripts/test_at_protected_memory_data.sh": "204bbe003665d17d48860da7e5d62145165e478b4e02386621b4b61b88549521",
+    "scripts/test_at_ram_read_buffer.sh": "8ce3b31ba761be14e360ff08491d319c0d10229af5c24d8e7fd110abb1c6a2cf",
+    "scripts/test_at_ram_read_buffer_perf.sh": "57eca56b7b0ffb3507eeb96a425b6df27200aced5c76eea0117d7ce023fd6607",
+    "scripts/test_at_register_execution.sh": "bb74b9553ee07c6f09e9c211b10ebd115bcae9558991871ffed92dc1d3e99bc8",
+    "scripts/test_at_rtc_cmos.sh": "8058a6acb692c743a2a6cd76793ea127f8e532f821900c2e2261a45b5d792cab",
+    "scripts/test_at_scaler_avalon.sh": "1ec9c7fb154cd760c21acc3ba7e0f2940c93f1150b28ee769482e12146ad4331",
+    "scripts/test_at_scaler_config.sh": "41b0ee01a93237c1de53164cb2652dacdcc4e36a603fc585a5d1e8501d1478cf",
+    "scripts/test_at_sdram_capture.sh": "a71bed47da0ea5d15ef4ba1a47f856c225d93070e609e1b2536326e0cd28b117",
+    "scripts/test_at_sdram_entry.sh": "c4c31cf4f2521cf8ef71c6d871b35947402f8e27da7e5b61662db00a74cc393f",
+    "scripts/test_at_sdram_phase.sh": "d429288e0ef7bc1acd8f692134a570bd49cece2074c2b1147d36720bf1e3f5cb",
+    "scripts/test_at_sdram_read_buffer.sh": "7056acaae71f3806ce84ac3d2023abca900368d21809a41fe05069b3e8b2a605",
+    "scripts/test_at_sdram_write_admission.sh": "627a0c164da3adc44e7efb9284a6a9abaddf8cc047e1b8204da94b60f572652c",
+    "scripts/test_at_serial.sh": "623bf42da32abf09c3b52e6b3de7ff13d0e6e90802d0c8399689d93d1b00c93c",
+    "scripts/test_at_soundblaster.sh": "715782fc8af427557ea927488526bfa82fce6028e124f7ec81c8b3a39f978b3b",
+    "scripts/test_at_soundblaster_machine.sh": "bd9638cd98923e8321d896decc9e9e4995838e79afd02467f63e85247f367f83",
+    "scripts/test_at_splash_control.sh": "06f5ec30b3bea1c29c29804b9365bf20956aeaa305bcdd31513b1537e9a46d63",
+    "scripts/test_at_stack_offset_arithmetic.sh": "a1b9f5d37d3d4afa331482bd7c1262467ebcd133f84e7592a02b2dd466627422",
+    "scripts/test_at_video_options.sh": "d397e4233f96092377e276b7a215a494ee50a73fa5d926cd7891b97474674064",
+    "scripts/test_at_video_window.sh": "f40e499b864a66b399b908f8244b849c27ac59f972bcbd6411ae3e471172b30a",
+    "scripts/test_at_xtide_machine.sh": "8b4dc1061d9a262a06b6090d20fd27b3601b6804bb925b64a516cbd2be958634",
+    "scripts/test_at_xub_probe.sh": "915172da9e4efa0b6b426ceb1f6fecdec9ad9ce39865dd7e9e1cdf30d5bae022",
+    "scripts/test_checkit_directed.sh": "0421ec1ef2752a2d46d19aa4ee2e7b2b5687d5f6b8d2a0f21ac519a1cfa6f126",
+    "scripts/test_checkit_profile.sh": "e91859e9158157253b15f1523ccc92185b1eed5e3724700829df100785b581a1",
+    "scripts/test_code_buffer_capacity.sh": "8c147f1f7e1204b45bb9a22d708b3813b3ba5be68c754147a36d7ab57e112e57",
+    "scripts/test_code_buffer_coherence_audit.sh": "3889b4e319cf056efa9b09b1b5997d8e1f30f3900579b822560419af3d1f0031",
+    "scripts/test_debug_overlay.sh": "e56e27ea8777603e47d3d95a9511439a0070101488b1860d639be6865c775abf",
+    "scripts/test_i1_cpu_package.sh": "e45d8aeee9fad7ffd3766d4865d39a54aeb28e1ceb8cd337ab6e78ca053df7eb",
+    "scripts/test_rtc_bcd_lookup.sh": "c28f4e2afc1c15d3a312828a6b4ff054dea040b15b4048265d2b72850ac55965"
+  },
+  "registered_cpu_units": [
+    "spk286_registers",
+    "spk286_segments",
+    "spk286_loadall_service",
+    "spk286_loadall_protected",
+    "spk286_protected_foundation",
+    "spk286_protected_system",
+    "spk286_protected_event_outer",
+    "spk286_protected_expand_down",
+    "spk286_call_stack_precheck",
+    "spk286_arpl",
+    "spk286_clts",
+    "spk286_clts_privilege",
+    "spk286_protected_retf",
+    "spk286_tss_service",
+    "spk286_tss_descriptor_service",
+    "spk286_task_segment_service",
+    "spk286_task_switch_service",
+    "spk286_protected_task",
+    "spk286_protected_task_fault",
+    "spk286_protected_task_state_fault",
+    "spk286_protected_task_gate",
+    "spk286_protected_task_gate_far",
+    "spk286_protected_task_gate_fault",
+    "spk286_protected_task_gate_error",
+    "spk286_protected_task_privilege",
+    "spk286_protected_task_privilege_outer",
+    "spk286_protected_task_gate_privilege",
+    "spk286_protected_task_gate_privilege_outer",
+    "spk286_protected_task_gate_event_privilege_outer",
+    "spk286_protected_task_iret",
+    "spk286_protected_task_ldt",
+    "spk286_fetch",
+    "spk286_core",
+    "spk286_prefetch_queue",
+    "spk286_protected_ltr",
+    "spk286_microsequencer",
+    "spk286_microcode_rom",
+    "spk286_decoder",
+    "spk286_timing_trace",
+    "spk286_timing_capture",
+    "spk286_timing_policy",
+    "spk286_timing_policy_contract",
+    "spk286_timing_policy_equivalence",
+    "spk286_timing_calibration",
+    "spk286_timing_calibration_extra",
+    "spk286_prefetch_fidelity",
+    "spk286_execution",
+    "spk286_microcode_execution",
+    "spk286_modrm",
+    "spk286_effective_address",
+    "spk286_operand_decode",
+    "spk286_biu",
+    "spk286_mov_operands",
+    "spk286_operand_lifecycle",
+    "spk286_operand_service",
+    "spk286_alu",
+    "spk286_alu_instructions",
+    "spk286_alu_lifecycle",
+    "spk286_stack_control",
+    "spk286_stack_lifecycle",
+    "spk286_event_instructions",
+    "spk286_event_lifecycle",
+    "spk286_event_streams",
+    "spk286_biu_width_io",
+    "spk286_operand_byte",
+    "spk286_alu_byte",
+    "spk286_byte_scalar",
+    "spk286_prefix",
+    "spk286_test_instructions",
+    "spk286_scalar_direct",
+    "spk286_shift",
+    "spk286_shift_instructions",
+    "spk286_data_instructions",
+    "spk286_data_lifecycle",
+    "spk286_unary_instructions",
+    "spk286_unary_lifecycle",
+    "spk286_adjust",
+    "spk286_adjust_instructions",
+    "spk286_adjust_lifecycle",
+    "spk286_segment_instructions",
+    "spk286_segment_lifecycle",
+    "spk286_stack_range",
+    "spk286_stack_frame_instructions",
+    "spk286_stack_frame_lifecycle",
+    "spk286_far_instructions",
+    "spk286_far_lifecycle",
+    "spk286_string_instructions",
+    "spk286_string_lifecycle",
+    "spk286_string_boundaries",
+    "spk286_scalar_io",
+    "spk286_string_io",
+    "spk286_string_io_lifecycle",
+    "spk286_muldiv",
+    "spk286_muldiv_instructions",
+    "spk286_muldiv_lifecycle",
+    "spk286_string_zero_events",
+    "spk286_string_io_zero_events",
+    "spk286_biu_hold_lock",
+    "spk286_xchg_hold_lock",
+    "spk286_esc_instructions",
+    "spk286_loadall_integration",
+    "spk286_npx_traps",
+    "spk286_esc_boundaries",
+    "spk286_double_fault_cpu",
+    "spk286_double_fault_events",
+    "spk286_protected_entry",
+    "spk286_protected_direct_call",
+    "spk286_conforming_data_load",
+    "spk286_call_gate_accessed",
+    "spk286_jmp_call_gate",
+    "spk286_hlt_privilege",
+    "spk286_event_nt",
+    "spk286_return_flags",
+    "spk286_gate_target_rpl",
+    "spk286_fault_metadata",
+    "spk286_fault_precedence",
+    "spk286_odd_protected_stack",
+    "spk286_system_access",
+    "spk286_iopl_access",
+    "spk286_protected_return_restart",
+    "spk286_protected_pop_segment_restart",
+    "spk286_descriptor_inspection",
+    "spk286_system_table_range",
+    "spk286_outer_return_sp",
+    "spk286_register_execution",
+    "spk286_task_late_publication",
+    "spk286_null_ldtr",
+    "spk286_immediate_execution",
+    "spk286_immediate_throughput",
+    "spk286_encoding_preview",
+    "spk286_length_boundary"
+  ],
+  "cpu_unit_supplement": [
+    "spk286_event_arbitration"
+  ],
+  "expected_cpu_icarus": 132,
+  "expected_cpu_verilator": 131,
+  "registered_root_shell": [
+    "test_a1_at_bridge.sh",
+    "test_a2_memory_arbiter.sh",
+    "test_a3_interrupts.sh",
+    "test_a4_dma_refresh_pit.sh",
+    "test_a5_at_devices.sh",
+    "test_at_bios_first_fetch.sh",
+    "test_at_bridge_cancel_pipeline.sh",
+    "test_at_bridge_response.sh",
+    "test_at_bus_latency.sh",
+    "test_at_cdc.sh",
+    "test_at_code_buffer_equivalence.sh",
+    "test_at_code_buffer_integration.sh",
+    "test_at_code_buffer_production.sh",
+    "test_at_code_buffer_warm_reset.sh",
+    "test_at_data_idle.sh",
+    "test_at_dma_registers.sh",
+    "test_at_ega_decode.sh",
+    "test_at_floppy_write_protect.sh",
+    "test_at_frame_shadowmask.sh",
+    "test_at_hdmi_vsync.sh",
+    "test_at_hps_rom_loader.sh",
+    "test_at_immediate_execution.sh",
+    "test_at_keyboard.sh",
+    "test_at_keyboard_packing.sh",
+    "test_at_landmark_cmos.sh",
+    "test_at_landmark_dma.sh",
+    "test_at_landmark_floppy.sh",
+    "test_at_landmark_keyboard.sh",
+    "test_at_landmark_peripherals.sh",
+    "test_at_landmark_pm_skip.sh",
+    "test_at_loadall_cpu.sh",
+    "test_at_loadall_xms.sh",
+    "test_at_machine_boundary.sh",
+    "test_at_memory_entry.sh",
+    "test_at_memory_perf.sh",
+    "test_at_mister_memory_port.sh",
+    "test_at_mister_sdram_owner.sh",
+    "test_at_mouse.sh",
+    "test_at_mrbios_restart.sh",
+    "test_at_multiline_code_buffer.sh",
+    "test_at_native_output.sh",
+    "test_at_phoenix_fdc_post.sh",
+    "test_at_phoenix_pm87.sh",
+    "test_at_pic_init_probe.sh",
+    "test_at_pit_irq0.sh",
+    "test_at_pit_ports.sh",
+    "test_at_profile_bridge.sh",
+    "test_at_profile_elab.sh",
+    "test_at_protected_memory_data.sh",
+    "test_at_ram_read_buffer.sh",
+    "test_at_ram_read_buffer_perf.sh",
+    "test_at_register_execution.sh",
+    "test_at_rtc_cmos.sh",
+    "test_at_scaler_avalon.sh",
+    "test_at_scaler_config.sh",
+    "test_at_sdram_capture.sh",
+    "test_at_sdram_entry.sh",
+    "test_at_sdram_phase.sh",
+    "test_at_sdram_read_buffer.sh",
+    "test_at_sdram_write_admission.sh",
+    "test_at_serial.sh",
+    "test_at_soundblaster.sh",
+    "test_at_soundblaster_machine.sh",
+    "test_at_splash_control.sh",
+    "test_at_stack_offset_arithmetic.sh",
+    "test_at_video_options.sh",
+    "test_at_video_window.sh",
+    "test_at_xtide_machine.sh",
+    "test_at_xub_probe.sh",
+    "test_checkit_directed.sh",
+    "test_checkit_profile.sh",
+    "test_code_buffer_capacity.sh",
+    "test_code_buffer_coherence_audit.sh",
+    "test_debug_overlay.sh",
+    "test_i1_cpu_package.sh",
+    "test_rtc_bcd_lookup.sh"
+  ],
+  "registered_root_python": [
+    "test_ascal_hacc_equivalence.py",
+    "test_ascal_terminal_equivalence.py",
+    "test_at_buffer_payload.py",
+    "test_at_floppy_write.py",
+    "test_at_floppy_write_protect.py",
+    "test_at_retained_fdc.py",
+    "test_at_scaler_luminance.py",
+    "test_at_sdram_clock.py",
+    "test_at_speed_profiles.py",
+    "test_at_timing_closure_audit.py",
+    "test_at_video_register_placement.py",
+    "test_check_at_net_delay.py",
+    "test_compare_at_memory_perf.py",
+    "test_fetch_turnaround.py",
+    "test_null_segment_commit_equivalence.py",
+    "test_p05_limit_equivalence.py",
+    "test_p06_deadline_carry_save_equivalence.py",
+    "test_p06_execution_deadline_equivalence.py",
+    "test_p06_length_fault_boundary.py",
+    "test_p06_live_speed.py",
+    "test_p06_metadata_budget_equivalence.py",
+    "test_p06_palette_address_encoding.py",
+    "test_p06_profile_compatibility.py",
+    "test_p06_repeat_branch_equivalence.py",
+    "test_p06_repeat_local_equivalence.py",
+    "test_p06_target_handoff_integration.py",
+    "test_spk286_at_cpu_profile.py",
+    "test_spk286_encoding_preview.py",
+    "test_spk286_instruction_timing.py",
+    "test_spk286_target_handoff.py",
+    "test_spk286_target_replay_equivalence.py",
+    "test_stack_offset_consumed_contract.py",
+    "test_stack_offset_contract.py",
+    "test_summarize_at_50mhz_timing.py",
+    "test_supersoft_landmark_patch.py",
+    "test_sync_spk286_vendor.py",
+    "test_xtsergey_at_keyboard.py"
+  ],
+  "excluded_historical": {
+    "test_at_code_buffer_equivalence.sh": "Historical Git-counterfactual; production capacity/coherence and integration run"
+  },
+  "coverage_alias": {
+    "test_stack_offset_contract.py": "test_at_stack_offset_arithmetic.sh: fresh raw/timed SAT + unchanged 12 dual cases"
+  },
+  "physical_required": {
+    "opcode_files": 307,
+    "discovered": 1387000,
+    "revoked": 3,
+    "executed": 1386996,
+    "passed": 1386996,
+    "failed": 0,
+    "required_population": 1386997,
+    "exact_e7_missing_physical_capture": 1,
+    "unexpected_omissions": 0,
+    "supplemental_d6_d8_executed": 6000
+  },
+  "profile_expected": {
+    "icarus": 208,
+    "verilator": 56,
+    "max_edge_reference": 26,
+    "total": 290
+  },
+  "mutation_families": [
+    "phase3_boundaries",
+    "alu",
+    "stack_control",
+    "events",
+    "byte_prefix",
+    "scalar",
+    "shift",
+    "data",
+    "unary",
+    "adjust",
+    "segment",
+    "stack_frame",
+    "far",
+    "strings",
+    "io",
+    "muldiv",
+    "double_fault",
+    "phase8",
+    "task_late",
+    "null_ldtr"
+  ],
+  "live_profile_latency_cases": 192,
+  "entry": "Exact RBF timing-open functional regression explicitly requested on 2026-10-06; global HDMI setup -0.063 ns remains open; all performance options on",
+  "resource_policy": {
+    "max_compile_workloads": 1,
+    "build_jobs_where_honored": 1,
+    "c_free_floor_gib": 10,
+    "d_free_floor_gib": 20,
+    "trace_storage": "digest",
+    "compiler_cleanup": "after process exit, archived source/log/vector/receipt identities verified, retain dependent executable/metadata",
+    "paths": "fresh owned D: run root and explicitly inventoried Linux-native leaf only",
+    "no_global_cache_prune": true,
+    "all_temp_and_objects": "owned D: run root",
+    "stage_order": "sequential"
+  },
+  "no_execution_performed": true
+}

@@ -1,0 +1,1396 @@
+// Composed AT machine boundary for the SPK286 integration.
+//
+// This module is intentionally a profile boundary rather than a replacement
+// for the active XT-derived MiSTer top level.  It composes the CPU wrapper,
+// AT bridge, memory decode, ownership arbiter and AT devices behind explicit
+// memory/refresh interfaces.  A later MiSTer profile can attach those ports
+// to the SDRAM/HPS/media/video owners without changing the CPU contract.
+`timescale 1ns/1ps
+
+`ifndef ENABLE_OPL2
+`define ENABLE_OPL2 0
+`endif
+`ifndef ENABLE_CMS
+`define ENABLE_CMS 0
+`endif
+`ifndef ENABLE_TANDY_AUDIO
+`define ENABLE_TANDY_AUDIO 0
+`endif
+`ifndef ENABLE_SB
+`define ENABLE_SB 0
+`endif
+`ifndef ENABLE_MIDI
+`define ENABLE_MIDI 0
+`endif
+
+module spk286_at_machine #(
+    parameter logic CPU_USES_SAMPLE_EDGE = 1'b0,
+    // Backend protocol, not a CPU speed option. The MiSTer memory port
+    // completes only a previously accepted record; abstract test backends
+    // may also accept and complete on the same edge.
+    parameter logic DMA_REGISTERED_MEMORY_COMPLETION = 1'b0
+) (
+    input  logic         clk,
+    input  logic         clk_cpu,
+    input  logic         cpu_sample_edge,
+    input  logic         reset,
+    // The video raster can run its power-on timing while the machine remains
+    // reset for a missing system BIOS.
+    input  logic         video_reset,
+    // CPU-local reset.  The AT splash holds the 286/BIU in reset while the
+    // device router and EGA raster remain alive to render the splash itself.
+    input  logic         cpu_reset,
+    input  logic         clk_video,
+    input  logic         splashscreen,
+    input  logic [1:0]   ega_monitor_profile,
+    input  logic [39:0]  at286ctl_status_effective,
+    input  logic [17:0]  at286ctl_status_osd_match,
+    input  logic [1:0]   at286ctl_eff_opl2,
+    input  logic         at286ctl_eff_cms,
+    input  logic         at286ctl_eff_sb,
+    input  logic [2:0]   at286ctl_eff_sb_irq,
+    input  logic         at286ctl_eff_tandy,
+    input  logic         at286ctl_eff_mpu401,
+    input  logic         at286ctl_eff_ems,
+    input  logic         at286ctl_eff_umb,
+    input  logic [2:0]   installed_ram_size_osd,
+    input  logic         midi_baudce,
+    input  logic         uart_baudce,
+    input  logic         midi_rx,
+    input  logic         uart1_rx,
+    input  logic         uart2_rx,
+    input  logic         uart2_cts_n,
+    input  logic         uart2_dsr_n,
+    input  logic         uart2_dcd_n,
+    input  logic         vga_enabled,
+    input  logic         vga_mode13_native,
+    input  logic [3:0]   crt_h_offset,
+    input  logic [2:0]   crt_v_offset,
+    input  logic [2:0]   vsync_width_osd,
+    input  logic [2:0]   hsync_width_osd,
+    input  logic [1:0]   joy_clk_select,
+    input  logic [4:0]   joy_opts,
+    input  logic [13:0]  joy0,
+    input  logic [13:0]  joy1,
+    input  logic [15:0]  joya0,
+    input  logic [15:0]  joya1,
+    input  logic         execute_enable,
+    input  logic         counter_clock,
+    input  logic         refresh_enable,
+
+    input  logic         keyboard_byte_valid,
+    input  logic [7:0]   keyboard_byte,
+    output logic         keyboard_byte_ready,
+    output logic         keyboard_translate_set1,
+    output logic         keyboard_num_lock,
+    input  logic         periodic_tick, // 32768 Hz RTC reference enable
+    input  logic         second_tick,
+    input  logic         parity_event,
+    input  logic         channel_check_event,
+    input  logic         external_nmi_event,
+
+    // MiSTer hps_ext management for RTC/CMOS and the shared floppy controller.
+    input  logic [15:0]  mgmt_address,
+    input  logic [15:0]  mgmt_writedata,
+    input  logic         mgmt_write,
+    input  logic         mgmt_read,
+    output logic [15:0]  mgmt_readdata,
+    input  logic [1:0]   use_mmc,
+    input  logic [1:0]   floppy_write_protect,
+    output logic [1:0]   floppy_present,
+    output logic [1:0]   floppy_request,
+    output logic [2:0]   ide_request,
+
+    // CPU memory/code-fetch target.  The request metadata is retained by the
+    // bridge and remains stable from command through READY.
+    output logic         memory_request_valid,
+    output logic         memory_command_valid,
+    output logic         memory_write,
+    output logic         memory_code_fetch,
+    output logic [3:0]   memory_cycle_class,
+    output logic [24:0]  memory_address,
+    output logic [1:0]   memory_byte_enable,
+    output logic [15:0]  memory_data_out,
+    input  logic         memory_accept,
+    input  logic         memory_ready,
+    input  logic [15:0]  memory_read_data,
+    input  logic         memory_read_data_valid,
+    // Older posted RAM writes fence I/O, LOCK and external ownership.
+    input  logic         memory_drain_pending,
+
+    // DMA memory side.  The device endpoint is internal to this boundary;
+    // this port is the motherboard memory endpoint for one DMA beat.
+    output logic         dma_memory_valid,
+    output logic         dma_memory_write,
+    output logic         dma_memory_read,
+    output logic [24:0]  dma_memory_address,
+    output logic [1:0]   dma_memory_byte_enable,
+    output logic [15:0]  dma_memory_data_out,
+    input  logic         dma_memory_accept,
+    input  logic         dma_memory_ready,
+    input  logic [15:0]  dma_memory_data_in,
+
+    // Refresh memory side.  Refresh is a separate arbiter owner and does not
+    // return architectural data to the CPU.
+    output logic         refresh_memory_valid,
+    output logic [23:0]  refresh_memory_address,
+    input  logic         refresh_memory_accept,
+    input  logic         refresh_memory_ready,
+
+    output logic         keyboard_output_valid,
+    output logic [7:0]   keyboard_output_byte,
+    output logic         a20_enable,
+    output logic         cpu_reset_request,
+    output logic         intr,
+    output logic         nmi,
+    output logic [15:0]  irq_request,
+    output logic         nmi_mask,
+    output logic         speaker_active,
+    output logic         speaker_level,
+    output logic signed [15:0] opl2_sound,
+    output logic signed [15:0] cms_sound_l,
+    output logic signed [15:0] cms_sound_r,
+    output logic signed [10:0] tandy_sound,
+    output logic signed [15:0] sb_sound_l,
+    output logic signed [15:0] sb_sound_r,
+    output logic         midi_tx,
+    output logic         uart1_rts_n,
+    output logic         uart2_tx,
+    output logic         uart2_rts_n,
+    output logic         uart2_dtr_n,
+
+    output logic [3:0]   selected_device,
+    output logic         unmapped_request,
+    output logic         ata_selected,
+    output logic         floppy_selected,
+    output logic         video_io_selected,
+    output logic         video_memory_selected,
+    output logic [5:0]   video_red,
+    output logic [5:0]   video_green,
+    output logic [5:0]   video_blue,
+    output logic         video_hsync,
+    output logic         video_hblank,
+    output logic         video_dbl_hsync,
+    output logic         video_vsync,
+    output logic         video_vblank,
+    output logic         video_vblank_border,
+    output logic         video_de,
+    output logic         video_dot_toggle,
+    output logic         video_scandouble_active,
+    output logic         video_vmode_toggle,
+    output logic         video_mode350,
+    output logic [11:0]  video_active_dots,
+    output logic [9:0]   video_active_lines,
+    output logic [7:0]   at286ctl_cpu,
+    output logic [7:0]   at286ctl_exp,
+    output logic [7:0]   at286ctl_vid,
+    output logic [7:0]   at286ctl_inp,
+    output logic [7:0]   at286ctl_midi,
+    output logic [7:0]   at286ctl_exp2,
+    output logic [7:0]   at286ctl_crt,
+    output logic [7:0]   at286ctl_sync,
+    output logic [6:0]   ems_map[0:3],
+    output logic         ems_window_enabled[0:3],
+
+    output logic         cpu_hold_request,
+    output logic         cpu_hlda,
+    output logic         bus_owner_valid,
+    output logic [2:0]   bus_owner,
+    output logic         dma_grant,
+    output logic         refresh_grant,
+    output logic         bridge_idle,
+    output logic         cpu_ready,
+
+    output logic [23:0]  cpu_address,
+    output logic [15:0]  cpu_data_out,
+    output logic [15:0]  cpu_data_in,
+    output logic         cpu_data_oe,
+    output logic         cpu_bus_valid,
+    output logic         cpu_bus_write,
+    output logic         cpu_bus_bhe_n,
+    output logic [3:0]   cpu_bus_status,
+    output logic         cpu_bus_lock,
+    output logic         cpu_halted,
+    output logic         cpu_shutdown,
+    output logic         cpu_fault,
+    output logic         debug_control_error,
+    output logic         debug_unsupported_opcode,
+    output logic         debug_microcode_fault,
+    output logic         debug_operand_blocked,
+    output logic         debug_event_completed,
+    output logic [7:0]   debug_event_vector,
+    output logic [7:0]   debug_opcode,
+    output logic [15:0]  debug_cs,
+    output logic [15:0]  debug_ip,
+    output logic [3:0]   debug_bus_state,
+    output logic [2:0]   debug_event_kind,
+    output logic [23:0]  debug_cs_base,
+    output logic [15:0]  debug_flags,
+    output logic [127:0] debug_gpr,
+    output logic         debug_instruction_retired,
+    output logic [63:0]  debug_segment_selectors,
+    output logic         debug_fetch_blocked,
+    output logic [16:0]  debug_fetch_cursor,
+    output logic [11:0]  debug_micro_pc,
+    output logic [11:0]  debug_micro_entry,
+    output logic [7:0]   debug_micro_instruction,
+    output logic         debug_micro_active,
+    output logic [3:0]   debug_prefetch_count,
+    output logic [7:0]   debug_biu_detail,
+    output logic [7:0]   debug_last_post,
+    output logic [15:0]  debug_cpu_cycle_count,
+    output logic [15:0]  debug_at_cycle_count,
+    output logic [31:0]  debug_trace0,
+    output logic [31:0]  debug_trace1,
+    output logic [31:0]  debug_trace2,
+    output logic [31:0]  debug_trace3,
+    output logic [7:0]   debug_keyboard_keycode,
+    output logic         debug_keyboard_irq,
+    output logic [7:0]   debug_keyboard_port_b,
+    output logic         debug_keyboard_pic_int,
+    output logic [3:0]   debug_dma_request,
+    output logic [3:0]   debug_dma_acknowledge_n,
+    output logic [19:0]  debug_at_address,
+    output logic [7:0]   debug_at_data_out,
+    output logic [7:0]   debug_at_data_in,
+    output logic [2:0]   debug_at_status,
+    output logic         debug_at_valid,
+    output logic         debug_at_write,
+    output logic         debug_at_io,
+    output logic         debug_at_inta,
+    output logic         debug_at_code,
+    output logic         debug_at_byte_high,
+    output logic         debug_at_memory_projection,
+    output logic         debug_at_cycle_active,
+    output logic         debug_at_ready,
+    output logic         debug_at_read_data_valid,
+    output logic         debug_dma_bus_request,
+    output logic         debug_refresh_request,
+    output logic [3:0]   debug_bridge_state,
+    output logic [15:0]  refresh_count,
+    output logic [15:0]  dma_side_effect_count,
+    output logic [15:0]  device_side_effect_count,
+    output logic         debug_bridge_error,
+    output logic         protocol_error
+);
+    localparam logic [3:0] CYCLE_INTA = 4'h0;
+
+    logic [15:0] cpu_data_in_i;
+    logic        cpu_ready_i;
+    logic        cpu_hlda_i;
+    logic        spk_halted;
+    logic        spk_shutdown;
+    logic        spk_control_error;
+    logic        spk_unsupported_opcode;
+    logic        spk_microcode_fault;
+    logic        spk_operand_blocked;
+    logic        spk_event_completed;
+    logic [2:0]  spk_debug_event_kind;
+    logic [23:0] spk_debug_cs_base;
+    logic [15:0] spk_debug_flags;
+    logic [127:0] spk_debug_gpr;
+    logic [63:0] spk_debug_segment_selectors;
+    logic        spk_fetch_blocked;
+    logic [16:0] spk_debug_fetch_cursor;
+    logic [11:0] spk_debug_micro_pc;
+    logic [11:0] spk_debug_micro_entry;
+    logic [7:0]  spk_debug_micro_instruction;
+    logic        spk_debug_micro_active;
+    logic [3:0]  spk_debug_prefetch_count;
+    logic [7:0]  spk_debug_biu_detail;
+
+    logic        at_valid;
+    logic        at_command_valid;
+    logic [2:0]  at_owner;
+    logic [3:0]  at_cycle_class;
+    logic [23:0] at_address;
+    logic        at_a0;
+    logic        at_bhe_n;
+    logic [1:0]  at_byte_enable;
+    logic [15:0] at_data_out;
+    logic        at_data_oe;
+    logic        at_write;
+    logic        at_io;
+    logic        at_inta;
+    logic        at_code_fetch;
+    logic        at_lock;
+    logic        at_accepted;
+    logic        at_completed;
+    logic        at_response_valid;
+    logic        at_accept;
+    logic        at_ready;
+    logic [15:0] at_read_data;
+    logic        at_read_data_valid;
+    logic        bridge_protocol_error;
+
+    // The 8042 owns the AT A20 gate.  SPK286 deliberately exposes the
+    // carry into A20 as part of its physical address, so the motherboard
+    // must clear only address bit 20 while the gate is closed.  Keep the
+    // raw bridge address for diagnostics and apply this view to memory
+    // decode/transactions (I/O ports are unaffected).  The reset-vector
+    // alias is deliberately exempt: this profile maps FF0000h-FFFFFFh to
+    // the F0000h BIOS window before the memory owner, even while A20 is off.
+    logic [23:0] at_memory_address;
+    logic [24:0] memory_backend_address;
+    logic        ems_aperture_select;
+    logic        ems_runtime_enabled;
+    logic        umb_region_select;
+    logic        umb_runtime_enabled;
+    logic [2:0]  installed_ram_size_q = 3'd0;
+
+    function automatic logic [2:0] normalize_ram_size(input logic [2:0] size);
+        begin
+            case (size)
+                3'd0, 3'd1, 3'd2, 3'd3, 3'd4: normalize_ram_size = size;
+                default: normalize_ram_size = 3'd0;
+            endcase
+        end
+    endfunction
+
+    // Memory geometry changes only when the user applies Hardware settings
+    // with Reset. This keeps the CPU decode and CMOS report in agreement.
+    always_ff @(posedge clk) begin
+        if (reset)
+            installed_ram_size_q <= normalize_ram_size(installed_ram_size_osd);
+    end
+
+    // The AT profile always decodes its EMS and UMB windows. Keep the legacy
+    // control inputs above for integration compatibility; they no longer gate
+    // the machine memory map.
+    assign ems_runtime_enabled = 1'b1;
+    assign umb_runtime_enabled = 1'b1;
+
+    logic        memory_cycle;
+    logic        conventional_ram_select;
+    logic        video_aperture_select;
+    logic        option_region_select;
+    logic        system_bios_select;
+    logic        extended_ram_select;
+    logic        memory_write_allowed;
+    logic        rom_write_blocked;
+    logic        memory_unmapped_request;
+
+    function automatic logic ems_page_selected(input logic [23:0] address);
+        begin
+            ems_page_selected = 1'b0;
+            if ((address >= 24'h0E0000) &&
+                (address <= 24'h0EFFFF)) begin
+                case (address[15:14])
+                    2'b00: ems_page_selected = ems_window_enabled[0];
+                    2'b01: ems_page_selected = ems_window_enabled[1];
+                    2'b10: ems_page_selected = ems_window_enabled[2];
+                    2'b11: ems_page_selected = ems_window_enabled[3];
+                    default: ems_page_selected = 1'b0;
+                endcase
+            end
+        end
+    endfunction
+
+    function automatic logic [24:0] map_memory_backend_address(
+        input logic [23:0] address
+    );
+        logic [6:0] selected_page;
+        begin
+            selected_page = 7'h00;
+            case (address[15:14])
+                2'b00: selected_page = ems_map[0];
+                2'b01: selected_page = ems_map[1];
+                2'b10: selected_page = ems_map[2];
+                2'b11: selected_page = ems_map[3];
+                default: selected_page = 7'h00;
+            endcase
+            // Resolve the CPU BIOS alias before entering backend address
+            // space. Backend FF0000h-FFFFFFh also backs shifted RAM at
+            // CPU DF0000h-DFFFFFh and must not be translated again.
+            if (address >= 24'hFF0000)
+                map_memory_backend_address = {9'h00F, address[15:0]};
+            // Preserve the source core's physical EMS layout:
+            // {1'b1, page[6:0], offset[13:0]} = 0x200000..0x3FFFFF.
+            else if (ems_page_selected(address))
+                map_memory_backend_address = {1'b0, 2'b00, 1'b1,
+                                               selected_page, address[13:0]};
+            // Keep the EMS card's private 2-4 MiB page store separate from
+            // CPU-visible extended RAM. The physical SDRAM backend has room
+            // beyond the 286's 16 MiB address space, so shift high RAM by
+            // 2 MiB while preserving the CPU-visible address map.
+            else if ((address >= 24'h200000) &&
+                     (address < 24'hFE0000))
+                map_memory_backend_address = {1'b0, address} + 25'h0200000;
+            else
+                map_memory_backend_address = {1'b0, address};
+        end
+    endfunction
+
+    logic        cpu_grant;
+    logic        external_grant;
+    logic        loader_grant;
+    logic        arbiter_protocol_error;
+    logic        dma_bus_request;
+    logic        dma_transfer_valid;
+    logic [2:0]  dma_active_channel;
+    logic [23:0] dma_transfer_address;
+    logic [1:0]  dma_transfer_byte_enable;
+    logic        dma_transfer_write_to_memory;
+    logic        dma_transfer_read_from_memory;
+    logic        dma_transfer_io_to_memory;
+    logic        dma_transfer_memory_to_io;
+    logic [15:0] dma_transfer_data_out;
+    logic        dma_transfer_complete;
+    logic        dma_terminal_count;
+    logic [7:0]  dma_request_state;
+    logic [7:0]  dma_acknowledge;
+    logic        dma_cascade_request;
+    logic        dma_protocol_error;
+
+    logic        refresh_request;
+    logic        refresh_bus_valid;
+    logic [23:0] refresh_address;
+    logic        refresh_complete;
+    logic        refresh_protocol_error;
+
+    logic sys_request_accept, sys_request_ready, sys_read_valid;
+    logic [15:0] sys_read_data;
+    logic [7:0] sys_port_b;
+    logic timer_2_gate, speaker_enable, system_check_pending, sys_protocol_error;
+    logic        pit_request_accept;
+    logic        pit_request_ready;
+    logic [15:0] pit_read_data;
+    logic        pit_read_data_valid;
+    logic        irq0;
+    logic [2:0]  pit_counter_out;
+    logic        pit_protocol_error;
+
+    logic        pic_request_accept;
+    logic        pic_request_ready;
+    logic [15:0] pic_read_data;
+    logic        pic_read_data_valid;
+    logic        pic_slave_intr;
+    logic        pic_inta_sequence_active;
+    logic        pic_inta_first_active;
+    logic        pic_inta_second_active;
+    logic        pic_protocol_error;
+
+    logic        devices_request_accept;
+    logic        devices_request_ready;
+    logic [15:0] devices_read_data;
+    logic        devices_read_data_valid;
+    logic        devices_unmapped_request;
+    logic        devices_dma_transfer_accept;
+    logic        devices_dma_transfer_ready;
+    logic [15:0] devices_dma_transfer_data_out;
+    logic [7:0]  devices_dma_request;
+    logic        devices_cpu_reset_request;
+    logic        irq6;
+    logic        irq8;
+    logic        irq14;
+    logic [15:0] devices_irq_request;
+    logic        devices_protocol_error;
+
+    logic        dma_config_accept;
+    logic        dma_config_ready;
+    logic [15:0] dma_config_read_data;
+    logic        dma_config_read_data_valid;
+
+    logic        io_sink_active_q;
+    logic        io_sink_read_q;
+    logic [1:0]  io_sink_lane_q;
+    logic        io_sink_accept;
+    logic        io_sink_ready;
+    logic [15:0] io_sink_read_data;
+    logic        io_sink_read_data_valid;
+
+    logic        memory_sink_active_q;
+    logic        memory_sink_read_q;
+    logic [1:0]  memory_sink_lane_q;
+    logic        memory_sink_accept;
+    logic        memory_sink_ready;
+    logic [15:0] memory_sink_read_data;
+    logic        memory_sink_read_data_valid;
+
+    logic        rom_write_sink_active_q;
+    logic        rom_write_sink_accept;
+    logic        rom_write_sink_ready;
+
+    logic        dma_memory_accept_q;
+    wire dma_memory_response_valid = dma_memory_ready &&
+        (DMA_REGISTERED_MEMORY_COMPLETION ? dma_memory_accept_q :
+                                           (dma_memory_accept || dma_memory_accept_q));
+    logic        nmi_source_active_q;
+
+    logic [15:0] debug_cpu_cycle_count_q;
+    logic [15:0] debug_at_cycle_count_q;
+    logic [31:0] debug_trace0_q;
+    logic [31:0] debug_trace1_q;
+    logic [31:0] debug_trace2_q;
+    logic [31:0] debug_trace3_q;
+    logic [7:0]  debug_last_post_q;
+
+    logic        a5_io_candidate;
+    logic        pic_io_candidate;
+    logic        pit_io_candidate;
+    logic        dma_io_candidate;
+    logic        io_known_target;
+    logic        io_unmapped_candidate;
+    logic        memory_unmapped_candidate;
+    logic        cpu_owner_active;
+    logic        cpu_memory_candidate;
+    logic        device_request_candidate;
+    logic        sound_io_candidate;
+    logic        warm_boot_marker_event;
+
+    // Both the 8042 reset output and an 80286 SHUTDOWN cycle cause a
+    // CPU-local warm reset on an IBM AT. They must flush the CPU and its
+    // retained bus transaction, but must not reset CMOS or the other AT
+    // devices because the BIOS uses CMOS shutdown codes to resume execution.
+    wire       cpu_core_reset = reset | cpu_reset |
+                                devices_cpu_reset_request | spk_shutdown;
+
+    // When the optional divided CPU clock is selected, warm-reset pulses
+    // originate in the 50 MHz chipset domain. Assert asynchronously and
+    // release on the slower CPU clock after two complete edges. The ordinary
+    // 50 MHz build preserves the direct reset path.
+    logic cpu_clock_reset;
+    generate
+        if (CPU_USES_SAMPLE_EDGE) begin : g_cpu_reset_sync
+            logic cpu_reset_sync1_q;
+            logic cpu_reset_sync2_q;
+            always_ff @(posedge clk_cpu or posedge cpu_core_reset) begin
+                if (cpu_core_reset) begin
+                    cpu_reset_sync1_q <= 1'b1;
+                    cpu_reset_sync2_q <= 1'b1;
+                end else begin
+                    cpu_reset_sync1_q <= 1'b0;
+                    cpu_reset_sync2_q <= cpu_reset_sync1_q;
+                end
+            end
+            assign cpu_clock_reset = cpu_reset_sync2_q;
+        end else begin : g_cpu_reset_direct
+            assign cpu_clock_reset = cpu_core_reset;
+        end
+    endgenerate
+
+    // IBM AT BIOSes announce a warm reboot by storing 1234h at physical
+    // address 0040:0072. Keep this as a one-cycle event so AT286CTL can drop
+    // only its VGA+ enable while preserving other per-program overrides.
+    always_ff @(posedge clk or posedge reset) begin
+        if (reset)
+            warm_boot_marker_event <= 1'b0;
+        else
+            warm_boot_marker_event <= cpu_owner_active && at_command_valid &&
+                                      !at_io && at_write &&
+                                      (at_address[19:0] == 20'h00472) &&
+                                      (at_byte_enable == 2'b11) &&
+                                      (at_data_out == 16'h1234);
+    end
+
+    function automatic logic is_pic_port(input logic [15:0] port);
+        begin
+            is_pic_port = (port == 16'h0020) || (port == 16'h0021) ||
+                          (port == 16'h00A0) || (port == 16'h00A1);
+        end
+    endfunction
+
+    function automatic logic is_pit_port(input logic [15:0] port);
+        begin
+            is_pit_port = (port >= 16'h0040) && (port <= 16'h0043);
+        end
+    endfunction
+
+    function automatic logic is_dma_port(input logic [15:0] port);
+        begin
+            is_dma_port = ((port >= 16'h0000) && (port <= 16'h000F)) ||
+                          ((port >= 16'h0080) && (port <= 16'h008F)) ||
+                          ((port >= 16'h00C0) && (port <= 16'h00DF));
+        end
+    endfunction
+
+    function automatic logic is_a5_io_port(input logic [15:0] port);
+        begin
+            is_a5_io_port = (port == 16'h0060) || (port == 16'h0064) ||
+                            (port == 16'h0070) || (port == 16'h0071) ||
+                            ((port >= 16'h8980) && (port <= 16'h898F)) ||
+                            ((port >= 16'h01F0) && (port <= 16'h01F7)) ||
+                            ((port >= 16'h0200) && (port <= 16'h0207)) ||
+                            ((port >= 16'h03F8) && (port <= 16'h03FF)) ||
+                            ((`ENABLE_MIDI) &&
+                             (port >= 16'h02F8) && (port <= 16'h02FF)) ||
+                            ((`ENABLE_MIDI) &&
+                             (port >= 16'h0330) && (port <= 16'h0331)) ||
+                            (ems_runtime_enabled &&
+                             (port >= 16'h0260) && (port <= 16'h0263)) ||
+                            ((port >= 16'h03B0) && (port <= 16'h03DF)) ||
+                            ((port >= 16'h03F0) && (port <= 16'h03F7));
+        end
+    endfunction
+
+    assign cpu_owner_active = cpu_grant && at_valid;
+
+    always_comb begin
+        at_memory_address = at_address;
+        if (!at_io && !a20_enable &&
+            !((at_address >= 24'hFF0000) &&
+              (at_address <= 24'hFFFFFF)))
+            at_memory_address[20] = 1'b0;
+    end
+
+    always_comb begin
+        pic_io_candidate = at_io && is_pic_port(at_address[15:0]);
+        pit_io_candidate = at_io && is_pit_port(at_address[15:0]);
+        sound_io_candidate = at_io &&
+                             (((`ENABLE_OPL2) &&
+                               (at286ctl_eff_opl2 != 2'd2) &&
+                               (((at_address[15:0] == 16'h0388) ||
+                                 (at_address[15:0] == 16'h0389)) ||
+                                ((at286ctl_eff_opl2 == 2'd1) &&
+                                 ((at_address[15:0] == 16'h0228) ||
+                                  (at_address[15:0] == 16'h0229))))) ||
+                              ((`ENABLE_CMS) && at286ctl_eff_cms &&
+                               (at_address[15:4] == 12'h022) &&
+                               (((at_write) && !at_address[3]) ||
+                                ((!at_write) &&
+                                 ((at_address[3:0] == 4'h4) ||
+                                  (at_address[3:0] == 4'hB))))) ||
+                              ((`ENABLE_TANDY_AUDIO) && at286ctl_eff_tandy &&
+                               at_write &&
+                               (at_address[15:4] == 12'h00C)) ||
+                              // Admit SB DSP/mixer accesses before the
+                              // unmapped-I/O sink can consume them. Match
+                              // the device router's direction-aware decode.
+                              ((`ENABLE_SB) && at286ctl_eff_sb &&
+                               (at_address[15:4] == 12'h022) &&
+                               ((at_address[3:0] == 4'h6) ||
+                                (at_address[3:0] == 4'hA) ||
+                                (at_address[3:0] == 4'hC) ||
+                                (at_address[3:0] == 4'hE) ||
+                                (at_write &&
+                                 ((at_address[3:0] == 4'h4) ||
+                                  (at_address[3:0] == 4'h5))) ||
+                                (!at_write &&
+                                 (at_address[3:0] == 4'h5)))));
+        // Tandy's C0h-CFh decode takes the first half of the AT secondary-DMA
+        // page, just as it does on the source XT profile. Keep D0h-DFh for
+        // the DMA controller when Tandy sound is enabled.
+        dma_io_candidate = at_io && is_dma_port(at_address[15:0]) &&
+                           !((`ENABLE_TANDY_AUDIO) && at286ctl_eff_tandy &&
+                             (at_address[15:4] == 12'h00C));
+        a5_io_candidate = at_io && is_a5_io_port(at_address[15:0]);
+        io_known_target = at_inta || pic_io_candidate || pit_io_candidate ||
+                          dma_io_candidate || a5_io_candidate ||
+                          sound_io_candidate ||
+                          (at_io && at_address[15:0]==16'h61);
+        io_unmapped_candidate = cpu_owner_active && at_io &&
+                                !io_known_target;
+        memory_unmapped_candidate = cpu_owner_active && !at_io && !at_inta &&
+                                    memory_unmapped_request;
+        cpu_memory_candidate = cpu_owner_active && !at_io && !at_inta &&
+                               memory_cycle && !video_aperture_select &&
+                               !rom_write_blocked;
+        device_request_candidate = cpu_owner_active &&
+                                   (a5_io_candidate || sound_io_candidate ||
+                                    video_aperture_select);
+    end
+
+    spk286_machine_cpu u_cpu (
+        .clk                    (clk_cpu),
+        .reset                  (cpu_clock_reset),
+        .execute_enable         (execute_enable),
+        .ready                  (cpu_ready_i),
+        .data_in                (cpu_data_in_i),
+        .intr                   (intr),
+        .nmi                    (nmi),
+        .hold_request           (cpu_hold_request),
+        .address                (cpu_address),
+        .data_out               (cpu_data_out),
+        .data_oe                (cpu_data_oe),
+        .bus_valid              (cpu_bus_valid),
+        .bus_write              (cpu_bus_write),
+        .bus_bhe_n              (cpu_bus_bhe_n),
+        .bus_status             (cpu_bus_status),
+        .bus_lock               (cpu_bus_lock),
+        .hlda                   (cpu_hlda_i),
+        .halted                 (spk_halted),
+        .shutdown               (spk_shutdown),
+        .control_error          (spk_control_error),
+        .unsupported_opcode     (spk_unsupported_opcode),
+        .microcode_fault        (spk_microcode_fault),
+        .operand_blocked        (spk_operand_blocked),
+        .event_completed        (spk_event_completed),
+        .debug_event_vector     (debug_event_vector),
+        .debug_event_kind       (spk_debug_event_kind),
+        .debug_opcode           (debug_opcode),
+        .debug_cs               (debug_cs),
+        .debug_cs_base          (spk_debug_cs_base),
+        .debug_ip                (debug_ip),
+        .debug_flags             (spk_debug_flags),
+        .debug_gpr               (spk_debug_gpr),
+        .debug_instruction_retired(debug_instruction_retired),
+        .debug_segment_selectors (spk_debug_segment_selectors),
+         .fetch_blocked           (spk_fetch_blocked),
+        .debug_fetch_cursor      (spk_debug_fetch_cursor),
+        .debug_micro_pc          (spk_debug_micro_pc),
+        .debug_micro_entry       (spk_debug_micro_entry),
+        .debug_micro_instruction (spk_debug_micro_instruction),
+        .debug_micro_active      (spk_debug_micro_active),
+        .debug_prefetch_count    (spk_debug_prefetch_count),
+        .debug_bus_state         (debug_bus_state),
+        .debug_biu_detail        (spk_debug_biu_detail)
+    );
+
+    assign cpu_hlda = cpu_hlda_i;
+    assign cpu_ready = cpu_ready_i;
+    assign cpu_data_in = cpu_data_in_i;
+
+    // Determine target width before the bridge snapshots A0/BHE. Reuse the
+    // authoritative map, including the high reset-ROM alias. The ordinary
+    // decode below continues to own routing and write protection.
+    wire cpu_memory_word_capable;
+    // The standard AT IDE data register is an ISA16 target. Keep all other
+    // I/O on the bridge's byte-serialized path.
+    wire cpu_io_word_capable = cpu_bus_valid &&
+                                ((cpu_bus_status == 4'h9) ||
+                                 (cpu_bus_status == 4'hA)) &&
+                                !cpu_address[0] && !cpu_bus_bhe_n &&
+                                (cpu_address[15:0] == 16'h01F0);
+    spk286_at_memory_decode u_cpu_width_decode (
+        .request_valid          (cpu_bus_valid),
+        .request_write          (cpu_bus_write),
+        .cycle_class            (cpu_bus_status),
+        .address                (cpu_address),
+        .ems_enabled            (ems_runtime_enabled),
+        .ems_window_enabled     (ems_window_enabled),
+        .umb_enabled            (umb_runtime_enabled),
+        .installed_ram_size     (installed_ram_size_q),
+        .word_capable           (cpu_memory_word_capable),
+        .memory_cycle           (),
+        .conventional_ram_select(), .video_aperture_select(),
+        .option_region_select   (), .system_bios_select(),
+        .extended_ram_select    (), .ems_aperture_select(),
+        .write_allowed(),
+        .rom_write_blocked      (), .unmapped_request()
+    );
+
+    spk286_at_bus_bridge #(
+        .COMPLETE_ON_CPU_SAMPLE(CPU_USES_SAMPLE_EDGE)
+    ) u_bridge (
+        .clk                    (clk),
+        .reset                  (cpu_core_reset),
+        .cpu_sample_edge        (cpu_sample_edge),
+        .cpu_bus_valid          (cpu_bus_valid),
+        .cpu_address            (cpu_address),
+        .cpu_data_out           (cpu_data_out),
+        .cpu_data_oe            (cpu_data_oe),
+        .cpu_bus_write          (cpu_bus_write),
+        .cpu_bus_bhe_n          (cpu_bus_bhe_n),
+        .cpu_bus_status         (cpu_bus_status),
+        .cpu_bus_lock           (cpu_bus_lock),
+        .memory_drain_pending   (memory_drain_pending),
+        .cpu_memory_word_capable (cpu_memory_word_capable),
+        .cpu_io_word_capable    (cpu_io_word_capable),
+        .cpu_ready              (cpu_ready_i),
+        .cpu_data_in            (cpu_data_in_i),
+        .at_valid               (at_valid),
+        .at_command_valid       (at_command_valid),
+        .at_owner               (at_owner),
+        .at_cycle_class         (at_cycle_class),
+        .at_address             (at_address),
+        .at_a0                  (at_a0),
+        .at_bhe_n               (at_bhe_n),
+        .at_byte_enable         (at_byte_enable),
+        .at_data_out            (at_data_out),
+        .at_data_oe             (at_data_oe),
+        .at_write               (at_write),
+        .at_io                  (at_io),
+        .at_inta                (at_inta),
+        .at_code_fetch          (at_code_fetch),
+        .at_lock                (at_lock),
+        .at_accepted            (at_accepted),
+        .at_completed           (at_completed),
+        .at_response_valid      (at_response_valid),
+        .at_accept              (at_accept),
+        .at_ready               (at_ready),
+        .at_read_data           (at_read_data),
+        .at_read_data_valid     (at_read_data_valid),
+        .bridge_idle            (bridge_idle),
+        .debug_state            (debug_bridge_state),
+        .protocol_error         (bridge_protocol_error)
+    );
+
+    spk286_at_memory_decode u_memory_decode (
+        .request_valid          (cpu_owner_active),
+        .request_write          (at_write),
+        .cycle_class            (at_cycle_class),
+        .address                (at_memory_address),
+        .ems_enabled            (ems_runtime_enabled),
+        .ems_window_enabled     (ems_window_enabled),
+        .umb_enabled            (umb_runtime_enabled),
+        .installed_ram_size     (installed_ram_size_q),
+        .memory_cycle           (memory_cycle),
+        .conventional_ram_select(conventional_ram_select),
+        .video_aperture_select  (video_aperture_select),
+        .option_region_select   (option_region_select),
+        .system_bios_select     (system_bios_select),
+        .extended_ram_select    (extended_ram_select),
+        .ems_aperture_select    (ems_aperture_select),
+        .umb_region_select      (umb_region_select),
+        .word_capable           (),
+        .write_allowed          (memory_write_allowed),
+        .rom_write_blocked      (rom_write_blocked),
+        .unmapped_request       (memory_unmapped_request)
+    );
+
+    assign memory_request_valid = cpu_memory_candidate;
+    assign memory_command_valid = cpu_memory_candidate && at_command_valid;
+    assign memory_write = at_write;
+    assign memory_code_fetch = at_code_fetch;
+    assign memory_cycle_class = at_cycle_class;
+    assign memory_backend_address = map_memory_backend_address(at_memory_address);
+    assign memory_address = memory_backend_address;
+    assign memory_byte_enable = at_byte_enable;
+    assign memory_data_out = at_data_out;
+
+    assign rom_write_sink_accept = cpu_owner_active && at_command_valid &&
+                                   rom_write_blocked && !rom_write_sink_active_q;
+    assign rom_write_sink_ready = rom_write_sink_active_q;
+
+    spk286_at_device_router u_devices (
+        .clk                    (clk),
+        .cpu_sample_edge        (cpu_sample_edge),
+        .reset                  (reset),
+        .video_reset            (video_reset),
+        .prebios_video           ((reset || cpu_reset) && !video_reset),
+        .clk_video              (clk_video),
+        .splashscreen           (splashscreen),
+        .ega_monitor_profile    (ega_monitor_profile),
+        .clear_vga13            (warm_boot_marker_event),
+        .at286ctl_status_effective(at286ctl_status_effective),
+        .at286ctl_status_osd_match(at286ctl_status_osd_match),
+        .vga_enabled            (vga_enabled),
+        .vga_mode13_native      (vga_mode13_native),
+        .crt_h_offset           (crt_h_offset),
+        .crt_v_offset           (crt_v_offset),
+        .vsync_width_osd        (vsync_width_osd),
+        .hsync_width_osd        (hsync_width_osd),
+        .joy_clk_select         (joy_clk_select),
+        .joy_opts               (joy_opts),
+        .joy0                   (joy0),
+        .joy1                   (joy1),
+        .joya0                  (joya0),
+        .joya1                  (joya1),
+        .at286ctl_eff_opl2     (at286ctl_eff_opl2),
+        .at286ctl_eff_cms      (at286ctl_eff_cms),
+        .at286ctl_eff_sb       (at286ctl_eff_sb),
+        .at286ctl_eff_sb_irq   (at286ctl_eff_sb_irq),
+        .at286ctl_eff_tandy    (at286ctl_eff_tandy),
+        .at286ctl_eff_mpu401   (at286ctl_eff_mpu401),
+        .at286ctl_eff_ems      (ems_runtime_enabled),
+        .installed_ram_size    (installed_ram_size_q),
+        .midi_baudce           (midi_baudce),
+        .uart_baudce           (uart_baudce),
+        .midi_rx               (midi_rx),
+        .uart1_rx              (uart1_rx),
+        .uart2_rx              (uart2_rx),
+        .uart2_cts_n           (uart2_cts_n),
+        .uart2_dsr_n           (uart2_dsr_n),
+        .uart2_dcd_n           (uart2_dcd_n),
+        .midi_tx               (midi_tx),
+        .uart1_rts_n           (uart1_rts_n),
+        .uart2_tx              (uart2_tx),
+        .uart2_rts_n           (uart2_rts_n),
+        .uart2_dtr_n           (uart2_dtr_n),
+        .request_valid          (device_request_candidate),
+        .request_command_valid  (at_command_valid),
+        .request_write          (at_write),
+        .request_io             (at_io),
+        .request_address        (at_memory_address),
+        .request_byte_enable    (at_byte_enable),
+        .request_data_out       (at_data_out),
+        .request_accept         (devices_request_accept),
+        .request_ready          (devices_request_ready),
+        .request_read_data      (devices_read_data),
+        .request_read_data_valid(devices_read_data_valid),
+        .selected_device        (selected_device),
+        .unmapped_request       (devices_unmapped_request),
+        .keyboard_byte_valid    (keyboard_byte_valid),
+        .keyboard_byte          (keyboard_byte),
+        .keyboard_byte_ready    (keyboard_byte_ready),
+        .keyboard_translate_set1(keyboard_translate_set1),
+        .keyboard_num_lock(keyboard_num_lock),
+        .keyboard_output_valid  (keyboard_output_valid),
+        .keyboard_output_byte   (keyboard_output_byte),
+        .irq1                   (),
+        .a20_enable             (a20_enable),
+        .cpu_reset_request      (devices_cpu_reset_request),
+        .periodic_tick          (periodic_tick),
+        .second_tick            (second_tick),
+        .irq8                   (irq8),
+        .nmi_mask               (nmi_mask),
+        .dma_transfer_valid     (dma_transfer_valid),
+        .dma_transfer_complete  (dma_transfer_complete),
+        .dma_terminal_count     (dma_terminal_count),
+        .dma_active_channel     (dma_active_channel),
+        .dma_transfer_read_from_memory(dma_transfer_read_from_memory),
+        .dma_memory_data_valid  (dma_memory_response_valid),
+        // DMA1 byte devices consume a normalized low-byte value. Select the
+        // addressed SDRAM lane for memory-to-I/O transfers.
+        .dma_transfer_data_in   ((dma_active_channel < 3'd4) &&
+                                 dma_transfer_byte_enable[1] ?
+                                 {8'h00, dma_memory_data_in[15:8]} :
+                                 dma_memory_data_in),
+        .dma_transfer_accept    (devices_dma_transfer_accept),
+        .dma_transfer_ready     (devices_dma_transfer_ready),
+        .dma_transfer_data_out  (devices_dma_transfer_data_out),
+        .dma_request            (devices_dma_request),
+        .mgmt_address           (mgmt_address),
+        .mgmt_writedata         (mgmt_writedata),
+        .mgmt_write             (mgmt_write),
+        .mgmt_read              (mgmt_read),
+        .mgmt_readdata          (mgmt_readdata),
+        .floppy_write_protect   (floppy_write_protect),
+        .floppy_present         (floppy_present),
+        .floppy_request         (floppy_request),
+        .use_mmc                (use_mmc),
+        .ide_request            (ide_request),
+        .irq6                   (irq6),
+        .irq14                  (irq14),
+        .ata_selected           (ata_selected),
+        .floppy_selected        (floppy_selected),
+        .video_io_selected      (video_io_selected),
+        .video_memory_selected  (video_memory_selected),
+        .video_red              (video_red),
+        .video_green            (video_green),
+        .video_blue             (video_blue),
+        .video_hsync            (video_hsync),
+        .video_hblank           (video_hblank),
+        .video_dbl_hsync        (video_dbl_hsync),
+        .video_vsync            (video_vsync),
+        .video_vblank           (video_vblank),
+        .video_vblank_border    (video_vblank_border),
+        .video_de               (video_de),
+        .video_dot_toggle       (video_dot_toggle),
+        .video_scandouble_active(video_scandouble_active),
+        .video_vmode_toggle     (video_vmode_toggle),
+        .video_mode350          (video_mode350),
+        .video_active_dots      (video_active_dots),
+        .video_active_lines     (video_active_lines),
+        .at286ctl_cpu           (at286ctl_cpu),
+        .at286ctl_exp           (at286ctl_exp),
+        .at286ctl_vid           (at286ctl_vid),
+        .at286ctl_inp           (at286ctl_inp),
+        .at286ctl_midi          (at286ctl_midi),
+        .at286ctl_exp2          (at286ctl_exp2),
+        .at286ctl_crt           (at286ctl_crt),
+        .at286ctl_sync          (at286ctl_sync),
+        .ems_map                (ems_map),
+        .ems_window_enabled     (ems_window_enabled),
+        .opl2_sound             (opl2_sound),
+        .cms_sound_l            (cms_sound_l),
+        .cms_sound_r            (cms_sound_r),
+        .tandy_sound            (tandy_sound),
+        .sb_sound_l             (sb_sound_l),
+        .sb_sound_r             (sb_sound_r),
+        .side_effect_count      (device_side_effect_count),
+        .irq_request             (devices_irq_request),
+        .protocol_error          (devices_protocol_error)
+    );
+
+    // PIT IRQ0 is the only interrupt source not owned by the A5 device
+    // router.  The remaining lines are already mapped by that router.
+    assign irq_request = {devices_irq_request[15:1], irq0};
+
+`ifdef AT_MACHINE_PIC_MODEL
+        spk286_at_machine_pic_model u_pic (
+`else
+    spk286_at_pic u_pic (
+`endif
+        .clk                    (clk),
+        .reset                  (reset),
+        .request_valid          (cpu_owner_active && (at_io || at_inta)),
+        .request_command_valid  (at_command_valid),
+        .request_write          (at_write),
+        .request_io             (at_io),
+        .request_inta           (at_inta),
+        .request_address        (at_address),
+        .request_byte_enable    (at_byte_enable),
+        .request_data_out       (at_data_out),
+        .irq_request             (irq_request),
+        .intr                   (intr),
+        .slave_intr             (pic_slave_intr),
+        .request_accept         (pic_request_accept),
+        .request_ready          (pic_request_ready),
+        .request_read_data      (pic_read_data),
+        .request_read_data_valid(pic_read_data_valid),
+        .inta_sequence_active   (pic_inta_sequence_active),
+        .inta_first_active      (pic_inta_first_active),
+        .inta_second_active     (pic_inta_second_active),
+        .protocol_error         (pic_protocol_error)
+    );
+
+    spk286_at_system_control u_system_control (
+        .clk(clk), .reset(reset),
+        .request_valid(cpu_owner_active && at_io), .request_command_valid(at_command_valid),
+        .request_write(at_write), .request_io(at_io), .request_address(at_address),
+        .request_byte_enable(at_byte_enable), .request_data_out(at_data_out),
+        .request_accept(sys_request_accept), .request_ready(sys_request_ready),
+        .request_read_data(sys_read_data), .request_read_data_valid(sys_read_valid),
+        .timer_1_out(pit_counter_out[1]), .timer_2_out(pit_counter_out[2]),
+        .parity_event(parity_event), .channel_check_event(channel_check_event),
+        .timer_2_gate(timer_2_gate), .speaker_enable(speaker_enable),
+        .check_pending(system_check_pending),
+        .port_b(sys_port_b), .protocol_error(sys_protocol_error)
+    );
+    spk286_at_pit u_pit (
+        .clk                    (clk),
+        .reset                  (reset),
+        .counter_clock          (counter_clock),
+        .counter_2_gate         (timer_2_gate),
+        .request_valid          (cpu_owner_active && at_io),
+        .request_command_valid  (at_command_valid),
+        .request_write          (at_write),
+        .request_io             (at_io),
+        .request_address        (at_address),
+        .request_byte_enable    (at_byte_enable),
+        .request_data_out       (at_data_out),
+        .request_accept         (pit_request_accept),
+        .request_ready          (pit_request_ready),
+        .request_read_data      (pit_read_data),
+        .request_read_data_valid(pit_read_data_valid),
+        .irq0                   (irq0),
+        .counter_out            (pit_counter_out),
+        .protocol_error         (pit_protocol_error)
+    );
+
+    spk286_at_dma u_dma (
+        .clk                    (clk),
+        .reset                  (reset),
+        .request_valid          (cpu_owner_active && at_io),
+        .request_command_valid  (at_command_valid),
+        .request_write          (at_write),
+        .request_io             (at_io),
+        .request_address        (at_address),
+        .request_byte_enable    (at_byte_enable),
+        .request_data_out       (at_data_out),
+        .request_accept         (dma_config_accept),
+        .request_ready          (dma_config_ready),
+        .request_read_data      (dma_config_read_data),
+        .request_read_data_valid(dma_config_read_data_valid),
+        .dma_request             (devices_dma_request),
+        .dma_grant               (dma_grant),
+        .transfer_accept         (devices_dma_transfer_accept),
+        .transfer_ready          (devices_dma_transfer_ready &&
+                                  dma_memory_response_valid),
+        .transfer_data_in        (dma_transfer_read_from_memory ?
+                                  dma_memory_data_in :
+                                  devices_dma_transfer_data_out),
+        .dma_bus_request         (dma_bus_request),
+        .dma_transfer_valid      (dma_transfer_valid),
+        .dma_active_channel      (dma_active_channel),
+        .dma_transfer_address    (dma_transfer_address),
+        .dma_transfer_byte_enable(dma_transfer_byte_enable),
+        .dma_transfer_write_to_memory(dma_transfer_write_to_memory),
+        .dma_transfer_read_from_memory(dma_transfer_read_from_memory),
+        .dma_transfer_io_to_memory(dma_transfer_io_to_memory),
+        .dma_transfer_memory_to_io(dma_transfer_memory_to_io),
+        .dma_transfer_data_out   (dma_transfer_data_out),
+        .dma_transfer_complete   (dma_transfer_complete),
+        .dma_terminal_count      (dma_terminal_count),
+        .dma_request_state       (dma_request_state),
+        .dma_acknowledge         (dma_acknowledge),
+        .cascade_request         (dma_cascade_request),
+        .protocol_error          (dma_protocol_error)
+    );
+
+    assign dma_memory_valid = dma_transfer_valid;
+    assign dma_memory_write = dma_transfer_write_to_memory;
+    assign dma_memory_read = dma_transfer_read_from_memory;
+    // The AT A20 gate belongs to the CPU memory path.  Legacy 8237 DMA
+    // presents its programmed physical address directly on the bus; 86Box
+    // models this with mem_read_phys()/mem_write_phys(), which bypass the
+    // CPU rammask.  Keep DMA independent of the CPU A20 state.
+    assign dma_memory_address = map_memory_backend_address(dma_transfer_address);
+    assign dma_memory_byte_enable = dma_transfer_byte_enable;
+    assign dma_memory_data_out = dma_transfer_data_out;
+
+    // Export the complete CPU-local reset event so the external serialized
+    // memory path can cancel any request owned by the pre-reset CPU context.
+    assign cpu_reset_request = devices_cpu_reset_request | spk_shutdown;
+
+    // Minimal IBM AT PC speaker path.  The speaker only produces a waveform
+    // when both port 61h's speaker-enable and GATE2 are asserted; PIT channel
+    // 2 supplies the square-wave level.  Audio conversion remains at the
+    // profile boundary, so the machine still exposes the native logic level.
+    assign speaker_active = speaker_enable && timer_2_gate;
+    assign speaker_level  = speaker_active && pit_counter_out[2];
+
+    spk286_at_refresh u_refresh (
+        .clk                    (clk),
+        .reset                  (reset),
+        .refresh_enable         (refresh_enable),
+        .timer_1_out            (pit_counter_out[1]),
+        .refresh_grant          (refresh_grant),
+        .refresh_accept         (refresh_memory_accept &&
+                                 refresh_memory_valid),
+        .refresh_ready          (refresh_memory_ready &&
+                                 refresh_memory_valid),
+        .refresh_request        (refresh_request),
+        .refresh_bus_valid      (refresh_bus_valid),
+        .refresh_address        (refresh_address),
+        .refresh_complete      (refresh_complete),
+        .refresh_count          (refresh_count),
+        .protocol_error         (refresh_protocol_error)
+    );
+
+    assign refresh_memory_valid = refresh_bus_valid && refresh_grant;
+    assign refresh_memory_address = refresh_address;
+
+    // The overlay consumes a compact, source-domain snapshot.  Keep the
+    // architectural CPU state and the normalized AT transaction visible at
+    // the profile boundary instead of reaching through this wrapper from the
+    // MiSTer top level.
+    assign debug_event_kind        = spk_debug_event_kind;
+    assign cpu_halted              = spk_halted;
+    assign cpu_shutdown            = spk_shutdown;
+    assign debug_control_error     = spk_control_error;
+    assign debug_unsupported_opcode = spk_unsupported_opcode;
+    assign debug_microcode_fault   = spk_microcode_fault;
+    assign debug_operand_blocked   = spk_operand_blocked;
+    assign debug_event_completed   = spk_event_completed;
+    assign debug_cs_base           = spk_debug_cs_base;
+    assign debug_flags             = spk_debug_flags;
+    assign debug_gpr               = spk_debug_gpr;
+    assign debug_segment_selectors = spk_debug_segment_selectors;
+    assign debug_fetch_blocked     = spk_fetch_blocked;
+    assign debug_fetch_cursor      = spk_debug_fetch_cursor;
+    assign debug_micro_pc          = spk_debug_micro_pc;
+    assign debug_micro_entry       = spk_debug_micro_entry;
+    assign debug_micro_instruction = spk_debug_micro_instruction;
+    assign debug_micro_active      = spk_debug_micro_active;
+    assign debug_prefetch_count    = spk_debug_prefetch_count;
+    assign debug_biu_detail        = spk_debug_biu_detail;
+    // Port 80h is a write-only diagnostic port on a conventional AT.  Keep
+    // this observer separate from the CPU event vector: the latter is shown
+    // as EVT on the overlay and must not masquerade as a BIOS POST code.
+    assign debug_last_post         = debug_last_post_q;
+    assign debug_cpu_cycle_count   = debug_cpu_cycle_count_q;
+    assign debug_at_cycle_count    = debug_at_cycle_count_q;
+    assign debug_trace0            = debug_trace0_q;
+    assign debug_trace1            = debug_trace1_q;
+    assign debug_trace2            = debug_trace2_q;
+    assign debug_trace3            = debug_trace3_q;
+    assign debug_keyboard_keycode  = keyboard_byte;
+    assign debug_keyboard_irq      = keyboard_byte_valid;
+    assign debug_keyboard_port_b   = sys_port_b;
+    assign debug_keyboard_pic_int  = intr;
+    assign debug_dma_request       = devices_dma_request[3:0];
+    assign debug_dma_acknowledge_n = 4'hF;
+
+    assign debug_at_address        = at_address[19:0];
+    assign debug_at_data_out       = at_byte_enable[1] ?
+                                     at_data_out[15:8] : at_data_out[7:0];
+    assign debug_at_data_in        = at_byte_enable[1] ?
+                                     at_read_data[15:8] : at_read_data[7:0];
+    assign debug_at_status         = at_cycle_class[2:0];
+    assign debug_at_valid          = at_valid;
+    assign debug_at_write          = at_write;
+    assign debug_at_io             = at_io;
+    assign debug_at_inta           = at_inta;
+    assign debug_at_code           = at_code_fetch;
+    assign debug_at_byte_high      = at_byte_enable[1];
+    assign debug_at_memory_projection = conventional_ram_select |
+                                        video_aperture_select |
+                                        option_region_select |
+                                        system_bios_select |
+                                        extended_ram_select |
+                                        ems_aperture_select |
+                                        umb_region_select;
+    assign debug_at_cycle_active   = at_valid;
+    assign debug_at_ready         = at_ready;
+    assign debug_at_read_data_valid = at_read_data_valid;
+    assign debug_dma_bus_request  = dma_bus_request;
+    assign debug_refresh_request  = refresh_request;
+
+    always_ff @(posedge clk or posedge reset) begin
+        if (reset) begin
+            debug_cpu_cycle_count_q <= 16'h0000;
+            debug_at_cycle_count_q  <= 16'h0000;
+            debug_trace0_q          <= 32'h0000_0000;
+            debug_trace1_q          <= 32'h0000_0000;
+            debug_trace2_q          <= 32'h0000_0000;
+            debug_trace3_q          <= 32'h0000_0000;
+            debug_last_post_q       <= 8'h00;
+        end else begin
+            if (at_completed) begin
+                debug_cpu_cycle_count_q <= debug_cpu_cycle_count_q + 16'd1;
+                debug_trace3_q <= debug_trace2_q;
+                debug_trace2_q <= debug_trace1_q;
+                debug_trace1_q <= debug_trace0_q;
+                debug_trace0_q <= {at_address[19:0],
+                                   at_data_out[7:0],
+                                   at_cycle_class[2:0], at_write};
+
+                // Observe a completed byte write to the standard POST
+                // diagnostic port.  The normalized bridge presents the
+                // active byte on the selected lane, including the second
+                // beat of an aligned two-byte request.
+                if (at_io && at_write &&
+                    (at_address[15:0] == 16'h0080)) begin
+                    debug_last_post_q <= at_byte_enable[1] ?
+                                         at_data_out[15:8] :
+                                         at_data_out[7:0];
+                end
+            end
+            if (at_accepted)
+                debug_at_cycle_count_q <= debug_at_cycle_count_q + 16'd1;
+        end
+    end
+
+    spk286_at_arbiter u_arbiter (
+        .clk                    (clk),
+        .reset                  (reset),
+        .cpu_hlda               (cpu_hlda_i),
+        .cpu_bridge_idle        (bridge_idle),
+        .cpu_lock               (at_lock),
+        // The bridge retains an odd word as one locked logical request.  It
+        // cannot be interrupted because bridge_idle is false until all byte
+        // beats have completed; these two flags remain explicit tie-offs at
+        // this normalized composition boundary.
+        .cpu_odd_word_active    (1'b0),
+        .cpu_inta_lock_chain    (1'b0),
+        .cpu_response_pending   (at_valid),
+        .dma_request            (dma_bus_request),
+        .refresh_request        (refresh_request),
+        .loader_request         (1'b0),
+        .loader_reset_owner     (1'b0),
+        .external_done          ((dma_grant && dma_transfer_complete) ||
+                                 (refresh_grant && refresh_complete)),
+        .cpu_hold_request       (cpu_hold_request),
+        .cpu_grant              (cpu_grant),
+        .external_grant         (external_grant),
+        .bus_owner_valid        (bus_owner_valid),
+        .bus_owner              (bus_owner),
+        .dma_grant              (dma_grant),
+        .refresh_grant          (refresh_grant),
+        .loader_grant           (loader_grant),
+        .protocol_error         (arbiter_protocol_error)
+    );
+
+    assign io_sink_accept = io_unmapped_candidate && at_command_valid &&
+                            !io_sink_active_q;
+    assign io_sink_ready = io_sink_active_q;
+    assign io_sink_read_data = io_sink_lane_q[1] ? 16'hFF00 : 16'h00FF;
+    assign io_sink_read_data_valid = io_sink_ready && io_sink_read_q;
+
+    assign memory_sink_accept = memory_unmapped_candidate &&
+                                at_command_valid && !memory_sink_active_q;
+    assign memory_sink_ready = memory_sink_active_q;
+    assign memory_sink_read_data = (memory_sink_lane_q == 2'b11) ?
+                                   16'hFFFF :
+                                   (memory_sink_lane_q[1] ?
+                                    16'hFF00 : 16'h00FF);
+    assign memory_sink_read_data_valid = memory_sink_ready &&
+                                         memory_sink_read_q;
+
+    assign unmapped_request = io_unmapped_candidate ||
+                              memory_unmapped_candidate ||
+                              devices_unmapped_request;
+
+    // A blocked ROM write is a completed no-op.  It is kept separate from
+    // the unmapped-I/O sink so the memory policy remains visible in traces.
+    always_ff @(posedge clk) begin
+        if (reset) begin
+            io_sink_active_q <= 1'b0;
+            io_sink_read_q <= 1'b0;
+            io_sink_lane_q <= 2'b00;
+            memory_sink_active_q <= 1'b0;
+            memory_sink_read_q <= 1'b0;
+            memory_sink_lane_q <= 2'b00;
+            rom_write_sink_active_q <= 1'b0;
+            dma_memory_accept_q <= 1'b0;
+            nmi_source_active_q <= 1'b0;
+            nmi <= 1'b0;
+        end else begin
+            if (io_sink_active_q)
+                io_sink_active_q <= 1'b0;
+            if (memory_sink_active_q)
+                memory_sink_active_q <= 1'b0;
+            if (rom_write_sink_active_q)
+                rom_write_sink_active_q <= 1'b0;
+
+            if (io_sink_accept) begin
+                io_sink_active_q <= 1'b1;
+                io_sink_read_q <= !at_write;
+                io_sink_lane_q <= at_byte_enable;
+            end
+            if (memory_sink_accept) begin
+                memory_sink_active_q <= 1'b1;
+                memory_sink_read_q <= !at_write;
+                memory_sink_lane_q <= at_byte_enable;
+            end
+            if (rom_write_sink_accept)
+                rom_write_sink_active_q <= 1'b1;
+
+            if (!dma_transfer_valid)
+                dma_memory_accept_q <= 1'b0;
+            else if (dma_memory_accept)
+                dma_memory_accept_q <= 1'b1;
+
+            nmi <= (system_check_pending || external_nmi_event) &&
+                   !nmi_source_active_q && !nmi_mask;
+            nmi_source_active_q <= (system_check_pending || external_nmi_event) && !nmi_mask;
+        end
+    end
+
+    always_comb begin
+        at_accept = (memory_command_valid && memory_accept) ||
+                    memory_sink_accept ||
+                    rom_write_sink_accept ||
+                    devices_request_accept || pic_request_accept ||
+                    pit_request_accept || dma_config_accept ||
+                    sys_request_accept || io_sink_accept;
+
+        at_ready = (memory_request_valid && memory_ready) ||
+                   memory_sink_ready ||
+                   rom_write_sink_ready || devices_request_ready ||
+                   pic_request_ready || pit_request_ready ||
+                   dma_config_ready || sys_request_ready || io_sink_ready;
+
+        at_read_data = 16'h0000;
+        at_read_data_valid = 1'b0;
+        if (memory_request_valid && memory_ready &&
+            memory_read_data_valid) begin
+            at_read_data = memory_read_data;
+            at_read_data_valid = 1'b1;
+        end else if (memory_sink_ready && memory_sink_read_data_valid) begin
+            at_read_data = memory_sink_read_data;
+            at_read_data_valid = 1'b1;
+        end else if (devices_request_ready && devices_read_data_valid) begin
+            at_read_data = devices_read_data;
+            at_read_data_valid = 1'b1;
+        end else if (pic_request_ready && pic_read_data_valid) begin
+            at_read_data = pic_read_data;
+            at_read_data_valid = 1'b1;
+        end else if (pit_request_ready && pit_read_data_valid) begin
+            at_read_data = pit_read_data;
+            at_read_data_valid = 1'b1;
+        end else if (dma_config_ready && dma_config_read_data_valid) begin
+            at_read_data = dma_config_read_data;
+            at_read_data_valid = 1'b1;
+        end else if (sys_request_ready && sys_read_valid) begin
+            at_read_data = sys_read_data;
+            at_read_data_valid = 1'b1;
+        end else if (io_sink_ready && io_sink_read_data_valid) begin
+            at_read_data = io_sink_read_data;
+            at_read_data_valid = 1'b1;
+        end
+    end
+
+    assign debug_bridge_error = bridge_protocol_error | arbiter_protocol_error |
+                                pic_protocol_error | pit_protocol_error |
+                                dma_protocol_error | refresh_protocol_error |
+                                devices_protocol_error | sys_protocol_error;
+
+    assign cpu_fault = spk_shutdown | spk_control_error |
+                       spk_unsupported_opcode | spk_microcode_fault |
+                       spk_operand_blocked | debug_bridge_error;
+
+    assign protocol_error = cpu_fault;
+endmodule

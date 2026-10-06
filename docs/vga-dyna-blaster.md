@@ -16,14 +16,14 @@ the plane is `x mod 4`. Thus Offset `40h` selects 128 bytes per plane row
 (512 virtual pixels), and Offset `20h` selects 64 bytes per row (256 pixels).
 The game also changes Start Address, pel panning, and Line Compare during play.
 
-`VGATSR.COM` maps the mode `12h` BIOS request to the EGA BIOS's planar mode
-`0Dh`, reports mode `12h` in the BIOS Data Area, and writes `12h` to VGA+'s
-private control port. VGA+ continues to use the EGA display until it sees the
-256×232 timing, one of those two offsets, byte addressing, 256-colour shift,
-and unchained A000h planar memory. It then renders the game's four VGA planes.
-The existing packed mode `13h`, planar `0Dh`, and other unchained profiles
-retain their original selectors. A normal VGA 640×480×16 mode `12h` is outside
-the implemented scope.
+`VGATSR.COM` lets the EGA BIOS establish planar mode `0Dh` for a mode `12h`
+request, loads the IBM VGA mode `12h` registers over it, reports mode `12h` in
+the BIOS Data Area, and writes `12h` to VGA+'s private control port. VGA+
+displays that baseline through its 640×480 planar profile (see
+`vga-pinball-fantasies.md`) until it sees the 256×232 timing, one of those two
+offsets, byte addressing, 256-colour shift, and unchained A000h planar memory.
+It then renders the game's four VGA planes. The existing packed mode `13h`,
+planar `0Dh`, and other unchained profiles retain their original selectors.
 
 The TV output emits 256×232 logical pixels in an 1824-clock × 262-line
 15.7 kHz / 59.9 Hz frame. Native doubles pixels and lines to 512×464 output
